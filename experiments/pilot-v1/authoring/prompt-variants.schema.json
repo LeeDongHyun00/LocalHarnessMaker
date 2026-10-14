@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["frontend", "backend"],
+  "properties": {
+    "frontend": {"$ref": "#/$defs/variants"},
+    "backend": {"$ref": "#/$defs/variants"}
+  },
+  "$defs": {
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["A", "B", "C", "D", "E", "mentioned_requirement_ids", "review_notes"],
+      "properties": {
+        "A": {"type": "string"}, "B": {"type": "string"},
+        "C": {"type": "string"}, "D": {"type": "string"}, "E": {"type": "string"},
+        "mentioned_requirement_ids": {
+          "type": "object", "additionalProperties": false,
+          "required": ["A", "B", "C", "D", "E"],
+          "properties": {
+            "A": {"type": "array", "items": {"type": "string"}},
+            "B": {"type": "array", "items": {"type": "string"}},
+            "C": {"type": "array", "items": {"type": "string"}},
+            "D": {"type": "array", "items": {"type": "string"}},
+            "E": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "review_notes": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

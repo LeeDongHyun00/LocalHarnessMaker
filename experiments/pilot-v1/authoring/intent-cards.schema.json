@@ -1,0 +1,76 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["frontend", "backend"],
+  "properties": {
+    "frontend": {"$ref": "#/$defs/card"},
+    "backend": {"$ref": "#/$defs/card"}
+  },
+  "$defs": {
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "domain", "title", "purpose", "target_users", "scenario", "common_context", "requirements", "user_decisions", "optional", "out_of_scope", "implementation_defaults", "limitations"],
+      "properties": {
+        "project_id": {"type": "string"},
+        "domain": {"type": "string", "enum": ["frontend", "backend"]},
+        "title": {"type": "string"},
+        "purpose": {"type": "string"},
+        "target_users": {"type": "array", "items": {"type": "string"}},
+        "scenario": {"type": "string"},
+        "common_context": {"type": "string"},
+        "requirements": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "statement", "critical", "acceptance", "evaluation_method", "correction_feedback"],
+            "properties": {
+              "id": {"type": "string"},
+              "statement": {"type": "string"},
+              "critical": {"type": "boolean"},
+              "acceptance": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["given", "when", "then"],
+                  "properties": {
+                    "given": {"type": "string", "minLength": 1},
+                    "when": {"type": "string", "minLength": 1},
+                    "then": {"type": "string", "minLength": 1}
+                  }
+                }
+              },
+              "evaluation_method": {"type": "string", "enum": ["browser", "http", "artifact", "manual"]},
+              "correction_feedback": {"type": "string"}
+            }
+          }
+        },
+        "user_decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "topic", "question_examples", "answer", "requirement_ids"],
+            "properties": {
+              "id": {"type": "string"},
+              "topic": {"type": "string"},
+              "question_examples": {"type": "array", "items": {"type": "string"}},
+              "answer": {"type": "string"},
+              "requirement_ids": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        },
+        "optional": {"type": "array", "items": {"type": "string"}},
+        "out_of_scope": {"type": "array", "items": {"type": "string"}},
+        "implementation_defaults": {"type": "array", "items": {"type": "string"}},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "reviewer": "working_assistant",
+  "review_type": "structural_and_consistency_review_not_performance_evaluation",
+  "original_source": "authoring/teacher-intent-cards.original.json",
+  "original_sha256": "b7c19ca820cd0f18d2e0da49ad7c4df5066b80b30b9960d71fabcfb2e7a8cc55",
+  "changes": [
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F1",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F1",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F2",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F2",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F3",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F3",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F3",
+      "scenario": 3,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F4",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F4",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F5",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F5",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F6",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F6",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F7",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "frontend-001",
+      "requirement_id": "F7",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B1",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B1",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B2",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B3",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B3",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B3",
+      "scenario": 3,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B4",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B4",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B5",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B5",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B5",
+      "scenario": 3,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B6",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B6",
+      "scenario": 2,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B6",
+      "scenario": 3,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B7",
+      "scenario": 1,
+      "change": "Move explicit (Then) suffix from when to then without changing its text."
+    },
+    {
+      "project_id": "backend-001",
+      "requirement_id": "B6",
+      "change": "Clarify end <= start as invalid, matching the existing equal-time acceptance case."
+    }
+  ],
+  "new_requirements_added": false,
+  "reviewed_before_prompt_authoring": true
+}

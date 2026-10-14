@@ -1,0 +1,53 @@
+{
+  "version": "pilot-v1-draft-1",
+  "status": "draft_not_frozen",
+  "question_policy": {
+    "all_arms_can_ask": true,
+    "answer_source": "project intent-card.json user_decisions, requirements and implementation_defaults",
+    "routing": "사람이 질문의 의미를 확인해 관련 답만 선택한다. 키워드 자동 매칭으로 답변을 확정하지 않는다.",
+    "compound_questions": "실제로 물은 주제의 답만 합쳐 제공한다.",
+    "broad_requirements_question": "프로젝트 기능을 구체적으로 묻는 경우 관련 사용자 요구사항 문장만 답한다. 테스트 시나리오와 군 정보는 제공하지 않는다.",
+    "unknown_answer": "그 부분은 별도 요구사항이 없습니다. 명시된 목표와 기존 제약을 지키는 구현 방식을 선택해주세요.",
+    "unresolved_material_question": "답변표에 없는 중요한 결정이면 unresolved로 기록하고 같은 답변을 반복 실행에 재사용한다. 원본 변경은 새 프로토콜로 처리한다.",
+    "record_fields": ["run_id", "turn_index", "question", "matched_decision_ids", "answer", "answer_source", "unresolved", "elapsed_seconds"],
+    "suggested_max_question_rounds": 3
+  },
+  "correction_policy": {
+    "source": "고정된 요구사항별 판정과 correction_feedback",
+    "ordering": "critical 요구사항 먼저, 이후 숫자 ID 오름차순",
+    "batching": "그 회차의 미충족 필수 요구사항을 한 메시지로 모두 전달한다.",
+    "no_new_features": true,
+    "no_test_source_or_other_artifacts": true,
+    "stop_when": "모든 필수 요구사항 통과 또는 공통 실행 한도 도달",
+    "suggested_max_correction_rounds": 3,
+    "internal_repairs_are_separate": true,
+    "new_user_requirements_are_separate": true
+  },
+  "submission_policy": {
+    "first_submission": "처음 완료했다고 제출한 턴 직후 코드·결과물·사용량·질문 기록을 보존한다.",
+    "question_only_turn_is_submission": false,
+    "no_first_submission": "첫 완료 제출 전에 한도에 도달하면 no_first_submission으로 기록하고 실패를 제외하지 않는다.",
+    "final_submission": "통과 또는 한도 도달 시점. 첫 제출 스냅샷을 덮어쓰지 않는다."
+  },
+  "blinding_policy": {
+    "development_workspace": "공통 시작 자료와 배정 프롬프트만 전달. 원본·다른 군·평가 코드·대응표는 제외한다.",
+    "evaluator_package": "익명 artifact_id, 결과물, 같은 평가 기준과 실행 안내만 제공한다.",
+    "excluded_fields": ["arm", "prompt", "authoring_model", "conversation", "teacher_explanation", "run_id"],
+    "mapping_storage": "프로젝트 밖의 평가자 접근 불가능한 로컬 경로. GitHub에 게시하지 않는다.",
+    "randomized_order": true,
+    "allow_ties": true,
+    "artifact_content_must_not_change": true,
+    "code_can_reveal_technology": "이 한계를 기록하며 기술의 존재를 숨기기 위해 동작·소스를 바꾸지 않는다."
+  },
+  "evaluation_policy": {
+    "requirement_pass": "해당 요구사항의 모든 acceptance 시나리오가 통과해야 pass다.",
+    "measurement_failure": "측정 오류는 not_evaluated로 기록하고 요구사항 실패와 구분한다. 완료로 처리하지 않는다.",
+    "completion": "모든 필수 요구사항 통과. critical 통과와 전체 충족률도 별도 기록한다.",
+    "critical_failure_cannot_be_offset": true,
+    "visual_scores": "사용성·시각적 일관성을 각각 1~5점으로 평가하되 기능 통과를 대체하지 않는다.",
+    "judges": "가능하면 독립 평가자 2명. 불일치는 기록하고 제3자 검토 또는 합의 절차로 해결한다.",
+    "pilot_analysis": "A~E의 프로젝트 내 대응 비교와 개별 실패를 기술한다. 2프로젝트로 일반적 우수성을 주장하지 않는다.",
+    "main_comparison": "C versus A",
+    "secondary_comparisons": ["B versus A", "D versus C", "E versus C"]
+  }
+}

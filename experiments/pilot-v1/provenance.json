@@ -1,0 +1,69 @@
+{
+  "version": "pilot-v1-draft-1",
+  "source": "gpt-6.1-sol_teacher_output_with_recorded_review",
+  "requested_teacher": "gpt-6.1-sol",
+  "actual_teacher_output": true,
+  "training_eligible": false,
+  "intent_cards_reviewed": true,
+  "prompt_variants_reviewed": true,
+  "generation_attempts": [
+    {
+      "operation": "intent_cards",
+      "transport": "codex exec --model gpt-6.1-sol --sandbox read-only --ephemeral --output-schema",
+      "exit_code": 1,
+      "output_generated": false,
+      "failure_category": "authentication_refresh_failed",
+      "failure_message": "Your access token could not be refreshed because you have since logged out or signed in to another account. Please sign in again."
+    },
+    {
+      "operation": "intent_cards",
+      "transport": "codex exec --model gpt-6.1-sol --sandbox read-only --ephemeral --output-schema",
+      "model_requested": "gpt-6.1-sol",
+      "server_snapshot_id": null,
+      "exit_code": 0,
+      "elapsed_seconds": 185.1,
+      "output_generated": true,
+      "output_source": "authoring/teacher-intent-cards.original.json",
+      "output_sha256": "b7c19ca820cd0f18d2e0da49ad7c4df5066b80b30b9960d71fabcfb2e7a8cc55",
+      "request_sha256": "22ee56d12b6e6ad0488cb33440a4756607956a90208e300fb16f82b92b4e0b77",
+      "request_schema": "authoring/intent-cards.request-schema.json",
+      "request_schema_sha256": "17f58818729b076551a73889090b017ba4bb4be57ceca7f2a43256633bfac098",
+      "usage": {
+        "input_tokens": 15292,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 6480,
+        "reasoning_output_tokens": 82
+      }
+    },
+    {
+      "operation": "prompt_variants",
+      "transport": "codex exec --model gpt-6.1-sol --sandbox read-only --ephemeral --output-schema",
+      "model_requested": "gpt-6.1-sol",
+      "server_snapshot_id": null,
+      "exit_code": 0,
+      "elapsed_seconds": 117.3,
+      "output_generated": true,
+      "output_source": "authoring/teacher-prompt-variants.original.json",
+      "output_sha256": "82b4dfb9ec86aab1935710223448ef66f0da3c8c6d171aa728d6ade540add516",
+      "request_sha256": "ee897eb15fd1d0fe5e23ff024ac4fef58b0b365ceb3a756cd0e27d5a04358f65",
+      "request_schema": "authoring/prompt-variants.schema.json",
+      "request_schema_sha256": "9568ece7caa03642be84b54476f4ccd389b96c784e8c7da9a94631d926c3ec77",
+      "usage": {
+        "input_tokens": 21258,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4742,
+        "reasoning_output_tokens": 41
+      }
+    }
+  ],
+  "limitations": [
+    "모델 ID는 CLI에 명시한 요청 값이며 응답에서 별도 불변 서버 스냅샷 ID는 노출되지 않았다.",
+    "요구사항 원본에 형식·일관성 검토를 반영했고 원본 및 변경 내역을 보존했다.",
+    "교사 생성 성공은 구체화·질문·추천의 성능 개선을 입증하지 않는다.",
+    "인증 코드·토큰·원시 CLI 로그는 GitHub에 저장하지 않는다."
+  ],
+  "reviewer": "working_assistant",
+  "review_type": "structural_and_semantic_review_not_independent_outcome_evaluation"
+}

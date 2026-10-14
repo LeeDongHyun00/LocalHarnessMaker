@@ -1,0 +1,66 @@
+{
+  "protocol_version": "pilot-v1-draft-1",
+  "status": "draft_not_frozen",
+  "purpose": "단계 0 준비. 개발 실험을 실행한 설정으로 해석하지 않는다.",
+  "model": {
+    "requested_id": "gpt-6.1-sol",
+    "confirmed_id": null,
+    "version_snapshot": null,
+    "transport": "Codex CLI through ChatGPT login",
+    "reasoning_effort": null,
+    "successful_call_verified": true,
+    "auth_status": "verified_success_after_device_login",
+    "identity_basis": "Explicit CLI model selection and successful turn; server snapshot not returned.",
+    "authoring_reasoning_settings": "CLI defaults; no independent setting pin was asserted."
+  },
+  "environment_observed": {
+    "codex_cli": "0.159.2",
+    "node": "24.19.0",
+    "python": "3.12.14",
+    "jsonschema": "4.26.0",
+    "playwright_python": "1.62.0",
+    "browser_runtime_verified": true,
+    "starting_repository_commits": null,
+    "dependency_lockfiles": null,
+    "isolated_workspaces_verified": false,
+    "chromium": "151.0.7922.34",
+    "browser_timezone": "Asia/Seoul"
+  },
+  "candidate_limits": {
+    "projects": 2,
+    "arms": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "independent_repetitions": 2,
+    "development_runs": 20,
+    "max_question_rounds": 3,
+    "max_correction_rounds": 3,
+    "initial_submission_wall_seconds": 600,
+    "whole_run_wall_seconds": 1200,
+    "development_reasoning_effort": "medium"
+  },
+  "required_before_freeze": {
+    "actual_teacher_generation_and_review": true,
+    "model_and_reasoning_settings_verified": false,
+    "workspace_and_dependency_versions_locked": false,
+    "functional_evaluators_validated": false,
+    "question_and_correction_transport_verified": false,
+    "blinding_package_and_access_validated": false,
+    "judges_assigned": false,
+    "scope_and_limits_finalized": false,
+    "usage_and_cost_limits_enforceable": false
+  },
+  "undecided": {
+    "total_usage_cap": null,
+    "billing_mode_and_monetary_cap": null,
+    "main_effect_threshold": null,
+    "allowed_quality_degradation": null,
+    "allowed_question_burden": null,
+    "statistical_analysis_for_main_study": null
+  },
+  "pilot_claim_scope": "검증 절차와 개별 대응 결과 확인. 보편적 성능 우위나 기술 우수성을 주장하지 않는다."
+}

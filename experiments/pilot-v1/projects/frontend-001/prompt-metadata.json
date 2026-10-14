@@ -1,0 +1,65 @@
+{
+  "source": "gpt-6.1-sol_teacher_output",
+  "status": "draft_not_frozen",
+  "mentioned_requirement_ids": {
+    "A": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5"
+    ],
+    "B": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5"
+    ],
+    "C": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5",
+      "F6",
+      "F7"
+    ],
+    "D": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5",
+      "F6",
+      "F7"
+    ],
+    "E": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5",
+      "F6",
+      "F7"
+    ]
+  },
+  "id_mention_is_not_full_coverage": true,
+  "B_adds_facts_to_A": false,
+  "D_adds_requirements_to_C": false,
+  "D_fixes_implementation_choices": false,
+  "E_is_exact_C_plus_candidate": true,
+  "teacher_self_review_completed": true,
+  "working_assistant_review_completed": true,
+  "review_notes": [
+    "A와 B는 등록 항목, 목록 확인, 소비에 따른 수량 감소, 기한별 조회, 이름 검색, 새로고침 후 기록 유지라는 같은 정보를 담으며 B에는 새로운 결정이나 기술을 추가하지 않았다.",
+    "C와 D는 모든 필수 요구사항과 동일한 제외 범위를 담는다. D는 설명만 확장했으며 새로운 기능이나 구현 제약을 추가하지 않았다.",
+    "D에는 구체적인 테스트 입력 예시를 사용하지 않아 acceptance 입력을 재사용하지 않았다.",
+    "E는 C 문자열을 그대로 복사한 뒤 빈 줄 하나와 검증 전 가설로 표시한 기술 제안 문단만 추가했다.",
+    "요구사항 ID 목록은 해당 내용의 언급을 나타내며 acceptance 전체 충족을 보장하지 않는다. 이 메모는 작성자의 자기 검토이며 실행 결과나 독립 평가가 아니다."
+  ],
+  "review_limitations": [
+    "형식·의미 검토는 실제 개발 결과 검증이나 독립 평가가 아니다.",
+    "E는 기술 후보와 구현 안내를 함께 제공하므로 특정 기술의 단독 효과를 분리하지 않는다."
+  ]
+}
