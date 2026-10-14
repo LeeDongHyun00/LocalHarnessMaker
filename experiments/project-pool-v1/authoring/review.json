@@ -1,0 +1,93 @@
+{
+  "reviewer": "working_assistant",
+  "review_type": "structural_and_semantic_design_review_not_performance_evaluation",
+  "schema_valid_before_review": true,
+  "new_behavior_added": false,
+  "changes": [
+    {
+      "project_id": "fullstack-001",
+      "path": [
+        "requirements",
+        0,
+        "statement"
+      ],
+      "before": "제목·내용·이메일을 검증하여 접수하고, 고유 접수 번호와 고객 조회 토큰을 반환한다. 제목과 내용은 공백 제거 후 비어 있으면 안 되며 이메일은 로컬 부분과 도메인을 포함해야 한다.",
+      "after": "제목·내용·이메일을 검증하여 접수하고, 고유 접수 번호와 고객 조회 토큰을 반환한다. 제목과 내용은 공백 제거 후 비어 있으면 안 되며 이메일은 로컬 부분과 도메인을 포함해야 한다. 성공은 HTTP 201과 status new이며 잘못된 입력은 HTTP 400과 error.code VALIDATION_ERROR다.",
+      "reason": "Make existing acceptance codes and initial status explicit; no new behavior."
+    },
+    {
+      "project_id": "fullstack-001",
+      "path": [
+        "requirements",
+        2,
+        "statement"
+      ],
+      "before": "상태는 new→in_progress→resolved 순서로만 전환한다. 역방향 전환과 단계 건너뛰기는 HTTP 409로 거절하고 상태를 유지한다.",
+      "after": "상태는 new→in_progress→resolved 순서로만 전환한다. 역방향 전환과 단계 건너뛰기는 HTTP 409로 거절하고 상태를 유지한다. 해당 오류의 error.code는 INVALID_TRANSITION이다.",
+      "reason": "Make existing acceptance codes and initial status explicit; no new behavior."
+    },
+    {
+      "project_id": "fullstack-001",
+      "path": [
+        "requirements",
+        3,
+        "statement"
+      ],
+      "before": "공개 답변과 내부 메모를 저장한다. 고객 조회에는 공개 답변만 포함하며, 담당자 조회에는 두 종류 모두 포함한다. 잘못된 고객 토큰은 HTTP 403으로 거절한다.",
+      "after": "공개 답변과 내부 메모를 저장한다. 고객 조회에는 공개 답변만 포함하며, 담당자 조회에는 두 종류 모두 포함한다. 잘못된 고객 토큰은 HTTP 403으로 거절한다. 잘못된 토큰의 error.code는 FORBIDDEN이다.",
+      "reason": "Make existing acceptance codes and initial status explicit; no new behavior."
+    },
+    {
+      "project_id": "fullstack-001",
+      "path": [
+        "initial_requests",
+        "clear",
+        "text"
+      ],
+      "before": "고객 요청 서비스를 새로 만들어 주세요. 제목·내용은 공백 제거 후 필수이고 이메일은 로컬 부분과 도메인이 필요합니다. 접수 번호와 조회 토큰을 발급하고 잘못된 토큰은 403으로 거절하세요. 상태는 new→in_progress→resolved만 허용하며 다른 전환은 409입니다. 담당자 목록은 기본 전체, 상태 필터와 생성 시각 내림차순 정렬을 제공하고 동률은 id 오름차순입니다. 공개 답변과 내부 메모를 구분해 고객에게는 공개 답변만 보여 주세요. 접수·조회·담당자 처리 화면을 제공하고 실패 시 오류와 기존 입력을 유지하세요. 모든 데이터와 토큰은 재시작 후에도 유지해 주세요.",
+      "after": "고객 요청 서비스를 새로 만들어 주세요. 제목·내용은 공백 제거 후 필수이고 이메일은 로컬 부분과 도메인이 필요합니다. 접수 번호와 조회 토큰을 발급하고 잘못된 토큰은 403으로 거절하세요. 상태는 new→in_progress→resolved만 허용하며 다른 전환은 409입니다. 담당자 목록은 기본 전체, 상태 필터와 생성 시각 내림차순 정렬을 제공하고 동률은 id 오름차순입니다. 공개 답변과 내부 메모를 구분해 고객에게는 공개 답변만 보여 주세요. 접수·조회·담당자 처리 화면을 제공하고 실패 시 오류와 기존 입력을 유지하세요. 모든 데이터와 토큰은 재시작 후에도 유지해 주세요. 접수 성공은 201과 초기 상태 new, 입력 오류는 400 VALIDATION_ERROR, 잘못된 토큰은 403 FORBIDDEN, 잘못된 상태 전환은 409 INVALID_TRANSITION으로 응답하세요.",
+      "reason": "Align clear request with already specified acceptance error codes."
+    },
+    {
+      "project_id": "fullstack-001",
+      "path": [
+        "common_context"
+      ],
+      "before": "Linux, Node.js 24, Python 3.12와 로컬 브라우저를 사용할 수 있다. 외부 계정이나 비밀 키는 필요 없다. 서비스는 PORT 환경변수의 포트에서 HTTP로 실행한다. JSON은 UTF-8이며 날짜는 UTC ISO 8601이다. 공개 계약은 POST /api/requests, GET /api/requests/:id, GET /api/staff/requests, PATCH /api/staff/requests/:id, POST /api/staff/requests/:id/messages다. 메시지 입력은 {visibility,body}이며 visibility는 public 또는 internal이다. 고객 조회는 접수 시 반환된 receiptToken을 X-Receipt-Token으로 전달한다. 담당자 API는 X-Test-Actor: staff-a를 사용하며 실제 인증은 구현하지 않는다. 브라우저 경로는 /submit, /track/:id, /staff다. 요청 필드는 id, subject, description, email, status, createdAt이다. 시작 데이터는 빈 목록이다. 오류 응답은 {error:{code,message}} 형식이다.",
+      "after": "Linux, Node.js 24, Python 3.12와 로컬 브라우저를 사용할 수 있다. 외부 계정이나 비밀 키는 필요 없다. 서비스는 PORT 환경변수의 포트에서 HTTP로 실행한다. JSON은 UTF-8이며 날짜는 UTC ISO 8601이다. 공개 계약은 POST /api/requests, GET /api/requests/:id, GET /api/staff/requests, PATCH /api/staff/requests/:id, POST /api/staff/requests/:id/messages다. 메시지 입력은 {visibility,body}이며 visibility는 public 또는 internal이다. 고객 조회는 접수 시 반환된 receiptToken을 X-Receipt-Token으로 전달한다. 담당자 API는 X-Test-Actor: staff-a를 사용하며 실제 인증은 구현하지 않는다. 브라우저 경로는 /submit, /track/:id, /staff다. 요청 필드는 id, subject, description, email, status, createdAt이다. 시작 데이터는 빈 목록이다. 오류 응답은 {error:{code,message}} 형식이다. 공통 응답 형태에서 GET /api/staff/requests는 요청 객체 배열이고 GET /api/requests/:id는 단일 요청 객체다. 두 조회의 요청 객체는 messages 배열을 가질 수 있으며 메시지 필드는 visibility와 body다. 각 조회에서 허용할 메시지 범위는 요구사항에서 정한다. 담당자 메시지는 목록 조회로 확인하므로 별도 단건 경로를 추가할 의무는 없다. 데이터 디렉터리는 DATA_DIR로 지정한다.",
+      "reason": "Complete transport and storage contracts for existing message-viewing and restart requirements."
+    },
+    {
+      "project_id": "fullstack-002",
+      "path": [
+        "common_context"
+      ],
+      "before": "Linux, Node.js 24, Python 3.12와 로컬 브라우저에서 재현한다. 앞으로 준비할 기준 스택은 React, Express, SQLite이며 외부 서비스는 없다. 서버 포트는 PORT, SQLite 경로는 DATA_FILE로 지정한다. UTF-8 JSON을 사용한다. X-Test-Actor 헤더의 로컬 식별자는 manager-a, worker-a, reviewer-a, viewer-a, reviewer-b이며 브라우저의 테스트 사용자 선택기로 같은 식별자를 선택한다. team-a에는 앞의 네 사용자, team-b에는 reviewer-b가 속한다. fixture 업무 task-a는 team-a, 담당자 worker-a, 상태 todo이며 task-b는 team-b, 담당자 reviewer-b, 상태 todo다. API는 GET /api/tasks, GET /api/tasks/:id, PATCH /api/tasks/:id, POST /api/tasks/:id/review-request, POST /api/tasks/:id/review-decision, GET /api/tasks/:id/history, PATCH /api/teams/:id/members/:actor다. 업무 필드는 id, teamId, title, assigneeId, status다. 검토 결정 입력은 {decision,comment}이다. 역할 변경 입력은 {role}이다. 오류는 {error:{code,message}}다. 브라우저 경로는 /tasks와 /team/members다. 실제 로그인 서비스는 범위에 없다.",
+      "after": "Linux, Node.js 24, Python 3.12와 로컬 브라우저에서 재현한다. 앞으로 준비할 기준 스택은 React, Express, SQLite이며 외부 서비스는 없다. 서버 포트는 PORT, SQLite 경로는 DATA_FILE로 지정한다. UTF-8 JSON을 사용한다. X-Test-Actor 헤더의 로컬 식별자는 manager-a, worker-a, reviewer-a, viewer-a, reviewer-b이며 브라우저의 테스트 사용자 선택기로 같은 식별자를 선택한다. team-a에는 앞의 네 사용자, team-b에는 reviewer-b가 속한다. fixture 업무 task-a는 team-a, 담당자 worker-a, 상태 todo이며 task-b는 team-b, 담당자 reviewer-b, 상태 todo다. API는 GET /api/tasks, GET /api/tasks/:id, PATCH /api/tasks/:id, POST /api/tasks/:id/review-request, POST /api/tasks/:id/review-decision, GET /api/tasks/:id/history, PATCH /api/teams/:id/members/:actor다. 업무 필드는 id, teamId, title, assigneeId, status다. 검토 결정 입력은 {decision,comment}이다. 역할 변경 입력은 {role}이다. 오류는 {error:{code,message}}다. 브라우저 경로는 /tasks와 /team/members다. 실제 로그인 서비스는 범위에 없다. 기존 GET /api/teams/:id/members는 actor와 role을 가진 구성원 배열을 반환한다. 검토 요청·결정의 성공은 200과 갱신된 업무 객체다. 시작 역할은 manager-a=manager, worker-a=worker, reviewer-a=viewer, viewer-a=viewer, reviewer-b=viewer이며 사용자 이름은 현재 역할을 뜻하지 않는다. reviewer가 필요한 시나리오는 먼저 공개 역할 변경 API로 설정한다.",
+      "reason": "Expose existing member lookup and specify neutral test setup rather than inferring roles from names."
+    },
+    {
+      "project_id": "fullstack-003",
+      "path": [
+        "common_context"
+      ],
+      "before": "Linux, Node.js 24, Python 3.12와 로컬 브라우저를 사용한다. 앞으로 준비할 기준 스택은 Vue 3, FastAPI, SQLite다. PORT와 DATA_FILE로 실행 위치를 지정한다. 브라우저 경로는 /reservations이다. 로컬 사용자 user-a, user-b를 X-Test-Actor로 전달하며 실제 인증은 없다. UTF-8 JSON 계약은 GET /api/seats?date=YYYY-MM-DD와 POST /api/reservations이고 예약 입력은 {date,seatId}, 응답 항목은 {date,seatId,reservationId,ownerId}다. fixture 날짜 2026-11-02와 2026-11-03에는 각각 S1, S2가 있다. 첫 날짜의 S1은 user-b 예약, 나머지는 비어 있다. GET 응답은 {date,seats:[{seatId,reservationId,ownerId}]}이며 빈 좌석의 두 예약 필드는 null이다. 오류는 {error:{code,message}}다. 로컬 fixture 서버의 POST /__fixture/reset은 데이터를 초기화하고 POST /__fixture/rules는 {rules:[{method,path,query,delayMs,status,body,times}]}로 다음 일치 요청의 지연·오류를 지정한다. 생략한 query는 모든 쿼리에 일치하며 times는 적용 횟수다. 성공 지연 GET은 요청 수신 시점의 응답을 보관했다가 반환한다. 이 fixture 제어는 운영 UI에 노출하지 않는다.",
+      "after": "Linux, Node.js 24, Python 3.12와 로컬 브라우저를 사용한다. 앞으로 준비할 기준 스택은 Vue 3, FastAPI, SQLite다. PORT와 DATA_FILE로 실행 위치를 지정한다. 브라우저 경로는 /reservations이다. 로컬 사용자 user-a, user-b를 X-Test-Actor로 전달하며 실제 인증은 없다. UTF-8 JSON 계약은 GET /api/seats?date=YYYY-MM-DD와 POST /api/reservations이고 예약 입력은 {date,seatId}, 응답 항목은 {date,seatId,reservationId,ownerId}다. fixture 날짜 2026-11-02와 2026-11-03에는 각각 S1, S2가 있다. 첫 날짜의 S1은 user-b 예약, 나머지는 비어 있다. GET 응답은 {date,seats:[{seatId,reservationId,ownerId}]}이며 빈 좌석의 두 예약 필드는 null이다. 오류는 {error:{code,message}}다. 로컬 fixture 서버의 POST /__fixture/reset은 데이터를 초기화하고 POST /__fixture/rules는 {rules:[{method,path,query,delayMs,status,body,times}]}로 다음 일치 요청의 지연·오류를 지정한다. 생략한 query는 모든 쿼리에 일치하며 times는 적용 횟수다. 성공 지연 GET은 요청 수신 시점의 응답을 보관했다가 반환한다. 이 fixture 제어는 운영 UI에 노출하지 않는다. 기존 충돌 오류 code는 SEAT_TAKEN이다. GET /__fixture/requests는 {items:[{method,path,query,body}]} 형식의 기록을 제공하며 예약 POST 수를 이 기록에서 확인한다. fixture 제어 요청은 업무 요청 수에 포함하지 않는다.",
+      "reason": "Complete existing conflict and request-log fixture contract needed by preservation and duplicate-submission criteria."
+    },
+    {
+      "project_id": "cli-data-002",
+      "path": [
+        "common_context"
+      ],
+      "before": "Linux, Python 3.12, Node.js 24와 로컬 브라우저를 사용할 수 있다. 앞으로 준비할 기준 구현의 스택은 Python 3.12다. 공개 명령은 ./records-convert --input <파일> --output <파일.csv> --fields <쉼표로 구분한 필드 목록> [--format json|ndjson]이다. 기존 --format 생략값은 json이다. JSON 입력은 객체 배열이고 NDJSON의 각 비어 있지 않은 물리적 줄은 하나의 JSON 값이다. 입력과 출력은 UTF-8이며 출력은 첫 레코드가 헤더인 표준 CSV다. 성공은 종료 코드 0, 입력 오류는 1과 stderr 진단으로 전달한다. fixture는 로컬 임시 파일이며 외부 계정이나 서비스는 필요 없다.",
+      "after": "Linux, Python 3.12, Node.js 24와 로컬 브라우저를 사용할 수 있다. 앞으로 준비할 기준 구현의 스택은 Python 3.12다. 공개 명령은 ./records-convert --input <파일> --output <파일.csv> --fields <쉼표로 구분한 필드 목록> [--format json|ndjson]이다. 기존 --format 생략값은 json이다. JSON 입력은 객체 배열이고 NDJSON의 각 비어 있지 않은 물리적 줄은 하나의 JSON 값이다. 입력과 출력은 UTF-8이며 출력은 첫 레코드가 헤더인 표준 CSV다. 성공은 종료 코드 0, 입력 오류는 1과 stderr 진단으로 전달한다. fixture는 로컬 임시 파일이며 외부 계정이나 서비스는 필요 없다. 기존 스칼라 매핑은 누락·null=빈 문자열, 문자열=원문, 불리언=소문자 true/false, 숫자=JSON 숫자 표현이다. 선택 필드의 배열·객체 값은 기존 json 입력에서도 오류다.",
+      "reason": "Make baseline value mapping available as project facts; it is not a new user requirement."
+    }
+  ],
+  "limitations": [
+    "명확한 요청·질문 필요성·기술 제안 적합성은 설계 가설이며 실제 실행으로 확인할 항목이다.",
+    "기존 과제는 실제 시작 코드가 없으므로 재현·비회귀·공통 계약을 materialize 후 다시 확인한다.",
+    "합성 표본과 한 교사의 편향은 다양성 확대만으로 제거되지 않는다."
+  ]
+}

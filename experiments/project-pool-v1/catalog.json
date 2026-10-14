@@ -1,0 +1,284 @@
+{
+  "version": "project-pool-v1-draft-1",
+  "status": "requirements_prepared_not_executed",
+  "target_project_count": 12,
+  "domains": [
+    "frontend",
+    "backend",
+    "fullstack",
+    "cli_data"
+  ],
+  "work_types": [
+    "new_build",
+    "feature_extension",
+    "bug_fix"
+  ],
+  "design_labels_are_not_empirical_results": true,
+  "projects": [
+    {
+      "project_id": "frontend-001",
+      "domain": "frontend",
+      "work_type": "new_build",
+      "title": "가정 식재료 소비 일정판",
+      "source_kind": "existing_pilot_reference",
+      "source_path": "experiments/pilot-v1/projects/frontend-001/intent-card.json",
+      "technology_design_mode": "candidate",
+      "input_status": "existing_pilot_prepared",
+      "source_sha256": "4eba82017259fcaeefd0b08e55275d26124e7e2628102d58056d4a54316bc52a",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/pilot-v1/projects/frontend-001/prompts/A.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/pilot-v1/projects/frontend-001/prompts/C.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "frontend-002",
+      "domain": "frontend",
+      "work_type": "feature_extension",
+      "title": "기존 상품 목록의 검색·필터 확장",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/frontend-002/intent-card.json",
+      "technology_design_mode": "maintain_existing",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "c2fdc4e548275533ba3eb5f62ac07336c5f87d04e9bc2e3002b75247dd425217",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/frontend-002/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/frontend-002/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "frontend-003",
+      "domain": "frontend",
+      "work_type": "bug_fix",
+      "title": "폼 상태와 키보드 조작 오류 수정",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/frontend-003/intent-card.json",
+      "technology_design_mode": "withhold",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "087b6b68ceeb3382e2eedd875d01819228e06480dd4ddcfa1511d7be6f4dc21e",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/frontend-003/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/frontend-003/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "backend-001",
+      "domain": "backend",
+      "work_type": "new_build",
+      "title": "공유 작업실 장비 예약 API",
+      "source_kind": "existing_pilot_reference",
+      "source_path": "experiments/pilot-v1/projects/backend-001/intent-card.json",
+      "technology_design_mode": "candidate",
+      "input_status": "existing_pilot_prepared",
+      "source_sha256": "845ed75a869e7f6aeff5623b829ef26682d5bcc547b141d9add32e5347c1f548",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/pilot-v1/projects/backend-001/prompts/A.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/pilot-v1/projects/backend-001/prompts/C.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "backend-002",
+      "domain": "backend",
+      "work_type": "feature_extension",
+      "title": "기존 문서 API의 권한 확장",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/backend-002/intent-card.json",
+      "technology_design_mode": "maintain_existing",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "e0a937bbc8ce19c3d534e67661c9e66f93cf3043fc1a709cf67d17776d2b9416",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/backend-002/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/backend-002/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "backend-003",
+      "domain": "backend",
+      "work_type": "bug_fix",
+      "title": "이벤트 중복 처리와 데이터 누락 수정",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/backend-003/intent-card.json",
+      "technology_design_mode": "withhold",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "e4190a2e67338b212137670d7cf2682db64acb187fb98b149e67bd7da9b83d37",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/backend-003/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/backend-003/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "fullstack-001",
+      "domain": "fullstack",
+      "work_type": "new_build",
+      "title": "고객 요청 관리 서비스",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/fullstack-001/intent-card.json",
+      "technology_design_mode": "candidate",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "78f6967d4ddba5c5152aaa3b99c560c24ad9a31f4031a4486b4529dd69c0cbe1",
+      "baseline_status": "new_workspace",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/fullstack-001/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/fullstack-001/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "fullstack-002",
+      "domain": "fullstack",
+      "work_type": "feature_extension",
+      "title": "기존 팀 업무 도구의 역할 확장",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/fullstack-002/intent-card.json",
+      "technology_design_mode": "maintain_existing",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "52cd6b59dac4a6631d595d78f5bbcb3baebd373ad8a921222823eaafb64575a6",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/fullstack-002/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/fullstack-002/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "fullstack-003",
+      "domain": "fullstack",
+      "work_type": "bug_fix",
+      "title": "화면·서버 상태 불일치 수정",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/fullstack-003/intent-card.json",
+      "technology_design_mode": "withhold",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "9ddbdca65cdc2e89a0bf6e049fc3cd3874cdc957dae7196efdd3c0ec1e9499dc",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/fullstack-003/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/fullstack-003/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "cli-data-001",
+      "domain": "cli_data",
+      "work_type": "new_build",
+      "title": "CSV 정리 도구",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/cli-data-001/intent-card.json",
+      "technology_design_mode": "candidate",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "b3dc980451c01eef4a2cbc6acc269c36fd018e960d2f7348336138e2b1511d48",
+      "baseline_status": "new_workspace",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/cli-data-001/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/cli-data-001/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "cli-data-002",
+      "domain": "cli_data",
+      "work_type": "feature_extension",
+      "title": "기존 변환기의 새 형식 지원",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/cli-data-002/intent-card.json",
+      "technology_design_mode": "maintain_existing",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "f8aab4b0669c5e674e988304d369a793caba2ec2d19a1a98d03d6d06081f0f01",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/cli-data-002/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/cli-data-002/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    },
+    {
+      "project_id": "cli-data-003",
+      "domain": "cli_data",
+      "work_type": "bug_fix",
+      "title": "인코딩·부분 실패 처리 수정",
+      "source_kind": "new_teacher_card",
+      "source_path": "experiments/project-pool-v1/projects/cli-data-003/intent-card.json",
+      "technology_design_mode": "withhold",
+      "input_status": "teacher_card_reviewed",
+      "source_sha256": "9d75eb545ee42848e9eb5092daa9cbb3e45e531825cf9369483efcf85d7c2a03",
+      "baseline_status": "baseline_not_materialized",
+      "request_refs": {
+        "underspecified": {
+          "path": "experiments/project-pool-v1/projects/cli-data-003/request-underspecified.md",
+          "design_expected_question_action": "clarify"
+        },
+        "clear": {
+          "path": "experiments/project-pool-v1/projects/cli-data-003/request-clear.md",
+          "design_expected_question_action": "pass_or_enrich"
+        }
+      }
+    }
+  ],
+  "profiles_are_question_policy_controls_not_extra_AE_runs": true,
+  "omitted_decisions_are_request_omissions_not_necessarily_unknown_project_facts": true,
+  "development_runs_executed": 0
+}

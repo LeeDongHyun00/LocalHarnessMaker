@@ -21,6 +21,8 @@
 
 입력 자료는 [파일럿 자료](../experiments/pilot-v1/README.md), 생성·검토 이력은 [준비 보고서](experiments/pilot-v1-preparation.md)에 있습니다.
 
+다양성 확대 자료로 [12개 프로젝트 풀](../experiments/project-pool-v1/README.md)과 [확대 준비 보고서](experiments/project-pool-v1-preparation.md)를 추가했습니다. 기존 두 파일럿을 먼저 실행할 순서는 유지합니다. 추가 원본 10개의 코드와 A~E 전체는 아직 준비하지 않았습니다.
+
 1. 원본과 다른 군을 볼 수 없는 개발 작업 공간과 의존성 준비 방식을 정의합니다.
 2. 30개 브라우저·HTTP 판정 시나리오를 실제 실행할 평가기로 만들고 검증합니다.
 3. 질문·수정 회차 연결과 익명 평가 패키지의 분리를 확인합니다.

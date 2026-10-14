@@ -1,0 +1,116 @@
+{
+  "version": "project-pool-v1-draft-1",
+  "source": "gpt-6.1-sol_teacher_output_with_recorded_review",
+  "actual_teacher_output": true,
+  "requested_teacher": "gpt-6.1-sol",
+  "server_snapshot_id": null,
+  "generated_new_projects": 10,
+  "existing_pilot_references": 2,
+  "training_eligible": false,
+  "generation_attempts": [
+    {
+      "operation": "project_cards",
+      "domain": "frontend",
+      "model_requested": "gpt-6.1-sol",
+      "exit_code": 0,
+      "elapsed_seconds": 206.7,
+      "output_generated": true,
+      "started_at_seoul": "2026-10-14T12:11:52.252573+09:00",
+      "output_source": "experiments/project-pool-v1/authoring/frontend.teacher-output.json",
+      "output_sha256": "f5e2d1bbbf6831158892de905818f4fe2be045cf51d82be07f2b64c05c4c6397",
+      "request_path": "experiments/project-pool-v1/authoring/frontend.request.md",
+      "request_sha256": "8e6488dfd27eb38decff53012fde6eadc0d06a0869383d0c00e62a72c9b5bd5c",
+      "request_schema_path": "experiments/project-pool-v1/authoring/project-cards.schema.json",
+      "request_schema_sha256": "1987ca6f94a82497caf7d174ae36aaa8c1185327dd1bf4d5d7ad4a0ca38ef130",
+      "transport": "codex exec --model gpt-6.1-sol --sandbox read-only --ephemeral --output-schema",
+      "server_snapshot_id": null,
+      "usage": {
+        "input_tokens": 16107,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7294,
+        "reasoning_output_tokens": 48
+      }
+    },
+    {
+      "operation": "project_cards",
+      "domain": "backend",
+      "model_requested": "gpt-6.1-sol",
+      "exit_code": 0,
+      "elapsed_seconds": 219.4,
+      "output_generated": true,
+      "started_at_seoul": "2026-10-14T12:11:52.254255+09:00",
+      "output_source": "experiments/project-pool-v1/authoring/backend.teacher-output.json",
+      "output_sha256": "652833786f5eb34bee926d03dfa6246aeb183cf8c6fe09ed55c1012856dc0f67",
+      "request_path": "experiments/project-pool-v1/authoring/backend.request.md",
+      "request_sha256": "8305fc883942a18f515b91c360233cb29ffb5cfea53b7cac54c2c59c7e20d996",
+      "request_schema_path": "experiments/project-pool-v1/authoring/project-cards.schema.json",
+      "request_schema_sha256": "1987ca6f94a82497caf7d174ae36aaa8c1185327dd1bf4d5d7ad4a0ca38ef130",
+      "transport": "codex exec --model gpt-6.1-sol --sandbox read-only --ephemeral --output-schema",
+      "server_snapshot_id": null,
+      "usage": {
+        "input_tokens": 16106,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7401,
+        "reasoning_output_tokens": 43
+      }
+    },
+    {
+      "operation": "project_cards",
+      "domain": "fullstack",
+      "model_requested": "gpt-6.1-sol",
+      "exit_code": 0,
+      "elapsed_seconds": 258.4,
+      "output_generated": true,
+      "started_at_seoul": "2026-10-14T12:11:52.268359+09:00",
+      "output_source": "experiments/project-pool-v1/authoring/fullstack.teacher-output.json",
+      "output_sha256": "d635daffab5b0feb043d7dee149626d9e80ebbc8f69602cd7f0b8bb296b2efaf",
+      "request_path": "experiments/project-pool-v1/authoring/fullstack.request.md",
+      "request_sha256": "87bcaafaa9d89b617b52ae0c1ead31ef406cb09c760ad95c006a9c3697dfd292",
+      "request_schema_path": "experiments/project-pool-v1/authoring/project-cards.schema.json",
+      "request_schema_sha256": "1987ca6f94a82497caf7d174ae36aaa8c1185327dd1bf4d5d7ad4a0ca38ef130",
+      "transport": "codex exec --model gpt-6.1-sol --sandbox read-only --ephemeral --output-schema",
+      "server_snapshot_id": null,
+      "usage": {
+        "input_tokens": 16205,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 9171,
+        "reasoning_output_tokens": 50
+      }
+    },
+    {
+      "operation": "project_cards",
+      "domain": "cli_data",
+      "model_requested": "gpt-6.1-sol",
+      "exit_code": 0,
+      "elapsed_seconds": 253.6,
+      "output_generated": true,
+      "started_at_seoul": "2026-10-14T12:11:52.280183+09:00",
+      "output_source": "experiments/project-pool-v1/authoring/cli_data.teacher-output.json",
+      "output_sha256": "897e90210d8a8bdd1b77728e5cb03589f84aece579dc91508431310dd9bfd4df",
+      "request_path": "experiments/project-pool-v1/authoring/cli_data.request.md",
+      "request_sha256": "aca4e70776522b449e40906aa0d056057d02ed1ed05c36aeff121c7759ecdb79",
+      "request_schema_path": "experiments/project-pool-v1/authoring/project-cards.schema.json",
+      "request_schema_sha256": "1987ca6f94a82497caf7d174ae36aaa8c1185327dd1bf4d5d7ad4a0ca38ef130",
+      "transport": "codex exec --model gpt-6.1-sol --sandbox read-only --ephemeral --output-schema",
+      "server_snapshot_id": null,
+      "usage": {
+        "input_tokens": 16205,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 9212,
+        "reasoning_output_tokens": 54
+      }
+    }
+  ],
+  "review_path": "experiments/project-pool-v1/authoring/review.json",
+  "review_completed": true,
+  "development_runs_executed": 0,
+  "limitations": [
+    "CLI에 모델을 명시한 성공 호출을 기록하며 별도 불변 서버 스냅샷은 노출되지 않았다.",
+    "원시 이벤트·인증 정보는 .local 및 Codex 인증 저장소에만 보관한다.",
+    "생성·준비 검토를 기능 또는 성능 검증으로 해석하지 않는다."
+  ]
+}

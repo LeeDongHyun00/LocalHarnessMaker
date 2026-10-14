@@ -1,0 +1,236 @@
+{
+  "project_id": "fullstack-003",
+  "domain": "fullstack",
+  "title": "화면·서버 상태 불일치 수정",
+  "purpose": "로컬 좌석 예약 화면에서 저장 실패와 응답 순서 역전 때문에 서버와 다른 상태가 보이는 결함을 수정한다.",
+  "target_users": [
+    "예약 사용자",
+    "운영 확인 담당자"
+  ],
+  "scenario": "사용자가 날짜를 빠르게 바꾸거나 좌석을 예약하는 동안 지연·충돌이 발생해도 현재 서버 상태와 선택한 날짜를 정확히 보여 준다.",
+  "common_context": "Linux, Node.js 24, Python 3.12와 로컬 브라우저를 사용한다. 앞으로 준비할 기준 스택은 Vue 3, FastAPI, SQLite다. PORT와 DATA_FILE로 실행 위치를 지정한다. 브라우저 경로는 /reservations이다. 로컬 사용자 user-a, user-b를 X-Test-Actor로 전달하며 실제 인증은 없다. UTF-8 JSON 계약은 GET /api/seats?date=YYYY-MM-DD와 POST /api/reservations이고 예약 입력은 {date,seatId}, 응답 항목은 {date,seatId,reservationId,ownerId}다. fixture 날짜 2026-11-02와 2026-11-03에는 각각 S1, S2가 있다. 첫 날짜의 S1은 user-b 예약, 나머지는 비어 있다. GET 응답은 {date,seats:[{seatId,reservationId,ownerId}]}이며 빈 좌석의 두 예약 필드는 null이다. 오류는 {error:{code,message}}다. 로컬 fixture 서버의 POST /__fixture/reset은 데이터를 초기화하고 POST /__fixture/rules는 {rules:[{method,path,query,delayMs,status,body,times}]}로 다음 일치 요청의 지연·오류를 지정한다. 생략한 query는 모든 쿼리에 일치하며 times는 적용 횟수다. 성공 지연 GET은 요청 수신 시점의 응답을 보관했다가 반환한다. 이 fixture 제어는 운영 UI에 노출하지 않는다. 기존 충돌 오류 code는 SEAT_TAKEN이다. GET /__fixture/requests는 {items:[{method,path,query,body}]} 형식의 기록을 제공하며 예약 POST 수를 이 기록에서 확인한다. fixture 제어 요청은 업무 요청 수에 포함하지 않는다.",
+  "requirements": [
+    {
+      "id": "R1",
+      "statement": "예약 POST가 409 또는 500으로 실패하면 성공 표시와 임시 예약 상태를 제거하고 오류를 보여 준다. 이어서 현재 날짜를 재조회해 서버 좌석 상태를 표시한다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "첫 날짜의 S2가 비어 있고 다음 예약 POST는 HTTP 500, SERVER_ERROR로 설정되어 있다.",
+          "when": "user-a가 S2 예약 버튼을 누른다.",
+          "then": "오류가 표시되고 재조회 후 S2는 빈 좌석으로 보이며 성공 메시지는 없다."
+        },
+        {
+          "given": "화면에는 첫 날짜 S2가 비어 있으나 서버에는 user-b가 해당 좌석을 예약했다.",
+          "when": "user-a가 S2 예약을 제출한다.",
+          "then": "409 오류를 표시하고 재조회 후 S2를 user-b의 예약으로 표시한다."
+        }
+      ],
+      "evaluation_method": "browser",
+      "correction_feedback": "저장에 실패한 좌석을 내 예약처럼 남기지 말고 오류와 서버의 최신 상태를 보여 주세요.",
+      "requirement_scope": "change"
+    },
+    {
+      "id": "R2",
+      "statement": "날짜별 조회 응답이 역순으로 도착해도 마지막으로 선택한 날짜와 그 날짜의 좌석만 표시한다. 이전 날짜 응답은 현재 날짜의 로딩·오류 상태도 바꾸지 않는다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "첫 날짜 GET은 800ms, 둘째 날짜 GET은 50ms 지연되도록 설정했다.",
+          "when": "첫 날짜를 조회한 직후 둘째 날짜를 선택하고 두 응답을 기다린다.",
+          "then": "선택 날짜와 좌석 표는 둘째 날짜로 유지되고 첫 날짜의 예약은 표시되지 않는다."
+        }
+      ],
+      "evaluation_method": "browser",
+      "correction_feedback": "늦게 도착한 이전 날짜 응답이 현재 선택한 날짜를 덮어쓰지 않게 해 주세요.",
+      "requirement_scope": "change"
+    },
+    {
+      "id": "R3",
+      "statement": "같은 날짜·좌석의 예약 요청이 진행 중이면 해당 예약 버튼을 비활성화하여 중복 제출을 막는다. 예약 성공 후 현재 날짜를 재조회하며 새로고침 후에도 동일한 예약을 표시한다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "첫 날짜 S2는 비어 있고 예약 POST 응답은 500ms 지연된다.",
+          "when": "user-a가 S2 예약 버튼을 빠르게 두 번 누른 뒤 응답을 기다리고 새로고침한다.",
+          "then": "해당 좌석의 POST는 한 번만 전송되고 진행 중 버튼은 비활성화되며 새로고침 후 user-a의 예약이 표시된다."
+        }
+      ],
+      "evaluation_method": "browser",
+      "correction_feedback": "예약 처리 중에는 같은 좌석을 다시 제출하지 못하게 하고 성공 상태를 서버 조회로 확인해 주세요.",
+      "requirement_scope": "change"
+    },
+    {
+      "id": "R4",
+      "statement": "현재 날짜 조회 실패는 빈 좌석 목록으로 표현하지 않는다. 해당 날짜의 조회 오류와 재시도 버튼을 표시하고 예약 조작을 막는다. 재시도 성공 시 오류를 지우고 조작을 복구한다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "다음 둘째 날짜 GET 한 번은 HTTP 500으로 설정되어 있다.",
+          "when": "둘째 날짜를 선택한 뒤 재시도 버튼을 누른다.",
+          "then": "실패 중에는 조회 오류와 비활성 예약 조작이 표시되고 재시도 성공 후 둘째 날짜 좌석과 정상 예약 조작이 표시된다."
+        }
+      ],
+      "evaluation_method": "browser",
+      "correction_feedback": "조회 실패를 좌석 없음으로 보여 주지 말고 재시도할 수 있게 해 주세요.",
+      "requirement_scope": "change"
+    },
+    {
+      "id": "R5",
+      "statement": "기존 서버의 날짜·좌석별 예약 유일성과 공개 응답 형식을 보존한다. 같은 날짜·좌석의 두 번째 예약은 409, SEAT_TAKEN이며 첫 예약은 유지된다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "첫 날짜 S2가 비어 있다.",
+          "when": "user-a가 예약한 뒤 user-b가 같은 날짜 S2를 예약한다.",
+          "then": "첫 요청은 201, 둘째 요청은 409와 SEAT_TAKEN이며 조회 결과 소유자는 user-a다."
+        }
+      ],
+      "evaluation_method": "http",
+      "correction_feedback": "화면 수정 후에도 서버가 같은 좌석의 중복 예약을 거절하고 기존 응답 형식을 유지하게 해 주세요.",
+      "requirement_scope": "preserve"
+    },
+    {
+      "id": "R6",
+      "statement": "기존 날짜별 독립 조회와 예약의 영속성을 보존한다. 한 날짜의 예약은 다른 날짜의 같은 좌석에 영향을 주지 않으며 서버 재시작 후 유지된다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "두 날짜의 S2가 모두 비어 있다.",
+          "when": "첫 날짜 S2를 예약하고 같은 데이터 파일로 서버를 재시작한 뒤 두 날짜를 조회한다.",
+          "then": "첫 날짜 S2의 예약은 유지되고 둘째 날짜 S2는 비어 있다."
+        }
+      ],
+      "evaluation_method": "http",
+      "correction_feedback": "날짜별 좌석 독립성과 재시작 후 예약 보존이 기존처럼 동작하게 해 주세요.",
+      "requirement_scope": "preserve"
+    }
+  ],
+  "user_decisions": [
+    {
+      "id": "D1",
+      "topic": "저장 실패 처리",
+      "question_examples": [
+        "예약이 실패하면 화면을 되돌릴까요, 다시 서버에서 확인할까요?"
+      ],
+      "answer": "성공 표시와 임시 상태를 제거하고 오류를 보여 준 뒤 현재 날짜를 재조회한다.",
+      "requirement_ids": [
+        "R1"
+      ]
+    },
+    {
+      "id": "D2",
+      "topic": "날짜 전환 기준",
+      "question_examples": [
+        "날짜를 빠르게 바꿨을 때 어느 조회 결과를 유효하게 볼까요?"
+      ],
+      "answer": "마지막 선택 날짜만 유효하다. 이전 응답은 현재 좌석·로딩·오류 상태에 영향을 주지 않는다.",
+      "requirement_ids": [
+        "R2"
+      ]
+    },
+    {
+      "id": "D3",
+      "topic": "진행 중 조작",
+      "question_examples": [
+        "예약 응답을 기다리는 동안 같은 좌석을 다시 누를 수 있게 할까요?"
+      ],
+      "answer": "같은 날짜·좌석 버튼은 비활성화한다. 성공 후 현재 날짜를 재조회한다.",
+      "requirement_ids": [
+        "R3"
+      ]
+    },
+    {
+      "id": "D4",
+      "topic": "조회 오류 경험",
+      "question_examples": [
+        "좌석 조회 실패 시 기존 표를 계속 조작하게 할까요?"
+      ],
+      "answer": "현재 날짜의 조회 오류와 재시도를 표시하고 예약을 막는다. 재시도 성공 후 복구한다.",
+      "requirement_ids": [
+        "R4"
+      ]
+    }
+  ],
+  "optional": [
+    "재시도 버튼의 키보드 포커스 개선"
+  ],
+  "out_of_scope": [
+    "예약 취소 기능 추가",
+    "예약 대기열",
+    "실시간 알림",
+    "스택 교체",
+    "실제 인증"
+  ],
+  "implementation_defaults": [
+    "Vue 3·FastAPI·SQLite 기준 스택을 유지한다.",
+    "요청 취소, 응답 식별 또는 상태 관리 방식은 관찰 가능한 요구사항을 만족하면 자유다."
+  ],
+  "limitations": [
+    "합성 설계이며 실제 시작 저장소, 구현, 기능 테스트와 블라인드 평가가 아직 없다. 결함과 fixture 제어 계약은 추후 기준 구현에서 재현하도록 설계한 것이다."
+  ],
+  "work_type": "bug_fix",
+  "starting_state": {
+    "status": "baseline_not_materialized",
+    "blueprint": "Vue 3 날짜 선택·좌석 표와 Python 3.12 FastAPI 서버, SQLite 예약 저장소를 앞으로 준비한다. 서버는 날짜·좌석 유일성을 적용하고 정상 예약은 201, 충돌은 409를 반환하며 재시작 후 데이터를 유지한다. 화면은 클릭 즉시 임시 예약을 표시하지만 POST 실패 때 복원하지 않는다. 모든 날짜 GET 응답을 도착 순서대로 화면에 적용하며 요청 중 버튼을 잠그지 않는다. GET 실패는 빈 배열로 처리한다. fixture 제어 경로와 요청 기록을 제공해 지연, 오류, POST 횟수를 로컬에서 확인할 수 있도록 준비한다.",
+    "proposed_stack": [
+      "Vue 3",
+      "Python 3.12",
+      "FastAPI",
+      "SQLite"
+    ],
+    "expected_before_behavior": [
+      "일반적인 단일 날짜 조회와 성공 예약은 동작한다.",
+      "서버는 중복 예약을 거절한다.",
+      "날짜별 예약은 독립적이고 영속 저장된다."
+    ],
+    "known_defects": [
+      "예약 POST 실패 후 화면에 임시 예약이 남는다.",
+      "이전 날짜의 늦은 응답이 현재 좌석 표를 덮어쓴다.",
+      "연속 클릭으로 같은 좌석 POST가 중복 전송된다.",
+      "조회 오류를 빈 좌석 목록으로 표시한다."
+    ]
+  },
+  "initial_requests": {
+    "underspecified": {
+      "text": "기존 좌석 예약 화면과 서버 상태가 가끔 다릅니다. 저장이 실패해도 예약된 것처럼 보이고 날짜를 빨리 바꾸면 다른 날짜 좌석이 나타납니다. 이 문제와 연속 클릭 문제를 고쳐 주세요. 기존 예약 API는 계속 사용할 수 있어야 합니다.",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "omitted_decision_ids": [
+        "D1",
+        "D2",
+        "D3",
+        "D4"
+      ],
+      "expected_question_action": "clarify"
+    },
+    "clear": {
+      "text": "기존 Vue 3·FastAPI·SQLite 예약 도구의 상태 불일치를 수정하세요. 예약 409·500 실패 시 성공 표시와 임시 예약을 제거하고 오류를 보여 준 뒤 현재 날짜를 재조회하세요. 마지막 선택 날짜의 응답만 좌석·로딩·오류 상태에 적용하세요. 같은 날짜·좌석 예약 진행 중 버튼을 비활성화해 중복 POST를 막고 성공 후 현재 날짜를 재조회하며 새로고침 결과도 일치시켜 주세요. 현재 날짜 조회 실패는 오류와 재시도로 표시하고 예약을 막으며 재시도 성공 후 복구하세요. 기존 응답 형식, 날짜·좌석별 유일성 및 409 충돌 처리, 날짜별 독립성과 재시작 후 영속성을 보존하세요.",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "omitted_decision_ids": [],
+      "expected_question_action": "pass_or_enrich"
+    }
+  },
+  "technology_policy": {
+    "mode": "withhold",
+    "rationale": "기술 제안보다 지연·실패 조건에서 결함을 재현하고 정확히 수정하는 것이 중심이다. 기존 스택과 공개 계약을 유지한다.",
+    "required_evidence": [
+      "기준 상태에서 네 결함의 재현 기록",
+      "수정 후 지연·실패·연속 클릭의 화면 및 HTTP 기록",
+      "서버 유일성·날짜 독립성·영속성 비회귀 결과"
+    ]
+  }
+}

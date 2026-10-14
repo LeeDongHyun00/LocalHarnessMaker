@@ -1,0 +1,247 @@
+{
+  "project_id": "fullstack-001",
+  "domain": "fullstack",
+  "title": "고객 요청 관리 서비스",
+  "purpose": "소규모 지원팀이 고객 요청을 접수하고 처리하며 고객에게 공개할 답변과 내부 메모를 구분한다.",
+  "target_users": [
+    "고객",
+    "지원 담당자"
+  ],
+  "scenario": "고객이 로컬 접수 화면에서 요청을 제출하고, 지원 담당자가 처리 상태와 공개 답변을 관리한다.",
+  "common_context": "Linux, Node.js 24, Python 3.12와 로컬 브라우저를 사용할 수 있다. 외부 계정이나 비밀 키는 필요 없다. 서비스는 PORT 환경변수의 포트에서 HTTP로 실행한다. JSON은 UTF-8이며 날짜는 UTC ISO 8601이다. 공개 계약은 POST /api/requests, GET /api/requests/:id, GET /api/staff/requests, PATCH /api/staff/requests/:id, POST /api/staff/requests/:id/messages다. 메시지 입력은 {visibility,body}이며 visibility는 public 또는 internal이다. 고객 조회는 접수 시 반환된 receiptToken을 X-Receipt-Token으로 전달한다. 담당자 API는 X-Test-Actor: staff-a를 사용하며 실제 인증은 구현하지 않는다. 브라우저 경로는 /submit, /track/:id, /staff다. 요청 필드는 id, subject, description, email, status, createdAt이다. 시작 데이터는 빈 목록이다. 오류 응답은 {error:{code,message}} 형식이다. 공통 응답 형태에서 GET /api/staff/requests는 요청 객체 배열이고 GET /api/requests/:id는 단일 요청 객체다. 두 조회의 요청 객체는 messages 배열을 가질 수 있으며 메시지 필드는 visibility와 body다. 각 조회에서 허용할 메시지 범위는 요구사항에서 정한다. 담당자 메시지는 목록 조회로 확인하므로 별도 단건 경로를 추가할 의무는 없다. 데이터 디렉터리는 DATA_DIR로 지정한다.",
+  "requirements": [
+    {
+      "id": "R1",
+      "statement": "제목·내용·이메일을 검증하여 접수하고, 고유 접수 번호와 고객 조회 토큰을 반환한다. 제목과 내용은 공백 제거 후 비어 있으면 안 되며 이메일은 로컬 부분과 도메인을 포함해야 한다. 성공은 HTTP 201과 status new이며 잘못된 입력은 HTTP 400과 error.code VALIDATION_ERROR다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "요청 목록이 비어 있다.",
+          "when": "제목 '배송 문의', 내용 '도착 예정일을 알려 주세요', 이메일 'customer@example.test'로 접수한다.",
+          "then": "HTTP 201과 id, receiptToken을 반환하고 신규 요청의 status는 new다."
+        },
+        {
+          "given": "요청 목록이 비어 있다.",
+          "when": "공백뿐인 제목으로 접수한다.",
+          "then": "HTTP 400과 VALIDATION_ERROR를 반환하고 목록은 비어 있다."
+        }
+      ],
+      "evaluation_method": "http",
+      "correction_feedback": "필수 입력을 확인하고, 정상 접수에는 접수 번호와 조회 토큰을 보여 주세요.",
+      "requirement_scope": "deliver_new"
+    },
+    {
+      "id": "R2",
+      "statement": "담당자는 상태별 목록을 조회한다. 필터를 생략하면 전체를 보여 주며 생성 시각 내림차순, 같은 시각이면 id 오름차순으로 정렬한다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "생성 시각이 서로 다른 new 요청 두 건과 resolved 요청 한 건이 있다.",
+          "when": "담당자가 status=new로 목록을 조회한다.",
+          "then": "new 요청 두 건만 최신 생성 시각 순서로 반환한다."
+        }
+      ],
+      "evaluation_method": "http",
+      "correction_feedback": "선택한 상태에 해당하는 요청만 최신 접수 순서로 보여 주세요.",
+      "requirement_scope": "deliver_new"
+    },
+    {
+      "id": "R3",
+      "statement": "상태는 new→in_progress→resolved 순서로만 전환한다. 역방향 전환과 단계 건너뛰기는 HTTP 409로 거절하고 상태를 유지한다. 해당 오류의 error.code는 INVALID_TRANSITION이다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "상태가 new인 요청이 있다.",
+          "when": "담당자가 상태를 resolved로 변경한다.",
+          "then": "HTTP 409와 INVALID_TRANSITION을 반환하고 상태는 new로 유지된다."
+        },
+        {
+          "given": "상태가 in_progress인 요청이 있다.",
+          "when": "담당자가 상태를 resolved로 변경한다.",
+          "then": "HTTP 200을 반환하고 고객 조회에도 resolved가 표시된다."
+        }
+      ],
+      "evaluation_method": "http",
+      "correction_feedback": "처리 시작을 거친 요청만 완료할 수 있도록 상태 전환을 제한해 주세요.",
+      "requirement_scope": "deliver_new"
+    },
+    {
+      "id": "R4",
+      "statement": "공개 답변과 내부 메모를 저장한다. 고객 조회에는 공개 답변만 포함하며, 담당자 조회에는 두 종류 모두 포함한다. 잘못된 고객 토큰은 HTTP 403으로 거절한다. 잘못된 토큰의 error.code는 FORBIDDEN이다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "한 요청에 공개 답변 '내일 발송합니다'와 내부 메모 '창고 확인 필요'가 있다.",
+          "when": "올바른 고객 토큰으로 요청을 조회한다.",
+          "then": "공개 답변은 반환하고 내부 메모의 본문과 항목은 반환하지 않는다."
+        },
+        {
+          "given": "고객 토큰이 발급된 요청이 있다.",
+          "when": "다른 토큰으로 요청을 조회한다.",
+          "then": "HTTP 403과 FORBIDDEN을 반환하고 요청 내용은 반환하지 않는다."
+        }
+      ],
+      "evaluation_method": "http",
+      "correction_feedback": "고객에게 내부 메모가 보이지 않게 하고 접수 토큰도 검사해 주세요.",
+      "requirement_scope": "deliver_new"
+    },
+    {
+      "id": "R5",
+      "statement": "브라우저에서 접수, 고객 조회, 담당자 목록·상태 변경·메시지 작성을 수행할 수 있다. 성공 결과는 화면에 반영하며 실패하면 입력을 유지하고 오류를 표시한다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "고객이 접수 화면에 잘못된 이메일과 나머지 정상 입력을 작성했다.",
+          "when": "접수 버튼을 누른다.",
+          "then": "오류가 화면에 표시되고 작성한 제목과 내용이 유지된다."
+        },
+        {
+          "given": "담당자 화면에 new 요청이 열려 있다.",
+          "when": "처리 시작을 선택한다.",
+          "then": "성공 후 화면의 상태가 in_progress로 바뀌며 새로고침 후에도 같다."
+        }
+      ],
+      "evaluation_method": "browser",
+      "correction_feedback": "화면에서 실제 처리를 완료할 수 있게 하고 실패 시 작성 내용을 지우지 말아 주세요.",
+      "requirement_scope": "deliver_new"
+    },
+    {
+      "id": "R6",
+      "statement": "접수, 상태, 메시지와 고객 토큰은 같은 데이터 디렉터리로 서버를 재시작해도 유지된다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "접수한 요청에 공개 답변을 추가하고 상태를 in_progress로 변경했다.",
+          "when": "같은 데이터 디렉터리로 서버를 재시작한 뒤 기존 토큰으로 조회한다.",
+          "then": "동일한 id, 상태와 공개 답변을 반환한다."
+        }
+      ],
+      "evaluation_method": "http",
+      "correction_feedback": "서버를 다시 켜도 접수 내역과 조회 토큰을 계속 사용할 수 있게 저장해 주세요.",
+      "requirement_scope": "deliver_new"
+    }
+  ],
+  "user_decisions": [
+    {
+      "id": "D1",
+      "topic": "처리 상태",
+      "question_examples": [
+        "어떤 처리 상태가 필요하고 완료 후 다시 열 수 있나요?"
+      ],
+      "answer": "new, in_progress, resolved를 순서대로 사용하며 재개와 단계 건너뛰기는 허용하지 않는다.",
+      "requirement_ids": [
+        "R1",
+        "R3"
+      ]
+    },
+    {
+      "id": "D2",
+      "topic": "메시지 공개 범위",
+      "question_examples": [
+        "담당자 메모를 고객에게도 보여 줄까요?"
+      ],
+      "answer": "공개 답변과 내부 메모를 구분하고 고객은 자신의 접수 토큰으로 공개 내용만 조회한다.",
+      "requirement_ids": [
+        "R4",
+        "R5"
+      ]
+    },
+    {
+      "id": "D3",
+      "topic": "목록 기준",
+      "question_examples": [
+        "목록의 기본 범위와 정렬은 어떻게 할까요?"
+      ],
+      "answer": "기본은 전체이며 상태 필터를 제공한다. 생성 시각 내림차순, 동률은 id 오름차순이다.",
+      "requirement_ids": [
+        "R2"
+      ]
+    },
+    {
+      "id": "D4",
+      "topic": "저장과 실패 경험",
+      "question_examples": [
+        "재시작 후 데이터와 제출 실패 시 입력을 유지해야 하나요?"
+      ],
+      "answer": "데이터와 토큰은 재시작 후 유지하고 화면의 실패한 입력도 유지한다.",
+      "requirement_ids": [
+        "R5",
+        "R6"
+      ]
+    }
+  ],
+  "optional": [
+    "접수 번호 복사 버튼"
+  ],
+  "out_of_scope": [
+    "이메일 발송",
+    "첨부파일",
+    "실제 사용자 인증",
+    "온라인 배포"
+  ],
+  "implementation_defaults": [
+    "후보 스택은 Node.js 기반 웹 서버와 브라우저 UI 또는 Python 기반 웹 서버와 브라우저 UI이며 최종 선택은 자유다.",
+    "저장소, UI 프레임워크와 스타일은 공개 계약을 만족하는 범위에서 자유롭게 선택한다."
+  ],
+  "limitations": [
+    "합성 설계이며 실제 시작 저장소, 구현, 기능 테스트와 블라인드 평가가 아직 없다. 기술 후보의 우열은 검증하지 않았다."
+  ],
+  "work_type": "new_build",
+  "starting_state": {
+    "status": "new_workspace",
+    "blueprint": "빈 작업공간에서 공개 HTTP 계약과 세 브라우저 경로를 갖는 소규모 접수 서비스를 새로 만든다. 데이터 디렉터리는 DATA_DIR 환경변수로 지정한다.",
+    "proposed_stack": [
+      "Node.js 24 또는 Python 3.12 기반 HTTP 서버",
+      "로컬 브라우저 UI",
+      "로컬 영속 저장소"
+    ],
+    "expected_before_behavior": [
+      "서비스와 저장 데이터가 아직 없다."
+    ],
+    "known_defects": [
+      "기존 구현이 없어 재현 대상 결함은 없다."
+    ]
+  },
+  "initial_requests": {
+    "underspecified": {
+      "text": "작은 지원팀이 쓸 고객 요청 관리 서비스를 만들어 주세요. 고객이 제목, 내용, 이메일로 접수하고 나중에 진행 상황을 확인하며, 담당자는 목록에서 처리하고 답변을 남길 수 있으면 좋겠습니다.",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "omitted_decision_ids": [
+        "D1",
+        "D2",
+        "D3",
+        "D4"
+      ],
+      "expected_question_action": "clarify"
+    },
+    "clear": {
+      "text": "고객 요청 서비스를 새로 만들어 주세요. 제목·내용은 공백 제거 후 필수이고 이메일은 로컬 부분과 도메인이 필요합니다. 접수 번호와 조회 토큰을 발급하고 잘못된 토큰은 403으로 거절하세요. 상태는 new→in_progress→resolved만 허용하며 다른 전환은 409입니다. 담당자 목록은 기본 전체, 상태 필터와 생성 시각 내림차순 정렬을 제공하고 동률은 id 오름차순입니다. 공개 답변과 내부 메모를 구분해 고객에게는 공개 답변만 보여 주세요. 접수·조회·담당자 처리 화면을 제공하고 실패 시 오류와 기존 입력을 유지하세요. 모든 데이터와 토큰은 재시작 후에도 유지해 주세요. 접수 성공은 201과 초기 상태 new, 입력 오류는 400 VALIDATION_ERROR, 잘못된 토큰은 403 FORBIDDEN, 잘못된 상태 전환은 409 INVALID_TRANSITION으로 응답하세요.",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "omitted_decision_ids": [],
+      "expected_question_action": "pass_or_enrich"
+    }
+  },
+  "technology_policy": {
+    "mode": "candidate",
+    "rationale": "신규 서비스이므로 동일한 공개 계약 아래 서버와 UI 기술 후보를 비교할 수 있다.",
+    "required_evidence": [
+      "각 후보의 로컬 설치·실행 재현성",
+      "동일한 접수·권한·영속성 시나리오 결과",
+      "구현 시간과 유지보수 부담의 추후 관찰"
+    ]
+  }
+}

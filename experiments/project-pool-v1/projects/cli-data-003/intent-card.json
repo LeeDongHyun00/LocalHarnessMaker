@@ -1,0 +1,236 @@
+{
+  "project_id": "cli-data-003",
+  "domain": "cli_data",
+  "title": "인코딩·부분 실패 처리 수정",
+  "purpose": "여러 텍스트 파일의 줄 수를 집계하는 CLI에서 인코딩 오판과 파일 단위 실패 전파를 수정한다.",
+  "target_users": [
+    "문서 이관 담당자",
+    "배치 작업 운영자"
+  ],
+  "scenario": "서로 다른 인코딩의 문서 묶음을 점검할 때 한 파일의 오류가 정상 파일의 집계까지 중단시키는 문제를 재현하고 수정한다.",
+  "common_context": "Linux, Node.js 24, Python 3.12와 로컬 브라우저가 제공된다. 앞으로 준비할 기준 구현은 Python 3.12다. 명령은 ./text-audit --manifest <목록.json> --report <보고서.json>이다. manifest는 {\"files\":[{\"id\":\"식별자\",\"path\":\"상대 경로\",\"encoding\":\"utf-8 또는 cp949\"}]} 형식이며 path는 manifest 부모 디렉터리 기준이다. id는 고유하고 비어 있지 않다. 보고서는 items 배열과 summary 객체를 갖는다. 성공 항목은 id,status,line_count이고 실패 항목은 id,status,error다. summary는 total,ok,failed다. fixture는 UTF-8·CP949 바이트 파일과 존재하지 않는 경로를 로컬 임시 디렉터리에 구성한다. 외부 인증과 네트워크는 사용하지 않는다.",
+  "requirements": [
+    {
+      "id": "R1",
+      "statement": "파일마다 manifest에 명시된 utf-8 또는 cp949로 엄격하게 디코딩하고 인코딩을 추측하거나 대체 문자를 삽입하지 않는다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "manifest가 UTF-8로 저장한 '가\\n나' 파일과 CP949로 저장한 '다\\n라' 파일을 각각 올바른 encoding으로 지정한다.",
+          "when": "text-audit를 실행한다.",
+          "then": "두 항목 모두 status ok와 line_count 2를 갖고 summary는 total 2, ok 2, failed 0이며 종료 코드는 0이다."
+        },
+        {
+          "given": "바이트 0xFF만 가진 파일이 utf-8로 지정돼 있다.",
+          "when": "text-audit를 실행한다.",
+          "then": "해당 항목은 status error와 error decode_error를 갖고 line_count는 없으며 종료 코드는 2다."
+        }
+      ],
+      "evaluation_method": "cli",
+      "correction_feedback": "각 파일의 지정 인코딩을 사용하고 읽을 수 없는 바이트를 정상 텍스트로 간주하지 말아 주세요.",
+      "requirement_scope": "change"
+    },
+    {
+      "id": "R2",
+      "statement": "파일 없음과 디코딩 실패를 항목 오류로 기록하고 모든 나머지 항목의 처리를 계속한다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "manifest 순서가 정상 한 줄 파일, 없는 파일, 잘못된 UTF-8 파일, 정상 두 줄 파일이다.",
+          "when": "text-audit를 실행한다.",
+          "then": "네 항목 모두 보고서에 있으며 상태는 ok,error,error,ok 순서이고 오류는 각각 file_not_found와 decode_error이며 마지막 항목의 line_count는 2다."
+        }
+      ],
+      "evaluation_method": "artifact",
+      "correction_feedback": "중간 파일이 실패해도 뒤의 정상 파일까지 처리하고 실패 파일의 이유를 보고서에 남겨 주세요.",
+      "requirement_scope": "change"
+    },
+    {
+      "id": "R3",
+      "statement": "처리가 완료되면 일부 또는 모든 파일 실패에도 보고서를 저장한다. 항목 오류가 있으면 종료 코드 2, 없으면 0이며 summary 집계는 실제 항목 결과와 일치한다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "manifest에 없는 파일 두 개가 지정돼 있고 보고서 경로는 없다.",
+          "when": "text-audit를 실행한다.",
+          "then": "종료 코드는 2이고 보고서가 생성되며 summary는 total 2, ok 0, failed 2다."
+        }
+      ],
+      "evaluation_method": "cli",
+      "correction_feedback": "전부 실패한 배치도 결과 보고서를 저장하고 파일별 실패를 종료 코드 2로 구분해 주세요.",
+      "requirement_scope": "change"
+    },
+    {
+      "id": "R4",
+      "statement": "기존 줄 수 계산을 보존한다. LF, CRLF와 단독 CR을 줄 구분자로 사용하고 마지막 구분자 뒤에 추가 빈 줄을 세지 않는다. 빈 파일은 0줄이다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "UTF-8 파일 내용이 'a\\r\\nb\\rc\\n'다.",
+          "when": "해당 파일을 포함한 manifest로 실행한다.",
+          "then": "항목은 status ok와 line_count 3을 갖는다."
+        },
+        {
+          "given": "manifest에 빈 파일과 줄 구분자가 없는 'abc' 파일이 있다.",
+          "when": "text-audit를 실행한다.",
+          "then": "각 line_count는 순서대로 0과 1이다."
+        }
+      ],
+      "evaluation_method": "artifact",
+      "correction_feedback": "인코딩 처리 수정 뒤에도 기존 줄 구분과 마지막 개행 계산을 유지해 주세요.",
+      "requirement_scope": "preserve"
+    },
+    {
+      "id": "R5",
+      "statement": "manifest 순서와 id, manifest 기준 상대 경로 해석을 보존하고 원본 텍스트 파일을 변경하지 않는다.",
+      "critical": false,
+      "acceptance": [
+        {
+          "given": "manifest 디렉터리에 상대 경로 문서 두 개가 있고 id 순서는 Z,A이며 현재 작업 디렉터리는 다른 곳이다.",
+          "when": "manifest의 절대 경로로 명령을 실행한다.",
+          "then": "보고서 항목 id 순서는 Z,A이며 두 파일을 정상 집계하고 원본 바이트는 실행 전과 같다."
+        }
+      ],
+      "evaluation_method": "cli",
+      "correction_feedback": "실행 위치가 달라도 목록 기준으로 파일을 찾고 항목 순서와 원본 파일을 유지해 주세요.",
+      "requirement_scope": "preserve"
+    },
+    {
+      "id": "R6",
+      "statement": "manifest 자체의 구문·구조 오류, 중복 id, 지원하지 않는 encoding은 기존처럼 전체 실행 실패로 처리한다. 파일 처리 전에 코드 1과 stderr 진단을 내고 기존 보고서를 보존한다.",
+      "critical": true,
+      "acceptance": [
+        {
+          "given": "manifest에 같은 id가 두 번 있고 보고서에는 기존 내용이 있다.",
+          "when": "text-audit를 실행한다.",
+          "then": "종료 코드는 1이고 stderr에 중복 id 오류가 표시되며 기존 보고서 바이트는 그대로다."
+        },
+        {
+          "given": "manifest가 encoding latin-1을 지정하고 보고서 경로는 없다.",
+          "when": "text-audit를 실행한다.",
+          "then": "종료 코드는 1이고 stderr에 지원하지 않는 encoding 오류가 표시되며 보고서는 생성되지 않는다."
+        }
+      ],
+      "evaluation_method": "cli",
+      "correction_feedback": "목록 자체의 오류를 파일별 부분 실패로 바꾸지 말고 기존 보고서를 보호하며 실행 오류로 알려 주세요.",
+      "requirement_scope": "preserve"
+    }
+  ],
+  "user_decisions": [
+    {
+      "id": "D1",
+      "topic": "인코딩 실패 정책",
+      "question_examples": [
+        "인코딩은 지정값을 엄격히 따를까요, 실패하면 다른 인코딩을 시도할까요?"
+      ],
+      "answer": "manifest의 utf-8 또는 cp949를 엄격히 사용한다. 추측이나 대체 문자 없이 실패 항목에 decode_error를 기록한다.",
+      "requirement_ids": [
+        "R1"
+      ]
+    },
+    {
+      "id": "D2",
+      "topic": "부분 실패와 종료 상태",
+      "question_examples": [
+        "파일 하나가 실패하면 계속 진행할까요?",
+        "모두 실패해도 보고서를 만들까요?"
+      ],
+      "answer": "파일 없음과 디코딩 실패는 개별 오류로 기록하고 끝까지 처리한다. 전부 실패해도 보고서를 저장한다. 항목 오류가 있으면 2, 없으면 0으로 종료한다.",
+      "requirement_ids": [
+        "R2",
+        "R3"
+      ]
+    },
+    {
+      "id": "D3",
+      "topic": "회귀와 전체 실패 경계",
+      "question_examples": [
+        "줄 수 기준과 목록 자체의 오류 처리도 바꿔야 하나요?"
+      ],
+      "answer": "기존 줄 수, 항목 순서, 상대 경로와 원본 보존 규칙을 유지한다. manifest 구문·구조·중복 id·지원하지 않는 encoding은 처리 전 전체 실패이며 코드 1과 기존 보고서 보호를 유지한다.",
+      "requirement_ids": [
+        "R4",
+        "R5",
+        "R6"
+      ]
+    }
+  ],
+  "optional": [
+    "stderr에 성공·실패 항목 수 요약"
+  ],
+  "out_of_scope": [
+    "인코딩 자동 감지",
+    "새 인코딩 추가",
+    "재시도 및 병렬 처리 기능",
+    "텍스트 변환·수정",
+    "스택 교체"
+  ],
+  "implementation_defaults": [
+    "기존 Python 3.12 스택에서 오류 처리 구조를 자유롭게 수정한다.",
+    "JSON 공백과 키 직렬화 순서는 자유롭게 선택한다.",
+    "stderr 문구는 오류 대상과 원인이 식별되면 자유롭게 작성한다."
+  ],
+  "limitations": [
+    "합성 설계이며 결함을 가진 기준 구현은 앞으로 준비할 상태다.",
+    "실제 시작 저장소, 구현, 기능 테스트 및 블라인드 평가는 아직 없다.",
+    "수정 효과와 질문 효과는 실제 실행으로 검증되지 않았다."
+  ],
+  "work_type": "bug_fix",
+  "starting_state": {
+    "status": "baseline_not_materialized",
+    "blueprint": "Python 3.12와 표준 json·pathlib 및 텍스트 디코딩 기능으로 text-audit 기준 CLI를 앞으로 준비한다. 공개 manifest와 report 형식을 사용한다. 목록의 JSON·구조·id·encoding 검증은 파일 처리 전에 정상 작동하고 오류 시 코드 1로 기존 보고서를 보호한다. 정상 UTF-8 파일의 줄 수와 상대 경로·순서·원본 보존은 정상이다. 결함은 검증한 encoding을 실제 읽기에 적용하지 않고 모든 파일을 UTF-8로 읽는 점, 파일 읽기 오류가 전체 루프로 전파되어 코드 1로 중단되고 보고서 작성도 생략되는 점이다.",
+    "proposed_stack": [
+      "유지할 기준 스택: Python 3.12",
+      "표준 json·pathlib 및 내장 디코더",
+      "로컬 CLI 실행 래퍼"
+    ],
+    "expected_before_behavior": [
+      "정상 UTF-8만 포함한 배치는 정확한 줄 수와 summary를 저장하고 0으로 종료한다.",
+      "LF·CRLF·단독 CR과 빈 파일의 줄 수 계산은 정상이다.",
+      "manifest 기준 상대 경로, id와 입력 순서를 유지하고 원본을 변경하지 않는다.",
+      "목록 자체 오류는 코드 1과 stderr 진단을 내고 기존 보고서를 보존한다."
+    ],
+    "known_defects": [
+      "CP949로 지정한 한글 파일도 UTF-8로 읽어 디코딩 오류가 발생한다.",
+      "없는 파일 또는 디코딩 오류 하나가 전체 처리를 중단해 뒤의 정상 파일이 누락된다.",
+      "파일 오류가 있는 배치는 보고서를 저장하지 않고 코드 1로 종료한다."
+    ]
+  },
+  "initial_requests": {
+    "underspecified": {
+      "text": "기존 text-audit에서 CP949 문서가 깨지고 파일 하나가 없으면 뒤의 문서 집계까지 멈춥니다. 이 문제를 고쳐 주세요. 정상 파일의 줄 수와 목록 순서, 상대 경로 처리, 원본 보존 및 목록 자체의 오류 처리는 유지해 주세요.",
+      "requirement_ids": [
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "omitted_decision_ids": [
+        "D1",
+        "D2"
+      ],
+      "expected_question_action": "clarify"
+    },
+    "clear": {
+      "text": "앞으로 준비할 Python text-audit의 인코딩 적용과 파일 오류 전파 결함을 수정하세요. 각 파일은 manifest의 utf-8 또는 cp949로 엄격히 읽고 인코딩 추측이나 대체 문자는 사용하지 마세요. 파일 없음은 file_not_found, 디코딩 실패는 decode_error로 기록하고 모든 항목을 계속 처리하세요. 실패 항목에 line_count를 넣지 마세요. 모든 파일이 실패해도 보고서를 저장하고 summary를 맞추며 항목 오류가 있으면 2, 없으면 0으로 종료하세요. 기존 LF·CRLF·단독 CR 줄 계산, 마지막 구분자 뒤 추가 줄 제외, 빈 파일 0줄, 목록 순서·id·목록 기준 상대 경로·원본 보존을 유지하세요. 목록 구문·구조·중복 id·지원하지 않는 encoding은 파일 처리 전 코드 1과 stderr 진단으로 실패하고 기존 보고서를 보존하세요. 스택 변경 없이 수정하세요.",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "omitted_decision_ids": [],
+      "expected_question_action": "pass_or_enrich"
+    }
+  },
+  "technology_policy": {
+    "mode": "withhold",
+    "rationale": "인코딩 지정 무시와 파일 오류 전파의 재현 및 정확한 수정이 핵심이므로 기술 후보 제안은 보류한다. 블루프린트의 기존 Python 스택을 기준으로 삼는다.",
+    "required_evidence": [
+      "기준 구현에서 두 결함의 재현 기록",
+      "수정 후 혼합 인코딩·부분 실패 보고서와 종료 코드 확인",
+      "줄 수·경로·순서·원본 및 목록 오류 보호의 비회귀 결과"
+    ]
+  }
+}
