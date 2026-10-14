@@ -1,0 +1,34 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>식재료 일정판 — evaluator fixture</title>
+<style>:focus-visible{outline:3px solid #1466df;outline-offset:3px}label{display:block;margin:8px}table{margin-top:20px}td{padding:8px}</style>
+<h1>식재료 일정판</h1>
+<form id="form" novalidate>
+<label>이름<input id="name"></label><label>수량<input id="quantity" type="text" value="1"></label>
+<label>소비기한<input id="expiry" placeholder="YYYY-MM-DD"></label><button>등록</button></form>
+<p role="alert" id="error" hidden></p>
+<label>기준일<input id="reference"></label><label>검색<input id="search"></label>
+<button id="all">전체</button><button id="expired">기한 지남</button><button id="imminent">임박</button>
+<p id="initial" hidden>등록된 재료가 없습니다.</p><p id="empty" hidden>검색 또는 필터 결과가 없습니다.</p>
+<table><thead><tr><th>이름</th><th>수량</th><th>소비기한</th><th>소비</th></tr></thead><tbody></tbody></table>
+<script>
+const fault=__FAULT__, $=id=>document.getElementById(id);
+let rows=fault==='no_persistence'?[]:JSON.parse(localStorage.getItem('ingredients')||'[]'), filter='all';
+const today=new Date(), localToday=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+$('reference').value=localToday;
+function dateValid(value){if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const d=new Date(value+'T00:00:00Z');return !isNaN(d)&&d.toISOString().slice(0,10)===value}
+function save(){if(fault!=='no_persistence')localStorage.setItem('ingredients',JSON.stringify(rows))}
+function render(){
+ const ref=Date.parse($('reference').value+'T00:00:00Z'), term=fault==='untrimmed_search'?$('search').value:$('search').value.trim();
+ let visible=rows.filter(r=>{const delta=(Date.parse(r.expiry+'T00:00:00Z')-ref)/86400000;return r.name.includes(term)&&(filter==='all'||filter==='expired'&&delta<0||filter==='imminent'&&delta>=0&&(fault==='exclusive_imminent'?delta<2:delta<=2))});
+ visible.sort((a,b)=>a.expiry.localeCompare(b.expiry)||(fault==='reverse_ties'?b.order-a.order:a.order-b.order));
+ const tbody=document.querySelector('tbody');tbody.replaceChildren();
+ for(const r of visible){const tr=document.createElement('tr');for(const [cls,v] of [['name',r.name],['quantity',r.quantity],['expiry',r.expiry]]){const td=document.createElement('td');td.className=cls;td.textContent=v;tr.append(td)}
+ const td=document.createElement('td'),button=document.createElement('button');button.textContent='한 개 소비';if(fault==='keyboard_unreachable')button.tabIndex=-1;
+ button.onclick=()=>{r.quantity--;if(r.quantity===0&&fault!=='zero_retained')rows=rows.filter(x=>x!==r);save();render()};td.append(button);tr.append(td);tbody.append(tr)}
+ $('initial').hidden=rows.length!==0||fault==='missing_notices';$('empty').hidden=rows.length===0||visible.length!==0||fault==='missing_notices';
+}
+$('form').onsubmit=e=>{e.preventDefault();$('error').hidden=true;const name=$('name').value.trim(),quantity=Number($('quantity').value),expiry=$('expiry').value;
+ if(!name||!Number.isInteger(quantity)||quantity<=0||!dateValid(expiry)){if(fault!=='invalid_accepted'){$('error').textContent='이름, 양의 정수 수량과 유효한 날짜를 입력하세요.';$('error').hidden=false;return}}
+ rows.push({name,quantity,expiry,order:rows.reduce((m,x)=>Math.max(m,x.order+1),0)});save();render();};
+for(const key of ['reference','search'])$(key).addEventListener('input',render);
+for(const key of ['all','expired','imminent'])$(key).onclick=()=>{filter=key;render()};render();
+</script></html>

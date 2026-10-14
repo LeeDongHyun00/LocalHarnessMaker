@@ -1,0 +1,533 @@
+{
+  "version": "harness-v1-validation-1",
+  "recorded_at_utc": "2026-10-14T04:36:53.495916+00:00",
+  "scope": "Hand-authored evaluator reference fixtures and deliberate faults; not teacher development outcomes",
+  "teacher_development_runs": 0,
+  "performance_improvement_verified": false,
+  "training_eligible": false,
+  "unit_tests_passed": 10,
+  "reference_acceptance_cases_passed": 30,
+  "deliberate_faults_detected": 16,
+  "evidence": {
+    "backend-reference": {
+      "project_id": "backend-001",
+      "cases": [
+        {
+          "case_id": "B1.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B1.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B2.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B3.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B3.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B3.3",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B4.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B4.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B5.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B5.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B5.3",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B6.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B6.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B6.3",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B7.1",
+          "status": "pass",
+          "detail": ""
+        }
+      ],
+      "requirements": [
+        {
+          "id": "B1",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "B2",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "B3",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "B4",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "B5",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "B6",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "B7",
+          "critical": false,
+          "status": "pass"
+        }
+      ],
+      "complete": true,
+      "critical_pass": true,
+      "measurement_errors": 0
+    },
+    "frontend-reference": {
+      "project_id": "frontend-001",
+      "cases": [
+        {
+          "case_id": "F1.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F1.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F2.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F2.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F3.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F3.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F3.3",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F4.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F4.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F5.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F5.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F6.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F6.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F7.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "F7.2",
+          "status": "pass",
+          "detail": ""
+        }
+      ],
+      "requirements": [
+        {
+          "id": "F1",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "F2",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "F3",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "F4",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "F5",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "F6",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "F7",
+          "critical": false,
+          "status": "pass"
+        }
+      ],
+      "complete": true,
+      "critical_pass": true,
+      "measurement_errors": 0
+    },
+    "backend-mutants": [
+      {
+        "fault": "closed_boundary",
+        "case_id": "B3.2",
+        "detected": true
+      },
+      {
+        "fault": "cross_equipment",
+        "case_id": "B3.3",
+        "detected": true
+      },
+      {
+        "fault": "cancel_blocks",
+        "case_id": "B4.1",
+        "detected": true
+      },
+      {
+        "fault": "delete_cancelled",
+        "case_id": "B4.2",
+        "detected": true
+      },
+      {
+        "fault": "filter_or",
+        "case_id": "B5.1",
+        "detected": true
+      },
+      {
+        "fault": "unsorted",
+        "case_id": "B5.2",
+        "detected": true
+      },
+      {
+        "fault": "invalid_mutates",
+        "case_id": "B6.2",
+        "detected": true
+      },
+      {
+        "fault": "no_persistence",
+        "case_id": "B7.1",
+        "detected": true
+      }
+    ],
+    "frontend-mutants": [
+      {
+        "fault": "exclusive_imminent",
+        "case_id": "F3.1",
+        "detected": true
+      },
+      {
+        "fault": "untrimmed_search",
+        "case_id": "F4.1",
+        "detected": true
+      },
+      {
+        "fault": "reverse_ties",
+        "case_id": "F4.2",
+        "detected": true
+      },
+      {
+        "fault": "zero_retained",
+        "case_id": "F2.2",
+        "detected": true
+      },
+      {
+        "fault": "no_persistence",
+        "case_id": "F5.1",
+        "detected": true
+      },
+      {
+        "fault": "invalid_accepted",
+        "case_id": "F6.1",
+        "detected": true
+      },
+      {
+        "fault": "missing_notices",
+        "case_id": "F7.1",
+        "detected": true
+      },
+      {
+        "fault": "keyboard_unreachable",
+        "case_id": "F7.2",
+        "detected": true
+      }
+    ],
+    "isolation": {
+      "checks": {
+        "nonroot": true,
+        "hidden_intent_absent": true,
+        "host_credentials_unreadable": true,
+        "docker_socket_absent": true,
+        "no_model_credentials_in_environment": true,
+        "work_writable": true,
+        "outbound_blocked": true,
+        "proxy_blocked": true,
+        "root_readonly": true
+      },
+      "host_bind_mount_count": 0,
+      "scope": "offline submitted-service containers, not live teacher session"
+    },
+    "browser-isolation": {
+      "http_outbound_blocked": true,
+      "websocket_outbound_blocked": true
+    },
+    "backend-cli": {
+      "project_id": "backend-001",
+      "cases": [
+        {
+          "case_id": "B1.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B1.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B2.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B3.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B3.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B3.3",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B4.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B4.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B5.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B5.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B5.3",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B6.1",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B6.2",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B6.3",
+          "status": "pass",
+          "detail": ""
+        },
+        {
+          "case_id": "B7.1",
+          "status": "pass",
+          "detail": ""
+        }
+      ],
+      "requirements": [
+        {
+          "id": "B1",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "B2",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "B3",
+          "critical": true,
+          "status": "pass"
+        },
+        {
+          "id": "B4",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "B5",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "B6",
+          "critical": false,
+          "status": "pass"
+        },
+        {
+          "id": "B7",
+          "critical": false,
+          "status": "pass"
+        }
+      ],
+      "complete": true,
+      "critical_pass": true,
+      "measurement_errors": 0,
+      "artifact_digest": "7be00aa835b02c5f54f681e5339bd570363ef87d8e3dbcc71ddbc6031b22e22d"
+    },
+    "frontend-extra": [
+      {
+        "case_id": "F4.1",
+        "status": "pass",
+        "extra_probe": "whole-name vs substring search"
+      },
+      {
+        "case_id": "F6.1",
+        "status": "pass",
+        "extra_probe": "negative quantity"
+      }
+    ],
+    "filesystem-packaging": {
+      "empty_directory_preserved": true,
+      "nested_directory_writable": true,
+      "internal_link_preserved": true
+    }
+  },
+  "fixture_artifact_digests": {
+    "frontend": "4d544a733de828ff185ecfc1f697f714e52680bdfeebabc78754db46fb950b14",
+    "backend": "7be00aa835b02c5f54f681e5339bd570363ef87d8e3dbcc71ddbc6031b22e22d"
+  },
+  "source_sha256": {
+    "experiments/pilot-v1/projects/backend-001/intent-card.json": "845ed75a869e7f6aeff5623b829ef26682d5bcc547b141d9add32e5347c1f548",
+    "experiments/pilot-v1/projects/frontend-001/intent-card.json": "4eba82017259fcaeefd0b08e55275d26124e7e2628102d58056d4a54316bc52a",
+    "harness/README.md": "67f96292a963f156737c886800325f65b55c3433bf5e8aebcbde61628b01ba89",
+    "harness/__init__.py": "96994c9849f6c9b02862dfc252558db5648b01fef84401d6c6f8f93fadd52ce1",
+    "harness/__main__.py": "ee5a9153bb8aebae11cad6db8fba11e17041201c4d033bbef58654b1bccc77cb",
+    "harness/backend.py": "1075b8c89b3b8cc7abac64362cbcad8dda4907cd749478850bd7302d5f75553c",
+    "harness/bridge.py": "5a59f67d554908f2ef7fa83eae52f05379049fcbde0cfc8aa855cb44f803962a",
+    "harness/browser_proxy.py": "ce300f858d0206aa32c1461764b12c22173b15fb00b283997bd82fffa4e13edc",
+    "harness/container.py": "ef746d98a1f49942874b9ce50e93022196cac5d3b1b34f87cef3a99dcb9e356a",
+    "harness/frontend.py": "45fb1c62cf162437741f58cf20cf3101e64fa0f058afd32aeb68be542e43ff3c",
+    "harness/packages.py": "0f3bd1f1bbc2d122aa7e1c0698cef6f0dffb984fe7b10489ad5108293905fead",
+    "harness/results.py": "55ae239545907aa40c73df258a7bd03fb21c8586d724067021abd8136b4dbf95",
+    "harness/runtime-lock.json": "a641b28b5f7c3b3a96fd02ec0ae581db903eaecbd8c481033e336ec56ab4de86",
+    "requirements-evaluation.txt": "cfa2186c0470feac813f1ac67c71e54a53021ec949026946255874958d245e82",
+    "scripts/record_harness_validation.py": "d8251fca852bd3ecfa2d81848258b431534a5788ba9cc8fbab28bee4c1215b1d",
+    "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/fixtures/backend/README.md": "87910de102c02b63f34f62024af35db898fe3f769d445a6662f875598db44872",
+    "tests/fixtures/backend/run.json": "528b2f7551dc01895907877d3ef52878a7bfb00dd9fb1a83898b749e9d59418e",
+    "tests/fixtures/backend/server.py": "9598da17b2d654faa4dfdc8bfe36dca1bbc306ce495add289664dd398fccf48a",
+    "tests/fixtures/frontend/README.md": "e3f883d0cc2e7d63594ec8244078955f4e4eb172cf45c95f5b658c5a138d14e3",
+    "tests/fixtures/frontend/index.html": "769dd30ec24ba492b4313f186868e8cf160c4a9aee342e54356b95dbbc3ca836",
+    "tests/fixtures/frontend/run.json": "10010e8c9e7590f4790cddd6179c9d80a1e569feaa7e140c88ac164963600748",
+    "tests/fixtures/frontend/server.mjs": "9f9b0adf62e01e7cd77b2619bbd2b97e34844ad811a22a37af6aaa70e12518f0",
+    "tests/fixtures/frontend/ui-adapter.json": "4fa4053c9951a021d21936a8185a6196adbb2e69665a260fff1e6d1bd7f55999",
+    "tests/test_harness.py": "1ac30daad1f3e61208592f5f32d7ac08eb5d5acb0f613291cde567710df43e32",
+    "tests/test_integration.py": "483ac5192fe24998665f1a72d57c1e4812d57998853717199ad0890f8e59b102"
+  },
+  "limitations": [
+    "Frontend F7.2 combines browser checks with fixture review assertions; actual submissions require human accessibility review.",
+    "Submitted-service isolation is verified; live teacher development filesystem and provider-network isolation remains unverified.",
+    "Private mapping separation and byte preservation are unit tested; independent judge account access separation remains unverified.",
+    "The preparation runtime.json is a preserved earlier draft; this evidence does not freeze the development protocol.",
+    "The initial combined integration run found isolation probe errors; corrected isolation checks and strengthened frontend checks were rerun."
+  ]
+}

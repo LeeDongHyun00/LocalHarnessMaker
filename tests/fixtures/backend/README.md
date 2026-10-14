@@ -1,0 +1,1 @@
+Evaluator reference fixture, authored for harness validation. Not a teacher-generated experimental submission. Start with `python server.py`. Persistent storage is `data.json` in the working directory.

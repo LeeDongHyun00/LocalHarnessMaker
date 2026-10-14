@@ -1,0 +1,1 @@
+Evaluator reference fixture, authored for harness validation. Not a teacher-generated experimental submission. Start with `node server.mjs`. Browser localStorage holds ingredients. No external dependencies.

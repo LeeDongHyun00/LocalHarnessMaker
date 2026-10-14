@@ -1,0 +1,19 @@
+{
+  "scope": "offline submitted-service evaluation; not a frozen teacher development image",
+  "images": {
+    "python": {
+      "ref": "python@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
+      "version": "3.12.14"
+    },
+    "node": {
+      "ref": "node@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df",
+      "version": "24.19.0"
+    }
+  },
+  "evaluation_host": {
+    "python": "3.12.14",
+    "playwright": "1.62.0",
+    "chromium": "151.0.7922.34",
+    "timezone": "Asia/Seoul"
+  }
+}

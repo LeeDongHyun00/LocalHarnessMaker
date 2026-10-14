@@ -1,0 +1,26 @@
+{
+  "scope": "fixture mapping only; independently map real submissions",
+  "controls": {
+    "name": {"label": "이름"},
+    "quantity": {"label": "수량"},
+    "expiry": {"label": "소비기한"},
+    "reference": {"label": "기준일"},
+    "search": {"label": "검색"},
+    "add": {"role": "button", "name": "등록"}
+  },
+  "filters": {
+    "all": {"role": "button", "name": "전체"},
+    "expired": {"role": "button", "name": "기한 지남"},
+    "imminent": {"role": "button", "name": "임박"}
+  },
+  "rows": "tbody tr",
+  "row_fields": {"name": {"css": ".name"}, "quantity": {"css": ".quantity"}, "expiry": {"css": ".expiry"}},
+  "consume": {"role": "button", "name": "한 개 소비"},
+  "notices": {"initial_empty": {"css": "#initial"}, "no_results": {"css": "#empty"}, "error": {"role": "alert", "name": ""}},
+  "review": {
+    "mapping_verified": true,
+    "controls_have_discernible_purpose": true,
+    "visible_focus_verified": true,
+    "basis": "Harness reference fixture only: explicit labels, native buttons, visible focus CSS. Real artifact review is still required."
+  }
+}
