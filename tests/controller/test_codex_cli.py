@@ -70,7 +70,7 @@ def test_codex_cli_uses_read_only_empty_temp_and_low_effort(
     assert argv[argv.index("--config") + 1] == 'model_reasoning_effort="low"'
     assert call["kwargs"]["shell"] is False and call["kwargs"]["check"] is False
     assert call["kwargs"]["text"] is True and call["kwargs"]["capture_output"] is True
-    assert call["kwargs"]["timeout"] == 180
+    assert call["kwargs"]["timeout"] == 35
     assert call["kwargs"]["input"] == "\n\n".join(
         f"## {('Controller instructions' if msg['role'] == 'system' else 'Controller input data')}\n\n{msg['content']}"
         for msg in messages

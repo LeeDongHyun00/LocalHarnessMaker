@@ -1,5 +1,29 @@
 # Controller update — 2026-10-22
 
+Cloud deadlines now use 35 s for both codex_cli and cheap_api, superseding
+the initial 25 s setting. Claude's repeated host contract call passed under the
+25 s deadline but took 20.0 s with four Codex jobs sharing the subscription,
+compared with 15.6 s idle. No API key is configured on this Mac, so a CLI timeout
+would fail without HTTP fallback; the revised setting provides more headroom.
+The original contract/judge/handoff latencies were 15.6/14.4/13.2 s on
+codex-cli 0.162.0-alpha.17.2 with gpt-6-luna. STATUS records the user-supplied
+evidence; no live calls ran here.
+
+Three deadlines plus approximately 1 s startup per call total
+3 * (35 + 1) = 108 s, within judge's unchanged 120 s budget and the handoff
+budget Role 2 is raising to 120 s. The observed 15.6–20.0 s contract latency
+fits the plugin's approved 30 s budget, but the controller deadline exceeds it:
+the plugin enforces the 30 s cutoff. This does not guarantee contract completion
+under further load or leave time for three attempts. Local configuration is
+unchanged. Regression tests pin the cloud deadlines and bound the worst CLI/HTTP
+combination against the revised 120 s smallest multi-call caller budget.
+
+D-4 observation only: the live example contract put SC-1 llm_judge before regex
+and command criteria despite the mechanical-check preference already present in
+the template. No prompt tuning, evaluation-task reading or schema changes were
+performed. HTTP fallback, production hook integration and the real D-4 comparison
+remain pending host verification, including the new deadline behavior.
+
 H4 is fixed: CLI executable lookup failure and runner spawn OSError record zero
 input, cached-input and output tokens and zero API-equivalent USD. The route log
 retains the actual CLI backend and fallback reason. With approved HTTP fallback,
@@ -59,7 +83,8 @@ requirements. Local prices remain unknown; no zero cost is fabricated.
 
 ## Verification
 
-`.venv/bin/python -m pytest tests/controller -q`: 145 passed in 1.71s. New mocked
+`.venv/bin/python -m pytest tests/controller -q`: 148 passed in 5.58s, including
+three deadline checks for the revised settings. Previous H4 coverage remains green. New mocked
 CLI/HTTP regressions cover all three never-started cases for contract and judge,
 unknown accounting after deadline/nonzero/missing-final-message failures, exact
 path stdout, output preservation, schema validation, per-call records and the
@@ -80,6 +105,8 @@ were changed. Shared interfaces and other roles' implementation remain untouched
 
 ## Assumptions
 
+- Host measurements are user-supplied Claude evidence, not rerun here. The 1 s
+  per-call startup allowance is approximate; HTTP latency is not yet measured.
 - The approved decisions and published schemas supersede old STATUS interface
   blockers. No new shared interface is needed.
 - No exact preflight tokenizer dependency is necessary for this implementation:
