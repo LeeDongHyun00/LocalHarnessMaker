@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Session handoff (draft)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["done", "remaining", "decisions", "verify_commands", "do_not_touch"],
+  "properties": {
+    "done": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["criterion_id", "artifact"],
+        "properties": {
+          "criterion_id": {"type": "string", "minLength": 1},
+          "artifact": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "remaining": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["criterion_id", "state"],
+        "properties": {
+          "criterion_id": {"type": "string", "minLength": 1},
+          "state": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["what", "why"],
+        "properties": {
+          "what": {"type": "string", "minLength": 1},
+          "why": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "verify_commands": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "do_not_touch": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

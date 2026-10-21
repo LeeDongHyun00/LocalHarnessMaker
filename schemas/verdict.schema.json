@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Verification verdict (draft)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items", "overall", "reinstruct_message", "attempt"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "evidence", "reason"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"enum": ["pass", "fail", "unverifiable"]},
+          "evidence": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "overall": {"enum": ["pass", "fail"]},
+    "reinstruct_message": {"type": ["string", "null"], "minLength": 1, "maxLength": 300},
+    "attempt": {"type": "integer", "minimum": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"overall": {"const": "pass"}}},
+      "then": {
+        "properties": {
+          "items": {"items": {"properties": {"status": {"const": "pass"}}}},
+          "reinstruct_message": {"type": "null"}
+        }
+      },
+      "else": {
+        "properties": {
+          "items": {"contains": {"properties": {"status": {"enum": ["fail", "unverifiable"]}}}}
+        }
+      }
+    }
+  ]
+}

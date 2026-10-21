@@ -1,0 +1,11 @@
+{
+  "items": [
+    {"id": "SC-1", "status": "pass", "evidence": "SYNTHETIC: python -m py_compile app/main.py; exit=0; stdout is empty.", "reason": "The application module compiles."},
+    {"id": "SC-2", "status": "pass", "evidence": "SYNTHETIC: contract SC-2 command; exit=0; stdout=health response verified\\n.", "reason": "Status and full JSON match."},
+    {"id": "SC-3", "status": "unverifiable", "evidence": "SYNTHETIC: python -m pytest -q tests/test_health.py; exit=4; ERROR: file or directory not found: tests/test_health.py.", "reason": "The requested test file is missing."},
+    {"id": "SC-4", "status": "fail", "evidence": "SYNTHETIC llm_judge: app/main.py diff is in scope, but tests/test_health.py is absent.", "reason": "The required test assertions cannot be found."}
+  ],
+  "overall": "fail",
+  "reinstruct_message": "Items SC-3 and SC-4 are not done. Add tests/test_health.py asserting status 200 and the complete JSON, then rerun pytest. Evidence: test file missing (exit 4); llm_judge could not find the required assertions. Fix only these items, then finish again.",
+  "attempt": 1
+}

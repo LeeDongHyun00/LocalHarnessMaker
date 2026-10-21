@@ -1,0 +1,20 @@
+{
+  "done": [
+    {"criterion_id": "SC-1", "artifact": "app/main.py (synthetic compile evidence in verdict_fail.json)"},
+    {"criterion_id": "SC-2", "artifact": "app/main.py GET /health (synthetic response evidence in verdict_fail.json)"}
+  ],
+  "remaining": [
+    {"criterion_id": "SC-3", "state": "Add tests/test_health.py and run python -m pytest -q tests/test_health.py."},
+    {"criterion_id": "SC-4", "state": "After adding the test, supply the before/after diff to llm_judge to check scope and both assertions."}
+  ],
+  "decisions": [
+    {"what": "Implement GET /health on the existing app instance.", "why": "Preserve all existing routes and dependencies."},
+    {"what": "Resume from the failing first attempt.", "why": "This hand-written handoff describes verdict_fail.json, before the synthetic passing second attempt."}
+  ],
+  "verify_commands": [
+    "python -m py_compile app/main.py",
+    "python -c 'from fastapi.testclient import TestClient; from app.main import app; r = TestClient(app).get(\"/health\"); assert r.status_code == 200; assert r.json() == {\"status\": \"ok\"}; print(\"health response verified\")'",
+    "python -m pytest -q tests/test_health.py"
+  ],
+  "do_not_touch": ["Existing routes", "Dependency manifests", "Files other than app/main.py and tests/test_health.py"]
+}

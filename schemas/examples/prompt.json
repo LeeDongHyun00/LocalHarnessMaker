@@ -1,0 +1,1 @@
+"In the existing FastAPI project, add GET /health in app/main.py. Return HTTP 200 with exactly {\"status\": \"ok\"}. Add tests/test_health.py using pytest and FastAPI TestClient to assert both the status code and complete response JSON. Preserve existing routes and dependencies. Run the new test and report its result."
