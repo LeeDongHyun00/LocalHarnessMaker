@@ -1,5 +1,9 @@
 ## Done
 
+- Fixed H4 for executable lookup and runner spawn failures: CLI calls that never started record zero input/cached/output tokens and USD, retain actual backend/fallback reason, and contract/judge totals equal one mocked HTTP call (.venv/bin/python -m pytest tests/controller -q: 145 passed in 1.71s, including six never-started CLI command cases).
+- Retained unknown accounting for started CLI deadline/nonzero/missing-final-message failures; tested contract exit 2 with no success stdout and preserved output after successful HTTP fallback, and schema-valid judge null totals (.venv/bin/python -m pytest tests/controller -q: 145 passed in 1.71s, including six started-process command cases).
+- Split invalid-message and missing-CLI tests and added a same-model fallback regression that requires rejection before HTTP; documented H4 and the unresolved contract schema policy in controller/CHANGES.md (.venv/bin/python -m pytest tests/controller -q: 145 passed in 1.71s).
+- Updated the reviewable change summary and role handoff; only controller/, tests/controller/ and this STATUS file were edited in this session (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
 - Added approved codex_cli routing to all three required --backend selectors and selected codex_cli in controller/config.yaml; mocked CLI tests cover exact one-path stdout and error preservation (.venv/bin/python -m pytest tests/controller -q -s: 131 passed).
 - Implemented a shared three-generation budget, one same-model CLI-to-HTTP transport fallback, environment-key/remaining-slot checks, guarded copied child environments on regeneration, configurable policy, and explicit errors without hidden local fallback (.venv/bin/python -m pytest tests/controller -q -s: 131 passed, including timeout/nonzero/unavailable CLI and exhausted-budget regressions).
 - Implemented controller judge against the published input/output schemas with local reference resolution, pre-call input checks, code-owned criterion/model/usage, all three statuses, llm_judge evidence marker, model-conflict rejection, cache subset checks and summed/null retry/fallback accounting (.venv/bin/python -m pytest tests/controller -q -s: 131 passed).
@@ -13,6 +17,7 @@
 
 ## Remaining
 
+- Needs Role 1 decision: version 1 contract cost_estimate cannot represent unknown usage from a started CLI process followed by successful HTTP fallback. Keep the current honest exit 2 until Role 1 approves any interface revision; judge can already retain null totals. No schema change was attempted.
 - Pending host verification: exercise the actual contract, judge and handoff CLIs with explicitly selected codex_cli and validate outputs; separately check configured HTTP fallback and production hook guard integration. Nested Codex, network, live model calls and macOS sandbox-exec were forbidden and were not attempted this session.
 - Pending host verification, D-1: measure API-equivalent control cost against an executor baseline and empirically calibrate effort v1 from task outcomes. Existing thresholds have only synthetic/fixture calibration; no exact tokenizer dependency is presently needed.
 - Pending host verification, D-3: select and verify the local llama.cpp/vLLM build, exact Gemma 4 12B artifact/alias, schema-constrained endpoint behavior, peak memory and latency; establish an approved API-equivalent local price snapshot before contract generation. Keep local.enabled=false until verified. STOP-C2/STOP-C4 apply if measured schema quality or GPU capacity fails.
@@ -23,6 +28,8 @@
 
 ## Decisions
 
+- Zero usage applies only before inference could start: constructor failure and runner spawn OSError spend no tokens; output handling after runner return cannot reset unknown usage to zero.
+- Retain contract exit 2 after a started CLI leaves unknown usage, even when HTTP fallback succeeds: non-null cost_estimate cannot honestly represent the total under the approved schema; Role 1 owns any revision.
 - Execute the user's priority order: approved backend routing, judge and handoff precede effort v1, retrieval and the mock-only local adapter.
 - Keep one budget in RoutedBackend: fallback consumes a generation slot and cannot reset regeneration limits; fail/unverifiable are content results, not fallback triggers.
 - Resolve published JSON Schema references from a local registry: validation must work offline without fetching schemas.
@@ -35,7 +42,7 @@
 
 ## Verify commands
 
-- .venv/bin/python -m pytest tests/controller -q -s
+- .venv/bin/python -m pytest tests/controller -q
 - git diff --check -- controller tests/controller state/STATUS-controller.md
 - Pending host: python -m controller contract --prompt schemas/examples/prompt.json --handoff none --cases controller/case_library/seed --backend codex_cli --out /tmp/controller-contract.json
 - Pending host: python -m controller judge --criterion schemas/examples/criterion.json --artifact PUBLIC_EVIDENCE_DIR --backend codex_cli --out /tmp/controller-judgment.json
@@ -53,6 +60,7 @@
 
 ## Assumptions
 
+- Injected runners follow subprocess.run semantics: FileNotFoundError/PermissionError from spawn mean no process started; TimeoutExpired means a process started. Fixtures and transports are mocked and do not establish live CLI/HTTP availability.
 - User approval of decisions 0002/0004 and the published schemas supersedes the old interface-blocked Remaining items; required CLI backend flags remain required despite the primary configuration selection.
 - The existing gpt-6-luna rates are user-specified API-equivalent planning rates, not verified billed pricing; missing local prices stay unknown.
 - Artifact evidence is bounded UTF-8 text with explicit omissions for .git/.venv/__pycache__/node_modules, binaries and byte limits; omitted material cannot support a pass that requires inspecting it.

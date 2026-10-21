@@ -141,6 +141,10 @@ class CodexCLIBackend:
                     events = raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else raw
                     self._usage = _read_usage(events, self.prices)
                     raise TransportError("Codex CLI timed out; consult its JSONL usage log") from exc
+                except OSError as exc:
+                    # Spawn failed before a process existed; no inference was run.
+                    self._usage = Usage(0, 0, 0.0, 0.0, 0)
+                    raise TransportError("Codex CLI executable could not be started") from exc
                 self._usage = _read_usage(events, self.prices)
                 for line in events.splitlines():
                     try:
@@ -162,7 +166,7 @@ class CodexCLIBackend:
                 status = "success"
                 return value
             except OSError as exc:
-                raise TransportError("Codex CLI executable could not be started") from exc
+                raise TransportError("Codex CLI output could not be read") from exc
             finally:
                 logger.info("control_cli_events %s", json.dumps({"model": self.model, "events": events}))
                 self._usage = Usage(

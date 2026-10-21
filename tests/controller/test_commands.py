@@ -144,11 +144,8 @@ def test_one_fallback_and_summed_accounting(failure: str, tmp_path: Path) -> Non
     assert count == 1 and len(transport.calls) == 2 and backend.count == 3
     assert [call["backend"] for call in backend.calls] == ["codex_cli", "cheap_api", "cheap_api"]
     assert backend.calls[0]["fallback_reason"]
-    assert result["usage"]["input_tokens"] == (None if failure == "missing" else 3200)
-    if failure == "missing":
-        assert result["usage"]["usd"] is None
-    else:
-        assert result["usage"]["usd"] == pytest.approx(sum(c["usd"] for c in backend.calls))
+    assert result["usage"]["input_tokens"] == (2000 if failure == "missing" else 3200)
+    assert result["usage"]["usd"] == pytest.approx(sum(c["usd"] for c in backend.calls))
 
 
 def test_fallback_cannot_reset_exhausted_budget(tmp_path: Path) -> None:
@@ -355,5 +352,119 @@ def test_cli_unavailability_falls_back_without_subprocess(tmp_path: Path, monkey
         "cheap_api": lambda: CheapAPIBackend(transport=transport),
     })
     result = generate_judgment(criterion(), tmp_path, backend)
-    assert backend.count == 2 and result["usage"]["usd"] is None
+    assert backend.count == 2 and result["usage"]["usd"] == pytest.approx(.000191)
     assert backend.calls[0]["backend"] == "codex_cli"
+
+
+@pytest.mark.parametrize("failure", ["not_on_path", "file_not_found", "permission"])
+@pytest.mark.parametrize("command", ["contract", "judge"])
+def test_cli_never_started_uses_only_http_accounting(
+    failure: str, command: str, tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    from tests.controller.support import model_contract
+    from tests.controller.test_cli import arguments
+
+    runner_calls = 0
+
+    def runner(argv: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        nonlocal runner_calls
+        runner_calls += 1
+        if failure == "permission":
+            raise PermissionError("synthetic spawn denied")
+        raise FileNotFoundError("synthetic missing executable")
+
+    monkeypatch.setattr("controller.backends.codex_cli.shutil.which", lambda _: None)
+    transport = RecordingTransport([response(model_contract() if command == "contract" else judgment())])
+    backend = RoutedBackend("codex_cli", factories={
+        "codex_cli": lambda: CodexCLIBackend(
+            runner=runner, executable="missing-codex" if failure == "not_on_path" else "/mock/codex"),
+        "cheap_api": lambda: CheapAPIBackend(transport=transport),
+    })
+    monkeypatch.setattr("controller.__main__.RoutedBackend", lambda selected: backend)
+    out = tmp_path / "output.json"
+    args = arguments(out) if command == "contract" else [
+        "judge", "--criterion", str(ROOT / "schemas/examples/criterion.json"),
+        "--artifact", str(tmp_path), "--backend", "codex_cli", "--out", str(out)]
+    args[args.index("--backend") + 1] = "codex_cli"
+    assert main(args) == 0
+    assert capsys.readouterr().out == f"{out}\n"
+    result = load_object(out)
+    schema_validator(f"{command if command == 'contract' else 'judgment'}.schema.json").validate(result)
+    usage = result["cost_estimate" if command == "contract" else "usage"]
+    assert usage["input_tokens"] == 1000 and usage["output_tokens"] == 200
+    assert usage["usd"] == pytest.approx(.000191)
+    if command == "judge":
+        assert usage["cached_input_tokens"] == 100
+    assert runner_calls == (0 if failure == "not_on_path" else 1)
+    assert len(transport.calls) == 1 and backend.count == 2
+    assert [call["backend"] for call in backend.calls] == ["codex_cli", "cheap_api"]
+    cli_call, http_call = backend.calls
+    assert cli_call["fallback_reason"]
+    for field in ("input_tokens", "cached_input_tokens", "output_tokens", "usd"):
+        assert cli_call[field] == 0
+        assert getattr(backend.usage(), field) == http_call[field]
+
+
+@pytest.mark.parametrize("failure", ["deadline", "nonzero", "no_usage"])
+@pytest.mark.parametrize("command", ["contract", "judge"])
+def test_started_cli_unknown_usage_remains_unknown_after_fallback(
+    failure: str, command: str, tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    from tests.controller.support import model_contract
+    from tests.controller.test_cli import arguments
+
+    runner_calls = 0
+
+    def runner(argv: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        nonlocal runner_calls
+        runner_calls += 1
+        if failure == "deadline":
+            raise subprocess.TimeoutExpired(argv, kwargs["timeout"], output='{"type":"turn.started"}\n')
+        # Successful exit with no final-message file is also a transport failure.
+        return subprocess.CompletedProcess(argv, 1 if failure == "nonzero" else 0, "", "")
+
+    transport = RecordingTransport([response(model_contract() if command == "contract" else judgment())])
+    backend = RoutedBackend("codex_cli", factories={
+        "codex_cli": lambda: CodexCLIBackend(runner=runner, executable="/mock/codex"),
+        "cheap_api": lambda: CheapAPIBackend(transport=transport),
+    })
+    monkeypatch.setattr("controller.__main__.RoutedBackend", lambda selected: backend)
+    out = tmp_path / "output.json"
+    if command == "contract":
+        out.write_text("existing", encoding="utf-8")
+        args = arguments(out)
+        args[args.index("--backend") + 1] = "codex_cli"
+        assert main(args) == 2
+        captured = capsys.readouterr()
+        assert captured.out == "" and "no reliable usage accounting" in captured.err
+        assert out.read_text(encoding="utf-8") == "existing"
+    else:
+        assert main(["judge", "--criterion", str(ROOT / "schemas/examples/criterion.json"),
+            "--artifact", str(tmp_path), "--backend", "codex_cli", "--out", str(out)]) == 0
+        assert capsys.readouterr().out == f"{out}\n"
+        result = load_object(out)
+        schema_validator("judgment.schema.json").validate(result)
+        for field in ("input_tokens", "cached_input_tokens", "output_tokens", "usd"):
+            assert result["usage"][field] is None
+    assert runner_calls == len(transport.calls) == 1
+    assert backend.calls[0]["fallback_reason"]
+    for field in ("input_tokens", "cached_input_tokens", "output_tokens", "usd"):
+        assert backend.calls[0][field] is None
+        assert getattr(backend.usage(), field) is None
+
+
+def test_fallback_rejects_different_model_before_http_call(tmp_path: Path) -> None:
+    config = copy.deepcopy(load_object(ROOT / "controller/config.yaml"))
+    config["cheap_api"]["model"] = "different-model"
+    runner = MockRunner(returncode=1)
+    transport = RecordingTransport([response(judgment())])
+    backend = RoutedBackend("codex_cli", config=config, factories={
+        "codex_cli": lambda: CodexCLIBackend(runner=runner, executable="/mock/codex"),
+        "cheap_api": lambda: CheapAPIBackend(transport=transport),
+    })
+    with pytest.raises(BackendError, match="same model"):
+        generate_judgment(criterion(), tmp_path, backend)
+    assert len(runner.calls) == backend.count == 1
+    assert not transport.calls

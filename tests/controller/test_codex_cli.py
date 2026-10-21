@@ -11,7 +11,7 @@ from jsonschema import Draft202012Validator
 from controller.backends.codex_cli import CodexCLIBackend, _read_usage
 from controller.backends.cheap_api import structured_schema
 from controller.contract_gen import build_messages
-from controller.errors import BackendError, InputError, InvalidGeneration
+from controller.errors import BackendError, InputError, InvalidGeneration, TransportError
 from controller.settings import load_object
 from tests.controller.support import ROOT, model_contract
 
@@ -157,9 +157,18 @@ def test_unknown_usage_after_success_stays_null() -> None:
     assert backend.usage().usd is None
 
 
-def test_invalid_messages_and_missing_cli_are_input_errors() -> None:
+def test_invalid_messages_are_input_errors() -> None:
+    runner = MockRunner()
     with pytest.raises(InputError):
-        CodexCLIBackend(executable="/no/such/codex").generate(contract_schema(), [{"role": "tool", "content": "bad"}])
+        CodexCLIBackend(runner=runner, executable="/mock/codex").generate(
+            contract_schema(), [{"role": "tool", "content": "bad"}])
+    assert not runner.calls
+
+
+def test_missing_cli_is_transport_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("controller.backends.codex_cli.shutil.which", lambda _: None)
+    with pytest.raises(TransportError, match="not found on PATH"):
+        CodexCLIBackend(executable="missing-codex")
 
 
 def test_api_fallback_model_and_rates_match_cli_estimate() -> None:

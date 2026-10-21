@@ -1,4 +1,21 @@
-# Controller update — 2026-10-21
+# Controller update — 2026-10-22
+
+H4 is fixed: CLI executable lookup failure and runner spawn OSError record zero
+input, cached-input and output tokens and zero API-equivalent USD. The route log
+retains the actual CLI backend and fallback reason. With approved HTTP fallback,
+contract and judge totals therefore equal the HTTP call's measured usage when
+the CLI never started. The OSError handler that assigns zero surrounds only the
+runner call; output-file errors after the runner returns retain measured or
+unknown usage.
+
+A CLI process that started and then failed, exceeded its deadline or supplied no
+usage retains unknown accounting where measurements are missing. After a valid
+HTTP fallback, judge reports null totals; contract still exits 2 with
+"Generation has no reliable usage accounting", prints no success path and
+preserves existing output. This is the honest result under the version 1
+contract schema, whose cost_estimate forbids null. Role 1 must decide whether to
+revise that interface; this change does not alter schemas or fabricate zero for
+started processes.
 
 The approved `codex_cli` selector is available on contract, judge and handoff;
 `--backend` remains required. Configuration selects it as primary. Command-scoped
@@ -42,7 +59,12 @@ requirements. Local prices remain unknown; no zero cost is fabricated.
 
 ## Verification
 
-`.venv/bin/python -m pytest tests/controller -q -s`: 131 passed. The original
+`.venv/bin/python -m pytest tests/controller -q`: 145 passed in 1.71s. New mocked
+CLI/HTTP regressions cover all three never-started cases for contract and judge,
+unknown accounting after deadline/nonzero/missing-final-message failures, exact
+path stdout, output preservation, schema validation, per-call records and the
+same-model fallback guard. Invalid-message and missing-CLI tests are separate.
+The original
 fixture report is 10/10 schema-valid and 4/4 ambiguous assumptions. Each adapter's
 expanded mocked report is 30/30 schema-valid and 8/8 ambiguous assumptions.
 Tests include fallback exhaustion, unavailable CLI, nonzero exit and timeout,

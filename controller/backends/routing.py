@@ -79,7 +79,8 @@ class RoutedBackend:
                     raise BackendError("CLI fallback requires the same model and an environment API key") from exc
                 fallback_reason = str(exc)
             finally:
-                usage = backend.usage() if backend is not None else Usage(None, None, None, 0.0)
+                # A failed constructor cannot have started a generation process.
+                usage = backend.usage() if backend is not None else Usage(0, 0, 0.0, 0.0, 0)
                 usages.append(usage)
                 self._usage = sum_usage(usages)
                 record = {"backend": self.selected, "model": self.model,
