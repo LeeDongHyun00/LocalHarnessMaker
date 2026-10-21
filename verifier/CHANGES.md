@@ -1,68 +1,61 @@
-# Verifier progress — 2026-10-21
+# Verifier fixes — 2026-10-22
 
-The checker reads the last assistant final report using the Codex response-item
-structure captured in both exec and TUI evidence linked by
-`docs/hooks-contract.md`. Completion terms are mapped only to explicit criterion
-IDs. Earlier reports, user messages, tools and commentary do not supply claims.
-A failed mechanical check with a completion claim keeps its failing status and
-evidence and receives reason `claimed_without_evidence`. Pass and unverifiable
-outcomes retain their original reasons. Synthetic report fixtures now use the
-measured record structure; a regression injects broken health-check outcomes.
+H3: re-instruction includes every non-pass item, including unverifiable checks
+and contract-quality warnings. It is null only for a passing verdict or at/above
+the attempt limit. The existing 300-character format details up to three items
+and counts the rest. The golden failure test compares the named criteria with
+schemas/examples/verdict_fail.json. An exhaustive test covers all 243 status
+mixes for five items at both remaining attempts and at exhaustion.
 
-`reinstruct.py` includes only verdict items whose status is `fail`, their
-criterion positions, descriptions and one line of failure evidence. Messages
-are bounded to 300 characters. Long descriptions/evidence are shortened; up to
-three failed items are detailed, with a count of further failed items.
-`HARNESS_MAX_ATTEMPTS` uses the hook's existing default of 3. At or beyond that
-limit, or with no failed items, the message is null. Unverifiable items still
-prevent overall pass and remain visible in the verdict; they do not generate
-failed-item feedback.
+M3/M4: comma-separated criterion lists share their completion predicate.
+Exception phrases (except, but, other than, apart from, besides, excluding)
+stop claim extraction for the rest of that clause. Explicit per-item negatives
+remain scoped, including “SC-1 completed, SC-2 not done”. Unmapped prose still
+supplies no claim. An integration regression checks that an unclaimed failing
+criterion retains its mechanical reason while a claimed failure receives
+claimed_without_evidence.
 
-Mixed contracts delegate only llm_judge criteria through
-`python -m controller judge --criterion FILE --artifact WORKSPACE --backend BACKEND --out FILE`.
-The subprocess uses the current interpreter, shell=False, piped input, a
-120-second deadline, and a copied environment with HARNESS_NESTED=1. Backend
-selection uses the hook's existing HARNESS_BACKEND default of codex_cli.
-Offline schema-reference resolution validates the complete approved criterion
-and judgment. Returned IDs, llm_judge evidence markers and accounting
-relationships are checked. Valid status/reason/evidence are preserved exactly;
-transport errors or malformed results become explicit unverifiable items.
-All-judge contracts retain the required quality warning without model calls.
-The verifier never imports controller.
+M5: controller judge runs with shell=False, piped input/output, a copied
+HARNESS_NESTED=1 environment and start_new_session=True. The verifier sends
+SIGKILL to the entire process group and reaps the child after timeout, other
+communication errors, and successful completion with possible lingering
+children. A timeout remains unverifiable with its deadline in the reason.
+HARNESS_JUDGE_TIMEOUT_SECONDS configures the finite positive deadline; the
+existing default stays 120 seconds. Validation precedes any check/model call,
+and the verifier never imports controller. Injected process runners, clocks
+and group signals test cleanup without real sleeps or model calls.
 
-Only the six tests that actually execute macOS Seatbelt skip when
-CODEX_SANDBOX is set. This session exposes CODEX_SANDBOX=seatbelt. Mocked tests
-and command rejection/profile tests still run; verifier/sandbox.py is unchanged.
+The test environment now unsets HARNESS_MAX_ATTEMPTS and HARNESS_BACKEND.
+Explicit regressions check their defaults of 3 and codex_cli with both unset,
+the 120-second judge default, a configured deadline, and invalid deadlines.
 
 ## Verification
 
-`.venv/bin/python -m pytest tests/verifier -q`: 125 passed, 6 skipped in 0.97s.
-Coverage includes both captured transcript excerpts, explicit/negated/grouped
-claims, claimed-without-evidence, CLI verdict output, bounded/exhausted
-re-instruction, all judge statuses, exact reason/evidence preservation, full
-criterion serialization, backend choice, copied nested guard, deadline,
-malformed judgments, ID/marker/accounting rejection, transport errors, and
-controller import independence. Judge subprocesses and command outcomes are
-mocked. No network, nested Codex, live model, or sandbox-exec call ran.
-`git diff --check -- verifier tests/verifier state/STATUS-verifier.md`: exit 0,
-no output.
+.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped.
+All six skips are real macOS Seatbelt tests blocked by nested sandboxing.
+The earlier host run reported by Claude on 2026-10-21 passed all 131 verifier
+tests and all 25 tests in tests/verifier/test_sandbox.py; another host run is
+required after these changes. git diff --check -- verifier tests/verifier
+state/STATUS-verifier.md: exit 0, no output.
 
 ## Pending
 
-Host verification remains required for real macOS isolation, FastAPI fixture
-outcomes, controller judge integration, production hook continuation and
-latency. The smoke helper now invokes live judge delegation for the unchanged
-shared contract and must only run on an authorized host. validate-handoff,
-review sampling, broader command support, bounded capture, complete sandbox
-auditing and measured D-4 rules remain unfinished. No merge, staging or commit
-was performed; the full suite is reserved for the pre-merge host check.
+Host checks: Seatbelt rerun, real controller/Codex grandchild timeout cleanup,
+FastAPI fixtures, live judge integration and plugin continuation/latency.
+A cross-role decision must align the Stop hook's 40-second timeout, this
+verifier's 120-second default, and controller codex_cli's 180 seconds per call
+with up to three generation calls per command. Other roles' files are unchanged
+by this session. Full-suite verification remains a host pre-merge task.
+
+Broader command support, bounded capture, complete sandbox auditing,
+validate-handoff, human review sampling and measured D-4 rules remain unfinished.
+No network, nested Codex, live model, sandbox-exec, staging or commit ran.
 
 ## Assumptions
 
-- The user's three ordered priorities define this session's implementation scope; future dated deliverables remain on the STATUS list.
-- Only explicit criterion IDs and completion terms in the last measured final report count; generic completion prose and semantic paraphrases are not inferred.
-- "Failed items only" means status=fail. Unverifiable results remain overall failures but generate no failed-item re-instruction by themselves.
-- The existing hook environment settings are reused; no shared CLI, schema, or hook changes are needed.
-- The workspace is the artifact directory supplied to the judge. Missing before/after evidence must remain unverifiable according to the rubric.
-- The captured format establishes current exec/TUI parsing only; resume/compaction variants and installed-wheel schema packaging remain unverified.
-- No PR was requested. This summary and STATUS provide Assumptions for a later PR description.
+- The user's host-review priorities define this session's scope; later deliverables remain pending.
+- Only explicit criterion IDs with completion terms in the last measured final report count; exception tails are conservatively unclaimed.
+- Failed items in rule 6 include every status other than pass, as explicitly directed by the user. The three-detail/count-rest overflow stays unchanged.
+- HARNESS_JUDGE_TIMEOUT_SECONDS is verifier-local configuration; deadline coordination requires a later cross-role decision. No shared CLI, schema or hook interface changes are made.
+- Process-group cleanup covers descendants remaining in the judge's POSIX group; real controller/Codex behavior still needs host verification. Forced termination by the shorter outer hook remains part of deadline coordination.
+- No PR was requested; this file and STATUS provide the change summary and Assumptions for a future PR.

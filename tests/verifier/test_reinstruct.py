@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from itertools import product
+import os
 from pathlib import Path
 from typing import Any
 
@@ -33,11 +35,31 @@ def test_retry_exhaustion(attempt: int) -> None:
     assert reinstruct(*inputs(), attempt, 3) is None
 
 
-def test_pass_and_unverifiable_are_not_failed_feedback() -> None:
+def test_unverifiable_items_receive_feedback() -> None:
     criteria, items = inputs()
     for item in items:
         item["status"] = "unverifiable"
-    assert reinstruct(criteria, items, 1, 3) is None
+    message = reinstruct(criteria, items, 1, 3)
+    assert message is not None and len(message) <= 300
+    assert message.startswith("Items 1 and 2 and 3 are not done.")
+    assert "2 more failed items" in message
+
+
+def test_every_status_mix_retries_until_exhaustion() -> None:
+    criteria, items = inputs()
+    for statuses in product(("pass", "fail", "unverifiable"), repeat=len(items)):
+        for item, status in zip(items, statuses):
+            item["status"] = status
+        overall = "pass" if all(status == "pass" for status in statuses) else "fail"
+        for attempt in (1, 2):
+            message = reinstruct(criteria, items, attempt, 3)
+            if overall == "fail":
+                assert message is not None and 0 < len(message) <= 300
+                numbers = [n for n, status in enumerate(statuses, 1) if status != "pass"]
+                assert message.startswith("Items " + " and ".join(map(str, numbers[:3])) + " are not done.")
+            else:
+                assert message is None
+        assert reinstruct(criteria, items, 3, 3) is None
 
 
 def test_long_feedback_stays_bounded() -> None:
@@ -68,3 +90,17 @@ def test_invalid_limit_before_execution(contract: dict[str, Any], workspace: Pat
     monkeypatch.setenv("HARNESS_MAX_ATTEMPTS", limit)
     with pytest.raises(ValueError):
         check_contract(contract, workspace, transcript, 1)
+
+
+def test_unset_max_attempts_defaults_to_three(
+    contract: dict[str, Any], workspace: Path, transcript: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for name in ("HARNESS_MAX_ATTEMPTS", "HARNESS_BACKEND"):
+        monkeypatch.delenv(name, raising=False)
+        assert name not in os.environ
+    contract["success_criteria"] = [{"id": "SC-1", "description": "Missing file", "check": {
+        "type": "file_exists", "path": "absent"}}]
+    for attempt in (1, 2, 3, 4):
+        verdict = check_contract(contract, workspace, transcript, attempt)
+        assert verdict["overall"] == "fail"
+        assert (verdict["reinstruct_message"] is not None) == (attempt < 3)

@@ -1,4 +1,4 @@
-"""Bounded, deterministic feedback for failed verdict items only."""
+"""Bounded, deterministic feedback for every non-pass verdict item."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def reinstruct(
     if attempt >= limit:
         return None
     descriptions = {c["id"]: c["description"] for c in criteria}
-    failed = [(n, item) for n, item in enumerate(items, 1) if item["status"] == "fail"]
+    failed = [(n, item) for n, item in enumerate(items, 1) if item["status"] != "pass"]
     if not failed:
         return None
     # At most three detailed entries fit; further failed items are counted.

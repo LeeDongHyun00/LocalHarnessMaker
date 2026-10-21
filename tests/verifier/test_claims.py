@@ -37,6 +37,16 @@ def test_only_latest_final_report(workspace: Path) -> None:
     ("SC-1 done. SC-2 completed. SC-3 passing.", {"SC-1", "SC-2", "SC-3"}),
     ("| SC-1 | implemented | app.py |\n| SC-2 | not done | absent |", {"SC-1"}),
     ("SC-1 and SC-2 completed", {"SC-1", "SC-2"}),
+    ("SC-1, SC-2, SC-3 done.", {"SC-1", "SC-2", "SC-3"}),
+    ("Done: SC-1, SC-2, SC-3.", {"SC-1", "SC-2", "SC-3"}),
+    ("All done except SC-3.", set()),
+    ("All done but SC-3.", set()),
+    ("All done other than SC-3.", set()),
+    ("All done apart from SC-3.", set()),
+    ("All done besides SC-3.", set()),
+    ("All done excluding SC-3.", set()),
+    ("SC-1, SC-2 done except SC-3.", {"SC-1", "SC-2"}),
+    ("Done: SC-1, SC-2, excluding SC-3.", {"SC-1", "SC-2"}),
     ("SC-1 completed, SC-2 not done", {"SC-1"}),
     ("SC-1 done and SC-2 not done", {"SC-1"}),
     ("SC-1 not done and SC-2 completed", {"SC-2"}),
@@ -86,3 +96,21 @@ def test_no_false_done_for_unverifiable_or_pass(contract: dict[str, Any], worksp
     verdict = check_contract(contract, workspace, transcript, 1, runner)
     assert [item["status"] for item in verdict["items"]] == ["pass", "unverifiable"]
     assert all(item["reason"] != "claimed_without_evidence" for item in verdict["items"])
+
+
+@pytest.mark.parametrize("report", ["SC-1 done. SC-3 is pending.", "SC-1 done. All done except SC-3."])
+def test_unclaimed_failure_keeps_mechanical_reason(
+    contract: dict[str, Any], workspace: Path, report: str,
+) -> None:
+    contract["success_criteria"] = [
+        {"id": identifier, "description": "Required file", "check": {
+            "type": "file_exists", "path": "absent"}}
+        for identifier in ("SC-1", "SC-3")
+    ]
+    transcript = workspace / "claims.jsonl"
+    transcript.write_text(json.dumps(report_record(report)))
+    verdict = check_contract(contract, workspace, transcript, 1)
+    assert [item["status"] for item in verdict["items"]] == ["fail", "fail"]
+    assert [item["reason"] for item in verdict["items"]] == [
+        "claimed_without_evidence", "required file is missing",
+    ]

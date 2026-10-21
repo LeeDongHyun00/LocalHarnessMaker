@@ -17,8 +17,9 @@ collect_ignore_glob = ["fixtures/*"]
 
 @pytest.fixture(autouse=True)
 def verifier_environment(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("HARNESS_MAX_ATTEMPTS", "3")
-    monkeypatch.setenv("HARNESS_BACKEND", "codex_cli")
+    monkeypatch.delenv("HARNESS_MAX_ATTEMPTS", raising=False)
+    monkeypatch.delenv("HARNESS_BACKEND", raising=False)
+    monkeypatch.delenv("HARNESS_JUDGE_TIMEOUT_SECONDS", raising=False)
 
 
 @pytest.fixture

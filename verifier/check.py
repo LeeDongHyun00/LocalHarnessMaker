@@ -9,7 +9,7 @@ import time
 from typing import Any
 
 from verifier.claims import claimed_criteria, last_report
-from verifier.judge import judge_criterion
+from verifier.judge import judge_criterion, judge_timeout
 from verifier.reinstruct import reinstruct
 from verifier.rules import evaluate
 from verifier.sandbox import Runner, run_command
@@ -35,6 +35,7 @@ def check_contract(
         backend = os.environ.get("HARNESS_BACKEND", "codex_cli")
         if backend not in {"codex_cli", "cheap_api", "local"}:
             raise ValueError("HARNESS_BACKEND must be codex_cli, cheap_api or local")
+        timeout = judge_timeout()
         criteria = contract["success_criteria"]
         ids = [criterion["id"] for criterion in criteria]
         if len(set(ids)) != len(ids):
@@ -56,7 +57,7 @@ def check_contract(
             for criterion in criteria:
                 mechanical = criterion["check"]["type"] != "llm_judge"
                 result = (evaluate(criterion["check"], workspace.resolve(), runner) if mechanical
-                          else judge_criterion(criterion, workspace.resolve(), backend))
+                          else judge_criterion(criterion, workspace.resolve(), backend, timeout=timeout))
                 command_seconds += result.command_duration
                 reason = result.reason
                 if mechanical and result.status == "fail" and criterion["id"] in claims:

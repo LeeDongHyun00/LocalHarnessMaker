@@ -1,40 +1,45 @@
 ## Done
 
-- Retained command/file/regex checks, CLI schema validation, quality warnings, deterministic mocked verdicts, timing logs and controller import independence (.venv/bin/python -m pytest tests/verifier -q: 125 passed, 6 skipped).
-- Implemented claims.py against response_item/message/assistant/final_answer/output_text records confirmed in docs/hooks-contract.md and both linked captured excerpts; only the latest final report supplies explicit criterion completion claims (.venv/bin/python -m pytest tests/verifier -q: 125 passed, 6 skipped; exec/TUI excerpts both select SECOND_REPLY).
-- Converted synthetic transcript fixtures to the confirmed record structure and added claimed_without_evidence regression using injected failing commands; pass/unverifiable and judge reasons remain unchanged (.venv/bin/python -m pytest tests/verifier -q: 125 passed, 6 skipped; claimed health fixture produces fail with claimed_without_evidence and failure output).
-- Implemented failed-item feedback bounded to 300 characters, including criterion positions, descriptions and single-line evidence; shared HARNESS_MAX_ATTEMPTS defaults to 3 and yields null at/above the limit (.venv/bin/python -m pytest tests/verifier -q: 125 passed, 6 skipped; long-message and configured-limit regressions pass).
-- Implemented llm_judge delegation through the approved controller CLI with full criterion serialization, offline schema references, copied HARNESS_NESTED=1 environment, backend selection, piped input and bounded shell=False subprocess; valid status/reason/evidence preserved and invalid transport/results remain unverifiable (.venv/bin/python -m pytest tests/verifier -q: 125 passed, 6 skipped; all judge subprocesses mocked).
-- Restricted Codex sandbox skips to six real macOS Seatbelt tests without modifying sandbox.py; mocked safety tests continue to run (env inspection: CODEX_SANDBOX=seatbelt, CODEX_CI=1, CODEX_SANDBOX_NETWORK_DISABLED=1; .venv/bin/python -m pytest tests/verifier -q: 125 passed, 6 skipped with explicit pending-host reasons).
-- Updated verifier/CHANGES.md and fixture documentation with evidence, assumptions and live-smoke caveats (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
+- Fixed H3: every non-pass item receives bounded retry feedback before exhaustion, including all-unverifiable and contract-quality cases; the reference failure verdict's named targets and all 243 five-item status mixes are checked (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
+- Fixed M3/M4: exception phrases exclude later IDs, comma-separated lists share completion predicates, and per-item negatives retain their scope; an unclaimed mechanical failure retains its own reason (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
+- Fixed M5: judge launches in its own process group, kills the group and reaps the child on timeout/errors/completion; timeout remains unverifiable; injected runner/clock/signal tests cover controller and grandchild cleanup without sleeps (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
+- Added finite positive HARNESS_JUDGE_TIMEOUT_SECONDS configuration with the existing 120-second default, validated before execution; verified unset HARNESS_MAX_ATTEMPTS=3 and HARNESS_BACKEND=codex_cli defaults without fixture-injected values (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
+- Claude completed the prior host Seatbelt verification on 2026-10-21; this is historical evidence before this job, and a fresh host run remains pending (.venv/bin/python -m pytest tests/verifier -q: 131 passed; .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v: 25 passed, as supplied by the user and docs/weekly/2026-10-21-host-verification.md).
+- Retained mechanical checks, measured exec/TUI final-report parsing, claimed_without_evidence, schema validation, quality warnings, deterministic mocked verdicts, timing logs and controller import independence (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
+- Retained approved judge criterion serialization, schema/accounting checks, backend selection and copied HARNESS_NESTED=1 environment; valid judge status/reason/evidence remain unchanged (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped; all judge processes mocked).
+- Kept only the six real macOS Seatbelt tests skipped in this sandbox, without changing verifier/sandbox.py (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped with explicit pending-host reasons).
+- Updated verifier/CHANGES.md and this status with the review fixes, evidence, decisions and assumptions (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
 
 ## Remaining
 
-- Pending host verification: run the six real macOS Seatbelt tests outside Codex; nested sandboxing is denied here. Do not weaken isolation or attempt sandbox-exec in this session.
-- Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the approved controller judge CLI after Role 3 is ready. The full-contract smoke helper now invokes live judge calls; run only with host/live-call authorization. No nested codex exec or live model call ran this session.
-- Pending host verification: test real plugin continuation with shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency. Unit mocks do not establish this integration.
+- Pending host verification after this job: rerun the six real macOS Seatbelt tests outside Codex, using .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. They passed on the prior host run but skip in this sandbox; do not weaken isolation or run sandbox-exec here.
+- Cross-role decision required: align plugin/hooks/hooks.json Stop timeout (40 seconds), verifier judge default (120 seconds), and controller/config.yaml codex_cli deadline (180 seconds per call, up to three generation calls per command). Keep 120 seconds until coordinated; validate outer-hook termination and process cleanup on the host. This session did not edit other roles' files.
+- Pending host verification: exercise real controller/Codex process-group timeout cleanup and confirm no grandchild survives. Mocked signals establish requested group teardown, not observed production process behavior. No nested codex exec or live model call ran this session.
+- Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the approved controller judge CLI after Role 3 is ready. The full-contract smoke helper invokes live judge calls; run only with host/live-call authorization.
+- Pending host verification: real plugin continuation for unverifiable checks and contract-quality warnings, shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency.
 - D-2: complete broader command support, bounded capture, deterministic-evidence policy and sandbox auditing. The Python-only macOS subset does not establish general destructive-operation prevention, read isolation, cross-platform support or complete SC-4/SC-5.
-- D-3: implement validate-handoff and human review sampling within the approved interfaces; these were outside this session's three priorities.
+- D-3: implement validate-handoff and human review sampling within approved interfaces; these are outside this session's priorities.
 - D-4: investigate measured misjudgments and write verifier/RULES.md when comparison evidence exists.
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
 
-- Follow the user's priority order rather than provision optional FastAPI dependencies: claims, bounded re-instruction and judge delegation are the authorized session work.
-- Select the last assistant final_answer response item and its output_text content: both published exec and TUI evidence confirm this structure, so no speculative event-message parser was added.
-- Require explicit criterion IDs for completion claims and suppress negated/future/quoted/code-block examples: conservative extraction avoids mapping unrelated prose onto criteria.
-- Mark only mechanically failed claimed criteria claimed_without_evidence: unverifiable is not proof of a failed assertion, and valid judge reason/evidence must remain unchanged.
-- Include only status=fail in re-instruction and return null for unverifiable-only verdicts: this follows the user's failed-items-only instruction while keeping overall fail and visible unverifiable evidence.
-- Reuse HARNESS_MAX_ATTEMPTS and HARNESS_BACKEND with existing hook defaults: no shared CLI, schema or hook interface change is needed.
-- Pass the public workspace as the judge artifact and invoke controller through subprocess only: the judge rubric handles missing comparison material; verifier remains independent of controller imports.
-- Keep malformed or unavailable judge results unverifiable without verifier retries: the controller owns generation retries and fallback limits.
-- Skip only actual Seatbelt execution tests when CODEX_SANDBOX is nonempty: the measured seatbelt environment cannot nest sandbox-exec; host runs with the variable unset still execute those tests.
+- Treat every non-pass item as unfinished for rule 6: the user's H3 instruction and frozen null-on-pass-or-exhaustion invariant supersede the previous status=fail-only interpretation, including contract-quality warnings.
+- Keep the three-detail/count-rest overflow and 300-character format: the user explicitly requested preserving the existing policy.
+- Keep grouped IDs in one clause and stop extraction at exception phrases: this fixes both reported claim errors while retaining explicit negative predicates and conservative unmapped prose handling.
+- Mark only mechanically failed claimed criteria claimed_without_evidence: unverifiable is not proof of a failed assertion, unclaimed failures retain their own reason, and valid judge reasons remain unchanged.
+- Launch judge in a fresh POSIX session and SIGKILL its group before reaping: subprocess.run only kills the direct child; descendants must be cleaned up on timeout, communication errors and completion.
+- Retain the 120-second default and add verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS: no measured basis supports a new default, and coordinating 40/120/180-second budgets requires other roles rather than unilateral edits.
+- Validate deadline configuration before any check and use injected process runner, clock and signal functions for lifecycle tests: malformed settings must not spend calls, and this environment forbids live judge execution.
+- Unset configuration in the autouse test fixture: ordinary tests now exercise real defaults, with explicit unset-default and override regressions.
+- Keep measured response_item/message/assistant/final_answer/output_text parsing and the public workspace judge artifact: published exec/TUI evidence and the approved controller CLI remain the interface boundaries.
+- Keep unavailable/malformed judge results unverifiable without verifier retries: the controller owns generation retry/fallback limits.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/verifier -q
 - git diff --check -- verifier tests/verifier state/STATUS-verifier.md
-- Host only, pending: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -q
+- Host only, pending rerun: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v
 - Host only with live-call authorization, pending: .venv/bin/python tests/verifier/smoke.py
 - Host only before merge, pending: .venv/bin/python -m pytest
 
@@ -48,12 +53,12 @@
 
 ## Assumptions
 
-- The three user-ordered priorities define this session's implementation scope; later deliverables remain unfinished rather than expanding scope.
-- Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion claims or semantic paraphrases are not inferred.
-- Failed-items-only means status=fail. Unverifiable items still prevent overall pass; a null feedback message permits the hook to end with visible unmet-item evidence.
-- Existing hook environment settings also configure the verifier: HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND defaults to codex_cli. Invalid settings are rejected before model calls.
-- Re-instruction details at most three failed criteria and counts the rest to stay within 300 characters. Long descriptions and evidence are shortened.
-- The public workspace is the judge artifact directory. Missing before/after material must remain unverifiable under its rubric; fixture judge outcomes are mocked.
-- Current transcript support is pinned to the published exec/TUI evidence. Resume/compaction variants and installed-wheel schema resources are unverified.
-- The optional FastAPI/httpx runtime and real controller integration were not provisioned or exercised. No real macOS sandbox or live-call evidence is claimed this session.
-- No PR was requested; verifier/CHANGES.md contains the change summary and Assumptions for a future PR. Concurrent controller changes observed during this session belong to another role and were not edited.
+- The user's H3, M3, M4, M5 and low-item priorities define this session's implementation scope; later deliverables remain unfinished.
+- Rule 6 failed items means status other than pass, as explicitly instructed; this replaces the prior contrary assumption. Up to three items receive details and further items are counted.
+- Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
+- HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. HARNESS_JUDGE_TIMEOUT_SECONDS is verifier-local, defaults to 120 seconds, and must be finite and positive.
+- The judge and controller descendants remain in the new POSIX process group. Host verification must confirm real Codex behavior; forced outer-hook termination is part of the pending cross-role deadline decision.
+- The public workspace is the judge artifact directory. Missing before/after material remains unverifiable under the rubric; judge outcomes and processes are mocked here.
+- Current transcript support is pinned to published exec/TUI evidence. Resume/compaction variants and installed-wheel schema resources remain unverified.
+- No optional FastAPI/httpx provisioning, real macOS sandbox, live model or real controller integration was attempted here. Historical host results do not verify this job's changes.
+- No PR was requested; verifier/CHANGES.md contains the change summary and Assumptions for a future PR. Other roles' concurrent changes were not edited, staged or committed.

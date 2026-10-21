@@ -20,6 +20,9 @@ _NEGATIVE = re.compile(
     r"\b(?:not|no|never|incomplete|unfinished|unverifiable|fail(?:ed|ing|s)?|"
     r"pending|remaining|blocked|todo|will|would|should|could|if)\b", re.IGNORECASE,
 )
+_EXCEPTION = re.compile(
+    r"\b(?:except|but|other than|apart from|besides|excluding)\b", re.IGNORECASE,
+)
 
 
 def last_report(transcript: Path) -> str:
@@ -67,9 +70,12 @@ def claimed_criteria(report: str, criterion_ids: Iterable[str]) -> set[str]:
             continue
         if fenced or line.lstrip().startswith(">"):
             continue
-        # Commas separating a new criterion start a new claim; ID lists using
-        # "and" remain together. Table rows and sentence boundaries also scope it.
-        for clause in re.split(r"[.!;]|,\s*(?=" + identifier.pattern + r")", line):
+        # Keep comma/and ID lists together so a shared predicate applies to all
+        # members. Individual negative predicates still clear only pending IDs.
+        for clause in re.split(r"[.!;]", line):
+            # Completion before an exception never claims the excluded IDs.
+            # Do not infer claims from prose following a contrast/exception.
+            clause = _EXCEPTION.split(clause, maxsplit=1)[0]
             matches = list(identifier.finditer(clause))
             if not matches:
                 continue

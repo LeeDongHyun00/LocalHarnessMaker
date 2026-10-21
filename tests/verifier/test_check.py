@@ -4,12 +4,14 @@ import ast
 import copy
 import json
 from pathlib import Path
+import re
 from typing import Any
 
 import pytest
 from jsonschema import ValidationError
 
 from verifier.check import check_contract, validate
+from verifier.rules import Result
 from verifier.sandbox import Execution
 
 
@@ -37,6 +39,7 @@ def test_shared_example_golden_mechanical_pass(
 
 def test_shared_example_golden_mechanical_fail(
     contract: dict[str, Any], workspace: Path, transcript: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     commands = [c["check"]["command"] for c in contract["success_criteria"][:3]]
 
@@ -45,11 +48,23 @@ def test_shared_example_golden_mechanical_fail(
             return Execution(4, stderr="ERROR: file or directory not found: tests/test_health.py")
         return Execution(0, "health response verified\n" if command == commands[1] else "")
 
-    contract["success_criteria"] = contract["success_criteria"][:3]
-    verdict = check_contract(contract, workspace, transcript, 1, runner)
     reference = json.loads((Path(__file__).resolve().parents[2] / "schemas/examples/verdict_fail.json").read_text())
-    assert [(i["id"], i["status"]) for i in verdict["items"]] == [(i["id"], i["status"]) for i in reference["items"][:3]]
+
+    def judge(*args: Any, **kwargs: Any) -> Result:
+        item = reference["items"][3]
+        return Result(item["status"], item["evidence"], item["reason"])
+
+    monkeypatch.setattr("verifier.check.judge_criterion", judge)
+    verdict = check_contract(contract, workspace, transcript, 1, runner)
+    assert [(i["id"], i["status"]) for i in verdict["items"]] == [(i["id"], i["status"]) for i in reference["items"]]
     assert verdict["overall"] == "fail"
+
+    def named_items(message: str) -> set[str]:
+        prefix = message.split(" are not done.", 1)[0]
+        return {f"SC-{number}" for number in re.findall(r"\b(?:SC-)?(\d+)\b", prefix)}
+
+    assert verdict["reinstruct_message"] is not None
+    assert named_items(verdict["reinstruct_message"]) == named_items(reference["reinstruct_message"])
     validate(verdict, "verdict.schema.json")
 
 
@@ -60,7 +75,7 @@ def test_full_example_does_not_pass_without_judge(
     def unavailable(*args: Any, **kwargs: Any) -> None:
         raise OSError("mock missing controller judge")
 
-    monkeypatch.setattr("verifier.judge.subprocess.run", unavailable)
+    monkeypatch.setattr("verifier.judge.run_judge", unavailable)
     def runner(command: str, root: Path, timeout: float) -> Execution:
         return Execution(0, "health response verified\n" if "TestClient" in command else "")
 
@@ -82,6 +97,10 @@ def test_quality_warning(
     verdict = check_contract(contract, workspace, transcript, 1, forbidden)
     assert verdict["overall"] == "fail"
     assert all(i["status"] == "unverifiable" for i in verdict["items"])
+    assert verdict["reinstruct_message"] is not None
+    assert len(verdict["reinstruct_message"]) <= 300
+    assert "Items 1 are not done." in verdict["reinstruct_message"]
+    assert ("contract-quality" if empty else "SC-4") == verdict["items"][0]["id"]
     assert "warning:" in capsys.readouterr().err
     validate(verdict, "verdict.schema.json")
 
