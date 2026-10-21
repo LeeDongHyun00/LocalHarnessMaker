@@ -1,5 +1,7 @@
 ## Done
 
+- Implemented D-3 validate-handoff: offline shared-schema validation, done/remaining overlap rejection, unchanged input bytes, exact supplied-path stdout, no --out flag, input exit 1 and internal exit 2 with stderr-only errors; 19 new cases include the reference handoff through the real module entry point (.venv/bin/python -m pytest tests/verifier -q: 170 passed, 6 skipped).
+- Confirmed the approved command accepts the checked-in reference handoff without controller/model execution (.venv/bin/python -m verifier validate-handoff --handoff schemas/examples/handoff.json: exit 0, stdout exactly schemas/examples/handoff.json followed by a newline).
 - Fixed H3: every non-pass item receives bounded retry feedback before exhaustion, including all-unverifiable and contract-quality cases; the reference failure verdict's named targets and all 243 five-item status mixes are checked (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
 - Fixed M3/M4: exception phrases exclude later IDs, comma-separated lists share completion predicates, and per-item negatives retain their scope; an unclaimed mechanical failure retains its own reason (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
 - Fixed M5: judge launches in its own process group, kills the group and reaps the child on timeout/errors/completion; timeout remains unverifiable; injected runner/clock/signal tests cover controller and grandchild cleanup without sleeps (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
@@ -12,18 +14,22 @@
 
 ## Remaining
 
+- D-3: implement human-review sampling (`python -m verifier sample --reports DIR --n 20`); validate-handoff is complete.
+- Pending host verification: rerun validate-handoff against the live controller-produced handoff and exercise Role 2's Stop/SessionStart integration. No live controller/model calls or nested Codex ran in this session.
 - Pending host verification after this job: rerun the six real macOS Seatbelt tests outside Codex, using .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. They passed on the prior host run but skip in this sandbox; do not weaken isolation or run sandbox-exec here.
 - Cross-role decision required: align plugin/hooks/hooks.json Stop timeout (40 seconds), verifier judge default (120 seconds), and controller/config.yaml codex_cli deadline (180 seconds per call, up to three generation calls per command). Keep 120 seconds until coordinated; validate outer-hook termination and process cleanup on the host. This session did not edit other roles' files.
 - Pending host verification: exercise real controller/Codex process-group timeout cleanup and confirm no grandchild survives. Mocked signals establish requested group teardown, not observed production process behavior. No nested codex exec or live model call ran this session.
 - Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the approved controller judge CLI after Role 3 is ready. The full-contract smoke helper invokes live judge calls; run only with host/live-call authorization.
 - Pending host verification: real plugin continuation for unverifiable checks and contract-quality warnings, shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency.
 - D-2: complete broader command support, bounded capture, deterministic-evidence policy and sandbox auditing. The Python-only macOS subset does not establish general destructive-operation prevention, read isolation, cross-platform support or complete SC-4/SC-5.
-- D-3: implement validate-handoff and human review sampling within approved interfaces; these are outside this session's priorities.
 - D-4: investigate measured misjudgments and write verifier/RULES.md when comparison evidence exists.
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
 
+- Preserve the original --handoff argument as a string for stdout: converting it to Path for display would normalize supplied relative path spelling.
+- Separate handoff input errors from validator infrastructure failures: unreadable/invalid input exits 1, while schema-loading and unexpected validator errors exit 2 without stdout.
+- Check done/remaining overlap after schema validation without a contract: contradictory states are detectable locally; contract membership, coverage and artifact existence need additional context.
 - Treat every non-pass item as unfinished for rule 6: the user's H3 instruction and frozen null-on-pass-or-exhaustion invariant supersede the previous status=fail-only interpretation, including contract-quality warnings.
 - Keep the three-detail/count-rest overflow and 300-character format: the user explicitly requested preserving the existing policy.
 - Keep grouped IDs in one clause and stop extraction at exception phrases: this fixes both reported claim errors while retaining explicit negative predicates and conservative unmapped prose handling.
@@ -38,6 +44,7 @@
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/verifier -q
+- .venv/bin/python -m verifier validate-handoff --handoff schemas/examples/handoff.json
 - git diff --check -- verifier tests/verifier state/STATUS-verifier.md
 - Host only, pending rerun: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v
 - Host only with live-call authorization, pending: .venv/bin/python tests/verifier/smoke.py
@@ -53,7 +60,8 @@
 
 ## Assumptions
 
-- The user's H3, M3, M4, M5 and low-item priorities define this session's implementation scope; later deliverables remain unfinished.
+- The user's current D-3 validate-handoff priority defines this session's implementation scope; human-review sampling and later deliverables remain unfinished. Prior H3/M3/M4/M5 evidence is retained as historical context.
+- Same-state handoff entries may represent multiple artifacts or remaining steps; only contradictory done/remaining membership is rejected beyond the schema, without adding an unspecified uniqueness requirement.
 - Rule 6 failed items means status other than pass, as explicitly instructed; this replaces the prior contrary assumption. Up to three items receive details and further items are counted.
 - Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
 - HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. HARNESS_JUDGE_TIMEOUT_SECONDS is verifier-local, defaults to 120 seconds, and must be finite and positive.
