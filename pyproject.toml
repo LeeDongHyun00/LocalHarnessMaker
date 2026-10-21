@@ -20,4 +20,4 @@ namespaces = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests/lead", "tests/plugin", "tests/controller", "tests/verifier", "tests/eval"]
-addopts = "-ra"
+addopts = "-ra --import-mode=importlib"

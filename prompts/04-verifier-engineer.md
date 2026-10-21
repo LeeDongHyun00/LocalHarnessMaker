@@ -22,7 +22,7 @@ The two CLIs in AGENTS.md section 3.2: verifier check and verifier validate-hand
 3. llm_judge: call python -m controller judge. Record its status and reason unchanged and put the string llm_judge in evidence so that humans can review these items.
 4. Done-claim verification (claims.py): from the last report in the transcript, extract claims of the form done, completed, implemented, passing, per criterion. If a claimed criterion fails its mechanical check, set status to fail and reason to claimed_without_evidence. This ratio is the source of the false-done-rate metric.
 5. unverifiable: the command cannot run (missing dependency, missing path, and similar). Never treat it as pass. For the overall result, treat it like fail.
-6. Re-instruction message (reinstruct.py): include only failed items, each with its number, description and one line of failure evidence. At most 300 characters. Form: "Items 3 and 5 are not done. Read the evidence below, fix only those items, then finish again." When attempt is greater than or equal to N, set reinstruct_message to null.
+6. Re-instruction message (reinstruct.py): include only items whose status is not pass (fail or unverifiable), each with its number, description and one line of failure evidence. At most 300 characters. Form: "Items 3 and 5 are not done. Read the evidence below, fix only those items, then finish again." When attempt is greater than or equal to N, set reinstruct_message to null.
 7. Contract quality warning: if success_criteria is empty or every item is llm_judge, print a warning on stderr and fill items with status unverifiable. A contract that cannot be verified must not pass.
 
 ## Deliverables

@@ -15,7 +15,7 @@ Read-only: everything else.
 
 - D-1, due 2026-10-22: repository skeleton. All directories. pyproject.toml with the packages controller, verifier, eval, plugin. Targets make test and make validate-schemas. CI running pytest. Five empty files state/STATUS-lead.md, state/STATUS-plugin.md, state/STATUS-controller.md, state/STATUS-verifier.md, state/STATUS-eval.md using the format in AGENTS.md section 6.
 - D-2, due 2026-10-24: schemas/ with the three JSON Schemas, schemas/examples/ with example files, docs/interfaces.md. Declare the freeze by setting schemas/VERSION to 1.
-- D-3, due 2026-10-27: docs/plan.md (weekly plan per role, identical to the Notion plan), docs/decisions/0001-direction.md (why the project changed direction, in one page), docs/eval-freeze.md (the task set hash sent by Role 5).
+- D-3, due 2026-10-27: docs/plan.md (weekly plan per role, identical to the Notion plan), docs/decisions/0005-direction.md (why the project changed direction, in one page), docs/eval-freeze.md (the task set hash sent by Role 5).
 - D-4, every Tuesday (2026-10-27, 2026-11-03, 2026-11-10): integration review. Read the four other STATUS files and write docs/weekly/DATE.md with blockers, conflicts, schedule risks and scope-cut proposals. Interface mismatches between roles are caught here.
 - D-5, due 2026-11-13: README.md covering install through demo, docs/architecture.md, docs/demo.md (demo scenario including the two-session handoff).
 - D-6, due 2026-11-15: docs/slides/ (presentation draft in markdown) and docs/qa.md with expected questions and answers. Required questions: how is this different from a static template; why not just raise reasoning effort; why a local model; how is this different from built-in Codex features.
