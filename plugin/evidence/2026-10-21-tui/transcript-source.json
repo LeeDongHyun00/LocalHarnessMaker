@@ -1,0 +1,5 @@
+{
+  "source": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-g0kb1wng/codex-home/sessions/2026/10/21/rollout-2026-10-21T13-31-34-01a15cba-9509-7011-a03f-83227aad185e.jsonl",
+  "sha256": "2e5f720443c57beb322a0cdc200efee85714323f0f050a3cb926c4e33ab20b33",
+  "selection": "response_item messages containing experiment markers or continuation; event_msg task_started, task_complete, token_count"
+}

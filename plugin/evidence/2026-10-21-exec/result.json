@@ -1,0 +1,16 @@
+{
+  "command": [
+    "codex",
+    "--no-daemon",
+    "--dangerously-bypass-hook-trust",
+    "exec",
+    "--skip-git-repo-check",
+    "--json",
+    "--color",
+    "never",
+    "-C",
+    "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-spmnaxsq/workspace",
+    "This is a hook compatibility experiment. Reply with the two exact markers supplied in extra context, then FIRST_REPLY. Do not use tools or change files. If later asked to print one more line, reply only SECOND_REPLY."
+  ],
+  "exit_code": 0
+}

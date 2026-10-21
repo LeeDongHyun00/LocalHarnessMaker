@@ -1,0 +1,17 @@
+{
+  "input": {
+    "session_id": "01a15cba-9509-7011-a03f-83227aad185e",
+    "turn_id": "01a15cba-954e-78d2-ba65-34bf906b5f82",
+    "transcript_path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-g0kb1wng/codex-home/sessions/2026/10/21/rollout-2026-10-21T13-31-34-01a15cba-9509-7011-a03f-83227aad185e.jsonl",
+    "cwd": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-g0kb1wng/workspace",
+    "hook_event_name": "Stop",
+    "model": "gpt-6.1-sol",
+    "permission_mode": "bypassPermissions",
+    "stop_hook_active": false,
+    "last_assistant_message": "HARNESS_SESSION_CONTEXT_4D91\nHARNESS_CONTRACT_CONTEXT_8B62\nFIRST_REPLY"
+  },
+  "output": {
+    "decision": "block",
+    "reason": "test: print one more line"
+  }
+}

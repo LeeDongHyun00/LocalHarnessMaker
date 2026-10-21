@@ -1,0 +1,6 @@
+{
+  "command": ["python", "-I", "-m", "unittest", "discover", "-s", ".", "-p", "test_*.py", "-v"],
+  "expected_exit_code": 0,
+  "expected_test_count": 3,
+  "pass_condition": "All three private unittest cases pass in a separate grading copy."
+}

@@ -1,0 +1,17 @@
+{
+  "input": {
+    "session_id": "01a15cba-0f64-7070-a1e4-f3a94a8fc456",
+    "transcript_path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-spmnaxsq/codex-home/sessions/2026/10/21/rollout-2026-10-21T13-31-01-01a15cba-0f64-7070-a1e4-f3a94a8fc456.jsonl",
+    "cwd": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-spmnaxsq/workspace",
+    "hook_event_name": "SessionStart",
+    "model": "gpt-6.1-sol",
+    "permission_mode": "bypassPermissions",
+    "source": "startup"
+  },
+  "output": {
+    "hookSpecificOutput": {
+      "hookEventName": "SessionStart",
+      "additionalContext": "When first replying, include this exact marker: HARNESS_SESSION_CONTEXT_4D91"
+    }
+  }
+}

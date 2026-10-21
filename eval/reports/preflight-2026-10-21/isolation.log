@@ -1,0 +1,7 @@
+codex-cli 0.162.0-alpha.17.2
+Diagnostic profile: :workspace (exec --sandbox workspace-write not invoked)
+Workspace: /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/tasks/bug-chunk-tail/workspace
+Private grader outside workspace: /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/tasks/bug-chunk-tail/hidden_tests/test_chunking.py
+Sandbox process exit: 0
+HIDDEN_GRADER_READABLE
+STOP-E4: :workspace permits reading the private grader by absolute path.

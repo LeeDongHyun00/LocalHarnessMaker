@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "capture": "script -q terminal.log env ... codex --no-daemon --dangerously-bypass-hook-trust --no-alt-screen -C WORKSPACE PROMPT",
+  "exit_action": "/quit after final Stop returned {}"
+}

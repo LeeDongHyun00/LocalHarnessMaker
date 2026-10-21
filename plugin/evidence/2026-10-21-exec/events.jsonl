@@ -3,3 +3,6 @@
 {"type":"item.completed","item":{"id":"item_1","type":"error","message":"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation."}}
 {"type":"item.completed","item":{"id":"item_2","type":"error","message":"Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-spmnaxsq/codex-home/config.toml."}}
 {"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"HARNESS_SESSION_CONTEXT_4D91\nHARNESS_CONTRACT_CONTEXT_8B62\nFIRST_REPLY"}}
+{"type":"item.completed","item":{"id":"item_4","type":"agent_message","text":"SECOND_REPLY"}}
+{"type":"turn.completed","usage":{"input_tokens":28704,"cached_input_tokens":26368,"cache_write_input_tokens":0,"output_tokens":31,"reasoning_output_tokens":0}}

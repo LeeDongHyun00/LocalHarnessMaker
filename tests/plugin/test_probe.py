@@ -11,6 +11,7 @@ import sys
 import pytest
 
 from plugin.hooks.probe import probe
+from plugin.probe import prepare
 
 
 @pytest.mark.parametrize("event", ["SessionStart", "UserPromptSubmit", "Stop"])
@@ -53,3 +54,40 @@ def test_errors_fail_open(stdin: str, tmp_path: Path) -> None:
     assert result.stdout == ""
     assert "warning:" in result.stderr
     assert "elapsed_seconds=" in result.stderr
+
+
+def test_prepare_isolated_configuration(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("plugin.probe.tempfile.mkdtemp", lambda **kwargs: str(tmp_path / "isolated"))
+    (tmp_path / "isolated").mkdir()
+    auth_home = tmp_path / "existing-home"
+    auth_home.mkdir()
+    (auth_home / "auth.json").write_text("test credentials must stay outside evidence")
+    monkeypatch.setenv("CODEX_HOME", str(auth_home))
+    calls: list[list[str]] = []
+
+    def run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        calls.append(command)
+        return subprocess.CompletedProcess(command, 0, "codex-cli 0.162.0-alpha.17.2\n", "")
+
+    output = tmp_path / "evidence"
+    metadata = prepare(output, run=run)
+    isolated = Path(str(metadata["codex_home"]))
+    assert calls == [["codex", "--version"]]
+    assert (isolated / "auth.json").is_symlink()
+    assert not (output / "auth.json").exists()
+    assert not (auth_home / "hooks.json").exists()
+    hooks = json.loads((isolated / "hooks.json").read_text())
+    assert set(hooks["hooks"]) == {"SessionStart", "UserPromptSubmit", "Stop"}
+
+
+def test_version_mismatch_stops_before_config_creation(tmp_path: Path) -> None:
+    def run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(command, 0, "codex-cli unsupported\n", "")
+
+    with pytest.raises(ValueError, match="Codex version mismatch"):
+        prepare(tmp_path / "evidence", run=run)
+
+
+def test_existing_evidence_cannot_be_overwritten(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="new evidence directory"):
+        prepare(tmp_path)
