@@ -1,0 +1,12 @@
+{
+  "id": "multiple-requirements-strip-prefix",
+  "type": "multiple_requirements",
+  "difficulty": "medium",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "strip-prefix",
+  "review_status": "draft"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "bug-fix-select-columns",
+  "type": "bug_fix",
+  "difficulty": "easy",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "select-columns",
+  "review_status": "draft"
+}

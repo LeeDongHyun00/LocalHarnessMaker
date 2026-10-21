@@ -1,0 +1,12 @@
+{
+  "id": "bug-fix-merge-counts",
+  "type": "bug_fix",
+  "difficulty": "easy",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "merge-counts",
+  "review_status": "draft"
+}

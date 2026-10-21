@@ -1,0 +1,12 @@
+{
+  "id": "feature-plus-test-flatten-once",
+  "type": "feature_plus_test",
+  "difficulty": "medium",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "flatten-once",
+  "review_status": "draft"
+}

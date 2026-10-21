@@ -40,7 +40,7 @@ def main() -> int:
     except Exception as exc:
         print(f"Internal error: {type(exc).__name__}; inspect retained external runtime logs", file=sys.stderr)
         return 2
-    print(output)
+    print(args.out)
     return 0
 
 

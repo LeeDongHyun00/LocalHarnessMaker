@@ -1,0 +1,12 @@
+{
+  "id": "constrained-refactoring-flatten-once",
+  "type": "constrained_refactoring",
+  "difficulty": "medium",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "flatten-once",
+  "review_status": "draft"
+}

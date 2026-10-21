@@ -14,9 +14,8 @@ import time
 from typing import Any, Callable
 import uuid
 
-from jsonschema import Draft202012Validator
-
-from eval.metrics import pass_rate
+from eval.runner import harness
+from eval.runner.report import build, build_task
 from eval.runner.audit import PrivateGraders, audit_logs, digest, executor_environment
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.telemetry import collect, records, session_id
@@ -44,11 +43,16 @@ def load_config(path: Path) -> dict[str, Any]:
                 "retry_limit", "seed", "codex_version", "tasks", "timeout_seconds", "grading_timeout_seconds"}
     if not isinstance(config, dict) or set(config) != required:
         raise ValueError("Config must contain exactly the documented baseline fields")
-    if config["harness"] is not False or config["control_backend"] != "none" or config["reinstruction_limit"] != 0:
-        raise ValueError("This initial runner supports standalone baselines only")
+    if type(config["harness"]) is not bool:
+        raise ValueError("harness must be boolean")
+    if config["harness"]:
+        if config["control_backend"] not in {"codex_cli", "cheap_api", "local"}:
+            raise ValueError("Harness needs an explicit control backend")
+    elif config["control_backend"] != "none" or config["reinstruction_limit"] != 0:
+        raise ValueError("Standalone baselines cannot select control orchestration")
     if config["reasoning_effort"] not in {"low", "medium", "high", "xhigh", "max"}:
         raise ValueError("Unsupported reasoning effort")
-    for key in ("retry_limit", "seed"):
+    for key in ("retry_limit", "reinstruction_limit", "seed"):
         if type(config[key]) is not int or config[key] < 0:
             raise ValueError(f"{key} must be a nonnegative integer")
     for key in ("timeout_seconds", "grading_timeout_seconds"):
@@ -58,7 +62,7 @@ def load_config(path: Path) -> dict[str, Any]:
         raise ValueError("Task identifiers must be a nonempty unique list")
     if any(not isinstance(task, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", task) for task in config["tasks"]):
         raise ValueError("Unsafe task identifier")
-    if len(config["tasks"]) * (config["retry_limit"] + 1) >= 10:
+    if len(config["tasks"]) * ((config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) + (3 if config["harness"] else 0)) >= 10:
         raise ValueError("STOP-3: batches of 10 or more executor calls require a reported estimate first")
     for key in ("name", "model", "codex_version"):
         if not isinstance(config[key], str) or not config[key]:
@@ -80,7 +84,8 @@ def taskset_digest(private_by_task: dict[str, PrivateGraders]) -> str:
 
 def publish(source: Path, destination: Path, private: PrivateGraders) -> None:
     """Retain original logs externally and publish a redacted review copy."""
-    destination.write_text(private.redact(source.read_text(errors="replace")))
+    if source.is_file():
+        destination.write_text(private.redact(source.read_text(errors="replace")))
 
 
 def grade(
@@ -118,7 +123,7 @@ def grade(
     failures = sum(int(n) for n in re.findall(r"(?:failures|errors)=(\d+)", text))
     ok = result.returncode == 0 and not result.timed_out and count == expected["expected_test_count"] and "\nOK\n" in text
     return {"result": "pass" if ok else "error" if result.timed_out or not counts else "fail",
-            "copied_at": copied_at, "executor_already_exited": True,
+            "copy_path": str(grading), "copied_at": copied_at, "executor_already_exited": True,
             "grader_source_outside_repository": True, "exit_code": result.returncode,
             "timed_out": result.timed_out, "passed_tests": count if ok else max(0, count - failures),
             "failed_tests": failures, "total_tests": count, "log": destination.name}
@@ -131,6 +136,9 @@ def run(
 ) -> Path:
     """Run or recover baseline tasks without relying on plugin hooks."""
     config = load_config(config_path)
+    # Public two-session candidates must not consume a single-session executor run.
+    if any(json.loads((REPOSITORY / "eval/tasks" / task / "meta.json").read_text())["two_session"] for task in config["tasks"]):
+        raise ValueError("Two-session execution is pending host-verified handoff orchestration")
     out = out.resolve()
     config_hash = digest(config_path.read_bytes())
     actual_version = version or subprocess.run(
@@ -152,12 +160,14 @@ def run(
     checkpoint = out / "checkpoint.json"
     if checkpoint.exists():
         state = json.loads(checkpoint.read_text())
+        if state.get("report_schema") != "evaluation-report-v1":
+            raise ValueError("Historical provisional checkpoint requires offline migration; use a fresh output directory")
         if state["config_sha256"] != config_hash:
             raise ValueError("Resume configuration differs from checkpoint")
         if state.get("task_set_sha256") != task_set_hash:
             raise ValueError("Resume task set differs from checkpoint")
     else:
-        state = {"run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
+        state = {"report_schema": "evaluation-report-v1", "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
                  "task_set_sha256": task_set_hash, "tasks": {}}
         write_json(checkpoint, state)
     order = list(config["tasks"])
@@ -208,14 +218,30 @@ def run(
         if not execution_finished and list(runtime.glob("grading-*")):
             raise ValueError("A grading copy already exists; executor resume is prohibited")
         final_process: ProcessResult | None = None
-        if execution_finished:
+        if execution_finished and entry["segments"]:
             last = entry["segments"][-1]
             final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
         interrupted = False
-        prior_audit = audit_logs(prior, private, require_completion=False) if prior else None
+        prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=tuple(runtime.glob("grading-*"))) if prior else None
         blocked = prior_audit is not None and prior_audit["status"] != "clean"
-        # At most retry_limit retries in this invocation. Hidden feedback is never resumed.
-        for retry in range(0 if blocked or execution_finished else config["retry_limit"] + 1):
+        control_error = entry.get("control_error")
+        if config["harness"] and not blocked and not execution_finished and not (runtime / "contract.json").exists():
+            try:
+                harness.contract(public, runtime, config, repository=REPOSITORY, execute=execute)
+            except harness.HarnessError as exc:
+                control_error = str(exc)
+                entry["control_error"] = control_error
+        if config["harness"] and not control_error and (runtime / "contract.json").exists():
+            generated = json.loads((runtime / "contract.json").read_text())
+            judges = sum(c["check"]["type"] == "llm_judge" for c in generated["success_criteria"])
+            maximum_calls = len(config["tasks"]) * (3 + (config["retry_limit"] + 1) *
+                (config["reinstruction_limit"] + 1) + 3 * judges * (config["reinstruction_limit"] + 1))
+            if maximum_calls >= 10:
+                raise ValueError("STOP-3: generated judge criteria require a reported batch cost estimate")
+        remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - len(entry["segments"])
+        if not config["harness"]:
+            remaining = config["retry_limit"] + 1
+        for retry in range(0 if blocked or execution_finished or control_error else remaining):
             index = len(entry["segments"]) + 1
             event_path, stderr_path = runtime / f"exec-{index}.jsonl", runtime / f"exec-{index}.stderr"
             argv = ["codex", "--no-daemon", "-a", "never", "exec"]
@@ -228,10 +254,12 @@ def run(
                      "-o", str(runtime / f"final-{index}.md")]
             if resumed_id:
                 argv += ["-c", 'sandbox_mode="workspace-write"', resumed_id, "-"]
-                prompt = "Continue the original task from the current workspace."
+                prompt = entry.get("reinstruction") or "Continue the original task from the current workspace."
             else:
                 argv += ["--sandbox", "workspace-write", "-C", str(workspace), "-"]
                 prompt = (public / "prompt.md").read_text()
+                if config["harness"]:
+                    prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + (runtime / "contract.json").read_text()
             segment = {"attempt": index, "started_at": now(), "events": event_path.name, "stderr": stderr_path.name}
             entry["segments"].append(segment)
             entry["phase"] = "running"
@@ -255,16 +283,40 @@ def run(
                             "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
             entry.pop("pid", None)
             write_json(checkpoint, state)
-            current_audit = audit_logs([event_path], private)
-            if interrupted or current_audit["status"] == "access_detected" or final_process.returncode == 0 or retry == config["retry_limit"]:
+            current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY)
+            if interrupted or current_audit["status"] != "clean":
                 break
-            resumed_id = session_id([event_path])
+            resumed_id = session_id([event_path]) or resumed_id
+            if final_process.returncode == 0:
+                if not config["harness"]:
+                    break
+                try:
+                    native = sorted((codex_home / "sessions").rglob("*.jsonl"))
+                    native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY)
+                    if native_audit["status"] != "clean":
+                        break
+                    attempt = len(entry.get("verdicts", [])) + 1
+                    verdict = harness.verify(runtime, workspace, native, attempt, config,
+                                             repository=REPOSITORY, execute=execute)
+                    entry.setdefault("verdicts", []).append(verdict)
+                    entry["reinstruction"] = verdict["reinstruct_message"]
+                    write_json(checkpoint, state)
+                    if verdict["overall"] == "pass" or attempt > config["reinstruction_limit"] or not verdict["reinstruct_message"]:
+                        break
+                    if not resumed_id:
+                        raise harness.HarnessError("Verifier continuation needs an executor session ID")
+                except harness.HarnessError as exc:
+                    control_error = str(exc)
+                    entry["control_error"] = control_error
+                    break
+            elif retry >= config["retry_limit"]:
+                break
         if not interrupted:
             entry["phase"] = "executed"
             write_json(checkpoint, state)
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
-        audit = audit_logs(event_paths + native_paths, private)
+        audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=tuple(runtime.glob("grading-*")))
         telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"])
         # Extract only settings and token/rate-limit evidence from native transcripts.
         selected = [event for path in native_paths for event in records(path)
@@ -277,7 +329,16 @@ def run(
             final = runtime / f'final-{segment["attempt"]}.md'
             if final.exists():
                 publish(final, task_out / final.name, private)
+        for evidence in runtime.glob("*.json"):
+            if evidence.name == "contract.json" or evidence.name.startswith("verdict-"):
+                publish(evidence, task_out / evidence.name, private)
+        for evidence in [*runtime.glob("contract.std*"), *runtime.glob("verdict-*.std*")]:
+            publish(evidence, task_out / evidence.name, private)
         invalid = []
+        if control_error:
+            invalid.append("control_cli_error")
+        if json.loads((public / "meta.json").read_text()).get("two_session"):
+            invalid.append("two_session_orchestration_pending")
         if audit["status"] != "clean":
             invalid.append("grader_access_detected" if audit["status"] == "access_detected" else "incomplete_access_audit")
         if not telemetry["settings_evidence"]["verified"]:
@@ -296,9 +357,9 @@ def run(
             outcome = grading["result"]
         meta = json.loads((public / "meta.json").read_text())
         result = {"task_id": task_id, "task_type": meta["type"], "outcome": outcome,
-                  "invalid_reasons": invalid, "attempts": len(entry["segments"]),
+                  "invalid_reasons": invalid, "attempts": max(1, len(entry["segments"])),
                   "session_id": session_id(event_paths), "segments": entry["segments"],
-                  "grader_access_audit": audit, "grading": grading, **telemetry}
+                  "grader_access_audit": audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
         write_json(task_out / "result.json", json.loads(private.redact(json.dumps(result))))
         # Preserve completed source only; no private grader or grading copy is published.
         if grading and not (task_out / "workspace").exists():
@@ -311,15 +372,11 @@ def run(
             stop_reason = "STOP-E1: executor interrupted or could not complete non-interactively; inspect retained logs before another live call."
             break
     tasks = [json.loads((out / task / "result.json").read_text()) for task in order if (out / task / "result.json").exists()]
-    report = {"format": "eval-baseline-provisional-v1", "metadata": {
-        "run_id": state["run_id"], "created_at": state["created_at"], "config_sha256": config_hash,
-        "task_set_sha256": task_set_hash,
-        "task_set_hash_timing": state.get("task_set_hash_timing", "before_execution"),
-        "config_name": config["name"], "model": config["model"], "reasoning_effort": config["reasoning_effort"],
-        "seed": config["seed"], "codex_version": actual_version, "harness": False,
-        "billing_basis": "chatgpt_subscription", "stop_reason": stop_reason,
-    }, "tasks": tasks, "metrics": {"pass_rate": pass_rate(tasks), "sample_size": sum(t["outcome"] != "invalid" for t in tasks)}}
-    Draft202012Validator(json.loads((REPOSITORY / "eval/report.schema.json").read_text())).validate(report)
+    pricing = json.loads((REPOSITORY / "eval/prices.yaml").read_text())
+    shared_tasks = [build_task(t, state["tasks"][t["task_id"]], out / t["task_id"], config, pricing,
+                              json.loads((REPOSITORY / "eval/tasks" / t["task_id"] / "meta.json").read_text())) for t in tasks]
+    report = build(config, state, shared_tasks, actual_version, REPOSITORY)
+    write_json(out / "run-diagnostics.json", {"stop_reason": stop_reason})
     destination = out / "report.json"
     # Redaction is mandatory even if future report fields unexpectedly contain a private marker.
     text = json.dumps(report, indent=2) + "\n"

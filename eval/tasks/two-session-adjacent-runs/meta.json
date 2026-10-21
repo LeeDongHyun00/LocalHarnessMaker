@@ -1,0 +1,13 @@
+{
+  "id": "two-session-adjacent-runs",
+  "type": "feature_plus_test",
+  "difficulty": "medium",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "adjacent-runs",
+  "review_status": "draft",
+  "day2_prompt": "day2.md"
+}

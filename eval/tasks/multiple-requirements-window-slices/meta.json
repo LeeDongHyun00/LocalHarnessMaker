@@ -1,0 +1,12 @@
+{
+  "id": "multiple-requirements-window-slices",
+  "type": "multiple_requirements",
+  "difficulty": "medium",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "window-slices",
+  "review_status": "draft"
+}

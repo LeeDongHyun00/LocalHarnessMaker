@@ -1,0 +1,12 @@
+{
+  "id": "feature-plus-test-pairwise-edges",
+  "type": "feature_plus_test",
+  "difficulty": "medium",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "pairwise-edges",
+  "review_status": "draft"
+}

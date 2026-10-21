@@ -1,31 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Provisional standalone baseline result; not the proposed shared report interface",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["format", "metadata", "tasks", "metrics"],
-  "properties": {
-    "format": {"const": "eval-baseline-provisional-v1"},
-    "metadata": {"type": "object", "required": ["model", "reasoning_effort", "codex_version", "billing_basis", "config_sha256", "seed"]},
-    "tasks": {"type": "array", "items": {"$ref": "#/$defs/task"}},
-    "metrics": {"type": "object", "required": ["pass_rate", "sample_size"], "properties": {"pass_rate": {"type": ["number", "null"], "minimum": 0, "maximum": 1}, "sample_size": {"type": "integer", "minimum": 0}}}
-  },
-  "$defs": {
-    "task": {
-      "type": "object",
-      "required": ["task_id", "outcome", "invalid_reasons", "attempts", "session_id", "segments", "grader_access_audit", "grading", "usage", "settings_evidence"],
-      "properties": {
-        "task_id": {"type": "string"},
-        "outcome": {"enum": ["pass", "fail", "error", "timeout", "invalid"]},
-        "invalid_reasons": {"type": "array", "items": {"type": "string"}},
-        "attempts": {"type": "integer", "minimum": 1},
-        "session_id": {"type": ["string", "null"]},
-        "segments": {"type": "array", "minItems": 1},
-        "grader_access_audit": {"type": "object", "required": ["method", "status", "logs", "matches", "errors"], "properties": {"method": {"const": "access_audit"}, "status": {"enum": ["clean", "access_detected", "inconclusive"]}, "matches": {"type": "array"}, "logs": {"type": "array", "minItems": 1}, "errors": {"type": "array"}}},
-        "grading": {"type": ["object", "null"]},
-        "usage": {"type": "object", "required": ["billing_basis", "tokens", "billed_usd", "plan_usage"], "properties": {"billing_basis": {"const": "chatgpt_subscription"}, "billed_usd": {"type": "null"}, "plan_usage": {"type": "object", "required": ["availability", "snapshots", "exact_task_consumption", "limitation"]}}},
-        "settings_evidence": {"type": "object", "required": ["verified", "source", "observed"]}
-      }
-    }
-  }
+  "$comment": "Retired provisional schema. Compatibility reference only; use schemas/evaluation-report.schema.json.",
+  "$ref": "../schemas/evaluation-report.schema.json"
 }

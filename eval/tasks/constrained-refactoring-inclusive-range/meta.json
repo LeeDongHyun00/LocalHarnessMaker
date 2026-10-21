@@ -1,0 +1,12 @@
+{
+  "id": "constrained-refactoring-inclusive-range",
+  "type": "constrained_refactoring",
+  "difficulty": "medium",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "inclusive-range",
+  "review_status": "draft"
+}

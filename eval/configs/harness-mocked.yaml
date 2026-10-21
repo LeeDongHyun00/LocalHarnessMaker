@@ -1,0 +1,14 @@
+{
+  "name": "harness-single-task-host-verification-pending",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "harness": true,
+  "control_backend": "codex_cli",
+  "reinstruction_limit": 1,
+  "retry_limit": 0,
+  "seed": 0,
+  "codex_version": "codex-cli 0.162.0-alpha.17.2",
+  "tasks": ["bug-chunk-tail"],
+  "timeout_seconds": 180,
+  "grading_timeout_seconds": 20
+}

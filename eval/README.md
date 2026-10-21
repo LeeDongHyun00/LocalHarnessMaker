@@ -1,78 +1,100 @@
 # Evaluation runner
 
-The initial runner supports standalone baselines without plugin hooks. The
-single-task config is valid YAML written in its JSON subset so the runner needs
-no new root dependency. Harness baselines and the shared report interface are
-not implemented; `report.schema.json` validates a provisional baseline artifact
-only. No schema under `schemas/` is changed.
+The runner writes `report.json` against the approved
+`schemas/evaluation-report.schema.json`, with offline schema/format validation
+and runtime checks for IDs, counts, ordering, costs and event hashes.
+`eval/report.schema.json` is retired and retained only as a reference to that
+shared schema. Historical reports in `reports/baseline-a-first-task/` remain
+unaltered provisional evidence; they have not been reclassified as approved
+reports or rerun.
 
-Set `LHM_PRIVATE_GRADERS` in the trusted parent shell to an external storage root
-that is separate from this repository. Do not put its value in repository files.
-Each task has an external subdirectory named by its public task ID, containing
-regular `test_*.py` grader files. Optional external `audit-names.json` contains
-`historical_names`, an array of previous grader basenames. This preserves audit
-coverage when relocating or renaming a grader. The initial grader has already
-been moved and its historical basename retained externally.
+The frozen command is `python -m eval run --config FILE --out DIR`.
+Successful stdout is exactly the supplied output directory plus a newline;
+exit codes are 0 for computed reports (including invalid tasks), 1 for input
+errors and 2 for internal errors. Configs use the JSON subset of YAML.
+Completed version-1 checkpoints do not call models again. Historical provisional
+checkpoints require an explicit offline migration or a fresh output directory;
+they are not silently relabeled as version 1. Interrupted or unsupported
+streams remain invalid even after a later successful continuation.
+
+Private graders must already exist outside the repository, supplied through
+`LHM_PRIVATE_GRADERS` in the trusted parent environment. This session does not
+create them. Each task's external directory contains `test_*.py`; optional
+`audit-names.json` lists historical filenames. Only after all executor work
+exits and the access/settings audit passes does the runner copy graders into
+a fresh trusted grading copy. That copy never enters a later executor turn.
+External raw logs and private copies are retained; public evidence is redacted.
+Native logs are referenced with hashes as well as executor JSON streams.
+
+Every executor, resume and control child uses a copied environment containing
+`HARNESS_NESTED=1`. Executor environments exclude private locations and API keys.
+The runner uses a temporary Codex home and the existing external auth symlink;
+it never copies credentials or changes global configuration.
+
+The access audit checks tool command, file-change, function-call and tool-result
+events for private grader sources/copies, `~/.codex`, the sibling `codex-bridge`
+folder and this repository outside the task workspace. URL/JSON encodings,
+relative traversal, existing symlink aliases, denied attempts and retries are
+covered. Assistant prose is excluded. Missing, truncated, unknown, unpaired or
+unfinished tool evidence and unresolved variables make the audit inconclusive.
+Detected or inconclusive access invalidates the task and aggregate report and
+prevents grading. This is observed access auditing, not filesystem isolation
+or proof that all unlogged activity is safe. Dynamic execution and additional
+installed-version event forms require host review before measurement.
+
+Harness configs select `harness=true`, an explicit `control_backend` and a
+`reinstruction_limit`. The runner calls `python -m controller contract` with
+an empty public case library and no handoff, validates the contract, injects
+its JSON into the executor prompt, then calls `python -m verifier check` with
+native transcript evidence and the public workspace. Only its bounded non-null
+re-instruction resumes the same executor session. It supplies
+`HARNESS_BACKEND` and `HARNESS_MAX_ATTEMPTS` in the verifier's copied environment.
+Private grading is outside this loop. Contract/verdict artifacts and control
+stdout/stderr are retained. `configs/harness-mocked.yaml` is a host-verification
+candidate, not a measured run. Unit tests mock every controller/verifier/model
+subprocess; synthetic grading remains a local process.
+
+Reports compute seeded task-cluster bootstrap metrics (10000 resamples;
+minimum 1000). Invalid tasks leave quality samples but retain costs. Any zero
+original/bootstrap denominator or missing accounting produces null values and
+bounds. Output tokens already include reasoning; cached input is an input
+subset. `prices.yaml` explicitly pins an **unpriced offline placeholder**, not
+verified market rates: no cost is fabricated and subscription usage is not
+zero-dollar API usage. Replace this snapshot with verified versioned rates
+before measured comparisons. Control CLI artifacts do not expose a complete
+per-call accounting ledger; actual fallback transport/model and costs remain
+unobserved. `control_model` and control costs stay null. Full done-claim
+extraction and hash-pinned paired parity are pending; false_done_rate and parity
+are undefined with reasons rather than incomplete headline measurements.
+
+There are 100 single-session and 20 two-session public task drafts across four
+types. New tasks are marked `frozen=false`, `review_status=draft` and
+`grader_status=pending`. `GRADERS-PENDING.md` names all 119 candidates needing
+external graders. The older bug-chunk-tail has historical grader evidence but
+still needs host revalidation. Related variants share 25 families: task diversity,
+specifications and negative/reference grader checks need review before freeze.
+Two-session candidates include a separate day-2 prompt; execution is rejected
+before model calls until handoff orchestration/observation is implemented.
+
+Offline verification:
 
 ```sh
 .venv/bin/python -m pytest tests/eval -q
-.venv/bin/python -m eval run --config eval/configs/pilot.yaml --out eval/reports/baseline-a-first-task
+git diff --check -- eval tests/eval state/STATUS-eval.md
 ```
 
-The CLI prints one report path and writes diagnostics to stderr. Exit codes are
-0 for a written report (including recorded invalid tasks), 1 for input errors,
-and 2 for internal errors. Reusing the same config/output directory recovers its
-checkpoint. Completed tasks do not invoke Codex again. Interrupted executor turns
-resume their explicit session ID; interrupted grading repeats grading without
-resuming an executor. Config/task fingerprint mismatches reject recovery.
-
-The trusted parent supplies grader storage; that setting and all other inherited
-private-location values are absent from the executor environment. Each task uses
-a fresh temporary workspace and Codex home with an external auth symlink to the
-existing ChatGPT login. Hooks and plugins are disabled for standalone baselines.
-No API key is forwarded and no global Codex configuration is edited. The exact
-command includes `--sandbox workspace-write`, never-approval policy,
-`model_reasoning_effort`, and `--json`; retained session evidence confirms the
-applied model and effort instead of inferring them from requested flags.
-
-All executor JSONL streams, including resumed segments, are scanned for private
-root spellings and current/historical grader basenames, across raw JSON, decoded
-strings and URL encodings. Matches invalidate a run. Empty, malformed or
-incomplete event evidence is inconclusive and invalidates the result. Full raw
-logs stay in external runtime storage; repository review copies redact private
-markers. Results retain original log hashes, line numbers and redacted evidence.
-
-Only after the executor exits and the audit/settings checks pass are private
-graders copied into a fresh grading copy. The loader selects only the private
-grader files, so executor-authored public tests cannot inflate the grader count.
-A grading copy is never used for an executor continuation. Raw runtime and
-grading evidence are retained for review rather than deleted.
-
-The user approved observed-access auditing instead of access denial. This method
-does not establish filesystem isolation or capture unlogged activity. Earlier
-grader contents remain in Git history; no history rewrite was requested.
-Historical filenames are included in the audit. Standard unittest grading also
-assumes cooperative task code; it is not an adversarial code-execution sandbox.
-
-Per-task usage contains observed token totals and native session rate-limit
-snapshots when exposed. These snapshots describe shared account usage and can
-be rounded or affected by concurrent sessions. Exact task subscription
-consumption and billed dollars remain null; tokens are not converted into an
-API invoice. API-equivalent cost metrics require a separately agreed basis.
-
-The installed CLI and
-[official configuration reference](https://developers.openai.com/codex/config-reference/)
-establish `model_reasoning_effort`. The
-[official non-interactive documentation](https://developers.openai.com/codex/noninteractive/)
-describes JSONL executor events and usage. On the installed version, applied
-effort and account snapshots come from native session JSONL, not exec stdout.
+No executor model, nested Codex, network or macOS sandbox-exec is invoked in this
+session. Live CLI compatibility, production retry/guard behavior, private graders
+and sandbox operation are pending host verification. No pilot, freeze, full run
+or quality/cost comparison is claimed.
 
 ## Assumptions
 
-- The user's access-audit decision authorizes relocating the original grader and
-  running one subscription-backed executor call, superseding the previous
-  deny-read prerequisite.
-- A single-task pilot validates runner mechanics; it cannot establish the
-  project's A/B quality or cost hypothesis.
-- The shared evaluation-report proposal remains unapproved. This local artifact
-  is provisional and does not implement that proposed interface.
+- The user's priority order supersedes the older STATUS claim that the shared
+  report interface is provisional; version 1 is approved.
+- Public candidates may be prepared without graders, but are not eligible for
+  measurement or freeze until independently graded and reviewed.
+- A reference-only compatibility schema retires the provisional definition
+  without deleting a file or changing the shared interface.
+- Model accounting absent from the frozen CLI output remains unknown; the
+  runner does not infer actual fallback transport or model identity.

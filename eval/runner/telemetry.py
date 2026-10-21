@@ -8,6 +8,8 @@ from typing import Any
 def records(path: Path) -> list[dict[str, Any]]:
     """Read usable events without treating malformed records as success."""
     events: list[dict[str, Any]] = []
+    if not path.is_file():
+        return events
     for line in path.read_text(errors="replace").splitlines():
         try:
             value = json.loads(line)

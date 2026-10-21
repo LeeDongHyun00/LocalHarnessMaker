@@ -1,60 +1,60 @@
 ## Done
 
-- Built the initial unfrozen bug-fix fixture and validated that its three private cases reject the original implementation and pass a correction; the private source has now been relocated outside the repository under the user's access-audit decision (.venv/bin/python -m pytest tests/eval -q: 26 passed in 1.54s, including both fixture checks; eval/reports/baseline-a-first-task/tests.log).
-- Implemented the hook-independent standalone baseline CLI, JSON-subset YAML config, provisional local report schema, pass_rate, timeout cleanup, transport retry and durable interruption/completed-run recovery (.venv/bin/python -m pytest tests/eval -q: 26 passed, including timeout, retry, same-session continuation, completed-checkpoint reuse and grading-crash recovery).
-- Implemented per-task observed-access auditing across executor segments and native JSONL, with invalidation on current/historical grader filenames, private root matches or incomplete/malformed evidence; filtered the executor environment and preserved external originals plus redacted repository evidence (.venv/bin/python -m pytest tests/eval -q: 26 passed, including escaped/URL paths, basenames, historical names, invalidation and environment filtering).
-- Ran exactly one subscription-backed baseline A executor on bug-chunk-tail; the CLI wrote the report, the executor exited successfully, the access audit was clean with zero matches/errors, and a fresh grading copy created after exit passed 3/3 private tests (.venv/bin/python -m eval run --config eval/configs/pilot.yaml --out eval/reports/baseline-a-first-task: exit 0, one report path; report.json and bug-chunk-tail/grading.log).
-- Confirmed actual gpt-6.1-sol at medium effort from native session JSONL; the exec stdout JSONL does not expose effort (bug-chunk-tail/session-evidence.jsonl: turn_context model=gpt-6.1-sol, effort=medium; report.json settings_evidence.verified=true).
-- Recorded per-task observed tokens and exposed ChatGPT account plan snapshots without inventing API billing or exact subscription consumption (bug-chunk-tail/exec-1.jsonl: turn.completed usage input_tokens=58248, cached_input_tokens=54656, output_tokens=524; session-evidence.jsonl: four prolite snapshots, 10080-minute primary window, used_percent=2.0; billed_usd and exact_task_consumption are null).
-- Verified completed-run recovery without another model call and validated the provisional report and repository privacy check (.venv/bin/python -m eval run --config eval/configs/pilot.yaml --out eval/reports/baseline-a-first-task: exit 0, retained one executor segment; trusted-parent .venv/bin/python - schema/privacy audit: local report schema valid, private-location occurrences=0).
-- Wrote the change summary, runner instructions, limitations and assumptions; retained the earlier preflight as historical evidence superseded by the user's audit choice (eval/README.md and eval/reports/baseline-a-first-task/README.md: present; git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0).
+- Replaced provisional report emission with the approved shared report schema, format validation, runtime ID/count/cost/order/hash checks, directory-only CLI stdout and an offline compatibility reference in eval/report.schema.json; historical provisional artifacts are preserved and cannot silently resume as version 1 (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; schema, runtime-invariant, legacy-checkpoint and CLI tests passed).
+- Expanded observed tool-access auditing to ~/.codex, the sibling codex-bridge folder, repository paths outside the task workspace and private grader/grading roots; assistant prose is excluded, while denied/encoded/traversed/symlink accesses and incomplete/unsupported evidence invalidate tasks before grading (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; protected-access, native-tool, missing-capture and unfinished-event tests passed).
+- Added hook-independent contract/verifier/re-instruction orchestration through frozen CLIs with injectable subprocesses, copied nested-guard environments, contract/verdict validation, same-session resume, null/exhausted feedback termination, retained evidence and failure recovery (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; mocked harness, failure, resume-access and completed-checkpoint tests passed).
+- Added seeded task-cluster bootstrap metrics and per-segment executor accounting without fabricated zero prices; unknown costs/model identity stay null, and full done-claim/parity measurements remain explicitly undefined (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; deterministic bootstrap, zero-denominator, cached-token and unknown-cost tests passed).
+- Prepared 119 new public drafts for a total of 100 single-session and 20 two-session tasks, with prompt.md, workspace, meta.json and expected.json, plus day2.md where applicable; listed every new task needing graders in eval/GRADERS-PENDING.md (.venv/bin/python eval/tools/prepare_tasks.py: Prepared 119 public candidates; no graders generated.; .venv/bin/python -m pytest tests/eval -q: inventory, Python syntax and pending-list checks passed).
+- Wrote eval/README.md and eval/CHANGES.md describing changes, limitations and assumptions; this session made no executor/model/network/sandbox-exec calls and did not stage or commit (.venv/bin/python -m pytest tests/eval -q: all model/control subprocesses mocked; git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0).
+- Preserved the prior session's one-task baseline artifacts as historical provisional evidence, without rerunning or claiming current-schema validity (eval/reports/baseline-a-first-task/report.json: retained unchanged; no current live result claimed).
 
 ## Remaining
 
-- D-1: complete harness-mode contract/verifier/reinstruction orchestration and broader failure isolation using the frozen role CLIs; the present runner intentionally accepts standalone baseline configurations only.
-- Coordinate the shared evaluation report schema with Role 1, including the user's subscription accounting choice. The current eval/report.schema.json is a provisional baseline artifact, not the proposed schemas/evaluation-report.schema.json. Do not change shared interfaces independently.
-- D-2: expand the unfrozen task set to 100 single-session tasks plus 20 two-session tasks. Move private graders directly into external storage, retain historical filename audit aliases when needed, and record task-set hashes before future execution. The first-run digest is explicitly labeled after_execution.
-- Prepare the 10-task baseline A/B pilot, report expected subscription usage or clearly labeled accounting assumptions, and obtain full-run approval. Respect STOP-3 before a batch of 10 or more paid calls; this session used one executor call only.
-- Freeze the approved task set and provide its hash to Role 1 for docs/eval-freeze.md; manually re-check five baseline A samples. No freeze, five-sample human review or full-run approval is claimed.
-- Continue D-3 through D-5 after the pilot: static-template and harness runs, cheap_api/local comparisons as approved, two-session handoff results, human review table, and final task-type metrics with confidence intervals. No A/B quality or cost conclusion follows from one task.
+- Pending host verification: installed CLI contract/verifier/executor/resume compatibility, actual nested guard and production retry behavior, model/effort evidence, process termination and macOS sandbox-exec. Nested Codex, live models, network and sandbox-exec were unavailable and were not attempted in this workspace-write session.
+- Obtain verified versioned model rates for eval/prices.yaml; its empty rates are explicitly an unpriced offline placeholder. Integrate actual per-call controller/judge/fallback transport/model/usage evidence exposed by the frozen CLIs; control costs and control_model remain null rather than inferred.
+- Complete full done-claim denominator extraction and hash-pinned paired local-minus-cheap_api parity. Current emitted false_done_rate/parity are undefined with reasons; mock metrics are not measured quality evidence.
+- Review the 119 draft candidates named in eval/GRADERS-PENDING.md, diversify related families, and write/validate external graders in a separately authorized session. No hidden task graders were written here. Revalidate the existing bug-chunk-tail external grader on the host; its two fixture tests skipped because LHM_PRIVATE_GRADERS was unset.
+- Implement two-session runner handoff generation, injection and day-2 observation before executing those candidates. Current runner rejects two-session tasks before model calls; public day-2 prompts do not constitute orchestration evidence.
+- Decide whether historical provisional baseline artifacts need explicit offline migration; otherwise use fresh output directories. No historical report was relabeled or rerun.
+- Prepare the 10-task A/B pilot estimate and required approval before any 10-or-more paid-call batch or full run. Do not infer full-run authorization from this offline session.
+- Freeze only after grader/specification/diversity review, then supply the task-set hash to Role 1 for docs/eval-freeze.md; re-check five A samples manually. SC-2, SC-5 and SC-6 remain unfinished.
+- Run the full suite once before a future merge, then continue D-3 through D-5: static-template/harness measurements, local comparison, human review, task-type breakdowns and final report. No merge or headline cost/quality comparison occurred here.
 
 ## Decisions
 
-- Use the user-approved access-audit method: it supersedes the earlier STOP-E4 deny-read prerequisite and authorizes relocating the original grader before one baseline A call.
-- Keep private grader locations only in trusted-parent memory/environment: actual locations are absent from repository artifacts and stripped from the environment passed to codex exec.
-- Copy graders only after executor exit, into a fresh separate grading copy: no executor continuation is permitted once grading has begun; grading recovery never invokes Codex again.
-- Audit all observed executor segments and native session JSONL, including historical grader basenames: matches invalidate the run and retain evidence, while absence of matches does not prove isolation.
-- Use a fresh temporary Codex home and existing external ChatGPT auth symlink, with hooks/plugins disabled and HARNESS_NESTED=1: Role 2 confirmed hooks fire under exec, and baseline A must remain independent of the harness.
-- Keep tokens and account rate-limit snapshots separate from billing: ChatGPT subscription snapshots are shared and rounded, so exact task consumption and billed USD remain unknown/null.
-- Keep the local result schema provisional: the shared evaluation report proposal is not approved and its API-equivalent accounting does not yet represent the user's subscription requirement.
-- Record the first task-set digest after execution and label its timing: runner finalization occurred after the live call; it is not evidence of a pre-run freeze.
-- Retain external raw logs and grading copies: no history rewrite or cleanup deletion was requested; historical grader contents remain in Git history and their former filename is audited.
+- Use the approved shared report schema directly: the prior provisional status was superseded by version-1 approval and this user's first priority.
+- Retire the local schema with a reference-only shim: no file deletion or shared-interface change is required.
+- Preserve historical provisional reports and reject silent checkpoint migration: old evidence must not acquire unobserved pricing, provenance or audit guarantees.
+- Audit supported tool access rather than assistant prose: the approved STOP-E4 requires observed operations, including denied attempts, and treats uncertainty as invalid.
+- Keep raw logs externally and hash-pin both executor/native evidence: public redaction must not replace the original audit trail.
+- Treat benchmark prompt execution as runner authorization to apply the generated contract: no interactive approval is possible in an automated evaluation; this does not change direct-user plugin behavior.
+- Keep private grading outside the contract/verifier loop: neither private test contents nor private feedback reaches later executor turns.
+- Keep absent rates/accounting and full claim denominators undefined: the frozen CLI output is insufficient to assert actual mixed-model/fallback accounting or false-done measurements.
+- Mark new tasks as unfrozen drafts with graders pending: 120 public directories do not establish 120 reviewed, independently graded benchmark tasks.
 
 ## Verify commands
 
-- With LHM_PRIVATE_GRADERS set only in the trusted parent shell: .venv/bin/python -m pytest tests/eval -q
-- With the same trusted-parent setup: .venv/bin/python -m eval run --config eval/configs/pilot.yaml --out eval/reports/baseline-a-first-task
-- codex --version
-- codex login status
-- Read eval/reports/baseline-a-first-task/report.json, bug-chunk-tail/result.json, exec-1.jsonl, session-evidence.jsonl and grading.log.
-- Validate report.json against eval/report.schema.json with jsonschema.Draft202012Validator; verify private root spellings are absent from tracked/untracked nonignored repository files.
+- .venv/bin/python -m pytest tests/eval -q
 - git diff --check -- eval tests/eval state/STATUS-eval.md
+- Read eval/GRADERS-PENDING.md for all 119 pending external graders.
+- Host only, after prerequisites/authorization: verify live CLI, model/effort evidence, nested guard, process cleanup, external graders and sandbox behavior; do not run these in this session.
+- Before a future merge only: run the full repository test suite once.
 
 ## Do not touch
 
-- controller/, controller/case_library/, verifier/, plugin/, other role tests and other role STATUS files; never share task-set contents with Role 3.
-- Shared schemas, CLIs and hook interfaces; only Role 1 may change them through the required decision/version process.
-- Existing user edits, legacy harness/, experiments/ and root configuration.
-- Never write the private grader root into repository files, executor prompts, configs, argv or forwarded environment; never copy grading files into an executor workspace.
-- Never use git add -A. Any future commit must stage only explicit eval/, tests/eval/ and state/STATUS-eval.md paths, and must exclude other roles' staged changes.
-- Do not delete unrelated files, rewrite Git history or change external service configuration. Relocating the original grader was explicitly authorized; no broader deletion permission was inferred.
+- controller/, controller/case_library/, verifier/, plugin/, shared schemas/configuration, other roles' tests or STATUS files; never share the task set with Role 3.
+- Existing concurrent edits and historical baseline artifacts; interface changes require Role 1 approval/versioning.
+- Private grader storage or task graders in this session; no private contents/paths may enter executor/controller context or public artifacts.
+- .git is read-only: do not stage, commit, rewrite history or delete files. Future commits must list only eval/, tests/eval/ and state/STATUS-eval.md paths explicitly.
+- No executor models, nested codex exec, live model/API calls, network or macOS sandbox-exec in this environment. No full-run approval is implied.
 
 ## Assumptions
 
-- The user approved access auditing instead of proving read denial and requested one subscription-backed baseline A task; no future full experiment was authorized.
-- Relocating the original grader includes removing its public working-tree copy. Its prior Git history is preserved; observed references to its old basename are included in the audit.
-- Native Codex JSONL turn_context and token_count records are valid runtime evidence when exec stdout omits applied effort or plan snapshots; both sources are identified explicitly in the result.
-- Four account snapshots at 2% usage do not establish zero task cost or exact task percentage consumption; the first snapshot can follow model usage and other sessions share the account.
-- Standard-library unittest grading assumes cooperative task code and observed-access audit coverage. Neither establishes an adversarial sandbox or visibility into unlogged activity.
-- The config uses the JSON subset of YAML to avoid modifying Role 1's dependency configuration. Full YAML syntax and harness configurations remain unsupported.
-- One passing task validates the first-task mechanics only; confidence intervals, parity, full task-set quality and cost-per-pass comparisons remain unfinished.
+- The user's current priority order replaces the old STATUS ordering and provisional-schema claim; shared version 1 remains unchanged.
+- A reference-only local schema counts as retirement while avoiding deletion under STOP-4.
+- Public task preparation may include related family variants as drafts; diversity and grader review are required before freeze or measurement.
+- expected_test_count=3 on new drafts is a planned grader-group count, not evidence that any grader exists or has run.
+- The non-interactive benchmark runner may inject its generated contract as an authorized evaluation input; direct-user plugin approvals remain outside this session.
+- Unobserved controller/judge accounting and actual fallback identity cannot be inferred from aggregate cost estimates or requested backend settings.
+- Complete native/executor tool-event capture is required for a clean observed-access audit; clean logs do not establish isolation or visibility into unlogged activity.
+- External grader configuration is absent in this test environment; the two skipped legacy fixture checks require trusted host verification.

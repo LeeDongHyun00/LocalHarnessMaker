@@ -1,0 +1,19 @@
+{
+  "command": [
+    "python",
+    "-I",
+    "-m",
+    "unittest",
+    "discover",
+    "-v"
+  ],
+  "expected_exit_code": 0,
+  "expected_test_count": 3,
+  "grader_status": "pending",
+  "pass_condition": "Pending external graders: ordinary behavior, boundaries/errors, and compatibility/input preservation.",
+  "planned_grader_groups": [
+    "ordinary behavior",
+    "boundaries and errors",
+    "compatibility and input preservation"
+  ]
+}

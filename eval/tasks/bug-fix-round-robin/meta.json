@@ -1,0 +1,12 @@
+{
+  "id": "bug-fix-round-robin",
+  "type": "bug_fix",
+  "difficulty": "easy",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "round-robin",
+  "review_status": "draft"
+}

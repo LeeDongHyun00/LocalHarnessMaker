@@ -1,0 +1,13 @@
+{
+  "id": "two-session-interleave",
+  "type": "feature_plus_test",
+  "difficulty": "medium",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 1,
+  "frozen": false,
+  "grader_status": "pending",
+  "family": "interleave",
+  "review_status": "draft",
+  "day2_prompt": "day2.md"
+}
