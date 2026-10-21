@@ -1,10 +1,18 @@
 {
   "cheap_api": {
-    "model": "gpt-4.1-mini-2025-04-14",
+    "model": "gpt-6-luna",
     "endpoint": "https://api.openai.com/v1/responses",
     "api_key_env": "OPENAI_API_KEY",
     "timeout_seconds": 60,
     "max_output_tokens": 4096,
-    "price_key": "gpt-4.1-mini"
+    "price_key": "gpt-6-luna"
+  },
+  "codex_cli": {
+    "executable": "codex",
+    "model": "gpt-6-luna",
+    "reasoning_effort": "low",
+    "sandbox": "read-only",
+    "timeout_seconds": 180,
+    "price_key": "gpt-6-luna"
   }
 }

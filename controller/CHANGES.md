@@ -64,3 +64,56 @@ interface was invented in this session.
 - [Responses structured output and supported schemas](https://developers.openai.com/api/docs/guides/structured-outputs)
 - [Configured model snapshot and capabilities](https://developers.openai.com/api/docs/models/gpt-4.1-mini)
 - [Standard token pricing checked on 2026-10-21](https://developers.openai.com/api/docs/pricing)
+
+# Backend selection update — 2026-10-21
+
+The user selected the logged-in Codex CLI with gpt-6-luna as the primary
+control backend, and gpt-6-luna over HTTP as fallback. Added the directly
+callable `CodexCLIBackend`, which invokes `codex exec` with a schema file
+generated from the existing strict wire adapter, request text on stdin, a new
+initially empty temporary working directory, a copied environment with
+`HARNESS_NESTED=1`, a read-only sandbox, ephemeral mode, and the low effort
+override `model_reasoning_effort="low"`. The existing CLI `--backend` choices
+remain unchanged while Role 1's related interface proposal awaits approval.
+
+The installed `codex-cli 0.162.0-alpha.17.2` accepts the override; `-c`
+configuration syntax appears in `codex exec --help`, and an offline strict
+config parse reached the missing-prompt validation. A first schema-only probe
+also confirmed that `--ask-for-approval` is not an `exec` option and was
+removed. The subsequent live smoke call confirms the selected model, effort
+override, schema file, token-event parsing, and final artifact validation work
+together. The call finished in 12.117 seconds with 16,060 input tokens,
+0 cached input tokens, 516 output tokens, and $0.001864 API-equivalent cost at
+the user-specified rates. This is an estimate, not an API invoice.
+
+The HTTP fallback's configured model and price key now use gpt-6-luna. The
+user-provided rates are 0.10 USD per million input tokens, 0.01 cached input,
+and 0.50 output. No HTTP backend call was made. Codex CLI choice wiring,
+automatic fallback routing, and hook recursion guards depend on the pending
+Role 1 interface decision and other roles' work; this change adds no CLI choice.
+
+## Verification
+
+- `.venv/bin/python -m pytest tests/controller/test_codex_cli.py
+  tests/controller/test_backend.py -q -s`: 28 passed before the final usage
+  edge case was added.
+- `.venv/bin/python -m pytest tests/controller -q -s`: 73 passed; fixture-only
+  mock rates and assumptions report 10/10 and 4/4.
+- A live direct `CodexCLIBackend.generate` call with `schemas/examples/prompt.json`
+  returned a contract that passed `Draft202012Validator` against
+  `schemas/contract.schema.json`; the STATUS file records exact token and
+  latency output.
+- `codex login status`: `Logged in using ChatGPT`.
+- `codex exec --help` and a strict-config CLI probe verified the installed
+  flags and `model_reasoning_effort` configuration key.
+
+## Assumptions
+
+- The user-provided gpt-6-luna prices are planning rates for API-equivalent
+  reporting, not a claim about the account's actual billed usage.
+- A Role 1 approval is still required before adding `codex_cli` to any frozen
+  backend CLI enum. Direct construction remains available for tests/smoke checks.
+
+## Official documentation
+
+- [Codex CLI overview and configuration](https://developers.openai.com/api/docs/libraries/openai-cli)

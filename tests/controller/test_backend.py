@@ -43,11 +43,12 @@ def test_request_golden_and_provider_usage(caplog: pytest.LogCaptureFixture) -> 
     }
     usage = backend.usage()
     assert (usage.input_tokens, usage.output_tokens, usage.cached_input_tokens) == (1000, 200, 100)
-    assert usage.usd == 0.00069
+    assert usage.usd == 0.000191
     assert usage.latency_seconds == 0.25
     log = caplog.records[-1].getMessage()
-    assert '"usd": 0.00069' in log and '"latency_seconds": 0.25' in log
+    assert '"usd": 0.000191' in log and '"latency_seconds": 0.25' in log
     assert "test-placeholder" not in log and "task data" not in log
+    assert config["model"] == "gpt-6-luna"
 
 
 def test_wire_schema_preserves_optional_stdout_and_disjoint_checks() -> None:
@@ -76,7 +77,7 @@ def test_invalid_generation_is_distinct_and_accounted(text: str) -> None:
     backend = CheapAPIBackend(transport=RecordingTransport([response(text=text)]))
     with pytest.raises(InvalidGeneration):
         backend.generate(load_object(ROOT / "schemas/contract.schema.json"), [])
-    assert backend.usage().usd == 0.00069
+    assert backend.usage().usd == 0.000191
 
 
 @pytest.mark.parametrize("kind", ["refusal", "incomplete", "missing-usage", "invalid-usage"])

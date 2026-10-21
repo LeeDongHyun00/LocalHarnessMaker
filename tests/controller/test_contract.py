@@ -31,7 +31,7 @@ def test_shared_prompt_produces_schema_valid_golden_contract() -> None:
     Draft202012Validator(load_object(ROOT / "schemas/contract.schema.json")).validate(result)
     expected = model_contract()
     expected["reasoning_effort"] = reasoning_effort(request)
-    expected["cost_estimate"] = {"input_tokens": 1000, "output_tokens": 200, "usd": 0.00069}
+    expected["cost_estimate"] = {"input_tokens": 1000, "output_tokens": 200, "usd": 0.000191}
     assert result == expected
 
 
@@ -84,7 +84,7 @@ def test_retry_accounts_for_every_call_and_logs_each(caplog: pytest.LogCaptureFi
     with caplog.at_level(logging.INFO):
         result = generate_contract("Add /health and tests", CheapAPIBackend(transport=transport))
     assert len(transport.calls) == 3
-    assert result["cost_estimate"] == {"input_tokens": 3000, "output_tokens": 600, "usd": 0.00207}
+    assert result["cost_estimate"] == {"input_tokens": 3000, "output_tokens": 600, "usd": 0.000573}
     assert sum(record.getMessage().startswith("control_call ") for record in caplog.records) == 3
     assert len(transport.calls[-1]["payload"]["input"]) == 4
 
