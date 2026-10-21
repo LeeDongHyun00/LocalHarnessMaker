@@ -1,9 +1,12 @@
 """Check that the initial evaluation fixture detects its intended defect."""
 
 from pathlib import Path
+import os
 import shutil
 import subprocess
 import sys
+
+import pytest
 
 
 TASK = Path(__file__).resolve().parents[2] / "eval/tasks/bug-chunk-tail"
@@ -12,7 +15,13 @@ TASK = Path(__file__).resolve().parents[2] / "eval/tasks/bug-chunk-tail"
 def grade_fixture(destination: Path, *, corrected: bool) -> subprocess.CompletedProcess[str]:
     """Grade a private copy, never placing tests into the initial workspace."""
     shutil.copytree(TASK / "workspace", destination)
-    shutil.copy2(TASK / "hidden_tests/test_chunking.py", destination)
+    value = os.environ.get("LHM_PRIVATE_GRADERS")
+    if not value:
+        pytest.skip("External graders are not configured in this trusted test process")
+    graders = list((Path(value) / TASK.name).glob("test_*.py"))
+    assert graders, "External task graders are missing"
+    for grader in graders:
+        shutil.copy2(grader, destination)
     if corrected:
         source = destination / "chunking.py"
         source.write_text(source.read_text().replace("len(items) - 1", "len(items)"))

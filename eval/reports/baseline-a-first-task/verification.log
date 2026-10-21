@@ -1,0 +1,8 @@
+Report schema: valid
+Per-task result: identical to report task
+Executor segments: 1
+Grading copy: created after executor exit
+Audit: clean
+Runtime setting: gpt-6.1-sol / medium
+Private-location occurrences in repository files: 0
+STATUS headings: valid

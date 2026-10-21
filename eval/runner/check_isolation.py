@@ -1,9 +1,10 @@
-"""Probe the required Codex sandbox without invoking an executor model.
+"""Historical preflight probe, superseded by the user's access-audit decision.
 
 This diagnostic reads a private grader file but never prints its contents.
 Exit 1 means STOP-E4: the built-in workspace sandbox can read the grader.
-Exit 2 means the probe could not establish isolation. Neither outcome permits
-an evaluation model call.
+Exit 2 means the probe could not establish isolation. The original fixture has
+since moved outside the repository, so this script is retained as historical
+source only. Use eval.runner.audit for current evaluation validity checks.
 """
 
 from pathlib import Path

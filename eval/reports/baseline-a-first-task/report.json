@@ -1,0 +1,196 @@
+{
+  "format": "eval-baseline-provisional-v1",
+  "metadata": {
+    "run_id": "e0c03a0141dd4d8bb3b93af2194ac141",
+    "created_at": "2026-10-21T05:33:51.772116+00:00",
+    "config_sha256": "ee008715dd4acc424ca319d7514bcd4e9dc7baedc4356cb2c563efc61706245a",
+    "task_set_sha256": "73ee6bc522001279424e4007a3d02e9c99505a56c5726fe6917149a9ecfc4ea4",
+    "task_set_hash_timing": "after_execution",
+    "config_name": "baseline-a-first-task",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "seed": 0,
+    "codex_version": "codex-cli 0.162.0-alpha.17.2",
+    "harness": false,
+    "billing_basis": "chatgpt_subscription",
+    "stop_reason": null
+  },
+  "tasks": [
+    {
+      "task_id": "bug-chunk-tail",
+      "task_type": "bug_fix",
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "session_id": "01a15cf3-9da1-7321-bc1c-5778a8890fd8",
+      "segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-21T05:33:51.775466+00:00",
+          "events": "exec-1.jsonl",
+          "stderr": "exec-1.stderr",
+          "exited_at": "2026-10-21T05:34:16.667609+00:00",
+          "exit_code": 0,
+          "timed_out": false,
+          "latency_seconds": 24.89146757600247
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "root_fingerprint": "9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a",
+        "grader_fingerprints": [
+          "a7d764a96173b667316cedaf2c4ccbecee8f313f3f0a2cae2b4538ed71ba0146"
+        ],
+        "logs": [
+          {
+            "name": "exec-1.jsonl",
+            "sha256": "e2b3a216ef7173dcf63d3c91efc79795466aa8bb91933523346fe40a98729a4a",
+            "bytes": 4493
+          },
+          {
+            "name": "rollout-2026-10-21T14-33-53-01a15cf3-9da1-7321-bc1c-5778a8890fd8.jsonl",
+            "sha256": "d217a21001613221b42d1cc5d46be861e34e7d17c5ef6dbf7b098c8379f3cc55",
+            "bytes": 62556
+          }
+        ],
+        "matches": [],
+        "errors": [],
+        "scope": "Observed JSONL only; absence of matches does not prove denied access."
+      },
+      "grading": {
+        "result": "pass",
+        "copied_at": "2026-10-21T05:34:16.691040+00:00",
+        "executor_already_exited": true,
+        "grader_source_outside_repository": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "passed_tests": 3,
+        "failed_tests": 0,
+        "total_tests": 3,
+        "log": "grading.log"
+      },
+      "settings_evidence": {
+        "verified": true,
+        "source": "native_session_jsonl.turn_context",
+        "observed": [
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "medium"
+          }
+        ],
+        "exec_json_exposes_effort": false
+      },
+      "usage": {
+        "billing_basis": "chatgpt_subscription",
+        "tokens": {
+          "input_tokens": 58248,
+          "cached_input_tokens": 54656,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 524,
+          "reasoning_output_tokens": 0
+        },
+        "billed_usd": null,
+        "plan_usage": {
+          "availability": "account_snapshots",
+          "snapshots": [
+            {
+              "timestamp": "2026-10-21T05:34:01.778Z",
+              "rate_limits": {
+                "limit_id": "codex",
+                "limit_name": null,
+                "primary": {
+                  "used_percent": 2.0,
+                  "window_minutes": 10080,
+                  "resets_at": 1793160218
+                },
+                "secondary": null,
+                "credits": {
+                  "has_credits": false,
+                  "unlimited": false,
+                  "balance": "0"
+                },
+                "individual_limit": null,
+                "spend_control_reached": null,
+                "plan_type": "prolite",
+                "rate_limit_reached_type": null
+              }
+            },
+            {
+              "timestamp": "2026-10-21T05:34:03.975Z",
+              "rate_limits": {
+                "limit_id": "codex",
+                "limit_name": null,
+                "primary": {
+                  "used_percent": 2.0,
+                  "window_minutes": 10080,
+                  "resets_at": 1793160218
+                },
+                "secondary": null,
+                "credits": {
+                  "has_credits": false,
+                  "unlimited": false,
+                  "balance": "0"
+                },
+                "individual_limit": null,
+                "spend_control_reached": null,
+                "plan_type": "prolite",
+                "rate_limit_reached_type": null
+              }
+            },
+            {
+              "timestamp": "2026-10-21T05:34:11.201Z",
+              "rate_limits": {
+                "limit_id": "codex",
+                "limit_name": null,
+                "primary": {
+                  "used_percent": 2.0,
+                  "window_minutes": 10080,
+                  "resets_at": 1793160218
+                },
+                "secondary": null,
+                "credits": {
+                  "has_credits": false,
+                  "unlimited": false,
+                  "balance": "0"
+                },
+                "individual_limit": null,
+                "spend_control_reached": null,
+                "plan_type": "prolite",
+                "rate_limit_reached_type": null
+              }
+            },
+            {
+              "timestamp": "2026-10-21T05:34:14.457Z",
+              "rate_limits": {
+                "limit_id": "codex",
+                "limit_name": null,
+                "primary": {
+                  "used_percent": 2.0,
+                  "window_minutes": 10080,
+                  "resets_at": 1793160218
+                },
+                "secondary": null,
+                "credits": {
+                  "has_credits": false,
+                  "unlimited": false,
+                  "balance": "0"
+                },
+                "individual_limit": null,
+                "spend_control_reached": null,
+                "plan_type": "prolite",
+                "rate_limit_reached_type": null
+              }
+            }
+          ],
+          "exact_task_consumption": null,
+          "limitation": "Account-wide, rounded snapshots; first observation may follow usage. Concurrent sessions prevent exact task attribution."
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "pass_rate": 1.0,
+    "sample_size": 1
+  }
+}
