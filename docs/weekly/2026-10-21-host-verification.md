@@ -62,8 +62,18 @@ Claude ran the jobs directly with codex-cli 0.162.0-alpha.17.2 (gpt-6.1-sol) fro
 | r3-fix-001, Role 3, medium | H4, low items | 145 passed | 145 passed. contract with codex missing exits 0 after one cheap_api call | 9ebad81 |
 | r1-cont-001, Role 1, medium | Unified collection, docs/plan.md, decision 0005, rule 6 wording | make test with zero collection errors | make test: 777 passed, 3 skipped, 1 xfailed. make validate-schemas: 6 schemas and 8 examples | b212873 |
 
-Open decisions:
-1. M2 (user and Role 1). The frozen evaluation-report schema forces validity=valid when no task is invalid, so a run halted by STOP-E1 reports valid. Role 5 stopped at STOP-1, and a strict xfail (tests/eval/test_runner.py::test_stop_e1_partial_report_is_invalid_with_counts) marks the gap. One option is a schema revision with VERSION 2 that allows an aggregate-only invalid reason. The other is to keep version 1 and have halted runs write no headline report.
-2. Deadlines (Roles 2, 3 and 4). The Stop hook times out at 40 s (plugin/hooks/hooks.json). The verifier gives the judge 120 s (HARNESS_JUDGE_TIMEOUT_SECONDS). The controller gives codex_cli 180 s per call, with up to three calls. As configured, an llm_judge criterion cannot finish inside the Stop hook.
-3. Dynamic execution (user, Role 1 and Role 5). 11 of the 59 real commands are python or cat heredoc scripts, and they still audit inconclusive under the AGENTS.md 3.4 unresolved-operand rule. The 10-task pilot must report how many tasks this invalidates before anyone changes the policy.
-4. Minor (Role 1). docs/plan.md cites the local path of the Notion export as its source. The next Role 1 job should cite the Notion page instead.
+## Decisions taken on 2026-10-22
+
+The user told Claude to proceed with the recommended options for the open decisions, and set LHM_PRIVATE_GRADERS for Role 5 jobs; the path stays out of repository files.
+
+1. M2, halted runs, with no schema change. A run halted by STOP-E1 writes no report.json and exits 2 (the run is incomplete). It prints the halt reason and the counts on stderr, and it keeps checkpoint.json and run-diagnostics.json so that a later run with the same --out resumes. The full report is written only when every configured task has a result. This replaces the strict xfail tests/eval/test_runner.py::test_stop_e1_partial_report_is_invalid_with_counts.
+2. Deadlines. Every caller outlasts its callee, and every caller kills the callee's whole process group on expiry. Initial values:
+   - UserPromptSubmit: hook timeout 40 s, contract call 30 s (both unchanged, user-approved).
+   - Stop: hook timeout 600 s; inside it, verifier check 480 s and controller handoff 90 s.
+   - Verifier judge: 120 s (unchanged).
+   - Controller codex_cli: the per-call deadline (now 180 s) will be set from Luna latencies that Claude measures on the host, so that three calls fit inside the judge deadline. Until then the callers cut it off.
+3. Dynamic execution. Python and cat heredoc scripts stay inconclusive under AGENTS.md 3.4. The 10-task pilot reports how many tasks this invalidates. The policy is revisited, through a Role 1 decision record, only if that share exceeds 10 percent of pilot tasks.
+4. Task families. Keep the 25 related families of four task types plus the 20 two-session tasks: the task type is the experimental factor, and rebuilding the set before the 2026-10-27 freeze would leave no time for validated graders. Reports keep the task-cluster metrics of decision 0003. Claude's final evaluation also reports family-cluster bootstrap intervals, and a claim counts only if it holds under them.
+5. Bridge. Use the bridge only for private-write jobs, run with --once so that it exits after the job. All other jobs run directly.
+6. Plan usage. No change: the pilot reports usage before any full run, and a full run needs the user's explicit approval.
+7. Minor. docs/plan.md cites the local path of the Notion export. The Role 1 job that records the freeze hash will cite the Notion page instead.
