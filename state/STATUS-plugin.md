@@ -7,10 +7,11 @@
 - Passed SC-2 with one initial Codex process: full fixture contract appears as developer context and the session waits for approval without verifier calls (HARNESS_STUB=1 HARNESS_CODEX_LIVE=1 HARNESS_CODEX_EVIDENCE=plugin/evidence/2026-10-21-d2 .venv/bin/python -m pytest tests/plugin/test_codex_integration.py -q: 1 passed in 17.98s; request-summary.json: contract_visible=true, approval_pending=true, verifier_calls=0).
 - Completed D-2 in a fresh routing-only stub demo, with the summary displayed before scripted demo approval, exactly one re-instruction, two verifier calls and synthetic pass; all source and transcript logs are retained (HARNESS_STUB=1 bash plugin/demo.sh --out plugin/evidence/2026-10-21-d2-pass --scripted-approval: exit 0; .venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-21-d2-pass: approval_gate=true, reinstructions=1, attempts=2, overall=pass, synthetic=true, real_task_verified=false, max_hook_overhead_seconds=0.192873).
 - Added the executor skill and updated plugin/README.md with reproduction commands, limitations, change summary and assumptions; validated using isolated PyYAML tooling without changing repository dependencies (skill-creator/scripts/quick_validate.py plugin/skills/harness with temporary PYTHONPATH: Skill is valid!; README link audit: OK; bash -n plugin/demo.sh: exit 0).
+- Applied the user's STOP-P3 prototype decision: synchronous controller contract calls now allow thirty seconds, UserPromptSubmit has a forty-second outer deadline, and each contract call logs latency on stderr including timeouts. Mocked ten/thirty-second successes and timeout handling preserve the approval gate and silent nested bypass (.venv/bin/python -m pytest tests/plugin -q: 73 passed, 1 opt-in live test skipped in 5.56s; git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
 
 ## Remaining
 
-- D-3: live-verify the real controller/verifier routes (default HARNESS_BACKEND=codex_cli), which currently delegate without an automatic stub fallback. The state fields, configurable default limit N=3 and unmet-item warning are implemented and mocked-tested; real CLI readiness, controller latency and real outcome verification remain unproven. Obey STOP-P3 if a contract call exceeds five seconds.
+- D-3: live-verify the real controller/verifier routes (default HARNESS_BACKEND=codex_cli), which currently delegate without an automatic stub fallback. The state fields, configurable default limit N=3 and unmet-item warning are implemented and mocked-tested; full-contract latency and real outcome verification remain unproven. Apply the user's accepted thirty-second synchronous limit and retain latency logs; do not build an asynchronous design now.
 - D-3/D-4: implement handoff generation before session completion using the controller CLI. Existing-handoff validation/injection is implemented and mocked-tested; no real handoff save/injection or two-session handoff demo has run.
 - D-4: implement install.sh and its three distinct --check diagnostics, project template, packaging, persisted trust review, and installed-environment checks. The current hooks reference this repository's schemas, packages and skill; portable installation is not complete. SC-6 remains pending.
 - D-5: produce the recording scenario and screen-order document. Preserve stub and real demo logs; current demo.sh deliberately supports stub mode only. bash plugin/install.sh --check and a real-mode demo remain unrun.
@@ -18,6 +19,8 @@
 
 ## Decisions
 
+- Accept synchronous control-model calls up to thirty seconds for the prototype, per the user's 2026-10-21 STOP-P3 decision: the call runs once per request before approval. This supersedes the role prompt's five-second threshold and asynchronous/cached-design escalation. Keep the subprocess deadline at thirty seconds, the UserPromptSubmit outer deadline at forty seconds, and latency_seconds plus aggregate cli_seconds logs.
+- Record the user's approximately ten-second one-line gpt-6-luna codex exec measurement as user-reported: it motivates the accepted prototype latency but is not a full-contract benchmark or a measurement performed in this session.
 - Keep the tested Codex pin: both interfaces worked on the installed version, so no upgrade or alternative continuation design is required.
 - Put the nested comparison immediately after importing os in every hook entry point: nested calls must not import runtime helpers, read stdin, access state/config, spawn children or log anything, including timing.
 - Keep _stub.py a CLI adapter rather than a lifecycle hook: its caller's child environment intentionally includes HARNESS_NESTED=1; the adapter still copies fixtures unchanged and makes no model calls.
@@ -49,6 +52,7 @@
 
 ## Assumptions
 
+- The latest STOP-P3 decision changes the prototype's synchronous deadline and logging only; no fresh paid benchmark, asynchronous implementation, shared interface edit or model substitution is requested. Tests simulate elapsed time without waiting or calling a model.
 - The latest instruction authorizes D-2 executor demonstrations and a scripted demo user after the summary is shown. Normal user sessions require actual approve/edit input; scripted approval is never injected by the production hooks.
 - Temporary CODEX_HOME registration satisfies isolated hook testing, not normal installation or persisted trust. The existing CLI login is referenced outside the repository without reading/copying credential content or changing persistent configuration.
 - The assigned executor is gpt-6.1-sol at low effort for fixture demonstrations. Controller model/effort selection remains controller-owned; real control API calls did not run, and no batch of ten paid calls was launched.

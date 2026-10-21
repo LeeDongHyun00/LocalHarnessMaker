@@ -70,13 +70,24 @@ from a fixture pass.
 
 Without stub mode, the hooks delegate to the shared CLIs using explicit
 `HARNESS_BACKEND` (default `codex_cli`) and optional `HARNESS_CASES`. This route
-is not live-verified for D-3. Controller contract calls have a five-second
-deadline; verifier calls have a thirty-second deadline. Every child gets a copied
+is not live-verified for D-3. Controller contract calls run synchronously before
+approval with a thirty-second subprocess deadline. The UserPromptSubmit hook's
+outer deadline is forty seconds to allow startup and output processing. Verifier
+calls have a thirty-second deadline. Every child gets a copied
 environment with `HARNESS_NESTED=1`. Normal hook exceptions return empty output,
 warn on stderr, and let Codex continue. `HARNESS_MAX_ATTEMPTS` defaults to 3;
 retry exhaustion or a null re-instruction ends with the unmet items in
 `systemMessage`. The five required state fields remain unchanged; the private
 session.json sidecar stores phase and reviewed-contract hash.
+
+The user's 2026-10-21 STOP-P3 decision supersedes the role prompt's five-second
+threshold for this prototype: synchronous control calls up to thirty seconds
+are accepted, once per request before approval. The user reported about ten
+seconds for a one-line `gpt-6-luna` reply through `codex exec`; this is not a new
+full-contract benchmark. No asynchronous design is planned. Every contract call
+logs `latency_seconds` on stderr, including timeouts; aggregate `cli_seconds`
+remains in hook timing logs and optional HARNESS_EVENT_LOG records. Approval
+does not repeat the control call. A subprocess timeout still fails open.
 
 SessionStart can validate/inject an existing `.harness/handoff.json`, but handoff
 generation, real integration, installation, packaging, and install.sh --check

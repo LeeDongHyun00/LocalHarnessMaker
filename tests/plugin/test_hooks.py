@@ -11,6 +11,7 @@ import runpy
 import shutil
 import subprocess
 import sys
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -226,3 +227,49 @@ def test_entrypoint_import_failure_always_fails_open(
     response, stderr = harness["drive"](event)
     assert response is None
     assert "warning: ImportError" in stderr
+
+
+@pytest.mark.parametrize("seconds", [10.0, 30.0])
+def test_synchronous_contract_accepts_and_logs_approved_latency(
+    harness: dict[str, Any], monkeypatch: pytest.MonkeyPatch, seconds: float,
+) -> None:
+    import _runtime
+
+    ticks = iter([100.0, 100.0 + seconds])
+    monkeypatch.setattr(_runtime, "time", SimpleNamespace(perf_counter=lambda: next(ticks)))
+    event_log = harness["root"] / "events.jsonl"
+    monkeypatch.setenv("HARNESS_EVENT_LOG", str(event_log))
+    response, stderr = harness["drive"]("UserPromptSubmit", prompt="request")
+    assert "HARNESS_CONTRACT" in response["hookSpecificOutput"]["additionalContext"]
+    assert f"harness controller contract latency_seconds={seconds:.6f}" in stderr
+    assert harness["calls"][0]["timeout"] == 30
+    hook_config = json.loads((ROOT / "plugin/hooks/hooks.json").read_text())
+    outer_deadline = hook_config["hooks"]["UserPromptSubmit"][0]["hooks"][0]["timeout"]
+    assert outer_deadline > harness["calls"][0]["timeout"]
+    assert json.loads(event_log.read_text())["cli_seconds"] == seconds
+    harness["drive"]("UserPromptSubmit", prompt="approve")
+    assert len(harness["calls"]) == 1
+
+
+def test_thirty_second_contract_timeout_logs_and_fails_open(
+    harness: dict[str, Any], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import _runtime
+
+    ticks = iter([100.0, 130.001])
+    monkeypatch.setattr(_runtime, "time", SimpleNamespace(perf_counter=lambda: next(ticks)))
+    calls: list[list[str]] = []
+
+    def timeout(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        calls.append(command)
+        assert kwargs["timeout"] == 30
+        raise subprocess.TimeoutExpired(command, kwargs["timeout"])
+
+    monkeypatch.setattr(subprocess, "run", timeout)
+    response, stderr = harness["drive"]("UserPromptSubmit", prompt="request")
+    assert response is None
+    assert "latency_seconds=30.001000" in stderr
+    assert "cli_seconds=30.001000" in stderr
+    assert "warning: TimeoutExpired" in stderr
+    assert harness["drive"]("Stop")[0] is None
+    assert len(calls) == 1
