@@ -70,6 +70,16 @@ def test_retired_schema_is_only_an_offline_reference_to_shared_schema() -> None:
     retired = json.loads((REPOSITORY / 'eval/report.schema.json').read_text())
     assert retired['$ref'] == '../schemas/evaluation-report.schema.json'
     # Validate resolving from the shim's actual location, with no network loader.
-    shim = {'$ref': shared.as_uri()}
+    shim_path = REPOSITORY / 'eval/report.schema.json'
+    registry = registry.with_resource(shim_path.as_uri(), Resource.from_contents(retired))
+    shim = {'$ref': shim_path.as_uri()}
     with pytest.raises(ValidationError):
         Draft202012Validator(shim, registry=registry).validate({'format': 'eval-baseline-provisional-v1'})
+
+
+def test_bootstrap_seed_controls_non_degenerate_samples() -> None:
+    clusters = [{'value': value} for value in [0, 1, 4, 9, 20, 43, 91]]
+    statistic = lambda sample: sum(item['value'] for item in sample) / len(sample)
+    first = metric(clusters, 'valid_task', len(clusters), statistic, seed=7, resamples=1000)
+    assert first == metric(clusters, 'valid_task', len(clusters), statistic, seed=7, resamples=1000)
+    assert first['ci95'] != metric(clusters, 'valid_task', len(clusters), statistic, seed=8, resamples=1000)['ci95']

@@ -309,3 +309,139 @@ def test_provisional_checkpoint_requires_explicit_migration(setup: tuple[Path, P
     with pytest.raises(ValueError, match='offline migration'):
         run(config, out, root, execute=executor, version='codex-cli 0.162.0-alpha.17.2')
     assert executor.calls == 0
+
+
+def two_task_config(root: Path, config: Path, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    import shutil
+    import eval.runner.core as core
+    repository = tmp_path / 'repository'
+    repository.mkdir()
+    shutil.copytree(REPOSITORY / 'schemas', repository / 'schemas')
+    (repository / 'eval/tasks').mkdir(parents=True)
+    shutil.copy2(REPOSITORY / 'eval/prices.yaml', repository / 'eval/prices.yaml')
+    for task_id in ('bug-chunk-tail', 'second-task'):
+        shutil.copytree(REPOSITORY / 'eval/tasks/bug-chunk-tail', repository / 'eval/tasks' / task_id)
+    shutil.copytree(root / 'bug-chunk-tail', root / 'second-task')
+    value = json.loads(config.read_text())
+    value.update(tasks=['bug-chunk-tail', 'second-task'], seed=0)
+    config.write_text(json.dumps(value))
+    monkeypatch.setattr(core, 'REPOSITORY', repository)
+    # Report git provenance is read from the original repository, never a model.
+    original_build = core.build
+    monkeypatch.setattr(core, 'build', lambda c, s, t, v, r, **kw: original_build(c, s, t, v, REPOSITORY, **kw))
+
+
+@pytest.mark.parametrize('absolute', [False, True])
+@pytest.mark.parametrize('cross_run', [False, True])
+def test_previous_grading_copy_access_invalidates(setup: tuple[Path, Path, Path], tmp_path: Path,
+                                                monkeypatch: pytest.MonkeyPatch, absolute: bool, cross_run: bool) -> None:
+    root, config, out = setup
+    two_task_config(root, config, monkeypatch, tmp_path)
+    executor = Executor()
+    grading_paths: list[Path] = []
+
+    def access(argv: list[str], **kwargs: Any) -> ProcessResult:
+        if argv[0] != 'codex':
+            grading_paths.append(kwargs['cwd'])
+            assert kwargs['cwd'].parent.name == 'lhm-retained-grading'
+            return executor(argv, **kwargs)
+        result = executor(argv, **kwargs)
+        if executor.calls == 2:
+            first_copy = grading_paths[0]
+            target = str(first_copy) if absolute else str(first_copy.parent / 'grading-*')
+            events = kwargs['stdout'].read_text().splitlines()
+            events.insert(1, json.dumps({'type': 'item.completed', 'item': {
+                'type': 'command_execution', 'command': f'cat {target}/test_*.py'}}))
+            kwargs['stdout'].write_text('\n'.join(events) + '\n')
+        return result
+
+    if cross_run:
+        value = json.loads(config.read_text())
+        value['tasks'] = ['bug-chunk-tail']
+        config.write_text(json.dumps(value))
+        run(config, out, root, execute=access, version='codex-cli 0.162.0-alpha.17.2')
+        value['tasks'] = ['second-task']
+        config.write_text(json.dumps(value))
+        out = tmp_path / 'second-out'
+    report = json.loads(run(config, out, root, execute=access, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    second = report['tasks'][-1]
+    assert second['grader_access_audit']['status'] == 'access_detected'
+    assert second['outcome'] == 'invalid'
+    assert second['grading'] is None
+    assert report['validity']['status'] == 'invalid'
+    assert len(grading_paths) == 1
+
+
+def test_private_path_never_published_in_checkpoint_or_any_output(setup: tuple[Path, Path, Path]) -> None:
+    root, config, out = setup
+    executor = Executor()
+
+    def leak(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = executor(argv, **kwargs)
+        events = kwargs['stdout'].read_text().splitlines()
+        events.insert(1, json.dumps({'type': 'item.completed', 'item': {
+            'type': 'command_execution', 'command': f'cat {root}/bug-chunk-tail/*'}}))
+        kwargs['stdout'].write_text('\n'.join(events) + '\n')
+        return result
+
+    report = json.loads(run(config, out, root, execute=leak, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert report['tasks'][0]['grader_access_audit']['status'] == 'access_detected'
+    for path in out.rglob('*'):
+        if path.is_file():
+            assert str(root) not in path.read_text()
+            assert str(root.resolve()) not in path.read_text()
+
+
+@pytest.mark.xfail(strict=True, reason="STOP-1: frozen schema requires valid when no task is invalid; aggregate-only halt invalidity needs Role 1 revision")
+def test_stop_e1_partial_report_is_invalid_with_counts(setup: tuple[Path, Path, Path], tmp_path: Path,
+                                                    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    root, config, out = setup
+    two_task_config(root, config, monkeypatch, tmp_path)
+    executor = Executor()
+
+    def fail(argv: list[str], **kwargs: Any) -> ProcessResult:
+        assert argv[0] == 'codex'
+        executor(argv, **kwargs)
+        return ProcessResult(1)
+
+    report = json.loads(run(config, out, root, execute=fail, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert report['validity']['status'] == 'invalid'
+    assert any('STOP-E1' in reason and 'after 1 of 2 tasks' in reason for reason in report['validity']['reasons'])
+    assert 'after 1 of 2 tasks' in capsys.readouterr().err
+    assert executor.calls == 1
+
+
+def test_reinstruction_has_its_own_transport_retry_budget(setup: tuple[Path, Path, Path]) -> None:
+    root, config, out = setup
+    harness_config(config)
+    value = json.loads(config.read_text())
+    value['retry_limit'] = 1
+    config.write_text(json.dumps(value))
+    executor = HarnessExecutor()
+
+    def fail_second(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = executor(argv, **kwargs)
+        if argv[0] == 'codex' and executor.calls == 2:
+            kwargs['stdout'].write_text('{"type":"thread.started","thread_id":"unit-session"}\n{"type":"turn.failed"}\n')
+            return ProcessResult(1)
+        return result
+
+    report = json.loads(run(config, out, root, execute=fail_second, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert executor.calls == 3
+    assert report['tasks'][0]['outcome'] == 'pass'
+
+
+def test_post_call_usage_invariant_is_internal_error(setup: tuple[Path, Path, Path]) -> None:
+    from eval.runner.core import ReportError
+    root, config, out = setup
+    executor = Executor()
+
+    def bad_usage(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = executor(argv, **kwargs)
+        if argv[0] == 'codex':
+            kwargs['stdout'].write_text(kwargs['stdout'].read_text().replace('"cached_input_tokens": 5', '"cached_input_tokens": 50'))
+        return result
+
+    with pytest.raises(ReportError):
+        run(config, out, root, execute=bad_usage, version='codex-cli 0.162.0-alpha.17.2')
+    assert executor.calls == 1

@@ -1,11 +1,13 @@
 """Audit observed grader access without publishing grader locations."""
 
 from dataclasses import dataclass
+import glob
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
+import shlex
 from typing import Any
 from urllib.parse import unquote
 
@@ -40,6 +42,13 @@ class PrivateGraders:
         if not isinstance(names, list) or any(not isinstance(name, str) or Path(name).name != name for name in names):
             raise ValueError("Historical grader aliases must be bare filenames")
         return cls(resolved, files, (str(root.expanduser().absolute()),), tuple(names))
+
+    def line_fingerprints(self) -> set[str]:
+        """Hash normalized non-trivial lines across the private task family."""
+        return {digest(normalize_line(line).encode())
+                for source in self.root.rglob("test_*.py") if source.is_file()
+                for line in source.read_text(errors="replace").splitlines()
+                if len(normalize_line(line)) >= 16}
 
     def markers(self) -> dict[str, str]:
         """Include both symlink spellings and platform-canonical paths."""
@@ -100,6 +109,85 @@ def executor_environment(private: PrivateGraders, codex_home: Path) -> dict[str,
     return environment
 
 
+def normalize_line(line: str) -> str:
+    """Ignore indentation/spacing, retaining only a digest in audit records."""
+    return " ".join(line.split())
+
+
+def command_operands(command: str, cwd: Path | None) -> tuple[list[tuple[Path, bool]], bool]:
+    """Resolve supported shell operands; uncertainty never establishes cleanliness."""
+    operands: list[tuple[Path, bool]] = []
+    unresolved = False
+    try:
+        lexer = shlex.shlex(command, posix=True, punctuation_chars=";&|()")
+        lexer.whitespace_split = True
+        tokens = list(lexer)
+    except ValueError:
+        return [], True
+    if "$" in command or "`" in command:
+        unresolved = True
+    if re.search(r"(?:base64|xxd|openssl).*\|.*(?:sh|bash|python|perl|ruby)\b", command):
+        unresolved = True
+    # shlex removes quoting and escapes. Mixed quoting inside a word must either
+    # resolve to an existing concrete file or stay unresolved.
+    mixed_quote = bool(re.search(r"[^\s'\"]['\"]|\\", command))
+    groups: list[list[str]] = [[]]
+    for token in tokens:
+        if token in {";", "&&", "||", "|", "(", ")", "&"}:
+            groups.append([])
+        else:
+            groups[-1].append(token)
+    stack: list[Path | None] = []
+    for group in groups:
+        if not group:
+            continue
+        executable = Path(group[0]).name
+        recursive = executable in {"find", "rg", "du", "tar", "rsync"} or (
+            executable in {"grep", "ls", "cp"} and any(
+                arg.startswith("-") and ("r" in arg.lower() or "recursive" in arg)
+                for arg in group[1:]))
+        if executable == "popd":
+            if stack:
+                cwd = stack.pop()
+            else:
+                unresolved = True
+            continue
+        args = group[1:]
+        if executable in {"cd", "pushd"} and not args:
+            args = ["~"]
+        for token in args:
+            if token.startswith("-") or token in {"+", "{}"}:
+                continue
+            if token.startswith("~") and token != "~" and not token.startswith("~/"):
+                unresolved = True
+                continue
+            expanded = Path(token).expanduser()
+            if not expanded.is_absolute():
+                if cwd is None:
+                    if "/" in token or executable in {"cd", "pushd"}:
+                        unresolved = True
+                    continue
+                expanded = cwd / expanded
+            magical = glob.has_magic(str(expanded))
+            concrete = [Path(value) for value in glob.glob(str(expanded))] if magical else [expanded]
+            if magical and not concrete:
+                unresolved = True
+            if mixed_quote and ("/" in token or executable in {"cd", "pushd"}) and not expanded.exists() and not magical:
+                unresolved = True
+            for candidate in concrete:
+                operands.append((candidate.resolve(), recursive))
+            if executable in {"cd", "pushd"}:
+                if len(concrete) != 1 or magical or not concrete[0].is_dir():
+                    unresolved = True
+                    cwd = None
+                else:
+                    if executable == "pushd":
+                        stack.append(cwd)
+                    cwd = concrete[0].resolve()
+                break
+    return operands, unresolved
+
+
 def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion: bool = True,
                workspace: Path | None = None, repository: Path | None = None,
                grading_roots: tuple[Path, ...] = ()) -> dict[str, Any]:
@@ -112,6 +200,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
              private.root, *grading_roots]
     aliases = {"~/.codex": Path.home() / ".codex", "$HOME/.codex": Path.home() / ".codex",
                "${HOME}/.codex": Path.home() / ".codex"}
+    fingerprints = private.line_fingerprints()
     calls: dict[str, str] = {}
     pending_calls: set[str] = set()
     pending_items: set[str] = set()
@@ -197,26 +286,62 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             for marker, label in private.markers().items():
                 if marker.casefold() in text.casefold():
                     hits.add(label)
-            # Extract operands from commands/results, JSON strings, and patch paths.
+            def protected(candidate: Path, recursive: bool = False) -> bool:
+                canonical = str(candidate.resolve()).casefold().rstrip("/")
+                for root in roots:
+                    # Only the repository restriction has a workspace exception.
+                    if root == repository and workspace is not None:
+                        allowed = str(workspace.resolve()).casefold().rstrip("/")
+                        if canonical == allowed or canonical.startswith(allowed + "/"):
+                            continue
+                    target = str(root.resolve()).casefold().rstrip("/")
+                    if canonical == target or canonical.startswith(target + "/"):
+                        return True
+                    if recursive and (target.startswith(canonical + "/") or canonical == ""):
+                        return True
+                return False
+
+            arguments = item.get("arguments", {})
+            if isinstance(arguments, str):
+                try:
+                    arguments = json.loads(arguments)
+                except ValueError:
+                    arguments = {"cmd": arguments}
+            if not isinstance(arguments, dict):
+                arguments = {}
+            command = item.get("command", item.get("cmd", arguments.get("cmd", arguments.get("command"))))
+            event_cwd = item.get("workdir", item.get("cwd", arguments.get("workdir", arguments.get("cwd",
+                        event.get("workdir", event.get("cwd"))))))
+            cwd = Path(event_cwd).expanduser() if isinstance(event_cwd, str) else workspace
+            if cwd is not None and not cwd.is_absolute():
+                cwd = workspace / cwd if workspace else None
+            if isinstance(command, str):
+                operands, unresolved = command_operands(command, cwd)
+                if unresolved:
+                    errors.append(f"unresolved_operand:{path.name}:{number}")
+                if any(protected(candidate, recursive) for candidate, recursive in operands):
+                    hits.add("protected_path")
+            # Structured non-shell tools and results still carry concrete paths.
             for token in re.findall(r"(?:/|\.\.?/|~/|[A-Za-z0-9_.-]+/)[^\s\"'<>;,|(){}\[\]]+", text):
-                token = token.rstrip(":.")
-                candidate = Path(token).expanduser()
+                candidate = Path(token.rstrip(":.")).expanduser()
                 if not candidate.is_absolute():
-                    if workspace is None:
+                    if cwd is None:
                         errors.append(f"unresolved_relative_path:{path.name}:{number}")
                         continue
-                    candidate = workspace / candidate
-                canonical = candidate.resolve()
-                if workspace is not None and canonical.is_relative_to(workspace.resolve()):
-                    continue
-                if any(canonical.is_relative_to(root.resolve()) for root in roots):
-                    hits.add(str(candidate))
+                    candidate = cwd / candidate
+                if protected(candidate):
+                    hits.add("protected_path")
             if "$" in text or "`" in text:
                 errors.append(f"unresolved_operand:{path.name}:{number}")
+            output_values = [item.get(key, "") for key in ("aggregated_output", "output", "result", "stdout", "stderr")]
+            for value in leaves(output_values):
+                if any(digest(normalize_line(output_line).encode()) in fingerprints
+                       for output_line in value.splitlines()):
+                    hits.add("private_line_fingerprint")
             for hit in sorted(hits):
                 matches.append({"log": path.name, "line": number, "marker": hit, "tool": tool,
                                 "operation": "execute" if "command" in tool or "exec" in tool else "unknown",
-                                "evidence_sha256": digest(line.encode()), "redacted_evidence": private.redact(line)})
+                                "evidence_sha256": digest(line.encode()), "redacted_evidence": "Observed protected access; see external stream hash."})
         if require_completion and not native and not terminal:
             errors.append(f"missing_terminal_event:{path.name}")
     if require_completion and (pending_calls or pending_items):
@@ -226,5 +351,6 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
     return {"method": "access_audit", "status": "access_detected" if matches else "inconclusive" if errors else "clean",
             "root_fingerprint": digest(str(private.root).encode()),
             "grader_fingerprints": [digest(p.read_bytes()) for p in private.files],
+            "line_fingerprints": sorted(fingerprints),
             "logs": logs, "matches": matches, "errors": errors,
             "scope": "Observed tool events only; a clean audit does not prove isolation."}

@@ -93,7 +93,10 @@ def grade(
     expected: dict[str, Any], timeout: float, execute: Callable[..., ProcessResult],
 ) -> dict[str, Any]:
     """Create an independent grading copy only after all executor turns exited."""
-    grading = runtime / ("grading-" + uuid.uuid4().hex)
+    # Retained separately from executor runtimes; every run audits this location.
+    retained = Path(tempfile.gettempdir()) / "lhm-retained-grading"
+    retained.mkdir(mode=0o700, exist_ok=True)
+    grading = retained / ("grading-" + uuid.uuid4().hex)
     if any(p.is_symlink() for p in workspace.rglob("*")):
         return {"result": "error", "reason": "Executor workspace contains a symlink", "passed_tests": 0, "failed_tests": 0}
     shutil.copytree(workspace, grading, ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
@@ -127,6 +130,17 @@ def grade(
             "grader_source_outside_repository": True, "exit_code": result.returncode,
             "timed_out": result.timed_out, "passed_tests": count if ok else max(0, count - failures),
             "failed_tests": failures, "total_tests": count, "log": destination.name}
+
+
+def audit_roots(runtime: Path) -> tuple[Path, ...]:
+    """Cover current legacy copies and all sibling/cross-run executor runtimes."""
+    temporary = Path(tempfile.gettempdir())
+    return (temporary / "lhm-retained-grading", *runtime.glob("grading-*"),
+            *(p for p in temporary.glob("lhm-eval-*") if p != runtime))
+
+
+class ReportError(RuntimeError):
+    """Post-execution accounting/report validation is an internal failure."""
 
 
 def run(
@@ -222,7 +236,7 @@ def run(
             last = entry["segments"][-1]
             final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
         interrupted = False
-        prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=tuple(runtime.glob("grading-*"))) if prior else None
+        prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime)) if prior else None
         blocked = prior_audit is not None and prior_audit["status"] != "clean"
         control_error = entry.get("control_error")
         if config["harness"] and not blocked and not execution_finished and not (runtime / "contract.json").exists():
@@ -241,6 +255,7 @@ def run(
         remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - len(entry["segments"])
         if not config["harness"]:
             remaining = config["retry_limit"] + 1
+        transport_retries = entry.get("transport_retries", 0)
         for retry in range(0 if blocked or execution_finished or control_error else remaining):
             index = len(entry["segments"]) + 1
             event_path, stderr_path = runtime / f"exec-{index}.jsonl", runtime / f"exec-{index}.stderr"
@@ -283,16 +298,18 @@ def run(
                             "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
             entry.pop("pid", None)
             write_json(checkpoint, state)
-            current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY)
+            current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
             if interrupted or current_audit["status"] != "clean":
                 break
             resumed_id = session_id([event_path]) or resumed_id
             if final_process.returncode == 0:
+                transport_retries = 0
+                entry["transport_retries"] = 0
                 if not config["harness"]:
                     break
                 try:
                     native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                    native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY)
+                    native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
                     if native_audit["status"] != "clean":
                         break
                     attempt = len(entry.get("verdicts", [])) + 1
@@ -309,14 +326,18 @@ def run(
                     control_error = str(exc)
                     entry["control_error"] = control_error
                     break
-            elif retry >= config["retry_limit"]:
-                break
+            else:
+                if transport_retries >= config["retry_limit"]:
+                    break
+                transport_retries += 1
+                entry["transport_retries"] = transport_retries
+                write_json(checkpoint, state)
         if not interrupted:
             entry["phase"] = "executed"
             write_json(checkpoint, state)
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
-        audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=tuple(runtime.glob("grading-*")))
+        audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
         telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"])
         # Extract only settings and token/rate-limit evidence from native transcripts.
         selected = [event for path in native_paths for event in records(path)
@@ -366,16 +387,19 @@ def run(
             shutil.copytree(workspace, task_out / "workspace", ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
         entry["phase"] = "interrupted" if interrupted else "finished"
         if not interrupted:
-            entry["result"] = result
+            entry["result"] = json.loads(private.redact(json.dumps(result)))
         write_json(checkpoint, state)
         if interrupted or (final_process and final_process.returncode != 0):
             stop_reason = "STOP-E1: executor interrupted or could not complete non-interactively; inspect retained logs before another live call."
             break
     tasks = [json.loads((out / task / "result.json").read_text()) for task in order if (out / task / "result.json").exists()]
     pricing = json.loads((REPOSITORY / "eval/prices.yaml").read_text())
-    shared_tasks = [build_task(t, state["tasks"][t["task_id"]], out / t["task_id"], config, pricing,
-                              json.loads((REPOSITORY / "eval/tasks" / t["task_id"] / "meta.json").read_text())) for t in tasks]
-    report = build(config, state, shared_tasks, actual_version, REPOSITORY)
+    try:
+        shared_tasks = [build_task(t, state["tasks"][t["task_id"]], out / t["task_id"], config, pricing,
+                                  json.loads((REPOSITORY / "eval/tasks" / t["task_id"] / "meta.json").read_text())) for t in tasks]
+        report = build(config, state, shared_tasks, actual_version, REPOSITORY)
+    except ValueError as exc:
+        raise ReportError("Runtime report accounting or validation failed") from exc
     write_json(out / "run-diagnostics.json", {"stop_reason": stop_reason})
     destination = out / "report.json"
     # Redaction is mandatory even if future report fields unexpectedly contain a private marker.

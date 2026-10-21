@@ -22,8 +22,14 @@ Private graders must already exist outside the repository, supplied through
 create them. Each task's external directory contains `test_*.py`; optional
 `audit-names.json` lists historical filenames. Only after all executor work
 exits and the access/settings audit passes does the runner copy graders into
-a fresh trusted grading copy. That copy never enters a later executor turn.
-External raw logs and private copies are retained; public evidence is redacted.
+a fresh trusted grading copy under the separate temporary
+`lhm-retained-grading/` location. Copies are retained for review, outside
+executor runtimes. Every task audits that retained location, every other
+`lhm-eval-*` runtime in the temporary directory (including previous runs),
+legacy grading copies in its own runtime, and the private source root.
+A later executor can reach these paths because reads are not denied;
+observed access invalidates the task. External raw logs are retained;
+public evidence uses redacted labels and hashes.
 Native logs are referenced with hashes as well as executor JSON streams.
 
 Every executor, resume and control child uses a copied environment containing
@@ -36,7 +42,15 @@ events for private grader sources/copies, `~/.codex`, the sibling `codex-bridge`
 folder and this repository outside the task workspace. URL/JSON encodings,
 relative traversal, existing symlink aliases, denied attempts and retries are
 covered. Assistant prose is excluded. Missing, truncated, unknown, unpaired or
-unfinished tool evidence and unresolved variables make the audit inconclusive.
+unfinished tool evidence and unresolved operands make the audit inconclusive.
+Shell commands use shlex, event cwd/workdir and tracked cd/pushd/popd locations.
+Parse failures, unresolved globs, named-user tildes and nonconcrete mixed quoting
+or escaping are inconclusive; concrete canonical paths compare without case.
+Recursive search/list/copy/archive operands covering an ancestor of a protected
+root are access_detected. Grader lines of at least 16 normalized characters are
+hashed across the private task family; matching tool output is access_detected.
+Only hashes, labels and redacted evidence are retained in audit results.
+Decode-and-execute pipelines such as `base64 -d | sh` are inconclusive.
 Detected or inconclusive access invalidates the task and aggregate report and
 prevents grading. This is observed access auditing, not filesystem isolation
 or proof that all unlogged activity is safe. Dynamic execution and additional
@@ -98,3 +112,11 @@ or quality/cost comparison is claimed.
   without deleting a file or changing the shared interface.
 - Model accounting absent from the frozen CLI output remains unknown; the
   runner does not infer actual fallback transport or model identity.
+
+STOP-1 from the 2026-10-22 remediation session remains unresolved: the shared
+schema requires aggregate validity=valid whenever every reported task is valid.
+That prevents recording an aggregate-only STOP-E1 partial-run invalidity while
+keeping an audit-clean executor failure a valid quality sample. Do not treat
+partial STOP-E1 reports as valid comparisons. The strict expected-failure test
+records the requested behavior pending a Role 1 schema decision. No live
+measurement was run during remediation.

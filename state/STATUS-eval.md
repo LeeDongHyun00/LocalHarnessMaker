@@ -1,60 +1,49 @@
 ## Done
 
-- Replaced provisional report emission with the approved shared report schema, format validation, runtime ID/count/cost/order/hash checks, directory-only CLI stdout and an offline compatibility reference in eval/report.schema.json; historical provisional artifacts are preserved and cannot silently resume as version 1 (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; schema, runtime-invariant, legacy-checkpoint and CLI tests passed).
-- Expanded observed tool-access auditing to ~/.codex, the sibling codex-bridge folder, repository paths outside the task workspace and private grader/grading roots; assistant prose is excluded, while denied/encoded/traversed/symlink accesses and incomplete/unsupported evidence invalidate tasks before grading (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; protected-access, native-tool, missing-capture and unfinished-event tests passed).
-- Added hook-independent contract/verifier/re-instruction orchestration through frozen CLIs with injectable subprocesses, copied nested-guard environments, contract/verdict validation, same-session resume, null/exhausted feedback termination, retained evidence and failure recovery (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; mocked harness, failure, resume-access and completed-checkpoint tests passed).
-- Added seeded task-cluster bootstrap metrics and per-segment executor accounting without fabricated zero prices; unknown costs/model identity stay null, and full done-claim/parity measurements remain explicitly undefined (.venv/bin/python -m pytest tests/eval -q: 55 passed, 2 skipped; deterministic bootstrap, zero-denominator, cached-token and unknown-cost tests passed).
-- Prepared 119 new public drafts for a total of 100 single-session and 20 two-session tasks, with prompt.md, workspace, meta.json and expected.json, plus day2.md where applicable; listed every new task needing graders in eval/GRADERS-PENDING.md (.venv/bin/python eval/tools/prepare_tasks.py: Prepared 119 public candidates; no graders generated.; .venv/bin/python -m pytest tests/eval -q: inventory, Python syntax and pending-list checks passed).
-- Wrote eval/README.md and eval/CHANGES.md describing changes, limitations and assumptions; this session made no executor/model/network/sandbox-exec calls and did not stage or commit (.venv/bin/python -m pytest tests/eval -q: all model/control subprocesses mocked; git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0).
-- Preserved the prior session's one-task baseline artifacts as historical provisional evidence, without rerunning or claiming current-schema validity (eval/reports/baseline-a-first-task/report.json: retained unchanged; no current live result claimed).
+- Fixed H2 by retaining grading copies outside executor runtimes and auditing retained copies, sibling runtimes and prior runs; four synthetic integration variants invalidate glob/absolute reads across tasks and runs (.venv/bin/python -m pytest tests/eval -q: 88 passed, 2 skipped, 1 xfailed).
+- Fixed H1 with shlex directory tracking, cwd/workdir, concrete glob/quote resolution, case-insensitive canonical comparisons, recursive ancestor detection and normalized private-line fingerprints; all ten host cases now detect access or are inconclusive, while ordinary workspace commands stay clean (PYTHONPATH=. .venv/bin/python /tmp/lhm_compare.py: ten clean-before cases became nine access_detected and one inconclusive; .venv/bin/python -m pytest tests/eval -q: 88 passed, 2 skipped, 1 xfailed).
+- Fixed M1 by using labels in audit matches and redacting checkpoint results; tests scan all --out files for raw/canonical synthetic grader roots (.venv/bin/python -m pytest tests/eval -q: publication scan passed; 88 passed, 2 skipped, 1 xfailed).
+- Fixed transport retry counting per reinstruction segment, post-call report/usage error classification, unresolved-guard coverage, seed-sensitive bootstrap coverage and actual-location shim resolution coverage; replaced previous unsupported STATUS evidence claims (.venv/bin/python -m pytest tests/eval -q: 88 passed, 2 skipped, 1 xfailed).
+- Documented retained-copy exposure accurately and recorded the H1 before/after table and M2 proposal in owned eval/CHANGES.md (.venv/bin/python -m pytest tests/eval -q: 88 passed, 2 skipped, 1 xfailed; no live model calls).
 
 ## Remaining
 
-- Pending host verification: installed CLI contract/verifier/executor/resume compatibility, actual nested guard and production retry behavior, model/effort evidence, process termination and macOS sandbox-exec. Nested Codex, live models, network and sandbox-exec were unavailable and were not attempted in this workspace-write session.
-- Obtain verified versioned model rates for eval/prices.yaml; its empty rates are explicitly an unpriced offline placeholder. Integrate actual per-call controller/judge/fallback transport/model/usage evidence exposed by the frozen CLIs; control costs and control_model remain null rather than inferred.
-- Complete full done-claim denominator extraction and hash-pinned paired local-minus-cheap_api parity. Current emitted false_done_rate/parity are undefined with reasons; mock metrics are not measured quality evidence.
-- Review the 119 draft candidates named in eval/GRADERS-PENDING.md, diversify related families, and write/validate external graders in a separately authorized session. No hidden task graders were written here. Revalidate the existing bug-chunk-tail external grader on the host; its two fixture tests skipped because LHM_PRIVATE_GRADERS was unset.
-- Implement two-session runner handoff generation, injection and day-2 observation before executing those candidates. Current runner rejects two-session tasks before model calls; public day-2 prompts do not constitute orchestration evidence.
-- Decide whether historical provisional baseline artifacts need explicit offline migration; otherwise use fresh output directories. No historical report was relabeled or rerun.
-- Prepare the 10-task A/B pilot estimate and required approval before any 10-or-more paid-call batch or full run. Do not infer full-run authorization from this offline session.
-- Freeze only after grader/specification/diversity review, then supply the task-set hash to Role 1 for docs/eval-freeze.md; re-check five A samples manually. SC-2, SC-5 and SC-6 remain unfinished.
-- Run the full suite once before a future merge, then continue D-3 through D-5: static-template/harness measurements, local comparison, human review, task-type breakdowns and final report. No merge or headline cost/quality comparison occurred here.
+- STOP-1: M2 cannot be satisfied under the frozen schema: its allOf requires aggregate valid if no task is invalid, while audit-clean executor failures must remain valid samples. Role 1 needs user approval, a decision record and schemas/VERSION revision allowing aggregate-only halt invalidity. The strict xfail test reproduces the requested two-task STOP-E1 behavior. Current partial STOP-E1 reports must not be used as valid comparisons. Proposal is in eval/CHANGES.md; no other-role path was edited.
+- After that interface decision, implement task-set ID/count mismatch validation, explicit halt/count reasons in report/stderr, and successful exit 0 for the recorded invalid report. Remove the strict xfail only when the behavior passes.
+- Pending host verification: installed CLI executor/controller/verifier/resume compatibility, actual nested guard, retry behavior, complete event capture, case-insensitive aliases, process termination and sandbox behavior. Nested Codex, live models, network and macOS sandbox-exec are unavailable here and were not attempted.
+- Revalidate external graders on the host; LHM_PRIVATE_GRADERS was unset and two legacy fixture tests skipped. All current tests use synthetic private roots and mocked model/control calls.
+- Obtain verified versioned prices and actual per-call controller/judge/fallback accounting; complete done-claim denominator and hash-pinned paired local-minus-cheap_api parity. Current missing observations remain undefined.
+- Review/diversify the 119 public drafts, provision external graders separately, implement two-session handoff execution and observations, then estimate/approve the 10-task pilot. Freeze only after review; supply the hash to Role 1 and manually re-check five baseline samples.
+- Full repository tests remain pending before any future merge; this session ran only tests/eval and did not stage or commit. D-2 through D-5 measurements remain unfinished.
 
 ## Decisions
 
-- Use the approved shared report schema directly: the prior provisional status was superseded by version-1 approval and this user's first priority.
-- Retire the local schema with a reference-only shim: no file deletion or shared-interface change is required.
-- Preserve historical provisional reports and reject silent checkpoint migration: old evidence must not acquire unobserved pricing, provenance or audit guarantees.
-- Audit supported tool access rather than assistant prose: the approved STOP-E4 requires observed operations, including denied attempts, and treats uncertainty as invalid.
-- Keep raw logs externally and hash-pin both executor/native evidence: public redaction must not replace the original audit trail.
-- Treat benchmark prompt execution as runner authorization to apply the generated contract: no interactive approval is possible in an automated evaluation; this does not change direct-user plugin behavior.
-- Keep private grading outside the contract/verifier loop: neither private test contents nor private feedback reaches later executor turns.
-- Keep absent rates/accounting and full claim denominators undefined: the frozen CLI output is insufficient to assert actual mixed-model/fallback accounting or false-done measurements.
-- Mark new tasks as unfrozen drafts with graders pending: 120 public directories do not establish 120 reviewed, independently graded benchmark tasks.
+- Retain grading copies outside executor runtimes and audit all retained/other-runtime locations: avoids deletion under STOP-4 while making observed cross-task/cross-run access invalid.
+- Classify recursive ancestor access as access_detected: find/recursive grep/list/copy/archive operations cover protected descendants.
+- Hash normalized non-trivial grader lines across the private task family: catches tool-output disclosure independently of operand construction without recording plaintext in fingerprint evidence.
+- Keep unresolved shell paths and decode-and-execute pipelines inconclusive: clean logs must not stand in for missing operand resolution.
+- Stop on M2's frozen invariant conflict: inventing an invalid task would violate valid quality-sample accounting; changing the shared schema exceeds Role 5 ownership.
+- Keep the existing relative-reference shim and resolve it from its actual URI: offline registry tests now exercise the real shim rather than substituting its target.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
 - git diff --check -- eval tests/eval state/STATUS-eval.md
-- Read eval/GRADERS-PENDING.md for all 119 pending external graders.
-- Host only, after prerequisites/authorization: verify live CLI, model/effort evidence, nested guard, process cleanup, external graders and sandbox behavior; do not run these in this session.
-- Before a future merge only: run the full repository test suite once.
+- Pending host only: complete live CLI/event/process/nested-guard/sandbox checks after the interface blocker is resolved.
+- Before a future merge only: full repository test suite once.
 
 ## Do not touch
 
-- controller/, controller/case_library/, verifier/, plugin/, shared schemas/configuration, other roles' tests or STATUS files; never share the task set with Role 3.
-- Existing concurrent edits and historical baseline artifacts; interface changes require Role 1 approval/versioning.
-- Private grader storage or task graders in this session; no private contents/paths may enter executor/controller context or public artifacts.
-- .git is read-only: do not stage, commit, rewrite history or delete files. Future commits must list only eval/, tests/eval/ and state/STATUS-eval.md paths explicitly.
-- No executor models, nested codex exec, live model/API calls, network or macOS sandbox-exec in this environment. No full-run approval is implied.
+- controller/, verifier/, plugin/, shared schemas/configuration, other roles' tests or STATUS files, or concurrent changes; never share task contents with Role 3.
+- Real private grader storage; this session uses only synthetic pytest/temp roots and no model calls.
+- .git and historical baseline artifacts; do not stage, commit, delete files or rewrite history.
+- No live evaluation until the open interface decision and host verification prerequisites are resolved.
 
 ## Assumptions
 
-- The user's current priority order replaces the old STATUS ordering and provisional-schema claim; shared version 1 remains unchanged.
-- A reference-only local schema counts as retirement while avoiding deletion under STOP-4.
-- Public task preparation may include related family variants as drafts; diversity and grader review are required before freeze or measurement.
-- expected_test_count=3 on new drafts is a planned grader-group count, not evidence that any grader exists or has run.
-- The non-interactive benchmark runner may inject its generated contract as an authorized evaluation input; direct-user plugin approvals remain outside this session.
-- Unobserved controller/judge accounting and actual fallback identity cannot be inferred from aggregate cost estimates or requested backend settings.
-- Complete native/executor tool-event capture is required for a clean observed-access audit; clean logs do not establish isolation or visibility into unlogged activity.
-- External grader configuration is absent in this test environment; the two skipped legacy fixture checks require trusted host verification.
+- The user's host-review priorities supersede the previous Remaining ordering; schemas and external CLIs remain frozen.
+- Retained copies share the runner's temporary directory namespace; all lhm-eval-* siblings and lhm-retained-grading are audit roots on every task/run.
+- Unknown named-user tildes remain unresolved; concrete globs and quote splitting can resolve to detected protected paths.
+- Dynamic execution is not fully established by static command parsing or line fingerprints; full capture and host review remain required.
+- The shim resolves relative to its own file URI through an offline registry; no frozen shared schema needs alteration for that test.
+- No human can answer in this environment; STOP-1 is reported without requesting a response or modifying another role's paths.

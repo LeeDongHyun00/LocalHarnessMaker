@@ -24,3 +24,19 @@ def test_success_prints_supplied_directory_once(tmp_path: Path, monkeypatch: pyt
     captured = capsys.readouterr()
     assert captured.out == str(output) + '\n'
     assert captured.err == ''
+
+
+@pytest.mark.parametrize('internal', [False, True])
+def test_error_classification_before_and_after_model_call(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+                                                       capsys: pytest.CaptureFixture[str], internal: bool) -> None:
+    import eval.__main__ as cli
+    from eval.runner.core import ReportError
+    monkeypatch.setenv('LHM_PRIVATE_GRADERS', '/synthetic-trusted-parent')
+    monkeypatch.setattr(sys, 'argv', ['eval', 'run', '--config', 'fixture', '--out', str(tmp_path)])
+
+    def fail(*args: object) -> Path:
+        raise ReportError('runtime invariant') if internal else ValueError('invalid input')
+
+    monkeypatch.setattr(cli, 'run', fail)
+    assert cli.main() == (2 if internal else 1)
+    assert capsys.readouterr().out == ''
