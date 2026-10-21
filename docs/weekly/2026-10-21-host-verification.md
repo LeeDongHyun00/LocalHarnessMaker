@@ -49,3 +49,21 @@ Unsettled: reinstruct.py:23 details at most three failed items and counts the re
 ## Consequences for the plan
 
 The executor sandbox does not deny reads, so the access audit is the only isolation control. Until H1 and H2 are fixed, an executor can read private graders while its task is graded valid, so no evaluation result counts as evidence. This blocks the 10-task pilot (handoff 5.4). H3 breaks the retry loop the plugin relies on and must be fixed before the Role 2 live demo (handoff 5.3). H4 must be fixed before the Role 3 live smoke (handoff 5.5), or that smoke must run with an absolute codex path in config.
+
+## Fix jobs on 2026-10-22
+
+Claude ran the jobs directly with codex-cli 0.162.0-alpha.17.2 (gpt-6.1-sol) from the repository root. Prompts, events and final reports are in ../codex-bridge/outbox/JOB/. Plan usage (primary weekly window) went from 4 to 7 percent across the five jobs.
+
+| Job | Scope | Codex claim | Host result | Commit |
+|---|---|---|---|---|
+| r4-fix-001, Role 4, high | H3, M3, M4, M5, low items | 151 passed, 6 skipped | 157 passed, including the six seatbelt tests. Probes: an unverifiable-only verdict is re-instructed at attempt 1 of 3 and null at 3 of 3; "All done except SC-3" claims nothing; comma lists credit every ID; the judge runs in its own process group | 3545c19 |
+| r5-fix-001, Role 5, medium | H1, H2, M1, low items | 88 passed, 2 skipped, 1 xfailed | Same. Every review bypass and cross-task grading-copy read is access_detected, and no private root appears under --out. Regression: 54 of 59 real Codex commands audited inconclusive | 5faf49d |
+| r5-fix-002, Role 5, high, resumed | The regression: wrapped `/bin/zsh -lc` commands and workspace globs | 306 passed, 2 skipped, 1 xfailed | Same. 48 of 59 real commands clean; all detections unchanged | 1846896 |
+| r3-fix-001, Role 3, medium | H4, low items | 145 passed | 145 passed. contract with codex missing exits 0 after one cheap_api call | 9ebad81 |
+| r1-cont-001, Role 1, medium | Unified collection, docs/plan.md, decision 0005, rule 6 wording | make test with zero collection errors | make test: 777 passed, 3 skipped, 1 xfailed. make validate-schemas: 6 schemas and 8 examples | b212873 |
+
+Open decisions:
+1. M2 (user and Role 1). The frozen evaluation-report schema forces validity=valid when no task is invalid, so a run halted by STOP-E1 reports valid. Role 5 stopped at STOP-1, and a strict xfail (tests/eval/test_runner.py::test_stop_e1_partial_report_is_invalid_with_counts) marks the gap. One option is a schema revision with VERSION 2 that allows an aggregate-only invalid reason. The other is to keep version 1 and have halted runs write no headline report.
+2. Deadlines (Roles 2, 3 and 4). The Stop hook times out at 40 s (plugin/hooks/hooks.json). The verifier gives the judge 120 s (HARNESS_JUDGE_TIMEOUT_SECONDS). The controller gives codex_cli 180 s per call, with up to three calls. As configured, an llm_judge criterion cannot finish inside the Stop hook.
+3. Dynamic execution (user, Role 1 and Role 5). 11 of the 59 real commands are python or cat heredoc scripts, and they still audit inconclusive under the AGENTS.md 3.4 unresolved-operand rule. The 10-task pilot must report how many tasks this invalidates before anyone changes the policy.
+4. Minor (Role 1). docs/plan.md cites the local path of the Notion export as its source. The next Role 1 job should cite the Notion page instead.
