@@ -43,6 +43,26 @@ def test_active_stop_does_not_reinstruct(tmp_path: Path) -> None:
     assert probe({"hook_event_name": "Stop", "stop_hook_active": True}, tmp_path) == {}
 
 
+def test_nested_probe_exits_without_reading_stdin_or_writing(tmp_path: Path) -> None:
+    script = Path(__file__).resolve().parents[2] / "plugin/hooks/probe.py"
+    process = subprocess.Popen(
+        [sys.executable, str(script)], stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        env={**os.environ, "HARNESS_NESTED": "1", "HARNESS_PROBE_DIR": str(tmp_path / "unused")},
+    )
+    try:
+        # Leave stdin open with no data: reading it would hang.
+        assert process.wait(timeout=2) == 0
+        stdout, stderr = process.communicate()
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.communicate()
+    assert stdout == b""
+    assert stderr == b""
+    assert not (tmp_path / "unused").exists()
+
+
 @pytest.mark.parametrize("stdin", ["not json", '{"hook_event_name":"Unknown"}'])
 def test_errors_fail_open(stdin: str, tmp_path: Path) -> None:
     script = Path(__file__).resolve().parents[2] / "plugin/hooks/probe.py"

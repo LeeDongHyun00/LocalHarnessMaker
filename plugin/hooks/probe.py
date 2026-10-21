@@ -3,10 +3,12 @@
 Experiment only; this does not implement controller or verifier behavior.
 """
 
-from __future__ import annotations
+import os
+
+if os.environ.get("HARNESS_NESTED") == "1":
+    raise SystemExit(0)
 
 import json
-import os
 from pathlib import Path
 import sys
 import time
@@ -49,6 +51,8 @@ def probe(payload: dict[str, Any], output_dir: Path) -> dict[str, Any]:
 
 def main() -> int:
     """Fail open on all ordinary hook errors and log elapsed time to stderr."""
+    if os.environ.get("HARNESS_NESTED") == "1":
+        return 0
     started = time.perf_counter()
     try:
         payload = json.load(sys.stdin)

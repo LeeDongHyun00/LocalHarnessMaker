@@ -1,0 +1,15 @@
+Goal: Simulate approval and hook routing for adding and testing `GET /health`, returning HTTP 200 and exactly `{"status":"ok"}`.
+
+Success checklist:
+- [ ] SC-1: Application module compiles.
+- [ ] SC-2: `/health` returns 200 and the complete expected JSON.
+- [ ] SC-3: `tests/test_health.py` exists and its tests pass.
+- [ ] SC-4: Existing behavior, dependencies, and approved file scope are preserved, supported by a before/after diff.
+
+Assumptions: The fixture assumes an exported FastAPI app, installed test dependencies, and an available diff. Your demonstration overrides these: the workspace is empty, so the unavailable-app stop condition applies. No tools, commands, or file edits will occur.
+
+Effort: **Medium — SYNTHETIC**, illustrating one endpoint and regression test.
+
+Estimate: **0 input tokens, 0 output tokens, $0 — SYNTHETIC placeholders**, not a computed estimate.
+
+Awaiting `approve` or edits.

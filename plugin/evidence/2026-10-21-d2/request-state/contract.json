@@ -1,0 +1,57 @@
+{
+  "task_summary": "Add and test GET /health in the existing FastAPI application.",
+  "constraints": [
+    "Preserve existing routes and dependencies.",
+    "Change only app/main.py and tests/test_health.py.",
+    "Return HTTP 200 and exactly {\"status\": \"ok\"}."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The modified application module compiles.",
+      "check": {"type": "command", "command": "python -m py_compile app/main.py", "expected": {"exit_code": 0}}
+    },
+    {
+      "id": "SC-2",
+      "description": "GET /health returns status 200 and the complete expected JSON object.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from fastapi.testclient import TestClient; from app.main import app; r = TestClient(app).get(\"/health\"); assert r.status_code == 200; assert r.json() == {\"status\": \"ok\"}; print(\"health response verified\")'",
+        "expected": {"exit_code": 0, "stdout": "health response verified\n"}
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The requested pytest file exists and all its tests pass.",
+      "check": {"type": "command", "command": "python -m pytest -q tests/test_health.py", "expected": {"exit_code": 0}}
+    },
+    {
+      "id": "SC-4",
+      "description": "The endpoint and test preserve the existing application behavior and requested scope.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Review the before/after diff of app/main.py and tests/test_health.py. Pass only if existing routes and dependencies are preserved, the endpoint change stays within the health request, and the new pytest test asserts both status 200 and the complete JSON object. Missing before/after evidence is unverifiable."
+      }
+    }
+  ],
+  "verification": [
+    {"command": "python -m py_compile app/main.py", "expected": {"exit_code": 0}},
+    {
+      "command": "python -c 'from fastapi.testclient import TestClient; from app.main import app; r = TestClient(app).get(\"/health\"); assert r.status_code == 200; assert r.json() == {\"status\": \"ok\"}; print(\"health response verified\")'",
+      "expected": {"exit_code": 0, "stdout": "health response verified\n"}
+    },
+    {"command": "python -m pytest -q tests/test_health.py", "expected": {"exit_code": 0}}
+  ],
+  "stop_conditions": [
+    "The existing application or required test dependencies are unavailable.",
+    "The task requires changing dependencies or files outside the approved scope."
+  ],
+  "assumptions": [
+    "The existing app is exported as app from app/main.py, and /health does not already exist.",
+    "FastAPI, pytest, and the TestClient HTTP dependency are already installed.",
+    "A before/after diff of the approved workspace is available to the judge.",
+    "This hand-written fixture uses illustrative medium effort and zero token/cost placeholders; real values must be computed by controller/analyze.py."
+  ],
+  "reasoning_effort": {"value": "medium", "rationale": "Illustrative fixture only: one endpoint plus a regression test; production code replaces this value."},
+  "cost_estimate": {"input_tokens": 0, "output_tokens": 0, "usd": 0}
+}

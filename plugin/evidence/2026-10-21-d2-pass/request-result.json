@@ -1,0 +1,14 @@
+{
+  "command": [
+    "codex",
+    "--no-daemon",
+    "--dangerously-bypass-hook-trust",
+    "exec",
+    "--skip-git-repo-check",
+    "--json",
+    "--output-last-message",
+    "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-21-d2-pass/request-reply.txt",
+    "-"
+  ],
+  "exit_code": 0
+}

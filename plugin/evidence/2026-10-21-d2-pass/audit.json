@@ -1,0 +1,10 @@
+{
+  "contract_visible": true,
+  "approval_gate": true,
+  "reinstructions": 1,
+  "attempts": 2,
+  "overall": "pass",
+  "synthetic": true,
+  "real_task_verified": false,
+  "max_hook_overhead_seconds": 0.192873
+}

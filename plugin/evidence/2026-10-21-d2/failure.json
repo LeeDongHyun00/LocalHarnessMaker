@@ -1,0 +1,9 @@
+{
+  "stage": "approval",
+  "exit_code": 124,
+  "deadline_seconds": 180,
+  "scripted_approval_sent": true,
+  "verification_reached": false,
+  "diagnosis": "executor stream stalled after commentary; no subsequent tool call or Stop event was observed; root cause unestablished",
+  "superseded_by": "../2026-10-21-d2-pass"
+}

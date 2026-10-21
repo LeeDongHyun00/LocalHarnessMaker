@@ -1,0 +1,16 @@
+{
+  "command": [
+    "codex",
+    "--no-daemon",
+    "--dangerously-bypass-hook-trust",
+    "exec",
+    "resume",
+    "01a15d0e-9462-76d0-aa5c-3e4d43934dac",
+    "--skip-git-repo-check",
+    "--json",
+    "--output-last-message",
+    "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-21-d2/approval-reply.txt",
+    "-"
+  ],
+  "exit_code": 124
+}

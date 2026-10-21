@@ -1,0 +1,6 @@
+| Unmet criterion | Status | Evidence |
+|---|---|---|
+| SC-3: Test file exists and passes | Not done | No file created or pytest run: the unavailable-app stop condition and no-tools scope still apply. |
+| SC-4: Behavior and scope preserved | Not done | No application or before/after diff available for review. |
+
+Hook reports of exit 4 and missing assertions are **SYNTHETIC** fixture evidence. No files were edited.

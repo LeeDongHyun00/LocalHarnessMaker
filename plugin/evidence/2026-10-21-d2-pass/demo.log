@@ -1,0 +1,24 @@
+Goal: Simulate approval and hook routing for adding and testing `GET /health`, returning HTTP 200 and exactly `{"status":"ok"}`.
+
+Success checklist:
+- [ ] SC-1: Application module compiles.
+- [ ] SC-2: `/health` returns 200 and the complete expected JSON.
+- [ ] SC-3: `tests/test_health.py` exists and its tests pass.
+- [ ] SC-4: Existing behavior, dependencies, and approved file scope are preserved, supported by a before/after diff.
+
+Assumptions: The fixture assumes an exported FastAPI app, installed test dependencies, and an available diff. Your demonstration overrides these: the workspace is empty, so the unavailable-app stop condition applies. No tools, commands, or file edits will occur.
+
+Effort: **Medium — SYNTHETIC**, illustrating one endpoint and regression test.
+
+Estimate: **0 input tokens, 0 output tokens, $0 — SYNTHETIC placeholders**, not a computed estimate.
+
+Awaiting `approve` or edits.
+SCRIPTED DEMO USER: approve (synthetic fixture demonstration only)
+| Unmet criterion | Status | Evidence |
+|---|---|---|
+| SC-3: Test file exists and passes | Not done | No file created or pytest run: the unavailable-app stop condition and no-tools scope still apply. |
+| SC-4: Behavior and scope preserved | Not done | No application or before/after diff available for review. |
+
+Hook reports of exit 4 and missing assertions are **SYNTHETIC** fixture evidence. No files were edited.
+{"approval_pending": false, "contract_visible": true, "overall": "pass", "real_task_verified": false, "reinstructions": 1, "synthetic": true, "verifier_calls": 2}
+Evidence: /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-21-d2-pass

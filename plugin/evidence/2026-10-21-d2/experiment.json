@@ -1,0 +1,12 @@
+{
+  "version": "codex-cli 0.162.0-alpha.17.2",
+  "workspace": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-d2-qifpln_2/workspace",
+  "codex_home": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-d2-qifpln_2/codex-home",
+  "out": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-21-d2",
+  "mode": "stub",
+  "executor": "gpt-6.1-sol",
+  "prompt": "This is an isolated HARNESS_STUB demonstration of contract approval and hook routing. The injected FastAPI contract and verifier verdicts are unchanged synthetic fixtures. Do not implement the endpoint or edit application files. First display the contract's goal, checklist, assumptions, effort and cost, then wait for approve. After approval, run the fixture verification commands, report their actual failures or missing dependencies, and label fixture evidence SYNTHETIC. When Stop supplies its one re-instruction, report only unmet criteria as not done; do not edit files or pretend the task succeeded. Task being simulated: Add and test GET /health in an existing FastAPI app.",
+  "approval": "pending",
+  "real_task_verified": false,
+  "thread_id": "01a15d0e-9462-76d0-aa5c-3e4d43934dac"
+}

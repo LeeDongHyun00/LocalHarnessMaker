@@ -1,0 +1,18 @@
+**Goal — SYNTHETIC fixture:** Simulate adding and testing `GET /health`, returning HTTP 200 and exactly `{"status":"ok"}`. No endpoint implementation or file edits will occur.
+
+Checklist:
+
+- [ ] SC-1: `app/main.py` compiles.
+- [ ] SC-2: `/health` returns 200 and the complete expected JSON.
+- [ ] SC-3: `tests/test_health.py` exists and passes.
+- [ ] SC-4: Before/after evidence verifies preservation of existing behavior and scope.
+
+Assumptions: The app is exported from `app/main.py`; `/health` is absent; FastAPI, pytest, and TestClient dependencies are installed; and a before/after diff is available. These remain unverified.
+
+**Effort:** Medium, an illustrative fixture value for one endpoint and regression test.
+
+**Estimated tokens and cost:** The fixture supplies 0 input tokens, 0 output tokens, and $0 USD as synthetic placeholders. Actual estimates have not been computed by `controller/analyze.py`.
+
+After approval, I will run the three supplied verification commands, report their actual exit codes and failures or missing dependencies, and label fixture evidence **SYNTHETIC**. Missing evidence will remain **not done**.
+
+Reply `approve` or provide edits.
