@@ -1,6 +1,7 @@
 """Mock executor behavior and prove grading occurs only after termination."""
 
 import json
+import shlex
 from pathlib import Path
 from typing import Any
 
@@ -331,10 +332,11 @@ def two_task_config(root: Path, config: Path, monkeypatch: pytest.MonkeyPatch, t
     monkeypatch.setattr(core, 'build', lambda c, s, t, v, r, **kw: original_build(c, s, t, v, REPOSITORY, **kw))
 
 
+@pytest.mark.parametrize('wrap', [False, True])
 @pytest.mark.parametrize('absolute', [False, True])
 @pytest.mark.parametrize('cross_run', [False, True])
 def test_previous_grading_copy_access_invalidates(setup: tuple[Path, Path, Path], tmp_path: Path,
-                                                monkeypatch: pytest.MonkeyPatch, absolute: bool, cross_run: bool) -> None:
+                                                monkeypatch: pytest.MonkeyPatch, absolute: bool, cross_run: bool, wrap: bool) -> None:
     root, config, out = setup
     two_task_config(root, config, monkeypatch, tmp_path)
     executor = Executor()
@@ -350,8 +352,11 @@ def test_previous_grading_copy_access_invalidates(setup: tuple[Path, Path, Path]
             first_copy = grading_paths[0]
             target = str(first_copy) if absolute else str(first_copy.parent / 'grading-*')
             events = kwargs['stdout'].read_text().splitlines()
+            command = f'cat {target}/test_*.py'
+            if wrap:
+                command = '/bin/zsh -lc ' + shlex.quote(command)
             events.insert(1, json.dumps({'type': 'item.completed', 'item': {
-                'type': 'command_execution', 'command': f'cat {target}/test_*.py'}}))
+                'type': 'command_execution', 'command': command}}))
             kwargs['stdout'].write_text('\n'.join(events) + '\n')
         return result
 

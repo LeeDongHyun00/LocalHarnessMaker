@@ -1,0 +1,181 @@
+{
+  "source": "real-commands.jsonl",
+  "source_sha256": "31c033b73bb0dae0ed94cd9fc1f7ff77e4a461da73da1795302b25fea13a0e56",
+  "baseline_commit": "5faf49d",
+  "selection": "42 distinct non-heredoc commands; external design note rewritten to fixtures/notion-design.md",
+  "before_counts": {
+    "clean": 4,
+    "inconclusive": 38,
+    "access_detected": 0
+  },
+  "cases": [
+    {
+      "source_index": 0,
+      "command": "/bin/zsh -lc 'pwd && git status --short && cat prompts/01-tech-lead.md && cat state/STATUS-lead.md'"
+    },
+    {
+      "source_index": 1,
+      "command": "/bin/zsh -lc 'cat pyproject.toml Makefile && cat fixtures/notion-design.md'"
+    },
+    {
+      "source_index": 2,
+      "command": "/bin/zsh -lc 'cat AGENTS.md prompts/02-plugin-engineer.md prompts/03-controller-engineer.md prompts/04-verifier-engineer.md prompts/05-eval-engineer.md'"
+    },
+    {
+      "source_index": 3,
+      "command": "/bin/zsh -lc 'cat prompts/03-controller-engineer.md prompts/04-verifier-engineer.md && cat tests/lead/test_schemas.py && cat tests/lead/test_interface_proposals.py'"
+    },
+    {
+      "source_index": 5,
+      "command": "/bin/zsh -lc 'git diff --check && git diff --stat && make -n test && make -n test PYTHON=python3'"
+    },
+    {
+      "source_index": 6,
+      "command": "/bin/zsh -lc 'make validate-schemas'"
+    },
+    {
+      "source_index": 7,
+      "command": "/bin/zsh -lc 'make test TEST_PATH='\"'\"'tests/lead -q -p no:cacheprovider'\"'\"''"
+    },
+    {
+      "source_index": 8,
+      "command": "/bin/zsh -lc 'rg --files docs | sort && cat prompts/02-plugin-engineer.md && cat schemas/VERSION && git status --short'"
+    },
+    {
+      "source_index": 10,
+      "command": "/bin/zsh -lc 'make test'"
+    },
+    {
+      "source_index": 13,
+      "command": "/bin/zsh -lc 'git diff --check -- Makefile pyproject.toml prompts/01-tech-lead.md prompts/04-verifier-engineer.md docs/plan.md docs/decisions/0005-direction.md docs/changes/2026-10-22-lead.md tests/lead/test_pytest_config.py state/STATUS-lead.md && git diff -- Makefile pyproject.toml prompts/01-tech-lead.md prompts/04-verifier-engineer.md state/STATUS-lead.md && git status --short'"
+    },
+    {
+      "source_index": 14,
+      "command": "/bin/zsh -lc 'cat docs/weekly/2026-10-21-host-verification.md'"
+    },
+    {
+      "source_index": 15,
+      "command": "/bin/zsh -lc 'cat prompts/03-controller-engineer.md state/STATUS-controller.md'"
+    },
+    {
+      "source_index": 16,
+      "command": "/bin/zsh -lc 'git status --short; rg --files -g AGENTS.md controller tests/controller'"
+    },
+    {
+      "source_index": 17,
+      "command": "/bin/zsh -lc 'cat controller/backends/routing.py controller/backends/codex_cli.py'"
+    },
+    {
+      "source_index": 18,
+      "command": "/bin/zsh -lc 'cat tests/controller/test_commands.py'"
+    },
+    {
+      "source_index": 19,
+      "command": "/bin/zsh -lc 'cat tests/controller/test_codex_cli.py controller/backends/base.py controller/CHANGES.md'"
+    },
+    {
+      "source_index": 20,
+      "command": "/bin/zsh -lc 'sed -n '\"'\"'120,190p'\"'\"' tests/controller/test_commands.py; cat tests/controller/test_cli.py; cat controller/contract_gen.py'"
+    },
+    {
+      "source_index": 21,
+      "command": "/bin/zsh -lc '.venv/bin/python -m pytest tests/controller -q'"
+    },
+    {
+      "source_index": 22,
+      "command": "/bin/zsh -lc 'git diff --stat -- controller tests/controller state/STATUS-controller.md; git diff -- controller/backends/codex_cli.py controller/backends/routing.py; cat tests/controller/support.py'"
+    },
+    {
+      "source_index": 23,
+      "command": "/bin/zsh -lc 'git diff --check -- controller tests/controller state/STATUS-controller.md; git status --short'"
+    },
+    {
+      "source_index": 24,
+      "command": "/bin/zsh -lc 'git diff --check -- controller tests/controller state/STATUS-controller.md'"
+    },
+    {
+      "source_index": 26,
+      "command": "/bin/zsh -lc 'cat prompts/04-verifier-engineer.md state/STATUS-verifier.md'"
+    },
+    {
+      "source_index": 27,
+      "command": "/bin/zsh -lc 'git status --short'"
+    },
+    {
+      "source_index": 28,
+      "command": "/bin/zsh -lc 'rg --files -g AGENTS.md -g '\"'\"'*.py'\"'\"' verifier tests/verifier'"
+    },
+    {
+      "source_index": 29,
+      "command": "/bin/zsh -lc 'cat verifier/reinstruct.py verifier/claims.py verifier/judge.py verifier/check.py tests/verifier/conftest.py'"
+    },
+    {
+      "source_index": 30,
+      "command": "/bin/zsh -lc 'cat tests/verifier/test_reinstruct.py tests/verifier/test_claims.py tests/verifier/test_judge.py tests/verifier/test_check.py verifier/CHANGES.md'"
+    },
+    {
+      "source_index": 31,
+      "command": "/bin/zsh -lc 'cat tests/verifier/test_claims.py tests/verifier/test_judge.py'"
+    },
+    {
+      "source_index": 32,
+      "command": "/bin/zsh -lc 'cat schemas/examples/verdict_fail.json verifier/rules.py tests/verifier/test_cli.py'"
+    },
+    {
+      "source_index": 33,
+      "command": "/bin/zsh -lc 'rg '\"'\"'judge_criterion|subprocess.run|HARNESS_'\"'\"' tests/verifier verifier -n'"
+    },
+    {
+      "source_index": 35,
+      "command": "/bin/zsh -lc '.venv/bin/python -m pytest tests/verifier -q'"
+    },
+    {
+      "source_index": 36,
+      "command": "/bin/zsh -lc 'git diff -- verifier tests/verifier'"
+    },
+    {
+      "source_index": 37,
+      "command": "/bin/zsh -lc 'cat prompts/04-verifier-engineer.md docs/hooks-contract.md'"
+    },
+    {
+      "source_index": 38,
+      "command": "/bin/zsh -lc 'git diff --check -- verifier tests/verifier state/STATUS-verifier.md'"
+    },
+    {
+      "source_index": 41,
+      "command": "/bin/zsh -lc 'rg '\"'\"'Popen|start_new_session|subprocess|process_group'\"'\"' controller/backends/codex_cli.py controller -n'"
+    },
+    {
+      "source_index": 42,
+      "command": "/bin/zsh -lc 'git diff --stat -- verifier tests/verifier state/STATUS-verifier.md'"
+    },
+    {
+      "source_index": 43,
+      "command": "/bin/zsh -lc 'cat verifier/judge.py verifier/claims.py'"
+    },
+    {
+      "source_index": 47,
+      "command": "/bin/zsh -lc 'cat docs/weekly/2026-10-21-host-verification.md prompts/05-eval-engineer.md state/STATUS-eval.md'"
+    },
+    {
+      "source_index": 48,
+      "command": "/bin/zsh -lc 'git status --short; rg --files eval tests/eval'"
+    },
+    {
+      "source_index": 49,
+      "command": "/bin/zsh -lc 'cat eval/runner/audit.py eval/runner/core.py'"
+    },
+    {
+      "source_index": 50,
+      "command": "/bin/zsh -lc 'cat eval/__main__.py eval/runner/report.py tests/eval/test_access_audit.py tests/eval/test_report.py tests/eval/test_runner.py eval/report.schema.json'"
+    },
+    {
+      "source_index": 51,
+      "command": "/bin/zsh -lc 'sed -n '\"'\"'150,430p'\"'\"' eval/runner/core.py; cat eval/__main__.py; sed -n '\"'\"'125,240p'\"'\"' eval/runner/report.py; cat tests/eval/test_access_audit.py; cat state/STATUS-eval.md'"
+    },
+    {
+      "source_index": 54,
+      "command": "/bin/zsh -lc 'head -18 schemas/evaluation-report.schema.json; cat tests/eval/test_cli.py; cat eval/metrics.py; sed -n '\"'\"'1,95p'\"'\"' eval/runner/report.py; sed -n '\"'\"'12,65p'\"'\"' eval/README.md'"
+    }
+  ]
+}

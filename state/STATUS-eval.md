@@ -1,5 +1,9 @@
 ## Done
 
+- Fixed ordinary wrapped-command false inconclusive audits by unwrapping zsh/bash/sh displays before shlex operand analysis, keeping quote provenance per inner word, bounding workspace globs and separating filter options from paths (.venv/bin/python -m pytest tests/eval -q: 306 passed, 2 skipped, 1 xfailed).
+- Added 42 distinct sanitized host-corpus commands with source indices/hash and synthetic referenced paths; before 4 clean/38 inconclusive, after 42 clean/0 inconclusive, with all six shell/quote variants clean (PYTHONPATH=. .venv/bin/python /tmp/lhm_compare_wrappers.py: fixture counts 4 C/38 I to 42 C/0 I; six wrapper quote replays I to C).
+- Preserved wrapped and unwrapped H1, absolute/traversal/encoded/symlink controls, all eight recursive ancestor command families, private-line fingerprints, decode-and-execute uncertainty and cross-task/cross-run grading-copy invalidation; documented per-case before/after tables (.venv/bin/python -m pytest tests/eval -q: 306 passed, 2 skipped, 1 xfailed; M2 strict-xfail AST unchanged from 5faf49d).
+
 - Fixed H2 by retaining grading copies outside executor runtimes and auditing retained copies, sibling runtimes and prior runs; four synthetic integration variants invalidate glob/absolute reads across tasks and runs (.venv/bin/python -m pytest tests/eval -q: 88 passed, 2 skipped, 1 xfailed).
 - Fixed H1 with shlex directory tracking, cwd/workdir, concrete glob/quote resolution, case-insensitive canonical comparisons, recursive ancestor detection and normalized private-line fingerprints; all ten host cases now detect access or are inconclusive, while ordinary workspace commands stay clean (PYTHONPATH=. .venv/bin/python /tmp/lhm_compare.py: ten clean-before cases became nine access_detected and one inconclusive; .venv/bin/python -m pytest tests/eval -q: 88 passed, 2 skipped, 1 xfailed).
 - Fixed M1 by using labels in audit matches and redacting checkpoint results; tests scan all --out files for raw/canonical synthetic grader roots (.venv/bin/python -m pytest tests/eval -q: publication scan passed; 88 passed, 2 skipped, 1 xfailed).
@@ -17,6 +21,11 @@
 - Full repository tests remain pending before any future merge; this session ran only tests/eval and did not stage or commit. D-2 through D-5 measurements remain unfinished.
 
 ## Decisions
+
+- Unwrap only literal supported shell invocations with shlex and keep inner raw-word provenance: wrapper quoting must not be confused with quoting inside an operand.
+- Certify workspace globs by their static directory prefix and absence of later traversal: unmatched internal globs are resolved, while concrete symlink matches remain protected-path checks and external globs remain unresolved or detected.
+- Treat rg/find/grep filter option values as patterns and retain recursive start-directory auditing: pattern syntax alone must not invalidate an ordinary workspace command.
+- Retain conservative variable handling, including HOME: environment-aware expansion is optional and outside this small correction.
 
 - Retain grading copies outside executor runtimes and audit all retained/other-runtime locations: avoids deletion under STOP-4 while making observed cross-task/cross-run access invalid.
 - Classify recursive ancestor access as access_detected: find/recursive grep/list/copy/archive operations cover protected descendants.
@@ -40,6 +49,11 @@
 - No live evaluation until the open interface decision and host verification prerequisites are resolved.
 
 ## Assumptions
+
+- The current user priority is the wrapped-command regression; the existing M2 STOP-1 record and strict xfail remain unchanged.
+- The 42-command corpus fixture intentionally selects distinct non-heredoc commands; the full 59-command production replay remains pending host verification.
+- All shell displays in tests are log data; even fixture commands naming other roles' tests are never executed. Only tests/eval was run.
+- No match for a workspace-bounded glob does not create audit uncertainty; a command may fail normally while its observed access audit stays clean.
 
 - The user's host-review priorities supersede the previous Remaining ordering; schemas and external CLIs remain frozen.
 - Retained copies share the runner's temporary directory namespace; all lhm-eval-* siblings and lhm-retained-grading are audit roots on every task/run.

@@ -114,48 +114,107 @@ def normalize_line(line: str) -> str:
     return " ".join(line.split())
 
 
-def command_operands(command: str, cwd: Path | None) -> tuple[list[tuple[Path, bool]], bool]:
+def unwrap_shell(command: str) -> str:
+    """Remove literal executor shell wrappers while preserving the inner syntax."""
+    for _ in range(8):
+        words = shlex.split(command)
+        if (len(words) == 3 and Path(words[0]).name in {"zsh", "bash", "sh", "dash"}
+                and words[1] in {"-c", "-lc", "-cl"}):
+            command = words[2]
+        else:
+            return command
+    raise ValueError("Shell wrapper nesting exceeds audit limit")
+
+
+def shell_tokens(command: str) -> list[tuple[str, str]]:
+    """Use shlex for values and retain each raw word for local quote checks."""
+    lexer = shlex.shlex(command, posix=True, punctuation_chars=";&|()")
+    lexer.whitespace_split = True
+    lexer.commenters = ""
+    values = list(lexer)
+    raw_words = re.findall(r"(?:[^\s;&|()'\"\\]|\\.|'[^']*'|\"(?:[^\"\\]|\\.)*\")+|[;&|()]+",
+                           command, flags=re.DOTALL)
+    if len(raw_words) != len(values):
+        raise ValueError("Unresolved shell token boundaries")
+    return list(zip(values, raw_words))
+
+
+def workspace_glob(pattern: Path, workspace: Path | None) -> bool:
+    """A static directory inside the workspace bounds a non-traversing glob."""
+    if workspace is None:
+        return False
+    value = str(pattern)
+    first = min(value.index(ch) for ch in "*?[" if ch in value)
+    if ".." in Path(value[first:]).parts:
+        return False
+    prefix = value[:first]
+    directory = Path(prefix.rsplit("/", 1)[0] or "/").resolve()
+    allowed = str(workspace.resolve()).casefold().rstrip("/")
+    canonical = str(directory).casefold().rstrip("/")
+    return canonical == allowed or canonical.startswith(allowed + "/")
+
+
+def command_operands(command: str, cwd: Path | None, *,
+                     workspace: Path | None = None) -> tuple[list[tuple[Path, bool]], bool]:
     """Resolve supported shell operands; uncertainty never establishes cleanliness."""
     operands: list[tuple[Path, bool]] = []
     unresolved = False
     try:
-        lexer = shlex.shlex(command, posix=True, punctuation_chars=";&|()")
-        lexer.whitespace_split = True
-        tokens = list(lexer)
+        command = unwrap_shell(command)
+        tokens = shell_tokens(command)
     except ValueError:
         return [], True
     if "$" in command or "`" in command:
         unresolved = True
     if re.search(r"(?:base64|xxd|openssl).*\|.*(?:sh|bash|python|perl|ruby)\b", command):
         unresolved = True
-    # shlex removes quoting and escapes. Mixed quoting inside a word must either
-    # resolve to an existing concrete file or stay unresolved.
-    mixed_quote = bool(re.search(r"[^\s'\"]['\"]|\\", command))
-    groups: list[list[str]] = [[]]
-    for token in tokens:
-        if token in {";", "&&", "||", "|", "(", ")", "&"}:
+    groups: list[list[tuple[str, str]]] = [[]]
+    for token, raw in tokens:
+        if token in {";", "&&", "||", "|", "(", ")", "&"} and raw == token:
             groups.append([])
         else:
-            groups[-1].append(token)
+            groups[-1].append((token, raw))
     stack: list[Path | None] = []
     for group in groups:
         if not group:
             continue
-        executable = Path(group[0]).name
+        executable = Path(group[0][0]).name
         recursive = executable in {"find", "rg", "du", "tar", "rsync"} or (
             executable in {"grep", "ls", "cp"} and any(
                 arg.startswith("-") and ("r" in arg.lower() or "recursive" in arg)
-                for arg in group[1:]))
+                for arg, _ in group[1:]))
         if executable == "popd":
             if stack:
                 cwd = stack.pop()
             else:
                 unresolved = True
             continue
+        if executable in {"zsh", "bash", "sh", "dash"} and len(group) >= 3 and group[1][0] in {"-c", "-lc", "-cl"}:
+            nested, unknown = command_operands(group[2][0], cwd, workspace=workspace)
+            operands.extend(nested)
+            unresolved |= unknown
+            continue
         args = group[1:]
         if executable in {"cd", "pushd"} and not args:
-            args = ["~"]
-        for token in args:
+            args = [("~", "~")]
+        pattern_options = {
+            "rg": {"-g", "--glob", "--iglob", "-e", "--regexp"},
+            "find": {"-name", "-iname", "-path", "-ipath", "-wholename"},
+            "grep": {"--include", "--exclude", "-e", "--regexp"},
+        }.get(executable, set())
+        skip_pattern = False
+        path_count = 0
+        for token, raw in args:
+            if executable == "make" and re.match(r"[A-Za-z_][A-Za-z0-9_]*=", token):
+                token, raw = token.split("=", 1)[1], raw.split("=", 1)[1]
+            if skip_pattern:
+                skip_pattern = False
+                continue
+            if token in pattern_options:
+                skip_pattern = True
+                continue
+            if any(token.startswith(option + "=") for option in pattern_options):
+                continue
             if token.startswith("-") or token in {"+", "{}"}:
                 continue
             if token.startswith("~") and token != "~" and not token.startswith("~/"):
@@ -169,13 +228,19 @@ def command_operands(command: str, cwd: Path | None) -> tuple[list[tuple[Path, b
                     continue
                 expanded = cwd / expanded
             magical = glob.has_magic(str(expanded))
-            concrete = [Path(value) for value in glob.glob(str(expanded))] if magical else [expanded]
-            if magical and not concrete:
+            concrete = [Path(value) for value in glob.glob(str(expanded), recursive=True)] if magical else [expanded]
+            bounded = magical and workspace_glob(expanded, workspace)
+            if magical and not bounded:
                 unresolved = True
-            if mixed_quote and ("/" in token or executable in {"cd", "pushd"}) and not expanded.exists() and not magical:
+            # Quote provenance belongs to this word, never the shell wrapper or
+            # another argument (for example sed's quoted address expression).
+            whole_quote = re.fullmatch(r"'[^']*'|\"(?:[^\"\\]|\\.)*\"", raw, flags=re.DOTALL)
+            mixed_quote = ("'" in raw or '"' in raw or "\\" in raw) and not whole_quote
+            if mixed_quote and ("/" in token or Path(token).suffix or executable in {"cd", "pushd"}) and not expanded.exists() and not magical:
                 unresolved = True
             for candidate in concrete:
                 operands.append((candidate.resolve(), recursive))
+            path_count += 1
             if executable in {"cd", "pushd"}:
                 if len(concrete) != 1 or magical or not concrete[0].is_dir():
                     unresolved = True
@@ -185,6 +250,10 @@ def command_operands(command: str, cwd: Path | None) -> tuple[list[tuple[Path, b
                         stack.append(cwd)
                     cwd = concrete[0].resolve()
                 break
+        if skip_pattern:
+            unresolved = True
+        if recursive and not path_count and cwd is not None:
+            operands.append((cwd.resolve(), True))
     return operands, unresolved
 
 
@@ -316,7 +385,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             if cwd is not None and not cwd.is_absolute():
                 cwd = workspace / cwd if workspace else None
             if isinstance(command, str):
-                operands, unresolved = command_operands(command, cwd)
+                operands, unresolved = command_operands(command, cwd, workspace=workspace)
                 if unresolved:
                     errors.append(f"unresolved_operand:{path.name}:{number}")
                 if any(protected(candidate, recursive) for candidate, recursive in operands):
