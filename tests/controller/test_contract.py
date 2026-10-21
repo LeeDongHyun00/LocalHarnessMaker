@@ -39,12 +39,19 @@ def test_ten_mocked_samples_and_ambiguous_assumptions() -> None:
     ambiguous = covered = passed = 0
     for sample in SAMPLES:
         # These hand-written responses test the pipeline, not model quality.
-        golden = model_contract()
-        golden["task_summary"] = f"Review requested work for sample {sample['id']}."
-        golden["assumptions"] = ["The unspecified acceptance details require user review."] if sample["ambiguous"] else []
+        check = sample["check"]
+        golden = {
+            "task_summary": sample["summary"], "constraints": [sample["constraint"]],
+            "success_criteria": [{"id": "SC-1", "description": sample["summary"], "check": check}],
+            "verification": [{"command": check["command"], "expected": check["expected"]}]
+                if check["type"] == "command" else [],
+            "stop_conditions": ["Required context is unavailable or the approved scope changes."],
+            "assumptions": sample["assumptions"],
+        }
         transport = RecordingTransport([response(golden)])
         result = generate_contract(sample["prompt"], CheapAPIBackend(transport=transport))
         assert result["task_summary"] == golden["task_summary"]
+        assert result["success_criteria"] == golden["success_criteria"]
         assert Draft202012Validator(load_object(ROOT / "schemas/contract.schema.json")).is_valid(result)
         passed += 1
         if sample["ambiguous"]:

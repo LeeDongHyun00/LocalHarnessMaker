@@ -24,8 +24,6 @@ def test_request_golden_and_provider_usage(caplog: pytest.LogCaptureFixture) -> 
     transport = RecordingTransport()
     ticks = iter([10.0, 10.25])
     backend = CheapAPIBackend(transport=transport, clock=lambda: next(ticks))
-    schema = {"type": "object", "properties": {}, "additionalProperties": True}
-    # Supply the real generation schema in this backend contract test.
     schema = load_object(ROOT / "schemas/contract.schema.json")
     for field in ("reasoning_effort", "cost_estimate"):
         schema["properties"].pop(field)
@@ -58,8 +56,8 @@ def test_wire_schema_preserves_optional_stdout_and_disjoint_checks() -> None:
     wire = structured_schema(schema)
     Draft202012Validator.check_schema(wire)
     assert schema == original
-    assert "oneOf" not in json.dumps(wire)
-    assert "const" not in json.dumps(wire)
+    assert '"oneOf":' not in json.dumps(wire)
+    assert '"const":' not in json.dumps(wire)
     value = load_object(ROOT / "schemas/examples/contract.json")
     assert Draft202012Validator(wire).is_valid(value)
     for check in ({"type": "file_exists", "path": "READY.txt"},
