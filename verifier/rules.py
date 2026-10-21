@@ -111,4 +111,4 @@ def evaluate(check: dict[str, Any], workspace: Path, runner: Runner = run_comman
         return file_rule(check, workspace)
     if check["type"] == "regex":
         return regex_rule(check, workspace)
-    return Result("unverifiable", "llm_judge: not run", "judge delegation is not implemented; shared judge interface is unresolved")
+    return Result("unverifiable", "llm_judge: not run", "judge delegation requires the full criterion via check_contract")

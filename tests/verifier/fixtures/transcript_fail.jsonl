@@ -1,2 +1,2 @@
-{"role":"user","content":"Implement the health route and its test."}
-{"role":"assistant","content":"The module compiles. SC-2 and SC-3 still fail; work remains."}
+{"type": "response_item", "payload": {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "Implement the health route and its test."}]}}
+{"type": "response_item", "payload": {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "The module compiles. SC-2 and SC-3 still fail; work remains."}], "phase": "final_answer"}}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import shlex
 import subprocess
@@ -73,7 +74,10 @@ def test_launch_error_is_unverifiable(workspace: Path, monkeypatch: pytest.Monke
     assert "cannot launch" in str(run_command("python -c 'print(1)'", workspace).error)
 
 
-macos = pytest.mark.skipif(sys.platform != "darwin", reason="initial sandbox supports macOS only")
+macos = pytest.mark.skipif(
+    sys.platform != "darwin" or bool(os.environ.get("CODEX_SANDBOX")),
+    reason="requires host macOS Seatbelt; CODEX_SANDBOX denies nested sandbox-exec (pending host verification)",
+)
 
 
 @macos

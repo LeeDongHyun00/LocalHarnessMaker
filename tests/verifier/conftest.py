@@ -15,6 +15,12 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 collect_ignore_glob = ["fixtures/*"]
 
 
+@pytest.fixture(autouse=True)
+def verifier_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HARNESS_MAX_ATTEMPTS", "3")
+    monkeypatch.setenv("HARNESS_BACKEND", "codex_cli")
+
+
 @pytest.fixture
 def contract() -> dict[str, Any]:
     return copy.deepcopy(json.loads((ROOT / "schemas/examples/contract.json").read_text()))

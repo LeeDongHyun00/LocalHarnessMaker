@@ -41,7 +41,11 @@ def test_cli_failing_verdict_is_successful_operation(
     path.write_text(json.dumps(contract))
     output = workspace / "verdict.json"
     assert main(arguments(path, workspace, transcript, output)) == 0
-    assert json.loads(output.read_text())["overall"] == "fail"
+    verdict = json.loads(output.read_text())
+    assert verdict["overall"] == "fail"
+    assert verdict["items"][0]["reason"] == "claimed_without_evidence"
+    assert verdict["reinstruct_message"] is not None
+    assert len(verdict["reinstruct_message"]) <= 300
     assert capsys.readouterr().out == str(output) + "\n"
 
 

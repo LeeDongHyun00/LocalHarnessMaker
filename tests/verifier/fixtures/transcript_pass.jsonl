@@ -1,2 +1,2 @@
-{"role":"user","content":"Implement the health route and its test."}
-{"role":"assistant","content":"SC-1 completed. SC-2 implemented. SC-3 passing. SC-4 done."}
+{"type": "response_item", "payload": {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "Implement the health route and its test."}]}}
+{"type": "response_item", "payload": {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "SC-1 completed. SC-2 implemented. SC-3 passing. SC-4 done."}], "phase": "final_answer"}}

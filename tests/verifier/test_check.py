@@ -55,7 +55,12 @@ def test_shared_example_golden_mechanical_fail(
 
 def test_full_example_does_not_pass_without_judge(
     contract: dict[str, Any], workspace: Path, transcript: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    def unavailable(*args: Any, **kwargs: Any) -> None:
+        raise OSError("mock missing controller judge")
+
+    monkeypatch.setattr("verifier.judge.subprocess.run", unavailable)
     def runner(command: str, root: Path, timeout: float) -> Execution:
         return Execution(0, "health response verified\n" if "TestClient" in command else "")
 

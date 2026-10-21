@@ -2,24 +2,18 @@
 
 from __future__ import annotations
 
-import json
+import os
 from pathlib import Path
 import sys
 import time
 from typing import Any
 
-from jsonschema import Draft202012Validator
-
+from verifier.claims import claimed_criteria, last_report
+from verifier.judge import judge_criterion
+from verifier.reinstruct import reinstruct
 from verifier.rules import evaluate
 from verifier.sandbox import Runner, run_command
-
-
-SCHEMAS = Path(__file__).resolve().parents[1] / "schemas"
-
-
-def validate(value: Any, schema_name: str) -> None:
-    schema = json.loads((SCHEMAS / schema_name).read_text(encoding="utf-8"))
-    Draft202012Validator(schema).validate(value)
+from verifier.schema import validate
 
 
 def check_contract(
@@ -34,14 +28,18 @@ def check_contract(
             raise ValueError("attempt must be at least 1")
         if not workspace.is_dir():
             raise ValueError("workspace must be an existing directory")
-        # JSONL is the role's provisional assumption, not a claim parser contract.
-        for number, line in enumerate(transcript.read_text(encoding="utf-8").splitlines(), 1):
-            if line.strip() and not isinstance(json.loads(line), dict):
-                raise ValueError(f"transcript line {number} must be a JSON object")
+        report = last_report(transcript)
+        limit = int(os.environ.get("HARNESS_MAX_ATTEMPTS", "3"))
+        if limit < 1:
+            raise ValueError("HARNESS_MAX_ATTEMPTS must be at least 1")
+        backend = os.environ.get("HARNESS_BACKEND", "codex_cli")
+        if backend not in {"codex_cli", "cheap_api", "local"}:
+            raise ValueError("HARNESS_BACKEND must be codex_cli, cheap_api or local")
         criteria = contract["success_criteria"]
         ids = [criterion["id"] for criterion in criteria]
         if len(set(ids)) != len(ids):
             raise ValueError("success criterion IDs must be unique")
+        claims = claimed_criteria(report, ids)
         quality_warning = not criteria or all(c["check"]["type"] == "llm_judge" for c in criteria)
         items = []
         if quality_warning:
@@ -56,15 +54,19 @@ def check_contract(
                    "evidence": "success_criteria is empty", "reason": "contract cannot be verified"}]
         else:
             for criterion in criteria:
-                result = evaluate(criterion["check"], workspace.resolve(), runner)
+                mechanical = criterion["check"]["type"] != "llm_judge"
+                result = (evaluate(criterion["check"], workspace.resolve(), runner) if mechanical
+                          else judge_criterion(criterion, workspace.resolve(), backend))
                 command_seconds += result.command_duration
+                reason = result.reason
+                if mechanical and result.status == "fail" and criterion["id"] in claims:
+                    reason = "claimed_without_evidence"
                 items.append({"id": criterion["id"], "status": result.status,
-                              "evidence": result.evidence, "reason": result.reason})
+                              "evidence": result.evidence, "reason": reason})
         verdict = {
             "items": items,
             "overall": "pass" if all(item["status"] == "pass" for item in items) else "fail",
-            # Bounded re-instruction is a D-2 deliverable, not inferred here.
-            "reinstruct_message": None,
+            "reinstruct_message": reinstruct(criteria, items, attempt, limit),
             "attempt": attempt,
         }
         validate(verdict, "verdict.schema.json")
