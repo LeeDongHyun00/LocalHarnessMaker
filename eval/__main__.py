@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import sys
 
-from eval.runner.core import run
+from eval.runner.core import IncompleteRun, run
 
 
 class InputParser(argparse.ArgumentParser):
@@ -33,6 +33,9 @@ def main() -> int:
         return 1
     try:
         output = run(args.config, args.out, Path(value))
+    except IncompleteRun as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     except (ValueError, FileNotFoundError) as exc:
         # Path-bearing exceptions stay outside repository artifacts and terminal output.
         print(f"Input error: {type(exc).__name__}; verify config, login and external grader setup", file=sys.stderr)

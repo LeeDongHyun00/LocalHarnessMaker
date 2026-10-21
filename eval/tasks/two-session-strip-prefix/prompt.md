@@ -6,3 +6,5 @@ Public behavior:
 Remove exactly one matching prefix. A nonmatching or empty prefix leaves text unchanged. Do not strip individual characters or repeated prefixes.
 
 Maintain type hints. Do not mutate input collections. No algorithmic complexity constraint is imposed. Verify with python -m unittest discover -v.
+
+Submission requirements: test_solution.py must contain at least 3 passing unittest test methods exercising the public API. HANDOFF.md is an allowed output; include design decisions and the verification command.

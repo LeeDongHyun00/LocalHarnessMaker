@@ -6,3 +6,5 @@ Public behavior:
 Return the last zero-based index equal to target, or None when absent. Empty input returns None. Matching is case-sensitive.
 
 Maintain type hints. Do not mutate input collections. No algorithmic complexity constraint is imposed. Verify with python -m unittest discover -v.
+
+Submission requirements: test_solution.py must contain at least 3 passing unittest test methods exercising the public API. Retain all behavior and compatibility requirements above.

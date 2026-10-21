@@ -30,5 +30,22 @@ def test_public_inventory_contains_100_single_and_20_two_session_tasks() -> None
             day2 = (task / meta['day2_prompt']).read_text()
             assert 'Day 2' in day2 and 'day-1 API compatible' in day2
         if task.name != 'bug-chunk-tail':
-            assert meta['grader_status'] == expected['grader_status'] == 'pending'
-            assert f'| {task.name} | pending |' in pending
+            assert meta['grader_status'] == expected['grader_status'] == 'validated_external'
+            assert f'| {task.name} | validated |' in pending
+
+
+def test_published_validation_counts_and_hashes_cover_every_task() -> None:
+    import re
+    summary = (REPOSITORY / 'eval/GRADERS-PENDING.md').read_text()
+    rows = [line.split('|')[1:-1] for line in summary.splitlines() if '| validated |' in line]
+    assert len(rows) == 120
+    for cells in rows:
+        task, status, original, reference, hashes = [cell.strip() for cell in cells]
+        expected = json.loads((REPOSITORY / 'eval/tasks' / task / 'expected.json').read_text())
+        passed, failed = map(int, original.split('/'))
+        reference_passed, reference_failed = map(int, reference.split('/'))
+        assert passed + failed == expected['expected_test_count']
+        assert failed > 0
+        assert reference_passed == expected['expected_test_count']
+        assert reference_failed == 0
+        assert all(re.fullmatch('[a-f0-9]{64}', value.strip()) for value in hashes.split(','))

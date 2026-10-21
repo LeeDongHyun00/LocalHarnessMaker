@@ -1,1 +1,3 @@
 Day 2: extend the existing public API with unique_many(cases: list[tuple]) -> list. Each tuple supplies positional arguments for one call of unique. Return results in case order, [] for no cases, and propagate the first exception unchanged. Keep the day-1 API compatible, do not mutate cases or arguments, add unittest coverage, and update HANDOFF.md with verification evidence. Use the workspace and handoff provided by the runner.
+
+Keep at least three passing unittest test methods in test_solution.py, including batch coverage. HANDOFF.md must record the verification command and its observed result.

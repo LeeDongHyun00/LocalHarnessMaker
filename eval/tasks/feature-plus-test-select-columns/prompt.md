@@ -6,3 +6,5 @@ Public behavior:
 Return new dictionaries containing requested columns in column order for every row. Missing keys are omitted. Keep row order, preserve values, and never modify rows. Repeated column names appear once.
 
 Maintain type hints. Do not mutate input collections. No algorithmic complexity constraint is imposed. Verify with python -m unittest discover -v.
+
+Submission requirements: test_solution.py must contain at least 2 passing unittest test methods exercising the public API. Retain all behavior and compatibility requirements above.

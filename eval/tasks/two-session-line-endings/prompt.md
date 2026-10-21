@@ -6,3 +6,5 @@ Public behavior:
 Replace CRLF and lone CR with LF. Preserve existing LF, all other characters, and the number of line breaks. Do not strip trailing newlines.
 
 Maintain type hints. Do not mutate input collections. No algorithmic complexity constraint is imposed. Verify with python -m unittest discover -v.
+
+Submission requirements: test_solution.py must contain at least 3 passing unittest test methods exercising the public API. HANDOFF.md is an allowed output; include design decisions and the verification command.

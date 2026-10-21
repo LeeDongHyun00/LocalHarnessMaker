@@ -211,3 +211,173 @@ caveat; unknown variable expansion and decode-and-execute stay unresolved.
   command success.
 - Optional HOME expansion was left unchanged; only literal shell
   unwrapping, operand quoting and workspace glob/pattern handling changed.
+
+
+## 2026-10-22 approved recovery and grader validation
+
+M2 now halts before report construction, exits 2 through the existing CLI, and
+prints STOP-E1 with attempted/configured counts on stderr. Checkpoint and run
+diagnostics survive; the same output directory resumes and publishes only the
+complete configured task set. The strict xfail was replaced with halt/recovery
+and CLI stream/exit tests. The earlier schema-change proposal below is superseded
+by the approved no-report decision; no shared schema or CLI changed.
+
+The task-set digest reads only `git ls-files` public inputs and private grader
+content hashes. Ignored caches and untracked generated files cannot enter it;
+tracked edits still change the digest. Missing/symlinked tracked inputs fail
+validation. Public workspace files were inspected as text only; every grading
+execution used independent copies.
+
+The standalone `python -m eval.runner.validate_graders --private-root
+"$PRIVATE_ROOT" --tasks all` validates through the runner's `grade()` function.
+References are private overlays, never included in grader sources or executor
+workspaces. Output contains task IDs, counts and hashes only. All 120 tasks
+failed on untouched copies and passed with references applied: 598 test methods,
+155 passed/443 failed on original copies, 598 passed/0 failed on reference copies.
+The existing bug-chunk-tail grader passed revalidation unchanged (0/3 original,
+3/0 reference). Per-task counts and every grader SHA-256 are published in
+`eval/GRADERS-PENDING.md` without locations or test contents.
+
+Public task review retained the 25 related families, 100 single-session tasks
+and 20 two-session tasks. It clarified observable submission requirements:
+bug fixes require at least one public unittest method; feature and constrained
+refactoring variants require at least two; multiple-requirement and two-session
+variants require at least three. This makes regression-test delivery explicit,
+including for refactoring originals whose behavior already passes. Graders check
+both refactoring entry points and input preservation, without prescribing the
+helper implementation. Multiple-requirement variants also check the requested
+public docstring. Two-session graders check both APIs, batch order, empty batch,
+input preservation, exception identity and handoff verification evidence.
+Structural helper extraction and regression coverage quality remain human review
+items; behavioral validation alone does not certify them. Family correlations
+remain relevant to later metric interpretation.
+
+Every changed public task file is enumerated below. For each task, `prompt.md`
+adds the submission requirements; `expected.json` replaces pending three-group
+metadata with five external groups and their pass condition; `meta.json` records
+specification review/external validation while retaining `frozen=false`.
+The listed `day2.md` files additionally clarify final regression coverage and
+handoff verification evidence. No public workspace source or existing task ID
+was changed. Bug-chunk-tail public files are unchanged.
+
+| Task directory under eval/tasks/ | Changed files |
+| --- | --- |
+| bug-fix-adjacent-runs | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-balanced-brackets | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-clamp-values | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-common-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-flatten-once | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-inclusive-range | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-interleave | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-interval-union | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-invert-groups | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-last-index | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-line-endings | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-merge-counts | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-pairwise-edges | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-parse-pairs | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-partition-sign | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-prefix-sums | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-rotate-left | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-round-robin | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-select-columns | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-stable-unique | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-strip-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-unique-permutations | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-window-slices | `prompt.md`, `expected.json`, `meta.json` |
+| bug-fix-word-counts | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-adjacent-runs | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-balanced-brackets | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-clamp-values | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-common-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-flatten-once | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-inclusive-range | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-interleave | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-interval-union | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-invert-groups | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-last-index | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-line-endings | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-merge-counts | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-ordinal-labels | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-pairwise-edges | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-parse-pairs | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-partition-sign | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-prefix-sums | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-rotate-left | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-round-robin | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-select-columns | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-stable-unique | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-strip-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-unique-permutations | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-window-slices | `prompt.md`, `expected.json`, `meta.json` |
+| constrained-refactoring-word-counts | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-adjacent-runs | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-balanced-brackets | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-clamp-values | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-common-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-flatten-once | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-inclusive-range | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-interleave | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-interval-union | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-invert-groups | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-last-index | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-line-endings | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-merge-counts | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-ordinal-labels | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-pairwise-edges | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-parse-pairs | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-partition-sign | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-prefix-sums | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-rotate-left | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-round-robin | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-select-columns | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-stable-unique | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-strip-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-unique-permutations | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-window-slices | `prompt.md`, `expected.json`, `meta.json` |
+| feature-plus-test-word-counts | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-adjacent-runs | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-balanced-brackets | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-clamp-values | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-common-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-flatten-once | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-inclusive-range | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-interleave | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-interval-union | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-invert-groups | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-last-index | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-line-endings | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-merge-counts | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-ordinal-labels | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-pairwise-edges | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-parse-pairs | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-partition-sign | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-prefix-sums | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-rotate-left | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-round-robin | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-select-columns | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-stable-unique | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-strip-prefix | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-unique-permutations | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-window-slices | `prompt.md`, `expected.json`, `meta.json` |
+| multiple-requirements-word-counts | `prompt.md`, `expected.json`, `meta.json` |
+| two-session-adjacent-runs | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-balanced-brackets | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-clamp-values | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-common-prefix | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-flatten-once | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-inclusive-range | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-interleave | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-interval-union | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-invert-groups | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-last-index | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-line-endings | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-merge-counts | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-pairwise-edges | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-partition-sign | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-prefix-sums | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-rotate-left | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-stable-unique | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-strip-prefix | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-window-slices | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+| two-session-word-counts | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |

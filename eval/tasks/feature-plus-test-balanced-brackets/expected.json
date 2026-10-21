@@ -8,12 +8,14 @@
     "-v"
   ],
   "expected_exit_code": 0,
-  "expected_test_count": 3,
-  "grader_status": "pending",
-  "pass_condition": "Pending external graders: ordinary behavior, boundaries/errors, and compatibility/input preservation.",
+  "expected_test_count": 5,
+  "grader_status": "validated_external",
+  "pass_condition": "All five external unittest groups pass: ordinary behavior, boundaries/errors, input preservation, submitted regression tests, and task-variant requirements.",
   "planned_grader_groups": [
     "ordinary behavior",
     "boundaries and errors",
-    "compatibility and input preservation"
+    "input preservation",
+    "submitted public regression tests",
+    "variant requirements"
   ]
 }

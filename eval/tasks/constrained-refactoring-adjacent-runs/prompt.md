@@ -6,3 +6,5 @@ Public behavior:
 Run-length encode adjacent equal strings as (value,count) pairs. Nonadjacent equal values form separate runs. Empty input returns [].
 
 Maintain type hints. Do not mutate input collections. No algorithmic complexity constraint is imposed. Verify with python -m unittest discover -v.
+
+Submission requirements: test_solution.py must contain at least 2 passing unittest test methods exercising the public API. Retain all behavior and compatibility requirements above.

@@ -6,8 +6,8 @@
   "source": "hand_written",
   "version": 1,
   "frozen": false,
-  "grader_status": "pending",
+  "grader_status": "validated_external",
   "family": "adjacent-runs",
-  "review_status": "draft",
+  "review_status": "specification_reviewed",
   "day2_prompt": "day2.md"
 }

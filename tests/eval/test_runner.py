@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from eval.runner.core import REPOSITORY, load_config, run
+from eval.runner.core import REPOSITORY, IncompleteRun, load_config, run
 from eval.runner.process import ProcessResult, run_process
 
 
@@ -101,9 +101,9 @@ def test_invalid_runs_keep_evidence_and_never_grade(setup: tuple[Path, Path, Pat
 def test_interrupted_turn_resumes_same_session_before_grading(setup: tuple[Path, Path, Path]) -> None:
     root, config, out = setup
     executor = Executor(interrupt=True)
-    first = json.loads(run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2").read_text())
-    assert first["tasks"][0]["grading"] is None
-    assert first["tasks"][0]["outcome"] == "invalid"
+    with pytest.raises(IncompleteRun, match="STOP-E1"):
+        run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2")
+    assert not (out / "report.json").exists()
     second = json.loads(run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2").read_text())
     # Recovery cannot erase the interrupted stream's incomplete audit evidence.
     assert second["tasks"][0]["outcome"] == "invalid"
@@ -327,6 +327,7 @@ def two_task_config(root: Path, config: Path, monkeypatch: pytest.MonkeyPatch, t
     value.update(tasks=['bug-chunk-tail', 'second-task'], seed=0)
     config.write_text(json.dumps(value))
     monkeypatch.setattr(core, 'REPOSITORY', repository)
+    monkeypatch.setattr(core, 'public_files', lambda task: sorted(p for p in (repository / 'eval/tasks' / task).rglob('*') if p.is_file()))
     # Report git provenance is read from the original repository, never a model.
     original_build = core.build
     monkeypatch.setattr(core, 'build', lambda c, s, t, v, r, **kw: original_build(c, s, t, v, REPOSITORY, **kw))
@@ -397,9 +398,8 @@ def test_private_path_never_published_in_checkpoint_or_any_output(setup: tuple[P
             assert str(root.resolve()) not in path.read_text()
 
 
-@pytest.mark.xfail(strict=True, reason="STOP-1: frozen schema requires valid when no task is invalid; aggregate-only halt invalidity needs Role 1 revision")
-def test_stop_e1_partial_report_is_invalid_with_counts(setup: tuple[Path, Path, Path], tmp_path: Path,
-                                                    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+def test_stop_e1_retains_checkpoint_and_resumes_all_tasks(setup: tuple[Path, Path, Path], tmp_path: Path,
+                                                        monkeypatch: pytest.MonkeyPatch) -> None:
     root, config, out = setup
     two_task_config(root, config, monkeypatch, tmp_path)
     executor = Executor()
@@ -409,11 +409,53 @@ def test_stop_e1_partial_report_is_invalid_with_counts(setup: tuple[Path, Path, 
         executor(argv, **kwargs)
         return ProcessResult(1)
 
-    report = json.loads(run(config, out, root, execute=fail, version='codex-cli 0.162.0-alpha.17.2').read_text())
-    assert report['validity']['status'] == 'invalid'
-    assert any('STOP-E1' in reason and 'after 1 of 2 tasks' in reason for reason in report['validity']['reasons'])
-    assert 'after 1 of 2 tasks' in capsys.readouterr().err
+    with pytest.raises(IncompleteRun, match='after 1 of 2 tasks'):
+        run(config, out, root, execute=fail, version='codex-cli 0.162.0-alpha.17.2')
+    assert not (out / 'report.json').exists()
+    assert (out / 'checkpoint.json').exists()
+    diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
+    assert diagnostics['attempted_tasks'] == 1
+    assert diagnostics['configured_tasks'] == 2
+    assert 'STOP-E1' in diagnostics['stop_reason']
     assert executor.calls == 1
+    report = json.loads(run(config, out, root, execute=executor, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert len(report['tasks']) == 2
+    assert executor.calls == 2
+
+
+def test_cli_incomplete_run_exits_two_without_success_path(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    import eval.__main__ as cli
+    monkeypatch.setenv('LHM_PRIVATE_GRADERS', '/synthetic/trusted')
+    monkeypatch.setattr('sys.argv', ['eval', 'run', '--config', 'config', '--out', 'out'])
+    def halted(*args: Any) -> None:
+        raise IncompleteRun('STOP-E1: attempted=1, configured=2')
+    monkeypatch.setattr(cli, 'run', halted)
+    assert cli.main() == 2
+    capture = capsys.readouterr()
+    assert capture.out == ''
+    assert 'STOP-E1: attempted=1, configured=2' in capture.err
+
+
+def test_taskset_hash_ignores_generated_and_untracked_files(setup: tuple[Path, Path, Path], tmp_path: Path,
+                                                         monkeypatch: pytest.MonkeyPatch) -> None:
+    import eval.runner.core as core
+    from eval.runner.audit import PrivateGraders
+    root, _, _ = setup
+    private = PrivateGraders.load(root, 'bug-chunk-tail', REPOSITORY)
+    tracked = core.public_files('bug-chunk-tail')
+    public = tmp_path / 'repository/eval/tasks/bug-chunk-tail'
+    import shutil
+    shutil.copytree(REPOSITORY / 'eval/tasks/bug-chunk-tail', public)
+    monkeypatch.setattr(core, 'REPOSITORY', tmp_path / 'repository')
+    monkeypatch.setattr(core.subprocess, 'run', lambda *a, **kw: __import__('subprocess').CompletedProcess(a, 0,
+        stdout=b'\0'.join(str(p.relative_to(REPOSITORY)).encode() for p in tracked)+b'\0'))
+    before = core.taskset_digest({'bug-chunk-tail': private})
+    (public / 'workspace/__pycache__').mkdir()
+    (public / 'workspace/__pycache__/generated.pyc').write_bytes(b'generated')
+    (public / 'workspace/scratch.py').write_text('generated')
+    assert core.taskset_digest({'bug-chunk-tail': private}) == before
+    (public / 'prompt.md').write_text('changed specification')
+    assert core.taskset_digest({'bug-chunk-tail': private}) != before
 
 
 def test_reinstruction_has_its_own_transport_retry_budget(setup: tuple[Path, Path, Path]) -> None:

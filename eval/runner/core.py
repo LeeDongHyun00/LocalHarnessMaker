@@ -70,12 +70,24 @@ def load_config(path: Path) -> dict[str, Any]:
     return config
 
 
+def public_files(task: str) -> list[Path]:
+    """Hash only version-controlled inputs; generated/untracked files never enter."""
+    result = subprocess.run(
+        ["git", "ls-files", "-z", "--", f"eval/tasks/{task}/"],
+        cwd=REPOSITORY, capture_output=True, check=True, timeout=10,
+    )
+    files = [REPOSITORY / os.fsdecode(name) for name in result.stdout.split(b"\0") if name]
+    if not files or any(not path.is_file() or path.is_symlink() for path in files):
+        raise ValueError("Task requires regular version-controlled public inputs")
+    return sorted(files)
+
+
 def taskset_digest(private_by_task: dict[str, PrivateGraders]) -> str:
-    """Fingerprint public inputs and private test contents without locations."""
+    """Fingerprint tracked public inputs and private test contents without locations."""
     hashes = {
         task: {"public": [
             [str(p.relative_to(REPOSITORY / "eval/tasks" / task)), digest(p.read_bytes())]
-            for p in sorted((REPOSITORY / "eval/tasks" / task).rglob("*")) if p.is_file()
+            for p in public_files(task)
         ], "graders": sorted(digest(p.read_bytes()) for p in private.files)}
         for task, private in private_by_task.items()
     }
@@ -137,6 +149,10 @@ def audit_roots(runtime: Path) -> tuple[Path, ...]:
     temporary = Path(tempfile.gettempdir())
     return (temporary / "lhm-retained-grading", *runtime.glob("grading-*"),
             *(p for p in temporary.glob("lhm-eval-*") if p != runtime))
+
+
+class IncompleteRun(RuntimeError):
+    """A halted run retains recovery evidence and cannot publish a report."""
 
 
 class ReportError(RuntimeError):
@@ -393,6 +409,15 @@ def run(
             stop_reason = "STOP-E1: executor interrupted or could not complete non-interactively; inspect retained logs before another live call."
             break
     tasks = [json.loads((out / task / "result.json").read_text()) for task in order if (out / task / "result.json").exists()]
+    attempted = sum(bool(entry.get("segments")) for entry in state["tasks"].values())
+    configured = len(config["tasks"])
+    write_json(out / "run-diagnostics.json", {
+        "stop_reason": stop_reason, "attempted_tasks": attempted, "configured_tasks": configured,
+    })
+    if stop_reason or {t["task_id"] for t in tasks} != set(config["tasks"]):
+        reason = stop_reason or "Incomplete configured task results"
+        raise IncompleteRun(f"{reason} Halted after {attempted} of {configured} tasks; "
+                            f"attempted={attempted}, configured={configured}")
     pricing = json.loads((REPOSITORY / "eval/prices.yaml").read_text())
     try:
         shared_tasks = [build_task(t, state["tasks"][t["task_id"]], out / t["task_id"], config, pricing,
@@ -400,7 +425,6 @@ def run(
         report = build(config, state, shared_tasks, actual_version, REPOSITORY)
     except ValueError as exc:
         raise ReportError("Runtime report accounting or validation failed") from exc
-    write_json(out / "run-diagnostics.json", {"stop_reason": stop_reason})
     destination = out / "report.json"
     # Redaction is mandatory even if future report fields unexpectedly contain a private marker.
     text = json.dumps(report, indent=2) + "\n"

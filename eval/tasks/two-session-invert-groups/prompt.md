@@ -6,3 +6,5 @@ Public behavior:
 Group input keys by their values. Each list of keys follows dictionary insertion order. Empty input returns {}.
 
 Maintain type hints. Do not mutate input collections. No algorithmic complexity constraint is imposed. Verify with python -m unittest discover -v.
+
+Submission requirements: test_solution.py must contain at least 3 passing unittest test methods exercising the public API. HANDOFF.md is an allowed output; include design decisions and the verification command.
