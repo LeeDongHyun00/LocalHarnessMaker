@@ -33,7 +33,7 @@ def contract_with(check: dict[str, Any]) -> dict[str, Any]:
 
 
 def test_all_schemas_and_examples_validate() -> None:
-    assert validator_module.validate_tree() == (3, 5)
+    assert validator_module.validate_tree() == (6, 8)
 
 
 @pytest.mark.parametrize("check", [
@@ -173,4 +173,52 @@ def test_validation_fails_for_incomplete_or_invalid_trees(tmp_path: Path, mutati
         schema["type" if mutation == "invalid_schema" else "$schema"] = "invalid"
         (directory / "handoff.schema.json").write_text(json.dumps(schema), encoding="utf-8")
     with pytest.raises(ValueError):
+        validator_module.validate_tree(directory)
+
+
+@pytest.mark.parametrize("missing", ["judgment-input.schema.json", "judgment.schema.json", "evaluation-report.schema.json"])
+def test_new_schemas_cannot_be_silently_omitted(tmp_path: Path, missing: str) -> None:
+    directory = tmp_path / "schemas"
+    shutil.copytree(SCHEMAS, directory, ignore=lambda _path, names: [name for name in names if name == missing])
+    with pytest.raises(ValueError, match="Missing required shared schema"):
+        validator_module.validate_tree(directory)
+
+
+@pytest.mark.parametrize("name", ["criterion.json", "judgment.json", "evaluation_report.json"])
+def test_new_examples_are_required_and_validated(tmp_path: Path, name: str) -> None:
+    missing = tmp_path / "missing"
+    shutil.copytree(SCHEMAS, missing, ignore=lambda _path, names: [item for item in names if item == name])
+    with pytest.raises(ValueError, match="Missing required reference sample"):
+        validator_module.validate_tree(missing)
+    invalid = tmp_path / "invalid"
+    shutil.copytree(SCHEMAS, invalid)
+    (invalid / "examples" / name).write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError):
+        validator_module.validate_tree(invalid)
+
+
+@pytest.mark.parametrize("timestamp", ["not-a-date", "2026-02-30T12:00:00Z", "2026-10-21T12:00:00", "2026-10-21T12:00:00+01:60"])
+def test_report_example_datetime_formats_are_checked(tmp_path: Path, timestamp: str) -> None:
+    directory = tmp_path / "schemas"
+    shutil.copytree(SCHEMAS, directory)
+    report = load("examples/evaluation_report.json")
+    report["metadata"]["created_at"] = timestamp
+    (directory / "examples/evaluation_report.json").write_text(json.dumps(report), encoding="utf-8")
+    with pytest.raises(ValueError, match="date-time"):
+        validator_module.validate_tree(directory)
+
+
+def test_missing_schema_reference_fails_without_network(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import socket
+
+    def reject_network(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("Schema validation must not open network connections")
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    directory = tmp_path / "schemas"
+    shutil.copytree(SCHEMAS, directory)
+    criterion_schema = load("judgment-input.schema.json")
+    criterion_schema["allOf"][0]["$ref"] = "https://invalid.example/unregistered-schema.json"
+    (directory / "judgment-input.schema.json").write_text(json.dumps(criterion_schema), encoding="utf-8")
+    with pytest.raises(ValueError, match="Unresolvable"):
         validator_module.validate_tree(directory)

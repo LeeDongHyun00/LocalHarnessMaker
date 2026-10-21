@@ -1,0 +1,8 @@
+{
+  "id": "SC-4",
+  "description": "Preserve existing routes.",
+  "check": {
+    "type": "llm_judge",
+    "rubric": "Review the supplied before/after diff. Pass only if existing routes are preserved. Missing comparison evidence is unverifiable."
+  }
+}

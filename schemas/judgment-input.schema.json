@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed judge criterion input",
+  "allOf": [
+    {
+      "$ref": "contract.schema.json#/properties/success_criteria/items"
+    },
+    {
+      "properties": {
+        "check": {
+          "properties": {
+            "type": {
+              "const": "llm_judge"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

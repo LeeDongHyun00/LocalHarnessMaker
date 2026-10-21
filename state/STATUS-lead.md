@@ -1,56 +1,54 @@
 ## Done
 
-- Initialized the D-1 repository skeleton using a reproducible root target, preserving engineer-owned implementation paths and the legacy harness (make skeleton: exit 0; .venv/bin/python -c 'import controller, verifier, eval, plugin; print("Namespace imports: controller, verifier, eval, plugin OK")': Namespace imports: controller, verifier, eval, plugin OK).
-- Added editable packaging, development dependencies, Make targets, and CI configuration for the role suites on Python 3.11 and 3.14; remote CI execution is not claimed (.venv/bin/python -m pip install -e '.[dev]': Successfully built and installed local-harness-maker-0.1.0.dev0; .venv/bin/python -m pip check: No broken requirements found).
-- Wrote the first draft of three schemas and five hand-written reference samples with three command checks and exactly one llm_judge check; kept schemas/VERSION at 0 (make validate-schemas PYTHON=.venv/bin/python: Validated 3 draft 2020-12 schemas and 5 examples).
-- Added schema boundary and malformed-input regression tests for the lead-owned validation tooling (make test PYTHON=.venv/bin/python: 41 passed).
-- Wrote docs/interfaces.md with the six-CLI table, official documented hook baseline, draft assumptions, and unresolved freeze prerequisites; wrote docs/decisions/0000-initial-interface-draft.md and docs/changes/2026-10-21-lead.md (lead handoff audit in docs/changes/2026-10-21-lead.md: 6 CLI rows; schemas/VERSION=0; all 5 STATUS files have the required headings).
-- Initialized the four other role STATUS files as empty six-heading templates and populated this lead handoff (lead handoff audit in docs/changes/2026-10-21-lead.md: all 5 STATUS files have the required headings).
+- Verified the selected 19-file commit scope in a separate HEAD archive overlaid only with those files, excluding concurrent uncommitted role work (make validate-schemas with the workspace .venv Python in the isolated archive: 6 schemas and 8 examples validated; make test in that archive: 168 passed in 4.97s).
+- Recorded "Status: approved by the user on 2026-10-21" in decisions 0002, 0003 and 0004; published their exact JSON schema/example content and set schemas/VERSION to 1 (make validate-schemas PYTHON=.venv/bin/python: Validated 6 draft 2020-12 schemas and 8 examples; make test PYTHON=.venv/bin/python: approved-record equality tests passed).
+- Added judgment-input.schema.json, judgment.schema.json and evaluation-report.schema.json plus criterion.json, judgment.json and evaluation_report.json; retained existing contract/verdict/handoff shapes (make validate-schemas PYTHON=.venv/bin/python: 6 schemas and 8 examples validated).
+- Extended local-only schema reference validation, required artifact inventory and deterministic timestamp-format checks without new dependencies; boundary tests reject missing schemas/examples, malformed criteria/reports, wrong metric intervals/units, invalid audit states, missing handoff evidence and unknown references (make test PYTHON=.venv/bin/python: 264 passed, 2 skipped; skips require external graders).
+- Updated docs/interfaces.md, AGENTS.md section 3, and the two explicitly authorized controller/evaluation role prompts for the approved model order, shared three-call budget, nested guard, judgment/report contracts, access audit and API-equivalent accounting (make test PYTHON=.venv/bin/python: interface/prompt consistency tests passed).
+- Published the approved installed-version hook contract with corrected evidence links; kept probe evidence and other roles' implementations unchanged (published evidence-link test passed; .venv/bin/python -m plugin.check_probe_evidence plugin/evidence/2026-10-21-exec plugin/evidence/2026-10-21-tui: both runs context_visible=true, continued_once=true, exit_code=0).
 
 ## Remaining
 
-- D-2, before 2026-10-24: resolve the missing judge criterion/output contract and evaluation report schema with Roles 3, 4, and 5; confirm the validation-only stdout assumption with Roles 2 and 4. Any schema revision requires user approval under STOP-L1 before editing, a decision record, and a version increment.
-- D-2, before 2026-10-24: review Role 2's installed-version hook evidence and version pin, including codex exec, Stop continuation, nullable transcript paths, and where the handoff is saved. The official documentation baseline is not runtime evidence.
-- D-2: after the initial review and approved corrections, declare the interface freeze with schemas/VERSION = 1 and rerun make validate-schemas and make test. D-2 is not yet frozen or complete.
-- D-3, by 2026-10-27: read the Notion design and plan; write docs/plan.md identical to that plan, docs/decisions/0001-direction.md, and docs/eval-freeze.md using the hash supplied by Role 5. No hash has been supplied.
-- D-4: read all four engineer STATUS files and write integration reviews on 2026-10-27, 2026-11-03, and 2026-11-10; monitor interface blockers for the two-day limit.
-- D-5, by 2026-11-13: update README.md for the plugin's verified installation/demo, and write docs/architecture.md and docs/demo.md; verify the two-session demo in a fresh clone and retain the log.
-- D-6, by 2026-11-15: write the presentation draft under docs/slides/ and docs/qa.md covering all four required questions.
-- Before merge: run the full relevant suites, including preserved legacy checks with their documented environment; current evidence covers the new role suites only.
+- Owning roles must implement and demonstrate version 1 runtime behavior: controller judge/handoff and shared-budget routing, all-hook HARNESS_NESTED bypass, verifier judgment delegation, and schema-valid evaluation report production. Shared contract publication is complete; runtime completion is not claimed.
+- Review production handoff-save point, nullable transcript handling, other SessionStart sources, persisted trust and retry/approval behavior with Role 2. Startup probe evidence does not establish these remaining behaviors.
+- D-3, by 2026-10-27: read the Notion design/plan, write docs/plan.md and the direction-change decision, and record the task-set hash supplied by Role 5 in docs/eval-freeze.md. No hash was supplied in this task.
+- D-4: read the four engineer STATUS files and write integration reviews on 2026-10-27, 2026-11-03 and 2026-11-10; monitor interface blockers for the two-day limit.
+- D-5, by 2026-11-13: update README.md for verified installation/demo, write docs/architecture.md and docs/demo.md, and verify the two-session demo in a fresh clone with retained evidence.
+- D-6, by 2026-11-15: write docs/slides/ and docs/qa.md with all four required questions.
+- External private-grader fixture tests require the trusted grader configuration; two tests were skipped in the current local role-suite run. Legacy top-level Docker/Chromium suites and remote CI were not run by this interface task.
 
 ## Decisions
 
-- Start from the First task: state/STATUS-lead.md did not exist at session start.
-- Keep interface version 0: this is the explicitly assigned initial draft, and installed-hook evidence plus several output details are still unresolved before freeze.
-- Recreate empty role directories with make skeleton: Git cannot preserve empty directories and Role 1 must not write other engineers' implementation files.
-- Preserve legacy code, experiments, README.md, and existing design documents: the current assignment initializes the new harness structure without rewriting earlier work.
-- Keep the hook evidence document absent until Role 2 supplies it: merely creating docs/hooks-contract.md would prematurely replace the official source of truth.
-- Mark reference evidence synthetic and metadata illustrative: no model calls or FastAPI implementation executions were performed to create the examples.
+- Treat FILE1/FILE2/FILE3 as decisions 0002/0003/0004: those are the three proposals immediately preceding the user's explicit approval and implementation request.
+- Publish version 1 on 2026-10-21: the user approved the bundle and explicitly requested VERSION=1 before the planned 2026-10-24 freeze.
+- Preserve approved schema/example content exactly: active artifacts match the JSON blocks in the approved records; existing contract/verdict/handoff shapes remain unchanged.
+- Use gpt-6-luna via logged-in codex_cli as primary, same-model cheap_api fallback and local Gemma as stage two: the user's approved model/transport order.
+- Use audited external private graders in fresh post-exit copies and invalidate observed access/inconclusive capture: the user's STOP-E4 decision replaces the earlier deny-read prerequisite without claiming filesystem isolation.
+- Update only the two named role prompts outside normal lead ownership: the user explicitly authorized those paths; controller/plugin/verifier/eval implementations and other STATUS files remain untouched.
+- Stage an explicit allowlist only, never git add -A: the user requires a scoped commit/push, and other roles have concurrent uncommitted changes.
 
 ## Verify commands
 
-- make skeleton
-- .venv/bin/python -m pip install -e '.[dev]'
-- .venv/bin/python -m pip check
 - make validate-schemas PYTHON=.venv/bin/python
 - make test PYTHON=.venv/bin/python
-- git diff --check
-- Run the lead handoff audit documented in docs/changes/2026-10-21-lead.md.
+- .venv/bin/python -m plugin.check_probe_evidence plugin/evidence/2026-10-21-exec plugin/evidence/2026-10-21-tui
+- git diff --check -- AGENTS.md docs/interfaces.md docs/validate_schemas.py prompts/03-controller-engineer.md prompts/05-eval-engineer.md schemas tests/lead state/STATUS-lead.md
+- git show --stat HEAD
+- git ls-remote --heads origin main
 
 ## Do not touch
 
-- Other roles' implementation files in controller/, verifier/, plugin/, eval/, or their tests; read-only for Role 1 except explicitly authorized skeleton initialization.
-- The four other role STATUS files after this initial empty-template setup.
-- Existing harness/, experiments/, scripts/, top-level legacy tests, and unrelated user edits.
-- Existing interfaces after this draft without STOP-L1 approval, a decision record, and a version increment.
-- Do not create docs/hooks-contract.md as a placeholder, register hooks, change external configuration, delete files, or run paid batches without respecting AGENTS.md stop conditions.
+- Version 1 interfaces without new user approval, a decision record and a version increment.
+- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. Only prompts/03-controller-engineer.md and prompts/05-eval-engineer.md are explicit cross-role exceptions for this task.
+- Existing harness/, experiments/, scripts/, legacy tests and unrelated user edits.
+- No git add -A, broad staging, foreign-path commit, deletion, history rewrite, hook registration or external configuration change.
+- Keep the canonical hook contract and captured evidence; never replace measured evidence with a placeholder or claim production behavior from startup probes.
 
 ## Assumptions
 
-- The explicit First task authorizes initial schema creation; it does not authorize later schema revisions or declaration of a verified freeze.
-- Unspecified draft field types use string evidence/reason/state and expected objects with exit_code plus optional exact stdout; attempts are one-based. Consumers must review these before freeze.
-- validate-handoff prints the supplied handoff path on successful validation without writing a new file, because the baseline has no --out argument; this remains pending review.
-- Empty namespace package roots are scaffolding only; engineers will implement the six CLIs. make skeleton recreates the directories after checkout.
-- The default new pytest collection covers the five role suites; preserved legacy tests require their existing separate setup.
-- The reference FastAPI request assumes an existing app.main.app, installed test dependencies, and an available before/after diff; all example evidence and metadata are illustrative.
-- Future dated deliverables and the Notion-aligned plan remain pending; no missing plan content, evaluation hash, runtime result, or cost was fabricated.
+- The approval placeholders identify the immediately preceding three proposals and DATE is 2026-10-21 in the user's timezone.
+- A separate published judgment-input schema is the approved input validator, referencing the existing contract item rather than duplicating/changing it.
+- This task publishes shared contracts, examples/tests and instructions; implementation changes in other roles' runtime packages remain their responsibility.
+- Synthetic prices, paths, hashes, usage and CIs remain fixtures. No paid model call, real pricing/account eligibility result or runtime-backend completion is inferred.
+- Version 1 validation needs deterministic timestamp checks even when optional jsonschema date-time dependencies are absent; the local validator enforces timestamp syntax/calendar validity without changing dependencies or approved schemas.
+- Commit and push are explicitly authorized; only the named shared changes, lead tests/STATUS, the necessary shared validator and previously approved canonical hook document are included. Concurrent role work and the older untracked proposal-session change summary remain outside the commit.

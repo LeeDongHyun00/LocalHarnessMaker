@@ -33,60 +33,148 @@ Rules:
 
 ## 3. Interfaces between roles
 
-Frozen on 2026-10-24. Only Role 1 may change them. Every change requires a record in docs/decisions/ and an increment of schemas/VERSION.
+Version 1 was approved and published on 2026-10-21, ahead of the planned
+2026-10-24 freeze. Approved records: docs/decisions/0002-judgment-schema-proposal.md,
+0003-evaluation-report-schema-proposal.md, and
+0004-codex-cli-backend-and-nested-guard-proposal.md. Only Role 1 changes shared
+interfaces. Later revisions require user approval, a decision record and an
+increment of schemas/VERSION. Publishing an interface is not proof that its
+owning role has implemented or measured it.
 
 ### 3.1 Schemas (directory schemas/, JSON Schema draft 2020-12)
+
+All objects reject unknown fields. make validate-schemas checks all six schemas
+and every reference example offline, including date/time formats and local
+references. The schema files are the exact field/type definitions.
 
 File contract.schema.json, the contract:
 - task_summary: string
 - constraints: array of string
-- success_criteria: array of objects with fields id, description, check
-  - check.type is one of: command, file_exists, regex, llm_judge
-  - check fields by type: command uses command and expected; file_exists uses path; regex uses path and pattern; llm_judge uses rubric
-- verification: array of objects with fields command, expected
+- success_criteria: array of objects with id, description, check
+  - check.type is exactly one of command, file_exists, regex, llm_judge
+  - command uses command and expected; file_exists uses path; regex uses path and pattern; llm_judge uses rubric
+  - expected has required integer exit_code and optional exact stdout, including newlines
+- verification: array of objects with command and expected
 - stop_conditions: array of string
-- assumptions: array of string. Things the request did not state and the control model assumed. The user corrects them before approval.
-- reasoning_effort: object with fields value, rationale. value is one of: low, medium, high, xhigh, max. Computed by code in controller/analyze.py, never by the model.
-- cost_estimate: object with fields input_tokens, output_tokens, usd. Computed by code.
+- assumptions: array of string; the user corrects unspecified assumptions before approval
+- reasoning_effort: value and rationale; value is low, medium, high, xhigh or max, computed in controller/analyze.py, never by the model
+- cost_estimate: input_tokens, output_tokens, usd, computed by code
 
 File verdict.schema.json, the verdict:
-- items: array of objects with fields id, status, evidence, reason. status is one of: pass, fail, unverifiable.
-- overall: pass or fail
-- reinstruct_message: string or null
-- attempt: integer
+- items: array of objects with id, status, evidence, reason; status is pass, fail or unverifiable
+- overall: pass or fail; pass requires all items to pass
+- reinstruct_message: string of at most 300 characters or null; null on overall pass or retry exhaustion
+- attempt: integer starting at 1
 
-File handoff.schema.json, the handoff document:
-- done: array of objects with fields criterion_id, artifact
-- remaining: array of objects with fields criterion_id, state
-- decisions: array of objects with fields what, why
-- verify_commands: array of string
-- do_not_touch: array of string
+File handoff.schema.json, the handoff:
+- done: array of objects with criterion_id and artifact
+- remaining: array of objects with criterion_id and state
+- decisions: array of objects with what and why
+- verify_commands, do_not_touch: arrays of string
+
+File judgment-input.schema.json, judge input:
+- Exactly one full success_criteria item: id, description, check, without a list or contract wrapper.
+- References the existing contract criterion definition and requires check.type=llm_judge. Mechanical criteria are input errors before any model call.
+
+File judgment.schema.json, judge output:
+- Exactly criterion_id, status, reason, evidence, model, usage.
+- status uses the verdict vocabulary: pass, fail, unverifiable. criterion_id must match input id, and evidence must include llm_judge; runtime code enforces these relationships.
+- Code supplies criterion_id, selected model identity and usage; generated content supplies status/reason/evidence only. Conflicting provider model identity is an error.
+- usage has input_tokens, cached_input_tokens, output_tokens, usd, latency_seconds, cost_basis and pricing_ref. cost_basis is api_equivalent_usd. Unknown token counts/cost or missing price reference use null, never a fabricated zero. Cache tokens are a subset of input tokens.
+- Sum all generation/regeneration/fallback usage and cost. Private per-call logs retain actual model/backend/pricing for mixed-model calls. Do not count billed reasoning tokens twice.
+
+File evaluation-report.schema.json, eval/reports/NAME/report.json:
+- metadata records run/config/task-set identity, hashes, Codex version, executor model/effort, control backend/model, seed, retry limit, pinned API-equivalent pricing, bootstrap configuration and optional hash-pinned parity comparator.
+- tasks records task identity/type, two-session flag, outcome, invalid reasons, executor segments and their --json logs/hashes, grader_access_audit, trusted grading, handoff evidence, done claims, calls, costs and artifact references.
+- grader_access_audit uses method=access_audit and status=clean, access_detected or inconclusive. Detected or incomplete audits require outcome=invalid, nonempty reasons and no grading result. Any invalid task makes aggregate validity=invalid; remaining quality metrics are diagnostic only.
+- metrics contains exactly pass_rate, false_done_rate, cost_per_pass, avg_attempts, handoff_success and parity. Every metric has value, sample_size, sample_unit, ci95 and undefined_reason. ci95 has level=0.95, lower, upper and method=task_cluster_percentile_bootstrap.
+- Use seeded task-cluster percentile bootstrap, default 10000 and minimum 1000 resamples; use paired tasks for parity. Zero original/bootstrap denominators or missing required accounting yield null value/bounds and a reason. Preserve local-minus-cheap_api parity; compare identical task sets/seeds/executor settings/Codex versions.
+- accounting records attempted/valid/invalid task counts and total_cost_usd. Invalid tasks are excluded from quality samples, but their costs remain in total cost and cost_per_pass. Audit-clean failures/timeouts/errors remain valid quality samples.
+- All costs are API-equivalent USD from a versioned per-model price snapshot, including CLI/local calls, failed calls, retries and fallbacks. Unknown usage/pricing stays null; a logged-in subscription is not free usage. Sum executor and all control calls once.
+
+The existing contract/verdict/handoff shapes are unchanged in version 1.
+Cross-artifact ID equality, counts, costs, CI ordering, observed model/effort,
+process/copy ordering and other arithmetic require runtime checks in addition
+to JSON Schema. Decision 0003 specifies metric units and runtime invariants.
 
 ### 3.2 Command line interfaces
 
-Each role provides these commands. Hooks and the evaluation runner call them.
-
-1. python -m controller contract --prompt FILE --handoff FILE_OR_none --cases DIR --backend cheap_api_OR_local --out contract.json
-2. python -m controller handoff --transcript PATH --contract contract.json --verdict verdict.json --backend cheap_api_OR_local --out handoff.json
-3. python -m controller judge --criterion JSON_FILE --artifact PATH --backend cheap_api_OR_local --out judgment.json (used only for llm_judge criteria)
+1. python -m controller contract --prompt FILE --handoff FILE_OR_none --cases DIR --backend codex_cli_OR_cheap_api_OR_local --out contract.json
+2. python -m controller handoff --transcript PATH --contract contract.json --verdict verdict.json --backend codex_cli_OR_cheap_api_OR_local --out handoff.json
+3. python -m controller judge --criterion JSON_FILE --artifact PATH --backend codex_cli_OR_cheap_api_OR_local --out judgment.json
 4. python -m verifier check --contract contract.json --workspace DIR --transcript PATH --attempt N --out verdict.json
 5. python -m verifier validate-handoff --handoff handoff.json
 6. python -m eval run --config YAML --out eval/reports/NAME/
 
+Backend is required and accepts exactly codex_cli, cheap_api or local. Primary
+workflow/config selects codex_cli using gpt-6-luna through the existing CLI
+login. cheap_api uses the same gpt-6-luna through HTTP Responses API with an
+environment API key. Local Gemma 4 12B remains stage two and is never a hidden
+cloud fallback. Names, endpoints, executables and deadlines are configurable.
+Do not copy auth.json or derive HTTP credentials from the CLI login.
+
+For codex_cli, transport unavailability/failure/deadline expiry may transition
+once to cheap_api if its key and the remaining budget exist. A fail/unverifiable
+judgment does not trigger fallback. There are at most three generation calls
+per command total, across initial call, retries, fallback and regeneration.
+Fallback consumes a slot and subsequent retries stay HTTP. No credential or
+remaining slot means explicit internal error. Local unavailability is explicit.
+
+Read CLI --json events as logs/accounting and final structured output from
+--output-last-message. Use --output-schema with the strict adapter supported
+by the installed CLI and validate locally before overwriting code-owned fields.
+Subprocesses are injectable, use shell=False, piped input and bounded deadlines.
+
 Conventions for every command:
-- Exit code 0 means success, 1 means input error, 2 means internal error.
-- stdout contains exactly one line: the path of the output file. All logs go to stderr.
-- Every output JSON must validate against its schema.
+- Exit 0 means successful computation, 1 input error, 2 internal error. Input validation occurs before model calls. A fail/unverifiable judgment or recorded invalid evaluation task is a successful computation, not a CLI error.
+- Successful stdout contains exactly one output path plus a newline. Logs go to stderr; no success path is printed on error.
+- controller/verifier outputs validate against their named schemas. eval prints its --out directory, containing report.json validated by evaluation-report.schema.json.
+- validate-handoff validates without rewriting input and prints the supplied handoff path; no --out flag is added.
 
-### 3.3 Hook input and output
+### 3.3 Hook input, output and nested environment guard
 
-Source of truth: the Codex hooks documentation at https://learn.chatgpt.com/docs/hooks until the file docs/hooks-contract.md exists. Once Role 2 writes docs/hooks-contract.md from the installed Codex version, that file is the source of truth.
+Source of truth: docs/hooks-contract.md, published from Role 2's measured draft.
+It records codex-cli 0.162.0-alpha.17.2 startup under interactive CLI and exec.
+Production behavior must be tested separately; startup evidence does not prove
+the new guard, handoff, persisted trust or production retry limits.
 
-- Input on stdin as JSON: session_id, transcript_path, cwd, hook_event_name, model, and for the UserPromptSubmit event also prompt.
-- UserPromptSubmit output: the contract text in the field hookSpecificOutput.additionalContext.
-- Stop output: if the verdict is fail, force continuation and pass the re-instruction message as the next prompt; if the verdict is pass, return empty output.
-- SessionStart output: the handoff text in the field hookSpecificOutput.additionalContext.
+- Common stdin fields: session_id, transcript_path (string or null), cwd, hook_event_name, model; UserPromptSubmit also has prompt. Additional event fields may be present, and transcript format is not stable.
+- UserPromptSubmit injects contract text through hookSpecificOutput.additionalContext with hookEventName=UserPromptSubmit.
+- Stop continues unmet work with {"decision":"block","reason":"REINSTRUCTION"}; pass/retry exhaustion permits completion. The measured continuation does not fire UserPromptSubmit again, so preserve contract state. Do not block with a null re-instruction.
+- SessionStart injects validated handoff text through hookSpecificOutput.additionalContext with hookEventName=SessionStart.
 - SessionEnd is observe-only. Do not use it.
+
+HARNESS_NESTED=1 makes every LocalHarnessMaker hook exit 0 immediately with zero
+bytes on stdout AND stderr. Compare the exact string "1" before reading stdin,
+loading state/config, importing controller/verifier, logging timing, creating
+files or calling any model/subprocess. Empty output is neither {} nor a newline.
+Unset, empty, "0", "true" and "01" take the normal path. This guard precedes
+normal handling and whole-script exception handling, including stub mode.
+
+Set the guard in a copied child environment for every controller-owned Codex
+subprocess/retry/resume and wrapper that can launch Codex. Role 5 sets it on
+runner-owned executor/resume processes because the runner owns the loop. Do not
+mutate the parent environment or persistent configuration. Normal direct-user
+sessions leave it unset. Other plugins' hooks need separate verification.
+
+### 3.4 Private grading and STOP-E4 access audit
+
+The user-approved access audit supersedes decision 0001's deny-read prerequisite.
+Private graders live outside the repository and all public executor workspaces.
+Only after codex exec and spawned work exit, copy the public artifact into a
+fresh trusted grading copy and copy in graders. Never run or resume Codex in a
+grading copy, expose it to later executor turns, or return private test contents
+to controller/executor context. Later attempts use only public workspaces and
+fresh post-exit grading copies.
+
+Retain and audit every --json execution/retry/resume stream and its SHA-256.
+Inspect tool arguments/results for private source/copy paths and canonical
+aliases, including children, traversal, listing/search/execution and denied
+access attempts. Log matches with file, line, tool, path, operation and evidence.
+Any observed private-grader access invalidates the task and aggregate report.
+Missing/malformed/truncated/unsupported streams or unresolved operands invalidate
+the audit as inconclusive. Assistant prose mentioning a path alone is not access.
+A clean audit states no access was observed; it does not prove read isolation.
 
 ## 4. Working rules
 

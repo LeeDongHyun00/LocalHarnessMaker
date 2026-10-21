@@ -1,0 +1,16 @@
+{
+  "criterion_id": "SC-4",
+  "status": "unverifiable",
+  "reason": "The before/after comparison is missing.",
+  "evidence": "SYNTHETIC llm_judge: review/diff.txt is absent.",
+  "model": "gpt-6-luna",
+  "usage": {
+    "input_tokens": 1200,
+    "cached_input_tokens": 200,
+    "output_tokens": 120,
+    "usd": 0.00134,
+    "latency_seconds": 0.8,
+    "cost_basis": "api_equivalent_usd",
+    "pricing_ref": "fixture-rates-v1"
+  }
+}

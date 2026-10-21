@@ -1,0 +1,217 @@
+{
+  "metadata": {
+    "run_id": "synthetic-proposal-example",
+    "created_at": "2026-10-21T16:00:00+09:00",
+    "config_name": "system-codex-cli",
+    "config_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "task_set_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "git_commit": "synthetic-fixture",
+    "codex_version": "codex-cli 0.162.0-alpha.17.2",
+    "executor_model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "control_backend": "codex_cli",
+    "control_model": "gpt-6-luna",
+    "seed": 42,
+    "reinstruction_limit": 3,
+    "cost_basis": "api_equivalent_usd",
+    "pricing": {
+      "snapshot_id": "fixture-rates-v1",
+      "source": "Synthetic fixture rates, not live pricing.",
+      "checked_on": "2026-10-21",
+      "rates": [
+        {
+          "model": "gpt-6.1-sol",
+          "input_per_million_usd": 1,
+          "cached_input_per_million_usd": 0.5,
+          "output_per_million_usd": 2
+        },
+        {
+          "model": "gpt-6-luna",
+          "input_per_million_usd": 1,
+          "cached_input_per_million_usd": 0.5,
+          "output_per_million_usd": 2
+        }
+      ]
+    },
+    "confidence": {
+      "level": 0.95,
+      "method": "task_cluster_percentile_bootstrap",
+      "resamples": 10000,
+      "seed": 42
+    },
+    "parity_comparator": null
+  },
+  "tasks": [
+    {
+      "task_id": "synthetic-feature-1",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "session_id": "synthetic-session-1",
+          "started_at": "2026-10-21T15:59:00+09:00",
+          "exited_at": "2026-10-21T15:59:10+09:00",
+          "exit_code": 0,
+          "events": {
+            "path": "events/synthetic-feature-1.jsonl",
+            "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "/private-eval-fixture/graders"
+        ],
+        "matches": [],
+        "reason": null
+      },
+      "grading": {
+        "copy_path": "/private-eval-fixture/grading/synthetic-feature-1",
+        "copied_at": "2026-10-21T15:59:11+09:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 3,
+        "failed_tests": 0,
+        "log": {
+          "path": "grading/synthetic-feature-1.log",
+          "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 1,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "synthetic-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 1000,
+            "cached_input_tokens": 120,
+            "output_tokens": 100,
+            "usd": 0.00114,
+            "latency_seconds": 10,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "fixture-rates-v1"
+          }
+        },
+        {
+          "call_id": "synthetic-contract-1",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 200,
+            "cached_input_tokens": 0,
+            "output_tokens": 40,
+            "usd": 0.00028,
+            "latency_seconds": 0.8,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "fixture-rates-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.00114,
+        "control_usd": 0.00028,
+        "total_usd": 0.00142
+      },
+      "artifacts": [],
+      "handoff": null
+    }
+  ],
+  "metrics": {
+    "pass_rate": {
+      "value": 1,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1,
+        "upper": 1,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "false_done_rate": {
+      "value": 0,
+      "sample_size": 1,
+      "sample_unit": "claimed_criterion",
+      "ci95": {
+        "level": 0.95,
+        "lower": 0,
+        "upper": 0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "cost_per_pass": {
+      "value": 0.00142,
+      "sample_size": 1,
+      "sample_unit": "attempted_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 0.00142,
+        "upper": 0.00142,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "avg_attempts": {
+      "value": 1,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1,
+        "upper": 1,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "handoff_success": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "eligible_two_session_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No eligible two-session tasks."
+    },
+    "parity": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "matched_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No paired local/cheap_api comparator report."
+    }
+  },
+  "accounting": {
+    "attempted_tasks": 1,
+    "valid_tasks": 1,
+    "invalid_tasks": 0,
+    "total_cost_usd": 0.00142
+  },
+  "validity": {
+    "status": "valid",
+    "reasons": []
+  }
+}

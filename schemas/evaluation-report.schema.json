@@ -1,0 +1,1217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed evaluation report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metadata",
+    "tasks",
+    "metrics",
+    "accounting",
+    "validity"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "created_at",
+        "config_name",
+        "config_sha256",
+        "task_set_sha256",
+        "git_commit",
+        "codex_version",
+        "executor_model",
+        "reasoning_effort",
+        "control_backend",
+        "control_model",
+        "seed",
+        "reinstruction_limit",
+        "cost_basis",
+        "pricing",
+        "confidence",
+        "parity_comparator"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "config_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "config_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "task_set_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "git_commit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "codex_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "executor_model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasoning_effort": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        },
+        "control_backend": {
+          "enum": [
+            "none",
+            "codex_cli",
+            "cheap_api",
+            "local"
+          ]
+        },
+        "control_model": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "reinstruction_limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost_basis": {
+          "const": "api_equivalent_usd"
+        },
+        "pricing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "snapshot_id",
+            "source",
+            "checked_on",
+            "rates"
+          ],
+          "properties": {
+            "snapshot_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "checked_on": {
+              "type": "string",
+              "format": "date"
+            },
+            "rates": {
+              "type": "array",
+              "minItems": 0,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "model",
+                  "input_per_million_usd",
+                  "cached_input_per_million_usd",
+                  "output_per_million_usd"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "input_per_million_usd": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "cached_input_per_million_usd": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "output_per_million_usd": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "confidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "level",
+            "method",
+            "resamples",
+            "seed"
+          ],
+          "properties": {
+            "level": {
+              "const": 0.95
+            },
+            "method": {
+              "const": "task_cluster_percentile_bootstrap"
+            },
+            "resamples": {
+              "type": "integer",
+              "minimum": 1000
+            },
+            "seed": {
+              "type": "integer"
+            }
+          }
+        },
+        "parity_comparator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/artifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pass_rate",
+        "false_done_rate",
+        "cost_per_pass",
+        "avg_attempts",
+        "handoff_success",
+        "parity"
+      ],
+      "properties": {
+        "pass_rate": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "properties": {
+                "sample_unit": {
+                  "const": "valid_task"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          ]
+        },
+        "false_done_rate": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "properties": {
+                "sample_unit": {
+                  "const": "claimed_criterion"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          ]
+        },
+        "cost_per_pass": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "properties": {
+                "sample_unit": {
+                  "const": "attempted_task"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0
+                }
+              }
+            }
+          ]
+        },
+        "avg_attempts": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "properties": {
+                "sample_unit": {
+                  "const": "valid_task"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 1
+                }
+              }
+            }
+          ]
+        },
+        "handoff_success": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "properties": {
+                "sample_unit": {
+                  "const": "eligible_two_session_task"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          ]
+        },
+        "parity": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "properties": {
+                "sample_unit": {
+                  "const": "matched_task"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": -1,
+                  "maximum": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempted_tasks",
+        "valid_tasks",
+        "invalid_tasks",
+        "total_cost_usd"
+      ],
+      "properties": {
+        "attempted_tasks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "valid_tasks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "invalid_tasks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_cost_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reasons"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_tokens",
+        "cached_input_tokens",
+        "output_tokens",
+        "usd",
+        "latency_seconds",
+        "cost_basis",
+        "pricing_ref"
+      ],
+      "properties": {
+        "input_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "cached_input_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "latency_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cost_basis": {
+          "const": "api_equivalent_usd"
+        },
+        "pricing_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt",
+        "session_id",
+        "started_at",
+        "exited_at",
+        "exit_code",
+        "events"
+      ],
+      "properties": {
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "exited_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "events": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "accessMatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_log",
+        "line",
+        "tool",
+        "path",
+        "operation",
+        "evidence"
+      ],
+      "properties": {
+        "event_log": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "enum": [
+            "read",
+            "list",
+            "search",
+            "execute",
+            "write",
+            "unknown"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "status",
+        "private_grader_roots",
+        "matches",
+        "reason"
+      ],
+      "properties": {
+        "method": {
+          "const": "access_audit"
+        },
+        "status": {
+          "enum": [
+            "clean",
+            "access_detected",
+            "inconclusive"
+          ]
+        },
+        "private_grader_roots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "matches": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/$defs/accessMatch"
+          }
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "clean"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "matches": {
+                "maxItems": 0
+              },
+              "reason": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "access_detected"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "matches": {
+                "minItems": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "inconclusive"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "sample_size",
+        "sample_unit",
+        "ci95",
+        "undefined_reason"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "sample_size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sample_unit": {
+          "enum": [
+            "valid_task",
+            "claimed_criterion",
+            "attempted_task",
+            "eligible_two_session_task",
+            "matched_task"
+          ]
+        },
+        "ci95": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "level",
+            "lower",
+            "upper",
+            "method"
+          ],
+          "properties": {
+            "level": {
+              "const": 0.95
+            },
+            "lower": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "upper": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "method": {
+              "const": "task_cluster_percentile_bootstrap"
+            }
+          }
+        },
+        "undefined_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ci95": {
+                "properties": {
+                  "lower": {
+                    "type": "null"
+                  },
+                  "upper": {
+                    "type": "null"
+                  }
+                }
+              },
+              "undefined_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "sample_size": {
+                "minimum": 1
+              },
+              "ci95": {
+                "properties": {
+                  "lower": {
+                    "type": "number"
+                  },
+                  "upper": {
+                    "type": "number"
+                  }
+                }
+              },
+              "undefined_reason": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "sample_size": {
+                "const": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "call": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "call_id",
+        "purpose",
+        "backend",
+        "model",
+        "status",
+        "usage"
+      ],
+      "properties": {
+        "call_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "enum": [
+            "executor",
+            "contract",
+            "handoff",
+            "judge"
+          ]
+        },
+        "backend": {
+          "enum": [
+            "codex_cli",
+            "cheap_api",
+            "local"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "failed",
+            "timeout"
+          ]
+        },
+        "usage": {
+          "$ref": "#/$defs/usage"
+        }
+      }
+    },
+    "grading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "copy_path",
+        "copied_at",
+        "grader_source_outside_repo",
+        "result",
+        "passed_tests",
+        "failed_tests",
+        "log"
+      ],
+      "properties": {
+        "copy_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "copied_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "grader_source_outside_repo": {
+          "const": true
+        },
+        "result": {
+          "enum": [
+            "pass",
+            "fail",
+            "error"
+          ]
+        },
+        "passed_tests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed_tests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "log": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "task_type",
+        "two_session",
+        "outcome",
+        "invalid_reasons",
+        "attempts",
+        "executor_segments",
+        "grader_access_audit",
+        "grading",
+        "done_claims",
+        "calls",
+        "costs",
+        "artifacts",
+        "handoff"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "two_session": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "enum": [
+            "pass",
+            "fail",
+            "timeout",
+            "error",
+            "invalid"
+          ]
+        },
+        "invalid_reasons": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executor_segments": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/$defs/segment"
+          }
+        },
+        "grader_access_audit": {
+          "$ref": "#/$defs/audit"
+        },
+        "grading": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/grading"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "done_claims": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "claimed_items",
+            "claimed_without_evidence"
+          ],
+          "properties": {
+            "claimed_items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "claimed_without_evidence": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "calls": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/$defs/call"
+          }
+        },
+        "costs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executor_usd",
+            "control_usd",
+            "total_usd"
+          ],
+          "properties": {
+            "executor_usd": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "control_usd": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "total_usd": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "handoff": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/handoff"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "grader_access_audit": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "access_detected",
+                      "inconclusive"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "const": "invalid"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "invalid"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "invalid_reasons": {
+                "minItems": 1
+              },
+              "grading": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "invalid_reasons": {
+                "maxItems": 0
+              },
+              "executor_segments": {
+                "minItems": 1
+              },
+              "grader_access_audit": {
+                "properties": {
+                  "status": {
+                    "const": "clean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "pass",
+                  "fail"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "grading": {
+                "$ref": "#/$defs/grading"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "two_session": {
+                "const": true
+              },
+              "outcome": {
+                "not": {
+                  "const": "invalid"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "handoff": {
+                "$ref": "#/$defs/handoff"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "two_session": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "handoff": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "day2_pass",
+        "user_restated_day1_context",
+        "evidence"
+      ],
+      "properties": {
+        "day2_pass": {
+          "type": "boolean"
+        },
+        "user_restated_day1_context": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "tasks": {
+            "contains": {
+              "properties": {
+                "outcome": {
+                  "const": "invalid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "validity": {
+            "properties": {
+              "status": {
+                "const": "invalid"
+              },
+              "reasons": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "validity": {
+            "properties": {
+              "status": {
+                "const": "valid"
+              },
+              "reasons": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
