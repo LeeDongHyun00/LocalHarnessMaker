@@ -15,45 +15,48 @@ from typing import Any
 from jsonschema import Draft202012Validator
 
 from controller.analyze import Prices, calculate_cost
-from controller.backends.base import Message, Usage
+from controller.backends.base import Message, Usage, configured_prices
 from controller.backends.cheap_api import structured_schema
-from controller.errors import BackendError, InputError, InvalidGeneration
+from controller.errors import BackendError, InputError, InvalidGeneration, TransportError
 from controller.settings import PACKAGE_DIR, load_object
 
 logger = logging.getLogger(__name__)
 Runner = Callable[..., subprocess.CompletedProcess[str]]
 
 
-def _read_usage(events: str, prices: Prices) -> Usage:
+def _read_usage(events: str, prices: Prices | None) -> Usage:
     """Sum completed-turn JSONL usage and price it at configured API rates."""
-    input_tokens = output_tokens = cached_tokens = 0
+    totals: list[int | None] = [0, 0, 0]
     found = False
     for line in events.splitlines():
+        if not line.strip():
+            continue
         try:
             event = json.loads(line)
         except (ValueError, TypeError):
-            continue
-        if not isinstance(event, dict) or event.get("type") != "turn.completed":
+            return Usage(None, None, None, 0.0)
+        if not isinstance(event, dict):
+            return Usage(None, None, None, 0.0)
+        if event.get("type") != "turn.completed":
             continue
         usage = event.get("usage")
         if not isinstance(usage, dict):
-            continue
-        inputs = usage.get("input_tokens")
-        outputs = usage.get("output_tokens")
-        cached = usage.get("cached_input_tokens", usage.get("cached_tokens", 0))
-        if any(type(value) is not int or value < 0 for value in (inputs, outputs, cached)):
-            continue
-        input_tokens += inputs
-        output_tokens += outputs
-        cached_tokens += cached
+            return Usage(None, None, None, 0.0)
+        counts = [usage.get("input_tokens"), usage.get("output_tokens"),
+                  usage.get("cached_input_tokens", usage.get("cached_tokens"))]
+        if any(value is not None and (type(value) is not int or value < 0) for value in counts):
+            return Usage(None, None, None, 0.0)
+        if counts[0] is not None and counts[2] is not None and counts[2] > counts[0]:
+            return Usage(None, None, None, 0.0)
+        totals = [None if old is None or new is None else old + new
+                  for old, new in zip(totals, counts)]
         found = True
     if not found:
         return Usage(None, None, None, 0.0)
-    if cached_tokens > input_tokens:
-        return Usage(None, None, None, 0.0)
-    return Usage(input_tokens, output_tokens,
-                 calculate_cost(input_tokens, output_tokens, prices, cached_tokens), 0.0,
-                 cached_tokens)
+    inputs, outputs, cached = totals
+    cost = (calculate_cost(inputs, outputs, prices, cached)
+            if None not in (inputs, outputs, cached, prices) else None)
+    return Usage(inputs, outputs, cost, 0.0, cached)
 
 
 def _render_prompt(messages: list[Message]) -> str:
@@ -82,10 +85,7 @@ class CodexCLIBackend:
         root = load_object(PACKAGE_DIR / "config.yaml")
         self.config = config if config is not None else root["codex_cli"]
         try:
-            price_book = load_object(PACKAGE_DIR / "prices.yaml")
-            self.prices = prices if prices is not None else Prices.from_dict(
-                price_book["models"][self.config["price_key"]]
-            )
+            self.prices, self.pricing_ref = configured_prices(self.config, prices)
             self.model = str(self.config["model"])
             self.reasoning_effort = str(self.config["reasoning_effort"])
             self.sandbox = str(self.config["sandbox"])
@@ -99,7 +99,7 @@ class CodexCLIBackend:
             raise InputError("Invalid Codex CLI configuration or prices") from exc
         self.executable = shutil.which(cli) if os.path.sep not in cli else cli
         if not self.executable:
-            raise InputError("Codex CLI executable was not found on PATH")
+            raise TransportError("Codex CLI executable was not found on PATH")
         self.runner = runner
         self.clock = clock
         self._usage = Usage(None, None, None, 0.0)
@@ -113,6 +113,7 @@ class CodexCLIBackend:
         self._usage = Usage(None, None, None, 0.0)
         started = self.clock()
         status = "error"
+        events = ""
         with tempfile.TemporaryDirectory(prefix="localharness-codex-") as temporary:
             workdir = Path(temporary)
             if any(workdir.iterdir()):
@@ -139,25 +140,31 @@ class CodexCLIBackend:
                     raw = exc.stdout or ""
                     events = raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else raw
                     self._usage = _read_usage(events, self.prices)
-                    raise BackendError("Codex CLI timed out; consult its JSONL usage log") from exc
+                    raise TransportError("Codex CLI timed out; consult its JSONL usage log") from exc
                 self._usage = _read_usage(events, self.prices)
+                for line in events.splitlines():
+                    try:
+                        event = json.loads(line)
+                    except ValueError:
+                        continue
+                    if isinstance(event, dict) and event.get("model") not in (None, self.model):
+                        raise BackendError("Codex CLI reported a conflicting model identity")
                 if result.returncode != 0:
-                    raise BackendError(f"Codex CLI exited with status {result.returncode}")
+                    raise TransportError(f"Codex CLI exited with status {result.returncode}")
                 if not output_path.is_file():
-                    raise BackendError("Codex CLI did not write its final-message file")
+                    raise TransportError("Codex CLI did not write its final-message file")
                 try:
                     value = json.loads(output_path.read_text(encoding="utf-8"))
                 except (OSError, ValueError) as exc:
                     raise InvalidGeneration("Codex CLI final message was not valid JSON") from exc
                 if not isinstance(value, dict) or not Draft202012Validator(schema).is_valid(value):
                     raise InvalidGeneration("Codex CLI output failed contract schema validation")
-                if self._usage.usd is None:
-                    raise BackendError("Codex CLI events contained no completed-turn token usage")
                 status = "success"
                 return value
-            except FileNotFoundError as exc:
-                raise InputError("Codex CLI executable could not be started") from exc
+            except OSError as exc:
+                raise TransportError("Codex CLI executable could not be started") from exc
             finally:
+                logger.info("control_cli_events %s", json.dumps({"model": self.model, "events": events}))
                 self._usage = Usage(
                     self._usage.input_tokens, self._usage.output_tokens, self._usage.usd,
                     max(0.0, self.clock() - started), self._usage.cached_input_tokens,
@@ -165,5 +172,6 @@ class CodexCLIBackend:
                 logger.info("control_call %s", json.dumps({
                     "backend": "codex_cli", "model": self.model,
                     "reasoning_effort": self.reasoning_effort, "status": status,
+                    "pricing_ref": self.pricing_ref,
                     **asdict(self._usage),
                 }, sort_keys=True))

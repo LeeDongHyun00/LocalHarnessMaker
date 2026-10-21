@@ -1,61 +1,63 @@
 ## Done
 
-- Implemented the backend protocol, injectable Responses API HTTP transport, strict-schema adapter, local validation, and per-call usage/cost/latency logging without new root dependencies (.venv/bin/python -m pytest tests/controller -q -s: 61 passed).
-- Implemented the initial contract CLI and bounded regeneration; code overwrites model metadata and sums usage across all attempts; input/internal errors use exit codes 1/2 and success prints one output path (.venv/bin/python -m pytest tests/controller -q -s: 61 passed, including CLI and metadata-override regressions).
-- Added contract prompt v0 with escaped request/handoff/example data blocks, a shared-example excerpt, and documented effort rules v0 plus conservative preflight token bounds (.venv/bin/python -m pytest tests/controller -q -s: 61 passed, including delimiter injection and all five effort levels).
-- Added ten hand-written mocked cases, including four ambiguous requests; recorded fixture-only schema and assumptions ratios (.venv/bin/python -m pytest tests/controller -q -s: Mocked schema pass rate: 10/10; ambiguous assumptions: 4/4).
-- Exercised the real contract CLI with mocked HTTP and independently validated the generated artifact (.venv/bin/python -m tests.controller.mock_contract_cli contract --prompt schemas/examples/prompt.json --handoff none --cases controller/case_library/seed --backend cheap_api --out /tmp/localharness-controller-first-task.json: exit 0 and stdout /tmp/localharness-controller-first-task.json; independent Draft202012Validator check: VALID: offline mocked contract matches schemas/contract.schema.json).
-- Wrote the controller-owned change summary with verification limits, assumptions, and official API references (controller/CHANGES.md reviewed; git diff --check: exit 0).
-- Added a directly callable Codex CLI backend using a clean temporary working directory, strict wire schema, stdin prompt, read-only sandbox, ephemeral execution, `HARNESS_NESTED=1`, and configured low reasoning effort; retained unchanged CLI backend choices pending Role 1 approval (.venv/bin/python -m pytest tests/controller -q -s: 73 passed).
-- Updated the HTTP API fallback to gpt-6-luna and configured API-equivalent user-specified token rates for both paths (test_codex_cli.py::test_api_fallback_model_and_rates_match_cli_estimate: passed).
-- Completed one live gpt-6-luna Codex CLI smoke call on schemas/examples/prompt.json; output validated against schemas/contract.schema.json (direct `CodexCLIBackend.generate`: valid; latency 12.117 s; input 16060; cached input 0; output 516; API-equivalent cost $0.001864).
-- Confirmed the installed CLI reasoning override key, `model_reasoning_effort`, via `codex exec --help`, an offline `--strict-config` parse, and the successful live invocation (codex-cli 0.162.0-alpha.17.2; the offline parse exited at `No prompt provided via stdin`, confirming config parsing completed).
+- Added approved codex_cli routing to all three required --backend selectors and selected codex_cli in controller/config.yaml; mocked CLI tests cover exact one-path stdout and error preservation (.venv/bin/python -m pytest tests/controller -q -s: 131 passed).
+- Implemented a shared three-generation budget, one same-model CLI-to-HTTP transport fallback, environment-key/remaining-slot checks, guarded copied child environments on regeneration, configurable policy, and explicit errors without hidden local fallback (.venv/bin/python -m pytest tests/controller -q -s: 131 passed, including timeout/nonzero/unavailable CLI and exhausted-budget regressions).
+- Implemented controller judge against the published input/output schemas with local reference resolution, pre-call input checks, code-owned criterion/model/usage, all three statuses, llm_judge evidence marker, model-conflict rejection, cache subset checks and summed/null retry/fallback accounting (.venv/bin/python -m pytest tests/controller -q -s: 131 passed).
+- Implemented bounded text artifact snapshots with explicit omitted-evidence manifests; symlinks and unreadable/missing inputs fail before calls, and prompts require unverifiable when required evidence is unavailable (.venv/bin/python -m pytest tests/controller -q -s: 131 passed, including workspace exclusions/binary/size-limit and symlink tests).
+- Implemented controller handoff with schema-valid input/output, unique matching criterion IDs, consistent verdict status, complete criterion coverage, and regeneration for contradicted or dropped completion state (.venv/bin/python -m pytest tests/controller -q -s: 131 passed, including trusted-verdict contradiction tests).
+- Added effort rules v1, deduplicated normalized requirement segments and documented thresholds; effort/cost remain code-owned and preflight byte counts remain explicitly approximate (.venv/bin/python -m pytest tests/controller -q -s: 131 passed, including five effort levels, boundaries and requirement deduplication).
+- Added deterministic BM25 top-three retrieval over curated contract JSONL, nested-library reading, duplicate suppression, stable ties and contract prompt v1; malformed cases fail before calls (.venv/bin/python -m pytest tests/controller -q -s: 131 passed, including codex_cli contract CLI with a retrieved case).
+- Added a disabled-by-default local JSON-schema chat adapter, injectable transport, bounded requests, explicit identity/availability errors, null unknown pricing and LOCAL.md serving/memory verification limits (.venv/bin/python -m pytest tests/controller -q -s: 131 passed; local adapter exercised only through mocks).
+- Expanded hand-authored samples to 30 and ran them through all three mocked adapters; fixtures are implementation evidence rather than model quality measurements (.venv/bin/python -m pytest tests/controller -q -s: Mocked codex_cli/cheap_api/local each schema=30/30 and ambiguous assumptions=8/8; original fixture report 10/10 and 4/4).
+- Updated controller/CHANGES.md with the current behavior, verification limits and Assumptions (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
 
 ## Remaining
 
-- D-1, by 2026-10-27: calibrate and document effort rules v1, decide whether an exact preflight tokenizer dependency is needed with Role 1, and measure API cost against an executor baseline. Current preflight count is a UTF-8 byte bound; actual output metadata uses provider token counts.
-- D-2, by 2026-11-03: implement BM25 top-three retrieval from verified JSONL cases, prompt v1, and complete contract generation quality checks. v0 rejects JSONL retrieval instead of silently ignoring it; no training data was collected.
-- D-3, by 2026-11-06: implement the local Gemma 4 12B constrained-decoding backend, serving/memory documentation, and shared golden tests. The local CLI selection currently returns an explicit input error without an API fallback.
-- Before D-4 judge implementation: obtain Role 1's approved criterion/output schema; the missing shared judge interface is already identified in state/STATUS-lead.md. Do not invent or edit that interface.
-- D-4, by 2026-11-10: implement handoff and judge generation/CLI after interface resolution, expand to 30 own samples, and compare both backends. SC-1/SC-2 live quality, SC-4 cost/latency targets, and SC-5 semantic injection resistance remain unmeasured.
-- Add `codex_cli` routing only after Role 1 approves the interface proposal in docs/decisions/0004-codex-cli-backend-and-nested-guard-proposal.md; this change tests the backend directly and leaves CLI enums unchanged.
-- Before merge: run the full relevant suite once. Controller-owned tests passed; no merge was performed. The user subsequently requested staging all changes and creating a Conventional Commit.
+- Pending host verification: exercise the actual contract, judge and handoff CLIs with explicitly selected codex_cli and validate outputs; separately check configured HTTP fallback and production hook guard integration. Nested Codex, network, live model calls and macOS sandbox-exec were forbidden and were not attempted this session.
+- Pending host verification, D-1: measure API-equivalent control cost against an executor baseline and empirically calibrate effort v1 from task outcomes. Existing thresholds have only synthetic/fixture calibration; no exact tokenizer dependency is presently needed.
+- Pending host verification, D-3: select and verify the local llama.cpp/vLLM build, exact Gemma 4 12B artifact/alias, schema-constrained endpoint behavior, peak memory and latency; establish an approved API-equivalent local price snapshot before contract generation. Keep local.enabled=false until verified. STOP-C2/STOP-C4 apply if measured schema quality or GPU capacity fails.
+- Pending host verification, D-4: compare real schema pass rate, assumptions, latency and API-equivalent cost across the 30 authored samples. Estimate/report cost before any paid batch of ten or more. SC-1/SC-2 live quality, SC-4 targets and SC-5 semantic injection resistance remain unmeasured.
+- D-2 library population requires verified, permitted provenance; do not gather executor/paid-model output for training without the STOP-C3 terms review. The curated seed library is intentionally empty.
+- Before merge: run the full repository suite once in a coordinated host session and verify packaging resources if wheel installation is required. No merge, staging or commit was performed; .git was read-only.
+- D-5 remains optional and unstarted: no QLoRA work or model-output training data collection was authorized by this implementation.
 
 ## Decisions
 
-- Begin with the First task: the controller STATUS file had no items under Remaining.
-- Use the standard-library HTTP transport and JSON-compatible YAML: root dependency/configuration edits are owned by Role 1 and are unnecessary for this initial implementation.
-- Keep a separate API wire-schema adapter: strict structured output requires complete required-key lists and supported unions while repository artifacts must retain the original schema semantics.
-- Keep computed metadata outside the model's requested schema and overwrite it in code: effort and billing facts must never originate from generated content.
-- Sum provider usage and code-calculated cost across regenerations: the artifact should account for every paid validation attempt, not just the successful call.
-- Log null costs when provider usage is unknown: transport failure does not prove a zero charge.
-- The original First task implementation was offline. The user later selected a logged-in Codex CLI smoke check, which ran once; user-provided API-equivalent rates do not claim actual billed pricing.
-- Codex CLI model selection is implemented as a directly callable backend pending Role 1 approval before adding it to the shared CLI interface.
-- Keep source-checkout execution as the verified packaging scope: wheel resource inclusion has not been tested or changed.
+- Execute the user's priority order: approved backend routing, judge and handoff precede effort v1, retrieval and the mock-only local adapter.
+- Keep one budget in RoutedBackend: fallback consumes a generation slot and cannot reset regeneration limits; fail/unverifiable are content results, not fallback triggers.
+- Resolve published JSON Schema references from a local registry: validation must work offline without fetching schemas.
+- Preserve unknown accounting as null in judgments and logs: incomplete usage does not imply free inference; contract's non-null schema requires an explicit internal error instead of fabricated numbers.
+- Pin price references to date/model/SHA-256 and retain per-call route/event logs: retry/fallback evidence must identify actual backend and pricing, including failed calls.
+- Bound artifact text and expose omissions: normal workspace metadata and binaries must not prevent judging available text or masquerade as inspected evidence.
+- Keep local disabled pending host verification: mocked protocol tests do not establish server compatibility, hardware capacity or constrained-decoding quality.
+- Retain byte-bound preflight features without a tokenizer dependency: provider token counts remain authoritative and no root dependency/interface change is needed.
+- Treat JSONL library provenance as an owner-curated precondition: schema validation proves structure, not prior verifier success, and the controller never auto-collects cases.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/controller -q -s
-- .venv/bin/python -m tests.controller.mock_contract_cli contract --prompt schemas/examples/prompt.json --handoff none --cases controller/case_library/seed --backend cheap_api --out /tmp/localharness-controller-first-task.json
-- .venv/bin/python -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; artifact = Path("/tmp/localharness-controller-first-task.json"); Draft202012Validator(json.loads(Path("schemas/contract.schema.json").read_text())).validate(json.loads(artifact.read_text())); print("VALID: offline mocked contract matches schemas/contract.schema.json")'
-- git diff --check
-- Live smoke evidence: `CodexCLIBackend.generate` on schemas/examples/prompt.json; validated against schemas/contract.schema.json, 12.117 seconds, 16,060 input tokens, 0 cached input tokens, 516 output tokens, $0.001864 API-equivalent estimate.
-- Installed CLI checks: `codex --version` (codex-cli 0.162.0-alpha.17.2), `codex exec --help`, and offline `codex exec --strict-config --config 'model_reasoning_effort="low"' --output-schema /dev/null - </dev/null` (exit 1: `No prompt provided via stdin`, after successful config parsing).
+- git diff --check -- controller tests/controller state/STATUS-controller.md
+- Pending host: python -m controller contract --prompt schemas/examples/prompt.json --handoff none --cases controller/case_library/seed --backend codex_cli --out /tmp/controller-contract.json
+- Pending host: python -m controller judge --criterion schemas/examples/criterion.json --artifact PUBLIC_EVIDENCE_DIR --backend codex_cli --out /tmp/controller-judgment.json
+- Pending host: python -m controller handoff --transcript TRANSCRIPT_PATH --contract CONTRACT_PATH --verdict VERDICT_PATH --backend codex_cli --out /tmp/controller-handoff.json
+- Pending before merge: full repository test suite, coordinated with the owning roles.
 
 ## Do not touch
 
-- Shared schemas/, root configuration, and other roles' implementation/tests/status files; controller ownership is controller/, tests/controller/, and this STATUS file.
-- eval/tasks/ is forbidden reading for Role 3; do not tune prompts against the evaluation set.
-- Existing harness/, experiments/, scripts/, and concurrent role/user edits.
-- No verifier imports, invented judge schema, interface changes, secrets in files, model-output training data, paid batches of ten or more, deletion, history rewriting, or external service configuration changes.
-- Do not expose `codex_cli` in any `--backend` choices until the Role 1 interface decision is approved; preserve existing user edits in non-controller paths.
+- Shared schemas/, root configuration, prompts/, verifier/, eval/, plugin/, other roles' tests/status and concurrent user/role changes; ownership is controller/, tests/controller/ and this STATUS file.
+- eval/tasks/ is forbidden reading; do not tune against the evaluation set.
+- .git is read-only in this session; do not stage, commit, rewrite history or delete files.
+- Do not run network/live models, nested Codex or macOS sandbox-exec in this environment; all such checks are pending host verification.
+- No verifier imports, new shared fields/interfaces, secrets in files, paid batches of ten or more without an estimate, or model-output training data without terms review.
+- Keep local.enabled=false until host serving verification and never make local a hidden fallback.
 
 ## Assumptions
 
-- The empty initial Remaining section authorizes the First task for this session, not automatic implementation of every later dated deliverable.
-- The user selected gpt-6-luna through logged-in Codex CLI as primary and HTTP fallback, with CLI invocation available only by direct backend construction until Role 1's interface approval.
-- gpt-6-luna's API-equivalent USD report uses the user-specified input/cached/output rates; it is not actual billed usage.
-- Config YAML uses the JSON subset so no YAML/SDK/tokenizer dependency needs to be added to root configuration.
-- Provider usage is the authority for actual token counts; preflight byte bounds are explicitly not exact tokenizer counts or complete API framing estimates.
-- Hand-written fixtures and synthetic usage verify implementation behavior only. One live sample passed schema validation but does not prove broader model quality, assumption quality, injection immunity, relative cost, or latency targets.
-- No PR was created; controller/CHANGES.md records the change summary and Assumptions within the owned path.
+- User approval of decisions 0002/0004 and the published schemas supersedes the old interface-blocked Remaining items; required CLI backend flags remain required despite the primary configuration selection.
+- The existing gpt-6-luna rates are user-specified API-equivalent planning rates, not verified billed pricing; missing local prices stay unknown.
+- Artifact evidence is bounded UTF-8 text with explicit omissions for .git/.venv/__pycache__/node_modules, binaries and byte limits; omitted material cannot support a pass that requires inspecting it.
+- Exact preflight tokenization is not needed for these effort heuristics; provider accounting owns actual usage, and byte counts exclude protocol framing.
+- A curated case library contains only previously verified, permitted contracts; this reader validates structure but cannot prove historical provenance.
+- The local serving protocol and 12B weight-storage arithmetic are implementation targets/lower bounds, not measured compatibility, memory requirements or performance.
+- Authored responses, runner events and local fixture prices verify plumbing only. No model calls or live benchmark comparisons ran this session.
+- No PR exists; controller/CHANGES.md contains the reviewable summary and Assumptions. Only owned directories and this STATUS file belong in the eventual commit.

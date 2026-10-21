@@ -14,7 +14,7 @@ from urllib.request import Request, urlopen
 from jsonschema import Draft202012Validator
 
 from controller.analyze import Prices, calculate_cost
-from controller.backends.base import Message, Usage
+from controller.backends.base import Message, Usage, configured_prices
 from controller.errors import BackendError, InputError, InvalidGeneration
 from controller.settings import PACKAGE_DIR, load_object
 
@@ -85,9 +85,7 @@ class CheapAPIBackend:
     ) -> None:
         self.config = config if config is not None else load_object(PACKAGE_DIR / "config.yaml")["cheap_api"]
         try:
-            self.prices = prices if prices is not None else Prices.from_dict(
-                load_object(PACKAGE_DIR / "prices.yaml")["models"][self.config["price_key"]]
-            )
+            self.prices, self.pricing_ref = configured_prices(self.config, prices)
             self.model = str(self.config["model"])
             self.endpoint = str(self.config["endpoint"])
             self.timeout = float(self.config["timeout_seconds"])
@@ -122,15 +120,26 @@ class CheapAPIBackend:
                 "Authorization": f"Bearer {key}", "Content-Type": "application/json"
             }, payload, self.timeout)
             usage = response.get("usage")
+            if usage is None:
+                usage = {}
             if not isinstance(usage, dict):
-                raise BackendError("Control API response is missing usage accounting")
+                raise BackendError("Control API returned invalid usage accounting")
             try:
-                inputs, outputs = usage["input_tokens"], usage["output_tokens"]
-                cached = (usage.get("input_tokens_details") or {}).get("cached_tokens", 0)
-                cost = calculate_cost(inputs, outputs, self.prices, cached)
+                inputs, outputs = usage.get("input_tokens"), usage.get("output_tokens")
+                cached = (usage.get("input_tokens_details") or {}).get("cached_tokens")
+                cost = (calculate_cost(inputs, outputs, self.prices, cached)
+                        if inputs is not None and outputs is not None and cached is not None
+                        and self.prices is not None else None)
             except (KeyError, TypeError, ValueError, AttributeError) as exc:
                 raise BackendError("Control API returned invalid usage accounting") from exc
+            for count in (inputs, outputs, cached):
+                if count is not None and (type(count) is not int or count < 0):
+                    raise BackendError("Control API returned invalid usage accounting")
+            if cached is not None and inputs is not None and cached > inputs:
+                raise BackendError("Control API cache exceeds total input")
             self._usage = Usage(inputs, outputs, cost, 0.0, cached)
+            if response.get("model") not in (None, self.model):
+                raise BackendError("Control API reported a conflicting model identity")
             if response.get("status") != "completed":
                 raise BackendError("Control API generation did not complete")
             text_parts: list[str] = []
@@ -157,5 +166,6 @@ class CheapAPIBackend:
             )
             logger.info("control_call %s", json.dumps({
                 "backend": "cheap_api", "model": self.model, "status": status,
+                "pricing_ref": self.pricing_ref,
                 **asdict(self._usage),
             }, sort_keys=True))

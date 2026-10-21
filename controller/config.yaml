@@ -1,4 +1,9 @@
 {
+  "default_backend": "codex_cli",
+  "fallback": {
+    "enabled": true,
+    "target": "cheap_api"
+  },
   "cheap_api": {
     "model": "gpt-6-luna",
     "endpoint": "https://api.openai.com/v1/responses",
@@ -14,5 +19,20 @@
     "sandbox": "read-only",
     "timeout_seconds": 180,
     "price_key": "gpt-6-luna"
-  }
+  },
+  "artifact_max_bytes": 1000000,
+  "local": {
+    "enabled": false,
+    "model": "gemma-4-12b",
+    "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+    "timeout_seconds": 30,
+    "max_output_tokens": 4096,
+    "price_key": null
+  },
+  "artifact_exclude_dirs": [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "node_modules"
+  ]
 }

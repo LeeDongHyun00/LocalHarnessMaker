@@ -11,3 +11,7 @@ class BackendError(RuntimeError):
 
 class InvalidGeneration(BackendError):
     """A completed generation was not valid JSON matching the schema."""
+
+
+class TransportError(BackendError):
+    """CLI transport unavailable; the approved HTTP fallback may be used."""

@@ -107,7 +107,7 @@ def test_token_events_sum_completed_turns_and_price_cache() -> None:
     prices = Prices.from_dict(price_dict)
     usage = _read_usage("\n".join([
         json.dumps({"type": "turn.started"}), events(1000, 200, 100).strip(),
-        events(200, 0, 50).strip(), "not json",
+        events(200, 0, 50).strip(),
     ]), prices)
     assert (usage.input_tokens, usage.cached_input_tokens, usage.output_tokens) == (1200, 200, 150)
     assert usage.usd == pytest.approx((1000 * .10 + 200 * .01 + 150 * .50) / 1_000_000)
@@ -151,10 +151,9 @@ def test_timeout_preserves_partial_event_usage() -> None:
     assert backend.usage().usd is not None
 
 
-def test_unknown_usage_after_success_is_an_error() -> None:
+def test_unknown_usage_after_success_stays_null() -> None:
     backend = CodexCLIBackend(runner=MockRunner(stdout="not JSONL\n"), executable="/usr/bin/codex")
-    with pytest.raises(BackendError, match="no completed-turn token usage"):
-        backend.generate(contract_schema(), build_messages("test"))
+    backend.generate(contract_schema(), build_messages("test"))
     assert backend.usage().usd is None
 
 

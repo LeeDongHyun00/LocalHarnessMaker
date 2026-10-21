@@ -40,7 +40,7 @@ def test_invalid_prices_rejected(rate: str) -> None:
 def test_effort_all_levels(prompt: str, level: str) -> None:
     effort = reasoning_effort(prompt)
     assert effort["value"] == level
-    assert effort["rationale"].startswith("effort-v0:")
+    assert effort["rationale"].startswith("effort-v1:")
 
 
 @pytest.mark.parametrize("size,points", [(499, 0), (500, 1), (1999, 1), (2000, 2),
@@ -53,3 +53,8 @@ def test_files_are_distinct_and_test_feature_is_explicit() -> None:
     rationale = reasoning_effort("Edit app/a.py and app/a.py; add 테스트.")["rationale"]
     assert "distinct_files=1" in rationale
     assert "tests_requested=true" in rationale
+
+
+def test_effort_v1_deduplicates_requirement_segments() -> None:
+    effort = reasoning_effort("1. Update title.\n2. update title!\n- Update   title; update title")
+    assert "requirement_segments=1" in effort["rationale"]

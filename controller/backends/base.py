@@ -1,7 +1,11 @@
 """The shared backend interface; no verifier dependency."""
 
+import hashlib
 from dataclasses import dataclass
 from typing import Any, Protocol
+
+from controller.analyze import Prices
+from controller.settings import PACKAGE_DIR, load_object
 
 Message = dict[str, str]
 
@@ -27,3 +31,18 @@ class Backend(Protocol):
     def usage(self) -> Usage:
         """Return accounting for the most recent call."""
         ...
+
+
+def configured_prices(config: dict[str, Any], override: Prices | None = None) -> tuple[Prices | None, str | None]:
+    """Pin a price snapshot; custom or unavailable prices have no false reference."""
+    if override is not None:
+        return override, None
+    snapshot = PACKAGE_DIR / "prices.yaml"
+    book = load_object(snapshot)
+    key = config.get("price_key")
+    if key not in book["models"]:
+        return None, None
+    digest = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+    return Prices.from_dict(book["models"][key]), (
+        f"controller/prices.yaml@{book['checked_on']}#{key}:sha256:{digest}"
+    )

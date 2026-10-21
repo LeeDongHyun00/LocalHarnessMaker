@@ -80,7 +80,7 @@ def test_invalid_generation_is_distinct_and_accounted(text: str) -> None:
     assert backend.usage().usd == 0.000191
 
 
-@pytest.mark.parametrize("kind", ["refusal", "incomplete", "missing-usage", "invalid-usage"])
+@pytest.mark.parametrize("kind", ["refusal", "incomplete", "invalid-usage"])
 def test_failures_do_not_claim_success(kind: str, caplog: pytest.LogCaptureFixture) -> None:
     envelope = response()
     if kind == "refusal":
@@ -136,3 +136,12 @@ def test_transport_sanitizes_errors(error: Exception, monkeypatch: pytest.Monkey
     with pytest.raises(BackendError) as caught:
         post_json("https://example.invalid", {}, {}, 3)
     assert "secret" not in str(caught.value)
+
+
+def test_missing_usage_remains_unknown() -> None:
+    envelope = response()
+    envelope.pop("usage")
+    backend = CheapAPIBackend(transport=RecordingTransport([envelope]))
+    backend.generate({}, [])
+    assert backend.usage().input_tokens is None
+    assert backend.usage().usd is None

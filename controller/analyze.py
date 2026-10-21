@@ -1,4 +1,4 @@
-"""Deterministic token bounds, pricing, and executor effort rules (v0)."""
+"""Deterministic token bounds, pricing, and executor effort rules (v1)."""
 
 import re
 from dataclasses import dataclass
@@ -60,8 +60,13 @@ def reasoning_effort(request: str) -> dict[str, str]:
         r"(?<![\w/])(?:[\w.-]+/)*[\w-]+\.[A-Za-z][A-Za-z0-9]*(?![\w/])", request
     ))
     tests = bool(re.search(r"\b(?:tests?|pytest|unittest|testing)\b|테스트", request, re.I))
-    requirements = len([part for part in re.split(r"[\n;]+|(?<=[.!?])\s+", request)
-                        if part.strip()])
+    unlisted = re.sub(r"(?m)^\s*(?:[-*]|\d+[.)])\s+", "", request)
+    segments = re.split(r"[\n;]+|(?<=[.!?])\s+", unlisted)
+    requirements = len({
+        re.sub(r"\s+", " ", re.sub(r"^\s*(?:[-*]|\d+[.)])\s+", "", part))
+        .strip(" .!?\t\r").casefold()
+        for part in segments if part.strip(" .!?\t\r")
+    })
     score = (
         (0 if size < 500 else 1 if size < 2000 else 2 if size < 6000 else 3)
         + min(len(files), 3)
@@ -71,6 +76,6 @@ def reasoning_effort(request: str) -> dict[str, str]:
     value = ("low" if score <= 1 else "medium" if score <= 3 else "high"
              if score <= 5 else "xhigh" if score <= 7 else "max")
     return {"value": value, "rationale": (
-        f"effort-v0: utf8_byte_bound={size}; distinct_files={len(files)}; "
+        f"effort-v1: utf8_byte_bound={size}; distinct_files={len(files)}; "
         f"tests_requested={str(tests).lower()}; requirement_segments={requirements}; score={score}"
     )}

@@ -1,4 +1,4 @@
-# Executor reasoning effort rules v0
+# Executor reasoning effort rules v1
 
 These deterministic heuristics describe the executor, not the control API's
 reasoning settings. Model output cannot select an effort level.
@@ -8,15 +8,18 @@ reasoning settings. Model output cannot select an effort level.
 | Request UTF-8 byte bound <500 / 500–1999 / 2000–5999 / >=6000 | 0 / 1 / 2 / 3 |
 | Distinct file references (path/name.extension), capped at three | 0–3 |
 | test, tests, testing, pytest, unittest, or 테스트 appears | 1 |
-| Requirement segments <3 / 3–5 / >=6 | 0 / 1 / 2 |
+| Distinct normalized requirement segments <3 / 3–5 / >=6 | 0 / 1 / 2 |
 
 Segments split at newlines, semicolons, or sentence-ending punctuation followed
-by whitespace. This is a reproducible proxy for distinct requirements; it does
+by whitespace. v1 strips list markers and terminal punctuation, normalizes
+whitespace and case, and deduplicates identical segments. This is a reproducible proxy for distinct requirements; it does
 not claim semantic understanding. File detection deduplicates matching strings
 and can count a dotted hostname as a file. Negated test requests also match.
 
 Scores 0–1 use low, 2–3 medium, 4–5 high, 6–7 xhigh, and 8–9 max. The rationale
-records version, raw feature counts, and score. v1 calibration remains D-1 work.
+records version, raw feature counts, and score. The score thresholds retain v0 behavior on the ten hand-written pipeline cases;
+synthetic boundary and duplicate-requirement tests calibrate reproducibility,
+not real task difficulty. Empirical executor-outcome calibration remains pending.
 
 `count_tokens` returns the UTF-8 byte count as a conservative text-only BPE
 bound, not an exact tokenizer count; protocol framing is excluded. This avoids

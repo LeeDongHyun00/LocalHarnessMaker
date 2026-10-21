@@ -1,4 +1,4 @@
-"""Version-zero contract prompting and bounded validation retries."""
+"""Version-one contract prompting and bounded validation retries."""
 
 import copy
 import json
