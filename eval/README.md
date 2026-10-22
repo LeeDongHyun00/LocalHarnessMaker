@@ -31,6 +31,10 @@ A later executor can reach these paths because reads are not denied;
 observed access invalidates the task. External raw logs are retained;
 public evidence uses redacted labels and hashes.
 Native logs are referenced with hashes as well as executor JSON streams.
+Each task also writes `access-audit.json`, containing every error and match with
+log name, line number and evidence hashes. The audit scans the entire file after
+an error, so multiple unsupported records appear in one run. The same complete
+audit remains in `result.json`; the shared report references the audit artifact.
 
 Every executor, resume and control child uses a copied environment containing
 `HARNESS_NESTED=1`. Executor environments exclude private locations and API keys.
@@ -60,14 +64,63 @@ Parse failures, named-user tildes and other unresolved expansions remain
 inconclusive; concrete canonical paths compare without case. Environment
 variable expansion, including `$HOME`, remains conservative.
 Recursive search/list/copy/archive operands covering an ancestor of a protected
-root are access_detected. Grader lines of at least 16 normalized characters are
-hashed across the private task family; matching tool output is access_detected.
+root are access_detected. Fingerprints cover distinctive hidden grader lines
+of at least 16 normalized characters across the private root. A candidate
+must contain a number or string literal absent from every public task's
+`prompt.md`, `day2.md`, `expected.json`, `meta.json` and `workspace/` files;
+lines already present publicly, docstrings, module entry guards and unittest
+launchers are excluded. Literal comparison includes decoded strings and numeric
+spellings, with conservative substring exclusion for common values.
+Only command `aggregated_output` and function/custom tool output contents are
+matched. Executor-authored patches, file changes, arguments and metadata are
+never fingerprint evidence. Path and operand checks still cover those inputs.
+Distinctive hidden output remains access_detected even when a read hides its path.
 Only hashes, labels and redacted evidence are retained in audit results.
 Decode-and-execute pipelines such as `base64 -d | sh` are inconclusive.
+For pinned codex-cli `0.162.0-alpha.17.2`, native records include `session_meta`,
+`turn_context`, `response_item`, `event_msg`, `world_state` and
+`token_usage_record`. Snapshot records require boolean `full` and object `state`;
+usage records require a usage object with nonnegative integer input/output
+counts, and validate supplied turn/thread counts. The entire snapshot/usage
+record, including nested keys and values, is scanned for private paths, aliases,
+canonical traversal/symlink targets. A match reports
+that a private location reached executor context and prevents grading. These
+records are metadata; ordinary session settings are not shell operands.
+Native `event_msg.item_completed` command/file-change records are inspected,
+while user/assistant message items remain prose. Native `custom_tool_call.input`
+and `custom_tool_call_output` are paired and inspected for paths; fingerprints
+apply only to outputs.
+Literal `exec` JavaScript wrappers around `tools.exec_command` and
+`tools.apply_patch` are decoded without executing code; shell arguments and patch
+targets receive operand checks, including bare symlink filenames. Dynamic or
+unsupported custom code stays inconclusive. Other unknown record/item kinds
+also stay inconclusive. The synthetic 33-record regression fixture preserves
+the supplied host session's structure and record order, with categorical
+discriminators retained and all task, identity, path and usage content replaced.
 Detected or inconclusive access invalidates the task and aggregate report and
 prevents grading. This is observed access auditing, not filesystem isolation
 or proof that all unlogged activity is safe. Dynamic execution and additional
 installed-version event forms require host review before measurement.
+
+Offline re-audit of a finished run (no executor/controller/judge calls):
+
+```sh
+.venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-a/
+```
+
+Here `--out` identifies the existing run directory to read. The command loads its
+checkpoint and report, requires finished tasks, and audits the original external
+`exec-*.jsonl` streams plus all native session logs under each retained runtime.
+It uses each task's own `PrivateGraders`, workspace, repository and the runner's
+`audit_roots(runtime)` grading/cross-runtime roots. Retained log hashes/counts and
+grader hashes must match the original audit; unavailable, lost or changed evidence
+is inconclusive unless access is detected. It prints one JSON row per task with
+only `task_id`, `status`, `error_kinds` and `match_labels`; no paths or contents.
+It writes nothing and does not replace the report, checkpoint or stored audits.
+Exit 0 means re-audit computation completed, including detected/inconclusive rows;
+exit 1 means the finished-run inputs or command arguments were unusable. Review
+the rows on the host before choosing a fresh pilot A rerun directory. A clean
+re-audit is observed cleanliness, not a new quality result or proof of isolation.
 
 Harness configs select `harness=true`, an explicit `control_backend` and a
 `reinstruction_limit`. The runner calls `python -m controller contract` with

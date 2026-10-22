@@ -368,6 +368,7 @@ def run(
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
         audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
+        write_json(task_out / "access-audit.json", json.loads(private.redact(json.dumps(audit))))
         telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"])
         telemetry["executor_runs"] = collect_runs(event_paths, native_paths, entry["segments"])
         # Extract only settings and token/rate-limit evidence from native transcripts.

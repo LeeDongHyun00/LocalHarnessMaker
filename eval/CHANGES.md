@@ -525,3 +525,91 @@ Validation: `.venv/bin/python -m pytest tests/eval -q` — 342 passed in 19.41s.
 `git diff --check -- eval tests/eval state/STATUS-eval.md` and
 `git diff --exit-code -- eval/tasks` — exit 0. The old placeholder-cost assertion
 was updated to verify the snapshot's computed executor/accounting/metric value.
+
+## 2026-10-22 native-session pilot audit remediation
+
+The user reports that Claude's host pilot A at d38a5da produced ten invalid,
+ungraded tasks, each reporting unsupported `world_state` at native line 7.
+The supplied retained session was read only to inspect its record structure.
+This session did not rerun, rewrite or grade `eval/reports/pilot-a/`.
+
+The audit now accepts and checks the basic shape of native `world_state` and
+`token_usage_record`. Full record text, including nested keys, is scanned for
+private markers and canonical aliases. A disclosure explicitly reports that
+the private location reached executor context. Unknown top-level/native item
+kinds and unresolved operands remain inconclusive.
+
+Native custom calls were already recognized, but their `input` was not parsed
+for shell operands, and tools nested in `event_msg.item_completed` were skipped.
+The audit now inspects both, decodes literal shell/patch calls in native `exec`
+JavaScript without execution, resolves patch/change paths and command arrays,
+and fingerprints tool inputs as well as outputs. Unsupported dynamic custom
+code stays inconclusive. Assistant prose remains excluded from access checks.
+
+Each task writes a redacted `access-audit.json` with all errors/matches, including
+errors after unknown records and errors accompanying detected access. Results
+retain the same audit; the shared report references the artifact and gives an
+explicit metadata disclosure reason without a schema or CLI change.
+
+Added a synthetic 33-record JSONL fixture preserving the supplied session's
+record order, containers and categorical discriminators. Task text, identities,
+paths, timestamps and numeric content are synthetic. Regressions cover a clean
+fixture; private paths in both metadata kinds, custom arguments and outputs;
+keys/encodings/traversal/symlink/grading-copy aliases; argument/output fingerprints;
+shell, patch and file-change operands; malformed metadata; unknown kinds; and
+complete persisted diagnostics preventing grading.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 385 passed in 23.65s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks` — exit 0. No model/executor/controller/judge
+call, network call, private-root lookup, staging or commit occurred.
+
+Assumptions: the supplied host session is structural evidence for the pinned
+CLI only; arbitrary new formats remain unsupported. Usage metadata acceptance
+does not change token accounting. Claude will rerun pilot A on the host and
+decide how to retain the old report; a passing offline suite is not a measured
+pilot result. The user reports the previous plan cost as about one percentage
+point of the weekly window; no new plan consumption was measured here.
+
+## 2026-10-22 fingerprint false-positive remediation and offline re-audit
+
+The user reports Claude's host verification of the native-record fix (385 tests
+passed), followed by a false-positive pilot A re-audit: an executor-authored
+`file_change` matched shared grader boilerplate. This supersedes the preceding
+section's argument-fingerprint behavior. Fingerprints now inspect only command
+`aggregated_output` and function/custom tool outputs. Path and operand checks
+continue inspecting inputs, patches, file changes and native metadata.
+
+Hidden line selection now requires a number/string literal absent from all
+public task prompts, day-2 prompts, expected/meta JSON and workspace files. It
+also excludes publicly present normalized lines, docstrings, module entry guards
+and unittest launchers. Decoded string/numeric equivalents and conservative
+substring checks exclude shared examples. The existing 16-character normalized
+minimum remains. Fingerprints still cover graders across the private root, but
+only hashes and labels enter audit artifacts.
+
+Added `python -m eval.runner.reaudit --private-root PATH --out EXISTING_RUN_DIR`.
+This read-only diagnostic uses finished checkpoint runtimes, every retained
+executor/native log, the task's own PrivateGraders and the runner's workspace,
+repository and grading/cross-runtime settings. It checks retained log and grader
+manifests, keeps access matches when evidence errors coexist, and prints only
+task IDs, statuses, error kinds and match labels. It makes no executor/control
+call and never rewrites reports, checkpoints or audit artifacts.
+
+Synthetic regressions cover honest unittest submissions and pytest output with
+shared examples/boilerplate, every public-file category and cross-task examples,
+equivalent literal spellings, authored arguments/patches/file changes/metadata,
+and hidden-line reads via cat/sed/grep/Python output with no private path.
+Re-audit cases cover real audit roots, multiple tasks, sanitation, missing/changed
+retained evidence, incomplete runs and byte-for-byte artifact immutability.
+
+Assumptions: `--out` names the finished source run, not a destination; Claude has
+the matching private root and original external runtimes on the host. Public
+files stay frozen. This offline change adds no pilot quality result; Claude must
+re-audit pilot A on the host before rerunning it. No model call, private-root
+lookup, pilot artifact change, staging or commit occurred here.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 425 passed in 33.24s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks` — exit 0. The full repository suite is
+deferred to a future merge; only the owned eval tests ran here.

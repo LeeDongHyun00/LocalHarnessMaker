@@ -60,6 +60,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     audit = result["grader_access_audit"]
     status = audit["status"]
     reason = "Observed forbidden access." if status == "access_detected" else "; ".join(audit["errors"]) if status == "inconclusive" else None
+    if any(m["tool"] in {"world_state", "token_usage_record"} for m in audit["matches"]):
+        reason = "Private location reached executor context through native metadata."
     shared_audit = {"method": "access_audit", "status": status,
                     "private_grader_roots": ["sha256:" + audit["root_fingerprint"]],
                     "reason": reason, "matches": [

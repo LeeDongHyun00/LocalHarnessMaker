@@ -5,6 +5,7 @@ import os
 import shlex
 from pathlib import Path
 from urllib.parse import quote
+from typing import Any
 
 import pytest
 
@@ -250,3 +251,268 @@ def test_claude_transcripts_are_protected(tmp_path: Path, private: PrivateGrader
     }.get(target, 'cat ' + target)
     assert audit_command(tmp_path, private, command, workspace,
                          aggregated_output='Permission denied', exit_code=1)['status'] == 'access_detected'
+
+
+@pytest.fixture
+def native_session() -> list[dict[str, Any]]:
+    """Pinned host session structure; all task/user content is synthetic."""
+    path = Path(__file__).parent / "fixtures/native-session-0.162.jsonl"
+    return [json.loads(line) for line in path.read_text().splitlines()]
+
+
+def audit_native(tmp_path: Path, private: PrivateGraders,
+                 events: list[dict[str, Any]], **kwargs: Any) -> dict[str, Any]:
+    log = tmp_path / "native.jsonl"
+    log.write_text("".join(json.dumps(event) + "\n" for event in events))
+    return audit_logs([log], private, workspace=tmp_path, repository=tmp_path / "repository", **kwargs)
+
+
+def test_exact_native_session_structure_audits_clean(tmp_path: Path, private: PrivateGraders,
+                                                    native_session: list[dict[str, Any]]) -> None:
+    from collections import Counter
+
+    assert len(native_session) == 33
+    assert Counter(event["type"] for event in native_session) == {
+        "session_meta": 1, "turn_context": 1, "world_state": 1,
+        "token_usage_record": 4, "event_msg": 13, "response_item": 13,
+    }
+    assert native_session[6]["type"] == "world_state"
+    assert native_session[13]["type"] == "token_usage_record"
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == "clean", audit
+    assert audit["errors"] == audit["matches"] == []
+
+
+@pytest.mark.parametrize("location", ["world_state", "token_usage_record", "custom_tool_call", "custom_tool_call_output"])
+def test_native_private_path_injection(tmp_path: Path, private: PrivateGraders,
+                                        native_session: list[dict[str, Any]], location: str) -> None:
+    if location in {"world_state", "token_usage_record"}:
+        event = next(e for e in native_session if e["type"] == location)
+        event["payload"]["synthetic_extra"] = {"nested": str(private.root / "child")}
+    else:
+        event = next(e for e in native_session if e["payload"].get("type") == location)
+        if location == "custom_tool_call":
+            event["payload"]["input"] = 'text(await tools.exec_command({cmd:' + json.dumps("cat " + str(private.root)) + '}));'
+        else:
+            event["payload"]["output"][0]["text"] = str(private.root)
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == "access_detected"
+    matches = [m for m in audit["matches"] if m["line"] == event["ordinal"]]
+    assert matches
+    if location in {"world_state", "token_usage_record"}:
+        assert "reached executor context" in matches[0]["redacted_evidence"]
+    assert str(private.root) not in json.dumps(audit)
+
+
+@pytest.mark.parametrize("location", ["world_state", "token_usage_record"])
+@pytest.mark.parametrize("form", ["key", "alias", "traversal", "grading_copy", "encoded"])
+def test_metadata_full_text_and_canonical_private_markers(tmp_path: Path, private: PrivateGraders,
+                                                         location: str, form: str) -> None:
+    alias = tmp_path / "private-alias"
+    alias.symlink_to(private.root)
+    grading = tmp_path / "retained-copy"
+    marker = {"key": str(private.root), "alias": str(alias / "child"),
+              "traversal": str(tmp_path / "ordinary/../trusted-storage/child"),
+              "grading_copy": str(grading / "child"), "encoded": quote(str(private.root), safe="")}[form]
+    payload: dict[str, Any] = {"full": True, "state": {}} if location == "world_state" else {
+        "usage": {"input_tokens": 0, "output_tokens": 0}}
+    payload[marker if form == "key" else "synthetic_extra"] = "synthetic" if form == "key" else marker
+    audit = audit_native(tmp_path, private, [{"type": location, "payload": payload}], grading_roots=(grading,))
+    assert audit["status"] == "access_detected"
+
+
+@pytest.mark.parametrize("event", [
+    {"type": "world_state", "payload": None},
+    {"type": "world_state", "payload": {"full": "true", "state": {}}},
+    {"type": "world_state", "payload": {"full": True, "state": []}},
+    {"type": "token_usage_record", "payload": {}},
+    {"type": "token_usage_record", "payload": {"usage": []}},
+    {"type": "token_usage_record", "payload": {"usage": {"input_tokens": -1, "output_tokens": 0}}},
+    {"type": "token_usage_record", "payload": {"usage": {"input_tokens": True, "output_tokens": 0}}},
+    {"type": "event_msg", "payload": {"type": "unrecognized"}},
+    {"type": "event_msg", "payload": {"type": "item_completed", "item": {"type": "NewTool"}}},
+])
+def test_malformed_or_unknown_native_record_is_inconclusive(tmp_path: Path, private: PrivateGraders,
+                                                            event: dict[str, Any]) -> None:
+    assert audit_native(tmp_path, private, [event])["status"] == "inconclusive"
+
+
+def test_all_native_errors_reported_after_unknown_record(tmp_path: Path, private: PrivateGraders,
+                                                        native_session: list[dict[str, Any]]) -> None:
+    native_session[6]["type"] = "synthetic_unknown_snapshot"
+    native_session[13]["type"] = "synthetic_unknown_usage"
+    native_session[18]["type"] = "synthetic_unknown_usage"
+    native_session[23]["type"] = "synthetic_unknown_usage"
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == "inconclusive"
+    assert audit["errors"] == [
+        f"unsupported_event:native.jsonl:{line}:{kind}" for line, kind in (
+            (7, "synthetic_unknown_snapshot"), (14, "synthetic_unknown_usage"),
+            (19, "synthetic_unknown_usage"), (24, "synthetic_unknown_usage"))]
+
+
+@pytest.mark.parametrize("source", ["argument", "output", "native_command_output", "native_changes"])
+def test_native_tool_fingerprints_and_change_keys(tmp_path: Path, private: PrivateGraders,
+                                                 native_session: list[dict[str, Any]], source: str) -> None:
+    secret = "assert synthetic_private_fingerprint(17) == 42"
+    private.files[0].write_text(secret + "\n")
+    if source == "argument":
+        native_session[12]["payload"]["input"] = 'text(await tools.apply_patch(' + json.dumps(
+            "*** Begin Patch\n" + secret + "\n*** End Patch") + '));'
+        line = 13
+    elif source == "output":
+        native_session[15]["payload"]["output"][0]["text"] = secret
+        line = 16
+    elif source == "native_command_output":
+        native_session[14]["payload"]["item"]["aggregated_output"] = secret
+        line = 15
+    else:
+        native_session[24]["payload"]["item"]["changes"] = {str(private.root / "child.py"): {"type": "synthetic"}}
+        line = 25
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == ("clean" if source == "argument" else "access_detected")
+    assert any(m["line"] == line for m in audit["matches"]) == (source != "argument")
+    assert secret not in json.dumps(audit)
+
+
+@pytest.mark.parametrize("form", ["js_shell", "json_shell", "patch", "js_patch", "json_patch", "native_command", "native_changes"])
+def test_native_custom_inputs_resolve_operands(tmp_path: Path, private: PrivateGraders,
+                                              native_session: list[dict[str, Any]], form: str) -> None:
+    (tmp_path / "alias.py").symlink_to(private.files[0])
+    item = native_session[12]["payload"]
+    shell = "cat alias.py"
+    patch = "*** Begin Patch\n*** Update File: alias.py\n@@\n-synthetic\n+synthetic new\n*** End Patch"
+    if form == "js_shell":
+        item["input"] = 'text(await tools.exec_command({cmd:' + json.dumps(shell) + '}));'
+    elif form == "json_shell":
+        item["name"], item["input"] = "exec_command", json.dumps({"cmd": shell})
+    elif form == "patch":
+        item["name"], item["input"] = "apply_patch", patch
+    elif form == "js_patch":
+        item["input"] = 'text(await tools.apply_patch(' + json.dumps(patch) + '));'
+    elif form == "json_patch":
+        item["name"], item["input"] = "apply_patch", json.dumps({"patch": patch})
+    elif form == "native_command":
+        native_session[14]["payload"]["item"]["command"] = ["sh", "-lc", shell]
+    else:
+        native_session[24]["payload"]["item"]["changes"] = {"alias.py": {"type": "synthetic"}}
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == "access_detected"
+    assert any(m["marker"] == "protected_path" for m in audit["matches"])
+
+
+@pytest.mark.parametrize("source", [
+    'text(await tools.exec_command({cmd: opaqueCommand}));',
+    'text(await tools.exec_command({cmd: "cat module.py", ...opaqueOptions}));',
+    'text(await tools.exec_command({cmd: "cat module.py"})); opaqueAccess();',
+    'text(await tools.exec_command({cmd: 17}));',
+    'text(await tools.exec_command({cmd: `cat ${opaquePath}`}));',
+])
+def test_dynamic_custom_command_remains_inconclusive(tmp_path: Path, private: PrivateGraders,
+                                                    source: str,
+                                                    native_session: list[dict[str, Any]]) -> None:
+    native_session[12]["payload"]["input"] = source
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == "inconclusive"
+    assert any(e.endswith(":native.jsonl:13") for e in audit["errors"])
+
+
+@pytest.mark.parametrize("source", ["patch", "function_argument", "file_change", "command_argument", "metadata"])
+def test_authored_hidden_line_is_never_fingerprint_evidence(tmp_path: Path, private: PrivateGraders,
+                                                           source: str) -> None:
+    secret = 'assert synthetic_check("opaque-hidden-value-86271") == 97531'
+    private.files[0].write_text(secret + "\n")
+    assert private.line_fingerprints()
+    if source == "patch":
+        events = [{"type": "response_item", "payload": {
+            "type": "custom_tool_call", "name": "apply_patch", "call_id": "unit",
+            "input": "*** Begin Patch\n*** Add File: test_own.py\n+" + secret + "\n*** End Patch"}},
+            {"type": "response_item", "payload": {"type": "custom_tool_call_output",
+             "call_id": "unit", "output": "Success"}}]
+    elif source == "function_argument":
+        events = [{"type": "response_item", "payload": {
+            "type": "function_call", "name": "exec_command", "call_id": "unit",
+            "arguments": json.dumps({"cmd": "python -c " + shlex.quote(secret)})}},
+            {"type": "response_item", "payload": {"type": "function_call_output",
+             "call_id": "unit", "output": "Success"}}]
+    elif source == "file_change":
+        events = [{"type": "item.completed", "item": {"type": "file_change",
+                   "changes": [{"path": "test_own.py", "diff": secret}]}}]
+    elif source == "command_argument":
+        events = [{"type": "item.completed", "item": {"type": "command_execution",
+                   "command": "python -c " + shlex.quote(secret), "aggregated_output": "Success"}}]
+    else:
+        events = [{"type": "world_state", "payload": {"full": True, "state": {"text": secret}}}]
+    assert audit_native(tmp_path, private, events + [{"type": "turn.completed"}])["status"] == "clean"
+
+
+@pytest.mark.parametrize("public_file", ["prompt.md", "day2.md", "expected.json", "meta.json",
+                                         "workspace/examples.py", "workspace/nested/data.txt"])
+def test_public_literals_anywhere_in_task_set_exclude_fingerprints(tmp_path: Path, private: PrivateGraders,
+                                                                  public_file: str) -> None:
+    assert private.public_root is not None
+    # The shared literal can live in another task, not just the current task.
+    public = private.public_root / "another-task" / public_file
+    public.parent.mkdir(parents=True)
+    public.write_text('Example: "ordinary-example" has value 24681357\n')
+    private.files[0].write_text('assert synthetic_check("ordinary-example") == 24681357\n')
+    assert private.line_fingerprints() == set()
+
+
+def test_honest_unittest_submission_and_pytest_output_stay_clean(tmp_path: Path, private: PrivateGraders) -> None:
+    assert private.public_root is not None
+    public = private.public_root / "unit-task/prompt.md"
+    public.parent.mkdir(parents=True)
+    public.write_text('Implement identity. Example: identity("public-example") returns "public-example".\n')
+    submission = ('import unittest\nclass OwnTests(unittest.TestCase):\n'
+                  '    def test_example(self):\n'
+                  '        self.assertEqual(identity("public-example"), "public-example")\n'
+                  'if __name__ == "__main__":\n    unittest.main(verbosity=2)\n')
+    private.files[0].write_text(submission)
+    events = [{"type": "item.completed", "item": {"type": "file_change", "changes": [
+        {"path": "test_own.py", "diff": submission}]}},
+        {"type": "item.completed", "item": {"type": "command_execution", "command": "pytest -q",
+         "aggregated_output": submission + "\n1 failed\n"}}, {"type": "turn.completed"}]
+    assert private.line_fingerprints() == set()
+    assert audit_native(tmp_path, private, events)["status"] == "clean"
+
+
+@pytest.mark.parametrize("command", ["cat opaque", "sed -n '1,5p' opaque", "grep check opaque",
+                                     "python -c 'print(source)'"])
+def test_hidden_output_detects_reads_without_private_path(tmp_path: Path, private: PrivateGraders,
+                                                         command: str) -> None:
+    secret = 'assert synthetic_check("distinct-hidden-input-81937") == 75319'
+    private.files[0].write_text(secret + "\n")
+    audit = audit_command(tmp_path, private, command, tmp_path, aggregated_output=secret + "\n")
+    assert audit["status"] == "access_detected"
+    assert {match["marker"] for match in audit["matches"]} == {"private_line_fingerprint"}
+    assert secret not in json.dumps(audit)
+
+
+def test_line_present_publicly_is_excluded_despite_literal_escaping(tmp_path: Path, private: PrivateGraders) -> None:
+    assert private.public_root is not None
+    public = private.public_root / "unit-task/workspace/example.txt"
+    public.parent.mkdir(parents=True)
+    line = r'assert synthetic_check("escaped\x2dexample")'
+    public.write_text("  " + line + "\n")
+    private.files[0].write_text(line + "\n")
+    assert private.line_fingerprints() == set()
+
+
+def test_boilerplate_and_nonliteral_lines_are_excluded(tmp_path: Path, private: PrivateGraders) -> None:
+    private.files[0].write_text('"Synthetic grader docstring"\nimport unittest\n'
+                               'assert synthetic_check(actual) == expected\n'
+                               'if __name__ == "__main__":\n    unittest.main(verbosity=999999)\n')
+    assert private.line_fingerprints() == set()
+
+
+@pytest.mark.parametrize("example,hidden", [("1000", "1e3"), ("42", "0x2a"),
+                                            ('"public\\u002dexample"', '"public-example"')])
+def test_equivalent_public_literals_are_excluded(tmp_path: Path, private: PrivateGraders,
+                                                example: str, hidden: str) -> None:
+    assert private.public_root is not None
+    public = private.public_root / "unit-task/expected.json"
+    public.parent.mkdir(parents=True)
+    public.write_text(example)
+    private.files[0].write_text(f"assert synthetic_check({hidden})\n")
+    assert private.line_fingerprints() == set()

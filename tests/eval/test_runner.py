@@ -104,6 +104,43 @@ def test_invalid_runs_keep_evidence_and_never_grade(setup: tuple[Path, Path, Pat
     assert result["metrics"]["pass_rate"]["sample_size"] == 0
 
 
+@pytest.mark.parametrize("metadata_leak", [False, True])
+def test_native_audit_persists_all_errors_and_blocks_grading(setup: tuple[Path, Path, Path],
+                                                           metadata_leak: bool) -> None:
+    root, config, out = setup
+
+    class NativeExecutor(Executor):
+        def __call__(self, argv: list[str], **kwargs: Any) -> ProcessResult:
+            assert argv[0] == "codex", "Invalid native evidence must prevent grading"
+            result = super().__call__(argv, **kwargs)
+            fixture = Path(__file__).parent / "fixtures/native-session-0.162.jsonl"
+            events = [json.loads(line) for line in fixture.read_text().splitlines()]
+            events[7]["payload"].update(model="gpt-6.1-sol", effort="medium")
+            if metadata_leak:
+                events[6]["payload"]["state"]["synthetic_location"] = str(root)
+            events.extend([{"type": "synthetic_unknown_one"}, {"type": "synthetic_unknown_two"}])
+            native = Path(kwargs["env"]["CODEX_HOME"]) / "sessions/rollout-unit.jsonl"
+            native.write_text("".join(json.dumps(event) + "\n" for event in events))
+            return result
+
+    report = json.loads(run(config, out, root, execute=NativeExecutor(), version="codex-cli 0.162.0-alpha.17.2").read_text())
+    task = report["tasks"][0]
+    assert task["outcome"] == "invalid" and task["grading"] is None
+    audit_path = out / "bug-chunk-tail/access-audit.json"
+    audit = json.loads(audit_path.read_text())
+    assert any(e == "unsupported_event:rollout-unit.jsonl:34:synthetic_unknown_one" for e in audit["errors"])
+    assert any(e == "unsupported_event:rollout-unit.jsonl:35:synthetic_unknown_two" for e in audit["errors"])
+    assert str(root) not in audit_path.read_text()
+    if metadata_leak:
+        assert audit["status"] == "access_detected"
+        assert "reached executor context" in task["grader_access_audit"]["reason"]
+    else:
+        assert audit["status"] == "inconclusive"
+        assert "synthetic_unknown_one" in task["grader_access_audit"]["reason"]
+        assert "synthetic_unknown_two" in task["grader_access_audit"]["reason"]
+    assert json.loads((audit_path.parent / "result.json").read_text())["grader_access_audit"] == audit
+
+
 def test_interrupted_turn_resumes_same_session_before_grading(setup: tuple[Path, Path, Path]) -> None:
     root, config, out = setup
     executor = Executor(interrupt=True)
