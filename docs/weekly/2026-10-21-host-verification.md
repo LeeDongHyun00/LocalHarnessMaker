@@ -99,3 +99,21 @@ Evaluation set: Role 5 wrote and validated private graders for all 120 tasks (80
 - Independent mutation testing of the references: 1021 of 1067 mutants killed, and every inspected survivor in the twelve weakest tasks was behavior-equivalent.
 
 The task set was frozen at 7cdaf3b with digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f, recorded in docs/eval-freeze.md (57a9606). The validation runs of r5-graders-001 had left 1019 grading copies in the system temporary directory; Claude moved them into the private root, and r5-graders-002 stopped validation runs from leaving such copies. ~/.claude is now a protected audit root, because Claude's transcripts live there.
+
+## Host checks after the plugin and verifier fixes (2026-10-22)
+
+- Commits: plugin ccdf683; verifier e927b73 and 7de2f99. make test on the host: 972 passed, 1 skipped (the opt-in real Codex test).
+- Real process trees on the host:
+  - plugin Stop hook: SIGTERM, group SIGHUP, and a child that exits while its grandchild holds the pipe each leave 0 processes. An unmarked directory gets 0 bytes of output and no .harness/.
+  - verifier check under sandbox-exec: SIGTERM leaves 0 processes; a 6 s budget gives a valid verdict in 5 of 5 runs; a command that exits 0 while a grandchild holds stdout passes in 0.3 s. Before the fixes this case waited past 40 s and left the grandchild behind.
+- Install: the README procedure works in a temporary HOME and CODEX_HOME. --check reports missing hooks and a missing skill separately, a reinstall is idempotent, hook timeouts are integers (10/40/660), and the real ~/.codex was unchanged.
+- Live demo, plugin/evidence/2026-10-22-real (232f23d):
+  - Request stage: gpt-6-luna generated the contract (14603 input and 251 output tokens). The executor showed the summary and stopped at the approval gate with an empty workspace.
+  - After approval: result.txt was created, the real verifier passed on attempt 1, and a validated handoff was saved.
+  - plugin.check_demo_evidence: approval_gate true, real_task_verified true, maximum hook overhead 0.19 s.
+  - Contract quality note: Luna described "ok\n" as two bytes; the executor flagged it, and the check itself was correct.
+- Prices: OpenAI's official pricing page (developers.openai.com/api/docs/pricing, read 2026-10-22, standard tier, context up to 272K), USD per 1M tokens:
+  - gpt-6.1-sol: input 2.00, cached input 0.10, output 10.00;
+  - gpt-6-luna: input 0.10, cached input 0.01, output 0.50.
+  At these prices the recorded baseline A task (58248 input, 54656 cached, 524 output) comes to about 0.018 USD.
+- Plan usage: the primary weekly window was 4 percent at 2026-10-21 06:57 UTC and 21 percent at 2026-10-22 01:52 UTC. In between, the Codex development jobs used 26.7M input tokens (1.35M uncached) and 0.37M output tokens. Resumed long sessions were the most expensive; r2-cont-003 alone sent 5.0M input tokens. The window resets at 2026-10-28 04:03 UTC.
