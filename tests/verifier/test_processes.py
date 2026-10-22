@@ -72,6 +72,7 @@ class Tree:
             sig = getattr(signal, self.outcome)
             self.handlers[sig](sig, None)
         if self.outcome == "timeout":
+            self.now += timeout
             raise subprocess.TimeoutExpired("fake tree", timeout, output=b"partial", stderr=b"err")
         if self.outcome == "error":
             raise OSError("mock pipe error")
@@ -115,7 +116,7 @@ def test_owned_tree_cleanup(
                 assert result.stdout == "output"
     assert not tree.members and not tree.owner.children
     assert tree.stdout.closed and tree.stderr.closed and tree.stdin.closed
-    assert 0 <= tree.now <= 2.001
+    assert 0 <= tree.now - (9 if outcome == "timeout" else 0) <= 2.001
     signals = [sig for _, sig in tree.events if sig]
     if outcome in {"success", "already_exited"}:
         assert signals == [signal.SIGKILL]
@@ -129,7 +130,7 @@ def test_cooperative_child_needs_no_kill(workspace: Path) -> None:
     with pytest.raises(subprocess.TimeoutExpired):
         run_owned(["mock"], timeout=9, runner=tree.launch, clock=lambda: tree.now,
                   kill_group=tree.kill, sleep=tree.sleep)
-    assert not tree.members and tree.now == 0
+    assert not tree.members and tree.now == pytest.approx(9)
     assert [sig for _, sig in tree.events if sig] == [signal.SIGTERM]
 
 
@@ -180,19 +181,22 @@ def test_signal_during_launch_is_registered_before_delivery(workspace: Path) -> 
 
 
 def test_launch_elapsed_time_is_deducted(workspace: Path) -> None:
-    tree = Tree("success")
+    tree = Tree("timeout", cooperative=True)
+    slices: list[float] = []
     def launch(argv: list[str], **kwargs: Any) -> Tree:
         tree.now += 0.25
         return tree.launch(argv, **kwargs)
+    original = tree.communicate
     def communicate(input: str | None, timeout: float) -> tuple[bytes, bytes]:
-        assert timeout == 8.75
-        tree.returncode = 0
-        tree.members.discard(tree.pid)
-        return b"ok", b""
+        slices.append(timeout)
+        return original(input, timeout)
     tree.communicate = communicate  # type: ignore[method-assign]
-    result = run_owned(["mock"], timeout=9, runner=launch, clock=lambda: tree.now,
-                       kill_group=tree.kill, sleep=tree.sleep)
-    assert result.stdout == b"ok" and not tree.members
+    with pytest.raises(subprocess.TimeoutExpired) as caught:
+        run_owned(["mock"], timeout=9, runner=launch, clock=lambda: tree.now,
+                  kill_group=tree.kill, sleep=tree.sleep)
+    assert sum(slices) == pytest.approx(8.75)
+    assert caught.value.timeout == 9
+    assert tree.now == pytest.approx(9) and not tree.members
 
 
 def test_budget_includes_timeout_tree_cleanup(
@@ -202,11 +206,6 @@ def test_budget_includes_timeout_tree_cleanup(
     from verifier.schema import validate
 
     tree = Tree()
-    original = tree.communicate
-    def communicate(input: str | None, timeout: float) -> tuple[Any, Any]:
-        tree.now += timeout
-        return original(input, timeout)
-    tree.communicate = communicate  # type: ignore[method-assign]
     monkeypatch.setenv("HARNESS_VERIFY_BUDGET_SECONDS", "10")
     monkeypatch.setattr(subprocess, "Popen", tree.launch)
     monkeypatch.setattr("verifier.processes.time.monotonic", lambda: tree.now)
@@ -387,3 +386,29 @@ def test_judge_timeout_reason_survives_group_error(
     assert result.reason == "judge delegation timed out after 9 seconds"
     assert "llm_judge" in result.evidence
     assert tree.reaped and not tree.members and not tree.owner.children
+
+
+@pytest.mark.parametrize("text", [False, True])
+@pytest.mark.parametrize("exit_code", [0, 7])
+def test_leader_exit_preserves_result_when_post_kill_drain_never_reaches_eof(
+    text: bool, exit_code: int,
+) -> None:
+    tree = Tree()
+    calls: list[float] = []
+    def communicate(input: str | None, timeout: float) -> tuple[Any, Any]:
+        calls.append(timeout)
+        tree.now += timeout
+        if len(calls) == 1:
+            tree.returncode = exit_code
+            tree.members.discard(tree.pid)
+        else:
+            assert not tree.members  # Group teardown precedes the final drain.
+        raise subprocess.TimeoutExpired("held pipe", timeout, output=b"out\r\n", stderr=b"err\r")
+    tree.communicate = communicate  # type: ignore[method-assign]
+    result = run_owned(["mock"], timeout=120, runner=tree.launch, clock=lambda: tree.now,
+                       kill_group=tree.kill, sleep=tree.sleep, text=text)
+    assert result.returncode == exit_code
+    assert result.stdout == ("out\n" if text else b"out\r\n")
+    assert result.stderr == ("err\n" if text else b"err\r")
+    assert calls == [0.05, 0.2] and tree.now == pytest.approx(0.25)
+    assert not tree.members and tree.stdout.closed and tree.stderr.closed

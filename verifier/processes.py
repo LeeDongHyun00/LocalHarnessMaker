@@ -5,6 +5,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar
 import errno
+import locale
 import os
 import signal
 import subprocess
@@ -14,6 +15,8 @@ from typing import Any, Callable, Iterator
 
 
 CLEANUP_SECONDS = 2.0
+POLL_SECONDS = 0.05
+DRAIN_SECONDS = 0.2
 SHUTDOWN_SIGNALS = (signal.SIGTERM, signal.SIGHUP, signal.SIGINT)
 
 
@@ -143,6 +146,60 @@ def shutdown_scope(
                 set_signal(sig, handler)
 
 
+def _partial_output(data: bytes | str | None, stream: Any, text: bool) -> bytes | str:
+    """TimeoutExpired stores bytes even for Popen(text=True)."""
+    if not text:
+        return data or b""
+    if isinstance(data, bytes):
+        data = data.decode(getattr(stream, "encoding", None) or locale.getencoding(),
+                           getattr(stream, "errors", None) or "strict")
+    return (data or "").replace("\r\n", "\n").replace("\r", "\n")
+
+
+def _capture(
+    process: Any, argv: list[str], timeout: float, deadline: float,
+    owner: ProcessGroups, now: Callable[[], float], text: bool,
+) -> subprocess.CompletedProcess[Any]:
+    """Drain in short communicate slices and observe leader exit independently."""
+    partial_stdout: bytes | str | None = None
+    partial_stderr: bytes | str | None = None
+    first = True
+    while True:
+        code = process.poll()
+        if code is not None:
+            # Pipe EOF can be held open by descendants long after the leader
+            # exits. Kill the group now, preserving the leader's own result.
+            owner.cleanup(graceful=False)
+            try:
+                stdout, stderr = process.communicate(input=None, timeout=DRAIN_SECONDS)
+            except subprocess.TimeoutExpired as exc:
+                # An escaped or unsignalable descendant must not hold us here.
+                stdout = _partial_output(
+                    exc.output if exc.output is not None else partial_stdout, process.stdout, text,
+                )
+                stderr = _partial_output(
+                    exc.stderr if exc.stderr is not None else partial_stderr, process.stderr, text,
+                )
+            return subprocess.CompletedProcess(argv, code, stdout, stderr)
+        remaining = deadline - now()
+        if remaining <= 0:
+            raise subprocess.TimeoutExpired(argv, timeout, output=partial_stdout, stderr=partial_stderr)
+        try:
+            # Popen.communicate uses selectors on POSIX and retains captured
+            # chunks between calls. Never wait for EOF for the full criterion.
+            stdout, stderr = process.communicate(
+                input="" if first and text else None, timeout=min(POLL_SECONDS, remaining),
+            )
+        except subprocess.TimeoutExpired as exc:
+            if exc.output is not None:
+                partial_stdout = exc.output
+            if exc.stderr is not None:
+                partial_stderr = exc.stderr
+        else:
+            return subprocess.CompletedProcess(argv, process.returncode, stdout, stderr)
+        first = False
+
+
 def run_owned(
     argv: list[str], *, timeout: float, runner: Callable[..., Any] | None = None,
     clock: Callable[[], float] | None = None,
@@ -171,11 +228,7 @@ def run_owned(
             owner.deferred_shutdown = None
             if deferred is not None:
                 deferred()
-        stdout, stderr = process.communicate(
-            input="" if kwargs.get("text") else None,
-            timeout=max(0.0, timeout - (now() - started)),
-        )
-        result = subprocess.CompletedProcess(argv, process.returncode, stdout, stderr)
+        result = _capture(process, argv, timeout, started + timeout, owner, now, bool(kwargs.get("text")))
         normal = True
         return result
     finally:

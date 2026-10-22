@@ -1,5 +1,33 @@
 # Verifier fixes — 2026-10-22
 
+## Leader exit before inherited pipe EOF
+
+A command could exit successfully while a background descendant retained stdout
+or stderr. Waiting for communicate to reach EOF delayed cleanup until the full
+criterion timeout and incorrectly produced an unverifiable timeout verdict.
+The user reproduced this with real sandbox-exec after commit e927b73.
+
+The shared command/judge runner now uses communicate in at most 50 ms slices,
+which drain both pipes through Python's POSIX selector implementation, and polls
+the direct child between slices. Once the child exits, its return code is saved,
+its group is killed immediately, and remaining pipe output is drained for at
+most 200 ms. If EOF still does not arrive, already captured output is retained
+and the saved child exit code determines the result. Text output keeps Popen's
+encoding/error policy and newline translation. Active children retain the
+original absolute deadline, TERM/grace/KILL timeout handling, EPERM/ESRCH
+fallback and final cleanup before verdict publication.
+
+Four real Python process-tree cases exercise command-rule and judge transport
+with direct exits 0 and 7 and grandchildren that inherit both pipes and sleep
+for two seconds. With a one-second criterion deadline they finish within three
+seconds, preserve exact output, pass for expected exit 0, preserve exit 7 as
+failure, and confirm the known grandchild PID no longer exists. These run
+without sandbox-exec, network, controller or model calls. Two real capture tests
+check complete UTF-8 output on both pipes, and four injected cases check bounded
+post-KILL drain without EOF in binary and text modes. Existing injected clocks
+now account for each communication slice; deadline and shutdown regressions
+remain covered. Real macOS sandbox-exec reproduction remains pending on host.
+
 ## macOS cleanup EPERM/ESRCH follow-up
 
 The host process-tree check found intermittent killpg EPERM during timeout
@@ -60,7 +88,7 @@ Injected runner, clock, signal and fake-tree tests cover both launch sites,
 TERM/HUP/INT, timeout escalation, cooperative exit, normal-exit leftovers,
 multiple groups sharing the grace period, launch-time accounting, signal delivery
 during launch, exact CLI shutdown output, and timeout cleanup consuming the
-budget before subsequent criteria. Lifecycle tests use simulated time.
+budget before subsequent criteria. These injected lifecycle tests use simulated time.
 
 ## D-3 validate-handoff
 
@@ -107,19 +135,22 @@ the 120-second judge default, a configured deadline, and invalid deadlines.
 
 ## Verification
 
-.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped in 2.87s.
+.venv/bin/python -m pytest tests/verifier -q: 254 passed, 6 skipped in 2.88s.
 All six skips are the real macOS Seatbelt tests blocked by nested sandboxing.
-No live processes, model calls or nested Codex were used for lifecycle tests.
-The user supplied Claude's prior host result: 206 passed including all six
-Seatbelt tests. The real host process-tree check passed SIGTERM cleanup but
-exposed the intermittent timeout EPERM defect above. These are historical host
-results before this follow-up fix; Claude's real process-tree rerun is pending.
+The new plain-Python process-tree and pipe-draining tests ran here; no live
+controller, model call or nested Codex ran.
+
+The user reported Claude verified and committed the preceding EPERM fix as
+e927b73: 250 passed on host including all six Seatbelt tests, zero processes
+after SIGTERM, and valid exit-0 verdicts in five of five 6-second budget runs.
+Those results predate this change. The new host repro found a background child
+holding stdout still alive after 40 seconds; Claude must rerun it after this fix.
 git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0,
 no output.
 
 ## Pending
 
-Host checks: real macOS command-tree timeout cleanup and CLI output/exit rerun,
+Host checks: real macOS leader-exit/inherited-pipe repro, timeout cleanup and CLI output/exit rerun,
 Seatbelt rerun after this fix, real controller/Codex grandchild timeout cleanup,
 FastAPI fixtures, live judge integration and plugin continuation/latency.
 The user selected a 480-second outer plugin deadline and 450-second verifier
@@ -131,12 +162,14 @@ Full-suite verification remains a host pre-merge task.
 Broader command support, bounded capture, complete sandbox auditing,
 human review sampling (`python -m verifier sample`) and measured D-4 rules remain unfinished.
 The live controller handoff and Stop/SessionStart hook loop need host verification;
-this session validates the checked-in reference and synthetic cases only.
+this session validates the checked-in reference, synthetic cases and controlled
+plain-Python transport processes.
 No network, nested Codex, live model, sandbox-exec, staging or commit ran.
 
 ## Assumptions
 
-- The user's EPERM/ESRCH cleanup and CLI publication priority supersedes Remaining order; human-review sampling remains pending.
+- The user's leader-exit/inherited-pipe priority supersedes Remaining order; human-review sampling remains pending.
+- The bounded post-exit drain is 200 ms. Output retained after that bound may be incomplete if a descendant escapes the owned group or is unsignalable; the completed command's own exit code is preserved as requested.
 - Each existing command timeout is 120 seconds; judge timeout remains configurable with a 120-second default. The new budget only reduces these deadlines.
 - The two-second reserve covers graceful termination; post-KILL child waits are bounded to two 0.1-second attempts per direct child. Verdict validation/writing and scheduling have the remaining margin before the plugin's 480-second deadline.
 - Contract-free runtime validation rejects done/remaining overlap. Contract membership, criterion coverage and artifact existence cannot be inferred from a handoff alone and are not checked. Same-state entries may describe multiple artifacts or remaining steps; no additional uniqueness constraint is imposed.

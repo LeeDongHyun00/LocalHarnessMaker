@@ -1,5 +1,11 @@
 ## Done
 
+- Separated direct-child exit detection from pipe EOF using 50 ms communicate slices and polling in the shared command/judge runner; completed children trigger immediate group cleanup and a 200 ms final drain, preserving their own exit code/output (.venv/bin/python -m pytest tests/verifier -q: 254 passed, 6 skipped).
+- Added four real plain-Python trees covering command-rule and judge transport exits 0/7 with descendants holding stdout/stderr; each finishes within three seconds under a one-second deadline, preserves exact output, passes expected exit 0, and observes the descendant PID gone (.venv/bin/python -m pytest tests/verifier -q: 254 passed, 6 skipped in 2.88s).
+- Added two real UTF-8 stdout/stderr capture cases and four injected no-EOF cases for bounded post-exit draining; retained timeout, budget, signal, launch-race and EPERM/ESRCH regressions with clocks accounting for communication slices (.venv/bin/python -m pytest tests/verifier -q: 254 passed, 6 skipped).
+- Recorded Claude's user-supplied host verification and commit e927b73 as evidence before this change: six Seatbelt tests passed, SIGTERM left zero processes, and all five 6-second budget runs produced valid exit-0 verdicts (.venv/bin/python -m pytest tests/verifier -q: 250 passed on host, as reported by the user; stdout-holding background-child repro remained unfinished after 40 seconds).
+- Updated verifier/CHANGES.md and this STATUS; six Seatbelt tests still skip in this sandbox and Claude's new real sandbox-exec repro remains pending host verification (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
+
 - Fixed killpg EPERM/ESRCH handling with exit-checked direct-child signaling and bounded reaping; timeout and shutdown reasons survive group/direct-child exit races, and completed groups are removed from ownership (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
 - Restricted "cannot launch command" to Popen construction failures; later communication failures have a distinct execution reason, and cleanup OS errors cannot replace the original timeout (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
 - Moved verdict writing and path stdout after successful shutdown-scope exit; injected unexpected final cleanup failures return 2, print no path, and leave an existing verdict unchanged (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
@@ -27,7 +33,7 @@
 
 ## Remaining
 
-- Pending host verification, highest priority: Claude must rerun the real macOS sandbox-exec process-tree checks at budgets 6 and 60 seconds and TERM/HUP/INT shutdown after this EPERM/ESRCH fix. Verify exact path/newline plus exit 0 for timeout/budget verdicts, exit 2 with empty stdout for shutdown, original reasons, and zero survivors; rerun the six Seatbelt tests after this change.
+- Pending host verification, highest priority: Claude must rerun the real sandbox-exec command that starts a background Python descendant and immediately exits. Confirm completion within about three seconds, passing expected exit 0, captured output, exact CLI stdout/exit 0 and zero descendants. Repeat for judge/controller transport, plus timeout/budget and shutdown regressions; rerun the six Seatbelt tests after this change.
 - Pending host verification: observe controller/Codex descendants and the 450-second verifier budget inside Role 2's 480-second hook deadline, including children that might create their own sessions. Injected tests do not establish production process-tree behavior.
 
 - D-3: implement human-review sampling (`python -m verifier sample --reports DIR --n 20`); validate-handoff is complete.
@@ -42,6 +48,10 @@
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
+
+- Poll direct-child exit between at most 50 ms communicate slices: inherited pipes must not delay normal-exit cleanup or fabricate a criterion timeout, and built-in POSIX selectors drain stdout/stderr together.
+- Save the direct child's exit code, KILL its group immediately, then drain at most 200 ms: background descendants are cleanup targets and their pipe lifetime does not determine the command verdict.
+- Test controlled real Python trees without sandbox-exec or controller calls, alongside injected stuck-pipe cases: exercise actual inherited descriptors within the permitted environment while preserving sandbox isolation rules.
 
 - Treat killpg EPERM/ESRCH as gone or unsignalable and fall back only to the known Popen child if alive: follow the user's macOS protocol without signaling a reused exited-child PID.
 - Preserve timeout/shutdown across signaling, polling, reaping and pipe-close OS races: cleanup must not fabricate a launch failure or escape from the final CLI scope.
@@ -85,14 +95,15 @@
 
 ## Assumptions
 
-- The user's current macOS EPERM/ESRCH cleanup and CLI publication priorities define this follow-up's scope; human-review sampling and later deliverables remain unfinished. Earlier Done bullets and Claude's supplied host results are historical evidence.
+- The user's current leader-exit/inherited-pipe priority defines this follow-up's scope; human-review sampling and later deliverables remain unfinished. Earlier Done bullets and Claude's supplied host results are historical evidence.
+- The post-exit drain bound is 200 ms; any output still unavailable after that bound is omitted while preserving the completed child's own exit code. Actual same-group descendants are killed before this drain.
 - Same-state handoff entries may represent multiple artifacts or remaining steps; only contradictory done/remaining membership is rejected beyond the schema, without adding an unspecified uniqueness requirement.
 - Rule 6 failed items means status other than pass, as explicitly instructed; this replaces the prior contrary assumption. Up to three items receive details and further items are counted.
 - Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
 - HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. Verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS defaults to 120 and HARNESS_VERIFY_BUDGET_SECONDS to 450; both must be finite and positive.
 - The two-second reserve covers graceful group termination. Post-KILL reaping uses at most two 0.1-second waits per direct child; verdict serialization and scheduling use the margin before the 480-second outer deadline.
 - Cleanup reaches signalable owned POSIX groups. Per user instruction, group EPERM/ESRCH is treated as gone or unsignalable; fallback can address only the known live direct child. Injected tests model descendants already exiting at that race; Claude must confirm actual zero-survivor behavior on macOS. A direct SIGKILL to the verifier is uncatchable and cannot execute Python shutdown handlers.
-- The public workspace is the judge artifact directory. Missing before/after material remains unverifiable under the rubric; judge outcomes and processes are mocked here.
+- The public workspace is the judge artifact directory. Missing before/after material remains unverifiable under the rubric. Judge outcomes/controller calls remain mocked; real plain-Python helpers exercise run_judge transport without any controller/model call.
 - Current transcript support is pinned to published exec/TUI evidence. Resume/compaction variants and installed-wheel schema resources remain unverified.
 - No optional FastAPI/httpx provisioning, real macOS sandbox, live model or real controller integration was attempted here. Historical host results do not verify this job's changes.
 - No PR was requested; verifier/CHANGES.md contains the change summary and Assumptions for a future PR. Other roles' concurrent changes were not edited, staged or committed.

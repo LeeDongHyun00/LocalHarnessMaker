@@ -32,7 +32,7 @@ def run_judge(
     clock: Callable[[], float] | None = None,
     kill_group: Callable[[int, int], None] | None = None,
 ) -> subprocess.CompletedProcess[str]:
-    """Own and clean up the controller and its descendants on every exit."""
+    """Poll controller exit independently of descendant-held pipes, then clean up."""
     return run_owned(
         argv, cwd=cwd, env=env, timeout=timeout, runner=runner, clock=clock,
         kill_group=kill_group, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
