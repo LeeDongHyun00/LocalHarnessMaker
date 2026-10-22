@@ -1,6 +1,19 @@
 {
-  "snapshot_id": "unpriced-offline-v1",
-  "source": "Offline placeholder: no verified model rates available; costs remain null.",
-  "checked_on": "2026-10-21",
-  "rates": []
+  "snapshot_id": "openai-standard-short-2026-10-22-v1",
+  "source": "https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).",
+  "checked_on": "2026-10-22",
+  "rates": [
+    {
+      "model": "gpt-6.1-sol",
+      "input_per_million_usd": 2,
+      "cached_input_per_million_usd": 0.1,
+      "output_per_million_usd": 10
+    },
+    {
+      "model": "gpt-6-luna",
+      "input_per_million_usd": 0.1,
+      "cached_input_per_million_usd": 0.01,
+      "output_per_million_usd": 0.5
+    }
+  ]
 }

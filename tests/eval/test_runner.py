@@ -80,8 +80,14 @@ def test_baseline_grades_after_exit_and_completed_checkpoint_does_not_repeat(set
     assert result["outcome"] == "pass"
     assert result["grading"]["passed_tests"] == 3
     assert result["grader_access_audit"]["status"] == "clean"
-    assert result["calls"][0]["usage"]["usd"] is None
-    assert report["accounting"]["total_cost_usd"] is None
+    assert result["calls"][0]["usage"]["usd"] == pytest.approx(.0001105)
+    assert report["accounting"]["total_cost_usd"] == pytest.approx(.0001105)
+    assert report["metrics"]["cost_per_pass"]["value"] == pytest.approx(.0001105)
+    diagnostics = json.loads((out / "run-diagnostics.json").read_text())
+    observed = diagnostics["executor_runs"][0]
+    assert observed["task_id"] == "bug-chunk-tail" and observed["attempt"] == 1
+    assert observed["tokens"] == {"input_tokens": 20, "cached_input_tokens": 5, "output_tokens": 8}
+    assert observed["plan_usage"]["before"] is observed["plan_usage"]["after"] is None
     assert report["metrics"]["pass_rate"]["value"] == 1
     assert str(root) not in "".join(p.read_text() for p in out.rglob("*") if p.is_file())
     run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2")

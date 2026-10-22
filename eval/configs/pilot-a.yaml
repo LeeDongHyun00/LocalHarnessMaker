@@ -1,0 +1,25 @@
+{
+  "name": "pilot-a",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "harness": false,
+  "control_backend": "none",
+  "reinstruction_limit": 0,
+  "retry_limit": 0,
+  "seed": 0,
+  "codex_version": "codex-cli 0.162.0-alpha.17.2",
+  "tasks": [
+    "bug-fix-adjacent-runs",
+    "bug-fix-balanced-brackets",
+    "bug-chunk-tail",
+    "feature-plus-test-clamp-values",
+    "feature-plus-test-common-prefix",
+    "feature-plus-test-flatten-once",
+    "multiple-requirements-inclusive-range",
+    "multiple-requirements-interleave",
+    "constrained-refactoring-interval-union",
+    "constrained-refactoring-invert-groups"
+  ],
+  "timeout_seconds": 600,
+  "grading_timeout_seconds": 20
+}

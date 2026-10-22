@@ -18,7 +18,7 @@ def artifact(path: Path) -> dict[str, str]:
     return {"path": str(path), "sha256": digest(path.read_bytes())}
 
 
-def usage(events: Path, latency: float, model: str, pricing: dict[str, Any]) -> dict[str, Any]:
+def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str = "standard") -> dict[str, Any]:
     """Use complete per-segment counts; cache is a subset, output includes reasoning."""
     turns = [e.get("usage", {}) for e in records(events) if e.get("type") == "turn.completed"]
     counts = {key: sum(t[key] for t in turns) if turns and all(type(t.get(key)) is int and t[key] >= 0 for t in turns) else None
@@ -26,7 +26,14 @@ def usage(events: Path, latency: float, model: str, pricing: dict[str, Any]) -> 
     i, c, o = (counts[k] for k in counts)
     if i is not None and c is not None and c > i:
         raise ValueError("Cached tokens exceed input tokens")
-    rate = next((r for r in pricing["rates"] if r["model"] == model), None)
+    # Standard is the baseline CLI default assumption; explicit unknown tiers
+    # and long-context requests cannot inherit the short-context price.
+    observed_tiers = [e.get("service_tier", e.get("usage", {}).get("service_tier", tier))
+                      for e in records(events) if e.get("type") == "turn.completed"]
+    covered = tier == "standard" and all(t in {"standard", "default"} for t in observed_tiers)
+    covered = covered and all(t["input_tokens"] <= 272000
+                              for t in turns if type(t.get("input_tokens")) is int)
+    rate = next((r for r in pricing["rates"] if r["model"] == model), None) if covered else None
     usd = None
     if rate is not None and all(v is not None for v in (i, c, o)):
         usd = ((i - c) * rate["input_per_million_usd"] + c * rate["cached_input_per_million_usd"] + o * rate["output_per_million_usd"]) / 1_000_000
@@ -48,7 +55,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
         calls.append({"call_id": f'{result["task_id"]}-exec-{segment["attempt"]}', "purpose": "executor",
                       "backend": "codex_cli", "model": config["model"],
                       "status": "timeout" if segment.get("timed_out") else "completed" if segment["exit_code"] == 0 else "failed",
-                      "usage": usage(path, segment.get("latency_seconds", 0), config["model"], pricing)})
+                      "usage": usage(path, segment.get("latency_seconds", 0), config["model"], pricing,
+                                     tier=result.get("pricing_evidence", {}).get("tier", "standard"))})
     audit = result["grader_access_audit"]
     status = audit["status"]
     reason = "Observed forbidden access." if status == "access_detected" else "; ".join(audit["errors"]) if status == "inconclusive" else None

@@ -18,7 +18,7 @@ from eval.runner import harness
 from eval.runner.report import build, build_task
 from eval.runner.audit import PrivateGraders, audit_logs, digest, executor_environment
 from eval.runner.process import ProcessResult, run_process
-from eval.runner.telemetry import collect, records, session_id
+from eval.runner.telemetry import collect, collect_runs, records, session_id
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -63,7 +63,14 @@ def load_config(path: Path) -> dict[str, Any]:
     if any(not isinstance(task, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", task) for task in config["tasks"]):
         raise ValueError("Unsafe task identifier")
     if len(config["tasks"]) * ((config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) + (3 if config["harness"] else 0)) >= 10:
-        raise ValueError("STOP-3: batches of 10 or more executor calls require a reported estimate first")
+        # Only the exact bundled pilot configurations have a published estimate.
+        pilots = [REPOSITORY / f"eval/configs/pilot-{letter}.yaml" for letter in ("a", "b")]
+        estimate = REPOSITORY / "eval/reports/pilot-estimate.md"
+        if not estimate.is_file() or not any(p.is_file() and json.loads(p.read_text()) == config for p in pilots):
+            raise ValueError("STOP-3: batches of 10 or more executor calls require a reported estimate first")
+        print("STOP-3 estimate: eval/reports/pilot-estimate.md; 10 executor calls, no retries; "
+              "A $0.178896; B illustrative 2x output $0.231296 API-equivalent USD. "
+              "Host operator must obtain pilot approval before execution.", file=sys.stderr)
     for key in ("name", "model", "codex_version"):
         if not isinstance(config[key], str) or not config[key]:
             raise ValueError(f"{key} must be a nonempty string")
@@ -362,6 +369,7 @@ def run(
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
         audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
         telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"])
+        telemetry["executor_runs"] = collect_runs(event_paths, native_paths, entry["segments"])
         # Extract only settings and token/rate-limit evidence from native transcripts.
         selected = [event for path in native_paths for event in records(path)
                     if event.get("type") == "turn_context" or
@@ -420,6 +428,8 @@ def run(
     configured = len(config["tasks"])
     write_json(out / "run-diagnostics.json", {
         "stop_reason": stop_reason, "attempted_tasks": attempted, "configured_tasks": configured,
+        "executor_runs": [{"task_id": t["task_id"], **segment}
+                          for t in tasks for segment in t.get("executor_runs", [])],
     })
     if stop_reason or {t["task_id"] for t in tasks} != set(config["tasks"]):
         reason = stop_reason or "Incomplete configured task results"

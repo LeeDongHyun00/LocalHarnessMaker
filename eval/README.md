@@ -85,10 +85,14 @@ Reports compute seeded task-cluster bootstrap metrics (10000 resamples;
 minimum 1000). Invalid tasks leave quality samples but retain costs. Any zero
 original/bootstrap denominator or missing accounting produces null values and
 bounds. Output tokens already include reasoning; cached input is an input
-subset. `prices.yaml` explicitly pins an **unpriced offline placeholder**, not
-verified market rates: no cost is fabricated and subscription usage is not
-zero-dollar API usage. Replace this snapshot with verified versioned rates
-before measured comparisons. Control CLI artifacts do not expose a complete
+subset. `prices.yaml` pins `openai-standard-short-2026-10-22-v1`, using the
+user-supplied Claude host fetch of OpenAI pricing (checked 2026-10-22): Standard
+tier, up to 272K input tokens. The source records the URL and absence of a
+provider version/date. Unknown models/tiers, long-context turns and incomplete
+tokens retain null costs; null propagates to accounting and cost_per_pass.
+Standard is the CLI baseline assumption when no tier evidence is present;
+observed non-Standard tiers override it. Subscription usage is not zero-dollar
+API usage. Historical reports are preserved. Control CLI artifacts do not expose a complete
 per-call accounting ledger; actual fallback transport/model and costs remain
 unobserved. `control_model` and control costs stay null. Full done-claim
 extraction and hash-pinned paired parity are pending; false_done_rate and parity
@@ -160,3 +164,33 @@ source, target and public prompt/expected hashes. Survivors are never classified
 equivalent automatically. Validation and mutation workspaces, logs and grading
 copies stay under the private root and are cleaned on exit, including failures;
 evaluation runs retain their existing grading-copy behavior.
+
+
+## Ten-task A/B pilot preparation (2026-10-22)
+
+`configs/pilot-a.yaml` and `configs/pilot-b.yaml` pin identical task lists, seed 0,
+CLI version, zero retries, harness off and 600-second task deadlines. A uses
+medium; B uses max. The [estimate](reports/pilot-estimate.md) documents deterministic
+family selection, the 3/3/2/2 type split, token/cost calculations, assumptions
+and host commands. The legacy single-task `configs/pilot.yaml` stays unchanged.
+The exact bundled pilot configs with the published estimate pass the batch
+preflight and print the estimate to stderr; other batches of ten or more calls
+remain blocked. Host approval is still required before the pilot is run.
+
+`run-diagnostics.json.executor_runs` and task `result.json.executor_runs` retain
+per-attempt tokens and primary plan used_percent from native token_count events,
+with timestamps and complete rate_limits. Before is the last native observation
+at or before process start; after is the last during the process. Missing
+observations stay null; first_observed_during_run is separate. This does not
+claim a true pre/post measurement when the native log has no such sample.
+Plan usage cannot be predicted from tokens. Existing raw/native evidence and
+hash retention remain in place; no frozen report fields were added.
+
+Task set v1 is frozen at `7cdaf3b`, full-set digest
+`b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f`,
+recorded in `docs/eval-freeze.md`. This supersedes the earlier pending-freeze
+notes below/in historical changes. Pilot metadata currently fingerprints the
+selected subset using the existing runner algorithm; compare identical A/B
+subset hashes and retain the full source-population digest in the estimate.
+SC-5 results, five manual A reviews, host prerequisites and full-run approval
+remain pending. No executor/model or private-root access occurred in preparation.

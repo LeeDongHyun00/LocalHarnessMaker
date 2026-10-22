@@ -33,3 +33,35 @@ def test_mismatched_runtime_effort_is_unverified(tmp_path: Path) -> None:
     events.write_text('{"type":"turn.completed"}\n')
     native.write_text('{"type":"turn_context","payload":{"model":"gpt-6.1-sol","effort":"low"}}\n')
     assert not collect([events], [native], "gpt-6.1-sol", "medium")["settings_evidence"]["verified"]
+
+
+def test_per_attempt_primary_plan_observations_and_tokens(tmp_path: Path) -> None:
+    from eval.runner.telemetry import collect_runs
+    events = [tmp_path / f'exec-{i}.jsonl' for i in (1, 2)]
+    for i, path in enumerate(events, 1):
+        path.write_text(json.dumps({'type': 'turn.completed', 'usage': {'input_tokens': i * 10}}) + '\n')
+    native = tmp_path / 'native.jsonl'
+    native.write_text(''.join(json.dumps({'type': 'event_msg', 'timestamp': f'2026-10-22T00:00:{second:02d}Z',
+        'payload': {'type': 'token_count', 'rate_limits': {'primary': {'used_percent': used}}}}) + '\n'
+        for second, used in [(1, 2), (3, 3), (6, 4), (9, 5)]))
+    segments = [{'attempt': i, 'started_at': f'2026-10-22T00:00:{start:02d}+00:00',
+                 'exited_at': f'2026-10-22T00:00:{end:02d}+00:00'}
+                for i, start, end in [(1, 0, 4), (2, 5, 8)]]
+    runs = collect_runs(events, [native], segments)
+    assert runs[0]['tokens']['input_tokens'] == 10
+    assert runs[1]['tokens']['input_tokens'] == 20
+    assert runs[0]['plan_usage']['before'] is None
+    assert runs[0]['plan_usage']['first_observed_during_run']['primary_used_percent'] == 2
+    assert runs[0]['plan_usage']['after']['primary_used_percent'] == 3
+    assert runs[1]['plan_usage']['before']['primary_used_percent'] == 3
+    assert runs[1]['plan_usage']['after']['primary_used_percent'] == 4
+    assert all(run['plan_usage']['exact_task_consumption'] is None for run in runs)
+    empty = collect_runs(events[:1], [], segments[:1])[0]['plan_usage']
+    assert empty['before'] is empty['after'] is None
+
+
+def test_native_unknown_tier_is_not_assumed_standard(tmp_path: Path) -> None:
+    native = tmp_path / 'native.jsonl'
+    native.write_text(json.dumps({'type': 'turn_context', 'payload': {
+        'model': 'gpt-6.1-sol', 'effort': 'medium', 'service_tier': 'priority'}}) + '\n')
+    assert collect([], [native], 'gpt-6.1-sol', 'medium')['pricing_evidence']['tier'] == 'priority'

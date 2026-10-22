@@ -477,3 +477,51 @@ review fields remain unchanged under the metadata-only instruction.
 
 Validation: `.venv/bin/python -m pytest tests/eval -q` — 336 passed in 33.41s.
 `git diff --check -- eval tests/eval state/STATUS-eval.md` — exit 0.
+
+## 2026-10-22 ten-task pilot preparation
+
+Replaced the offline price placeholder with snapshot
+`openai-standard-short-2026-10-22-v1`, using the user's supplied Claude host fetch
+of OpenAI pricing. The existing schema-compatible source string records the URL,
+Standard tier, 272K context boundary and absence of a provider version/date;
+checked_on is 2026-10-22. Sol input/cache/output rates are 2/0.10/10 USD per
+million, Luna 0.10/0.01/0.50. Existing per-call accounting feeds totals and metrics
+from this snapshot, bills cached and reasoning tokens once, and preserves null
+for unknown models/tiers, long context or incomplete usage. Explicit native tier
+evidence overrides the documented Standard default assumption.
+
+Added pilot-a/pilot-b configs with ten identical single-session tasks from ten
+families, deterministic 3/3/2/2 type quotas, seed 0, pinned CLI, zero retries,
+600-second executor deadlines and harness off. Only effort differs (medium/max).
+The exact bundled configs with their published estimate pass the existing paid
+batch preflight and print the estimate to stderr; other large batches still
+fail. This is preparation, not pilot approval. The estimate reports ten calls
+per config, $0.178896 for A and illustrative $0.231296 for B at 2x output, plus
+cache/output sensitivities. No maximum cost or plan-percent prediction is claimed.
+
+Existing telemetry kept native token_count snapshots but aggregated attempts.
+Added per-attempt tokens and timestamped primary used_percent before/after
+observations to task results and run-diagnostics, without changing the frozen
+report schema. Missing before/after observations remain null; first observed
+inside the process is separately labeled, and after means last in-run sample.
+Account rounding/concurrency still prevents an exact per-task consumption claim.
+
+The user supplied final freeze commit 7cdaf3b and full-set digest
+b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f,
+now recorded by Role 1 in docs/eval-freeze.md. This supersedes pending-freeze
+notes above. No public task, historical report, shared interface or other role's
+path changed. Existing selected-task hash semantics are documented in the
+estimate; the full frozen population hash is retained separately there.
+
+Assumptions: trust the supplied host price fetch in this offline session;
+Standard short context is the CLI baseline absent conflicting evidence; one
+historical task is only a planning proxy; max uses more output and 2x/5x are
+illustrative; zero retries bounds the initial batch. Claude must run approved
+pilots on the host, retain evidence, review five A samples and obtain approval
+before full measurement. No executor/controller/judge/model call, private-root
+lookup, network call, staging or commit occurred here.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 342 passed in 19.41s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks` — exit 0. The old placeholder-cost assertion
+was updated to verify the snapshot's computed executor/accounting/metric value.
