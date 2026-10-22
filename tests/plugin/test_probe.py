@@ -17,7 +17,8 @@ from plugin.probe import prepare
 @pytest.mark.parametrize("event", ["SessionStart", "UserPromptSubmit", "Stop"])
 def test_stdin_stdout_protocol(event: str, tmp_path: Path) -> None:
     script = Path(__file__).resolve().parents[2] / "plugin/hooks/probe.py"
-    payload = {"hook_event_name": event, "session_id": "test", "stop_hook_active": False}
+    (tmp_path / ".local-harness-maker").touch()
+    payload = {"cwd": str(tmp_path), "hook_event_name": event, "session_id": "test", "stop_hook_active": False}
     result = subprocess.run(
         [sys.executable, str(script)], input=json.dumps(payload), text=True,
         capture_output=True, env={**os.environ, "HARNESS_PROBE_DIR": str(tmp_path)}, check=False,

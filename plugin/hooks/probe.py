@@ -11,6 +11,7 @@ if os.environ.get("HARNESS_NESTED") == "1":
 import json
 from pathlib import Path
 import sys
+sys.dont_write_bytecode = True
 import time
 from typing import Any
 from uuid import uuid4
@@ -53,16 +54,19 @@ def main() -> int:
     """Fail open on all ordinary hook errors and log elapsed time to stderr."""
     if os.environ.get("HARNESS_NESTED") == "1":
         return 0
-    started = time.perf_counter()
+    started = None
     try:
-        payload = json.load(sys.stdin)
+        from _scope import read_scoped_payload
+        payload = read_scoped_payload()
+        if payload is None:
+            return 0
+        started = time.perf_counter()
         response = probe(payload, Path(os.environ["HARNESS_PROBE_DIR"]))
         print(json.dumps(response))
     except Exception as exc:
         print(f"harness probe warning: {type(exc).__name__}: {exc}", file=sys.stderr)
-    finally:
-        elapsed = time.perf_counter() - started
-        print(f"harness probe elapsed_seconds={elapsed:.6f}", file=sys.stderr)
+    elapsed = time.perf_counter() - started if started is not None else 0.0
+    print(f"harness probe elapsed_seconds={elapsed:.6f}", file=sys.stderr)
     return 0
 
 

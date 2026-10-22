@@ -7,19 +7,18 @@ import os
 from pathlib import Path
 import sys
 import time
+from typing import Any
 
 
-def execute(event: str, started: float) -> int:
+def execute(event: str, started: float, payload: dict[str, Any]) -> int:
     """Publish output only after all processing succeeds; errors always fail open."""
     response = None
-    payload = None
     error = None
     runtime = None
     try:
-        from _runtime import Runtime
-        payload = json.load(sys.stdin)
         if not isinstance(payload, dict) or payload.get("hook_event_name") != event:
             raise ValueError("hook event does not match entry point")
+        from _runtime import Runtime
         runtime = Runtime(payload)
         response = runtime.dispatch(event)
         cli_seconds = runtime.cli_seconds

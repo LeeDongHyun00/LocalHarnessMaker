@@ -10,7 +10,15 @@ from pathlib import Path
 import subprocess
 import sys
 import time
-from typing import Any
+from uuid import uuid4
+
+try:
+    from ._config import OUTER, CALLS, seconds, validate_settings
+    from ._process import run_group, CLEANUP_RESERVE
+except ImportError:
+    from _config import OUTER, CALLS, seconds, validate_settings
+    from _process import run_group, CLEANUP_RESERVE
+from typing import Any, Callable
 
 from jsonschema import Draft202012Validator
 
@@ -29,7 +37,9 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, value: dict[str, Any]) -> None:
     """Write plugin-owned session metadata, never controller/verifier artifacts."""
-    path.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temporary = path.with_name(f".{path.name}.{uuid4().hex}.tmp")
+    temporary.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temporary.replace(path)
 
 
 def validate(path: Path, schema: str) -> dict[str, Any]:
@@ -42,8 +52,14 @@ def validate(path: Path, schema: str) -> dict[str, Any]:
 class Runtime:
     """Keep all work behind the entry-point's exact nested-environment guard."""
 
-    def __init__(self, payload: dict[str, Any]) -> None:
+    def __init__(self, payload: dict[str, Any], *, runner: Callable[..., Any] | None = None,
+                 clock: Callable[[], float] = time.monotonic) -> None:
         self.payload = payload
+        self.runner = runner or run_group
+        self.clock = clock
+        event = payload["hook_event_name"]
+        validate_settings()
+        self.deadline = clock() + seconds(f"HARNESS_{event.upper()}_TIMEOUT", OUTER[event]) - CLEANUP_RESERVE
         self.workspace = Path(payload["cwd"]).resolve(strict=True)
         if not self.workspace.is_dir() or not isinstance(payload["session_id"], str):
             raise ValueError("invalid workspace or session id")
@@ -55,10 +71,21 @@ class Runtime:
 
     def initialize(self) -> tuple[dict[str, Any], dict[str, Any]]:
         """Reset new sessions; preserve state when the same session resumes/compacts."""
-        if self.session_path.exists() and self.state_path.exists():
-            session = read_json(self.session_path)
-            if session["session_id"] == self.payload["session_id"]:
-                return read_json(self.state_path), session
+        if self.session_path.exists():
+            try:
+                session = read_json(self.session_path)
+                if not isinstance(session.get("session_id"), str) or session.get("phase") not in {
+                    "idle", "awaiting_approval", "approved", "complete", "exhausted"
+                }:
+                    raise ValueError("invalid session metadata")
+                if session["phase"] == "awaiting_approval" and not isinstance(session.get("contract_sha256"), str):
+                    raise ValueError("missing reviewed contract hash")
+                if self.state_path.exists() and session["session_id"] == self.payload["session_id"]:
+                    return read_json(self.state_path), session
+            except (ValueError, KeyError, TypeError) as exc:
+                stale = self.session_path.with_name(f"session.bad.{uuid4().hex}.json")
+                self.session_path.rename(stale)
+                print(f"harness warning: malformed session metadata renamed to {stale}: {exc}", file=sys.stderr)
         state = {
             "attempt": 0,
             "contract_path": str(self.directory / "contract.json"),
@@ -84,9 +111,13 @@ class Runtime:
         child_env = {**os.environ, "HARNESS_NESTED": "1"}
         started = time.perf_counter()
         try:
-            result = subprocess.run(
+            name, default = CALLS[(module, operation)]
+            timeout = min(seconds(f"HARNESS_{name}_TIMEOUT", default), self.deadline - self.clock())
+            if timeout <= 0:
+                raise TimeoutError("hook deadline exhausted before child launch")
+            result = self.runner(
                 command, cwd=ROOT, env=child_env, text=True, capture_output=True,
-                shell=False, timeout=30, check=False,
+                shell=False, timeout=timeout, check=False,
             )
         finally:
             duration = time.perf_counter() - started
@@ -175,12 +206,38 @@ class Runtime:
         if verdict["overall"] == "pass":
             session["phase"] = "complete"
             self.save(state, session)
+            self.generate_handoff(state, transcript)
             return None
-        if attempt >= limit or verdict["reinstruct_message"] is None:
+        if attempt >= limit:
             session["phase"] = "exhausted"
             self.save(state, session)
+            try:
+                self.generate_handoff(state, transcript)
+            except Exception as exc:
+                print(f"harness Stop warning: handoff failed: {exc}", file=sys.stderr)
             unmet = "\n".join(f"{item['id']} ({item['status']}): {item['reason']} Evidence: {item['evidence']}"
                               for item in verdict["items"] if item["status"] != "pass")
             return {"systemMessage": f"Harness ended after attempt {attempt}; unmet items:\n{unmet}"}
         self.save(state, session)
+        if verdict["reinstruct_message"] is None:
+            raise ValueError("failing verdict before attempt limit has null reinstruct_message")
         return {"decision": "block", "reason": verdict["reinstruct_message"]}
+
+
+    def generate_handoff(self, state: dict[str, Any], transcript: str) -> None:
+        """Publish a validated current handoff; archive obsolete context on failure."""
+        current = Path(state["handoff_path"])
+        pending = self.directory / f"handoff.pending.{uuid4().hex}.json"
+        try:
+            self.call("controller", "handoff", [
+                "--transcript", transcript, "--contract", state["contract_path"],
+                "--verdict", state["verdict_path"], "--backend", os.environ.get("HARNESS_BACKEND", "codex_cli"),
+                "--out", str(pending),
+            ], pending)
+            self.call("verifier", "validate-handoff", ["--handoff", str(pending)], pending)
+            validate(pending, "handoff.schema.json")
+            pending.replace(current)
+        except BaseException:
+            if current.exists():
+                current.rename(current.with_name(f"handoff.stale.{uuid4().hex}.json"))
+            raise

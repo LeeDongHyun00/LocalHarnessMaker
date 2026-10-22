@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from plugin.hooks._process import run_group
 from collections.abc import Callable
 
 
@@ -21,21 +22,23 @@ PROMPT = (
 )
 
 
-def prepare(output_dir: Path, run: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run) -> dict[str, object]:
+def prepare(output_dir: Path, run: Callable[..., subprocess.CompletedProcess[str]] = run_group) -> dict[str, object]:
     """Create fresh config/workspace outside the repository, without copying secrets."""
     output_dir = output_dir.resolve()
     if output_dir.exists():
         raise ValueError("use a new evidence directory for each run")
-    output_dir.mkdir(parents=True)
-    version = run(["codex", "--version"], text=True, capture_output=True, check=True).stdout.strip()
+    version = run(["codex", "--version"], text=True, capture_output=True, check=False, timeout=5, shell=False,
+                  env={**os.environ, "HARNESS_NESTED": "1"}).stdout.strip()
     pin = Path(__file__).with_name("CODEX_VERSION").read_text().strip()
     if version != pin:
         raise ValueError(f"Codex version mismatch: expected {pin}; found {version}")
+    output_dir.mkdir(parents=True)
     sandbox_dir = Path(tempfile.mkdtemp(prefix="harness-hook-probe-"))
     config_home = sandbox_dir / "codex-home"
     workspace = sandbox_dir / "workspace"
     config_home.mkdir()
     workspace.mkdir()
+    (workspace / ".local-harness-maker").write_text("LocalHarnessMaker project opt-in v1\n")
     # Reuse existing local login via a symlink outside the repo; never read credentials.
     auth_home = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
     auth_path = auth_home / "auth.json"

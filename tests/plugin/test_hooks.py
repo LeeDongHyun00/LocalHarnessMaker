@@ -28,6 +28,7 @@ def harness(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
     monkeypatch.delenv("HARNESS_STUB", raising=False)
     monkeypatch.delenv("HARNESS_EVENT_LOG", raising=False)
     monkeypatch.setenv("HARNESS_MAX_ATTEMPTS", "3")
+    (tmp_path / ".local-harness-maker").touch()
     transcript = tmp_path / "transcript.jsonl"
     transcript.write_text('{"type":"example"}\n')
     calls: list[dict[str, Any]] = []
@@ -39,11 +40,13 @@ def harness(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         assert kwargs["env"]["HARNESS_NESTED"] == "1"
         assert kwargs["shell"] is False
         assert kwargs["capture_output"] is True
-        assert kwargs["timeout"] <= 30
+        assert kwargs["timeout"] <= 480
         flag = "--handoff" if operation == "validate-handoff" else "--out"
         out = Path(command[command.index(flag) + 1])
         if operation == "contract":
             shutil.copyfile(ROOT / "schemas/examples/contract.json", out)
+        elif operation == "handoff":
+            shutil.copyfile(ROOT / "schemas/examples/handoff.json", out)
         elif operation == "check":
             attempt = int(command[command.index("--attempt") + 1])
             name = "verdict_fail.json" if attempt == 1 else "verdict_pass.json"
@@ -55,7 +58,8 @@ def harness(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         return subprocess.CompletedProcess(command, control["returncode"],
                                            control["stdout"] if control["stdout"] is not None else str(out) + "\n", "")
 
-    monkeypatch.setattr(subprocess, "run", run)
+    import _runtime
+    monkeypatch.setattr(_runtime, "run_group", run)
 
     def drive(event: str, **updates: Any) -> tuple[dict[str, Any] | None, str]:
         payload = {"session_id": "session-1", "cwd": str(tmp_path), "model": "test",
@@ -105,13 +109,13 @@ def test_approval_then_one_reinstruction_then_pass(harness: dict[str, Any]) -> N
     assert len(calls) == 1
     assert drive("Stop")[0]["decision"] == "block"
     assert drive("Stop", stop_hook_active=True)[0] is None
-    assert [call["operation"] for call in calls] == ["contract", "check", "check"]
+    assert [call["operation"] for call in calls] == ["contract", "check", "check", "handoff", "validate-handoff"]
     state = json.loads((root / ".harness/state.json").read_text())
     assert set(state) == {"attempt", "contract_path", "verdict_path", "handoff_path", "started_at"}
     assert state["attempt"] == 2
     assert json.loads((root / ".harness/session.json").read_text())["phase"] == "complete"
     assert drive("Stop")[0] is None
-    assert len(calls) == 3
+    assert len(calls) == 5
 
 
 def test_resume_preserves_pending_contract_but_new_session_resets(harness: dict[str, Any]) -> None:
@@ -162,7 +166,10 @@ def test_exhaustion_or_null_message_ends_with_unmet_items(
     drive = harness["drive"]
     drive("UserPromptSubmit", prompt="Add a health endpoint")
     drive("UserPromptSubmit", prompt="approve")
-    response, _ = drive("Stop")
+    response, stderr = drive("Stop")
+    if missing_message:
+        assert response is None and "null reinstruct_message" in stderr
+        return
     assert "decision" not in response
     assert "SC-3" in response["systemMessage"] and "SC-4" in response["systemMessage"]
     assert "Evidence:" in response["systemMessage"]
@@ -209,7 +216,7 @@ def test_default_three_attempt_limit_is_bounded(harness: dict[str, Any]) -> None
     assert drive("Stop", stop_hook_active=True)[0]["decision"] == "block"
     assert "unmet items" in drive("Stop", stop_hook_active=True)[0]["systemMessage"]
     assert drive("Stop", stop_hook_active=True)[0] is None
-    assert len(harness["calls"]) == 4
+    assert len(harness["calls"]) == 6
 
 
 @pytest.mark.parametrize("event", HOOKS)
@@ -265,7 +272,7 @@ def test_thirty_second_contract_timeout_logs_and_fails_open(
         assert kwargs["timeout"] == 30
         raise subprocess.TimeoutExpired(command, kwargs["timeout"])
 
-    monkeypatch.setattr(subprocess, "run", timeout)
+    monkeypatch.setattr(_runtime, "run_group", timeout)
     response, stderr = harness["drive"]("UserPromptSubmit", prompt="request")
     assert response is None
     assert "latency_seconds=30.001000" in stderr
@@ -273,3 +280,102 @@ def test_thirty_second_contract_timeout_logs_and_fails_open(
     assert "warning: TimeoutExpired" in stderr
     assert harness["drive"]("Stop")[0] is None
     assert len(calls) == 1
+
+
+def test_pass_generates_validated_handoff_for_next_session(harness: dict[str, Any]) -> None:
+    drive = harness['drive']
+    drive('UserPromptSubmit', prompt='request')
+    drive('UserPromptSubmit', prompt='approve')
+    drive('Stop')
+    assert drive('Stop')[0] is None
+    handoff = harness['root'] / '.harness/handoff.json'
+    assert handoff.read_bytes() == (ROOT / 'schemas/examples/handoff.json').read_bytes()
+    output, stderr = drive('SessionStart', session_id='next-session')
+    assert 'HARNESS_HANDOFF' in output['hookSpecificOutput']['additionalContext']
+    assert 'warning' not in stderr
+    assert harness['calls'][-1]['operation'] == 'validate-handoff'
+
+
+def test_handoff_error_fails_open_archiving_previous_handoff(harness: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
+    import _runtime
+    original = _runtime.Runtime.call
+
+    def call(self: Any, module: str, operation: str, args: list[str], output: Path) -> None:
+        if operation == 'handoff':
+            output.write_text('broken')
+            raise RuntimeError('handoff failed')
+        original(self, module, operation, args, output)
+
+    monkeypatch.setattr(_runtime.Runtime, 'call', call)
+    drive = harness['drive']
+    drive('UserPromptSubmit', prompt='request')
+    drive('UserPromptSubmit', prompt='approve')
+    previous = harness['root'] / '.harness/handoff.json'
+    previous.write_bytes((ROOT / 'schemas/examples/handoff.json').read_bytes())
+    drive('Stop')
+    output, stderr = drive('Stop')
+    assert output is None and 'warning: RuntimeError: handoff failed' in stderr
+    assert not previous.exists()
+    assert next(previous.parent.glob("handoff.stale.*.json")).read_bytes() == (ROOT / "schemas/examples/handoff.json").read_bytes()
+    assert drive('Stop')[0] is None
+
+
+@pytest.mark.parametrize("bad", ["{broken", '{"session_id": 3, "phase": "approved"}', '{}'])
+def test_malformed_session_is_archived_and_reset(harness: dict[str, Any], bad: str) -> None:
+    drive, root = harness['drive'], harness['root']
+    drive('UserPromptSubmit', prompt='first task')
+    path = root / '.harness/session.json'
+    path.write_text(bad)
+    output, stderr = drive('UserPromptSubmit', prompt='new task')
+    assert 'HARNESS_CONTRACT' in output['hookSpecificOutput']['additionalContext']
+    assert 'malformed session metadata renamed' in stderr
+    assert next(path.parent.glob('session.bad.*.json')).read_text() == bad
+    assert json.loads((path.parent / 'state.json').read_text())['attempt'] == 0
+
+
+def test_exhaustion_generates_handoff_and_reports_unmet_items(harness: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv('HARNESS_MAX_ATTEMPTS', '1')
+    drive = harness['drive']
+    drive('UserPromptSubmit', prompt='request')
+    drive('UserPromptSubmit', prompt='approve')
+    output, _ = drive('Stop')
+    assert 'unmet items' in output['systemMessage']
+    assert [call['operation'] for call in harness['calls']] == ['contract', 'check', 'handoff', 'validate-handoff']
+    output, _ = drive('SessionStart', session_id='next-session')
+    assert 'HARNESS_HANDOFF' in output['hookSpecificOutput']['additionalContext']
+
+
+@pytest.mark.parametrize('failure', ['generation', 'validation'])
+def test_exhausted_handoff_failure_archives_stale_context(harness: dict[str, Any], monkeypatch: pytest.MonkeyPatch, failure: str) -> None:
+    import _runtime
+    monkeypatch.setenv('HARNESS_MAX_ATTEMPTS', '1')
+    original = _runtime.Runtime.call
+    def call(self: Any, module: str, operation: str, args: list[str], output: Path) -> None:
+        if operation == ('handoff' if failure == 'generation' else 'validate-handoff'):
+            raise RuntimeError('simulated handoff failure')
+        original(self, module, operation, args, output)
+    monkeypatch.setattr(_runtime.Runtime, 'call', call)
+    drive, root = harness['drive'], harness['root']
+    drive('UserPromptSubmit', prompt='request')
+    drive('UserPromptSubmit', prompt='approve')
+    old = root / '.harness/handoff.json'
+    old.write_bytes((ROOT / 'schemas/examples/handoff.json').read_bytes())
+    output, stderr = drive('Stop')
+    assert 'unmet items' in output['systemMessage']
+    assert 'handoff failed' in stderr and not old.exists()
+    assert next(old.parent.glob('handoff.stale.*.json')).is_file()
+    assert drive('SessionStart', session_id='next-session')[0] is None
+
+
+def test_json_state_publish_is_atomic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from plugin.hooks._runtime import write_json
+    path = tmp_path / 'state.json'
+    path.write_text('{"old": true}')
+    original = Path.replace
+    def replace(source: Path, target: Path) -> Path:
+        assert path.read_text() == '{"old": true}'
+        assert json.loads(source.read_text()) == {'new': True}
+        return original(source, target)
+    monkeypatch.setattr(Path, 'replace', replace)
+    write_json(path, {'new': True})
+    assert json.loads(path.read_text()) == {'new': True}

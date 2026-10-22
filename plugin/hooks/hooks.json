@@ -2,6 +2,6 @@
   "hooks": {
     "SessionStart": [{"hooks": [{"type": "command", "command": "\"${HARNESS_PYTHON:-python3}\" \"$PLUGIN_ROOT/hooks/session_start.py\"", "timeout": 10}]}],
     "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "\"${HARNESS_PYTHON:-python3}\" \"$PLUGIN_ROOT/hooks/user_prompt_submit.py\"", "timeout": 40, "additionalContextLimit": 5000}]}],
-    "Stop": [{"hooks": [{"type": "command", "command": "\"${HARNESS_PYTHON:-python3}\" \"$PLUGIN_ROOT/hooks/stop.py\"", "timeout": 40}]}]
+    "Stop": [{"hooks": [{"type": "command", "command": "\"${HARNESS_PYTHON:-python3}\" \"$PLUGIN_ROOT/hooks/stop.py\"", "timeout": 660}]}]
   }
 }
