@@ -77,3 +77,25 @@ The user told Claude to proceed with the recommended options for the open decisi
 5. Bridge. Use the bridge only for private-write jobs, run with --once so that it exits after the job. All other jobs run directly.
 6. Plan usage. No change: the pilot reports usage before any full run, and a full run needs the user's explicit approval.
 7. Minor. docs/plan.md cites the local path of the Notion export. The Role 1 job that records the freeze hash will cite the Notion page instead.
+
+## Later on 2026-10-22
+
+Live control calls on the host (codex_cli, gpt-6-luna, first call, no fallback): contract 15.6 s with the machine idle and 20.0 s under four concurrent Codex jobs, judge 14.4 s, handoff 13.2 s. All three outputs were schema-valid, and stdout was exactly the output path.
+
+Revisions to decision 2 (deadlines):
+- Controller per-call deadline, codex_cli and cheap_api: 35 s (commit 0d57e36). Three calls take about 108 s, which fits the 120 s judge budget.
+- Stop hook timeout 660 s. Inside it: verifier check 480 s, with the verifier's own overall budget of 450 s (HARNESS_VERIFY_BUDGET_SECONDS); controller handoff 120 s; validate-handoff 5 s; and a cleanup reserve.
+- UserPromptSubmit stays at 40 s with a 30 s contract call (user-approved). This path is a documented exception: the plugin cuts the contract call off before the controller's 35 s deadline, so the controller's fallback cannot run there.
+- Timeouts in hooks.json are JSON integers. Every hooks.json verified on the host used integers.
+
+Further decisions:
+8. Process shutdown. Every harness process that starts children (the plugin hooks and verifier check) follows one protocol. On SIGTERM, SIGHUP, SIGINT or its own deadline, it sends SIGTERM to its child process groups, waits 2 s, then SIGKILLs the groups still alive. After a child exits normally, it kills that child's group. A review reproduced orphaned verifier, controller and test processes after the hook was terminated.
+9. Project scoping. The installer marks the target project. Hooks exit with no output and no writes outside a marked project, so a user-level install does not touch other work.
+10. Handoff when retries run out. The Stop hook also writes a validated handoff, whose remaining list carries the unmet items. If generating it fails, the previous handoff is renamed so that it is not injected as current.
+
+Evaluation set: Role 5 wrote and validated private graders for all 120 tasks (80205d3, ad7d7be). Claude checked them on the host:
+- 120 of 120 valid.
+- No private path and no task-specific grader line in any public file.
+- Independent mutation testing of the references: 1021 of 1067 mutants killed, and every inspected survivor in the twelve weakest tasks was behavior-equivalent.
+
+The task set was frozen at 7cdaf3b with digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f, recorded in docs/eval-freeze.md (57a9606). The validation runs of r5-graders-001 had left 1019 grading copies in the system temporary directory; Claude moved them into the private root, and r5-graders-002 stopped validation runs from leaving such copies. ~/.claude is now a protected audit root, because Claude's transcripts live there.
