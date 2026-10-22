@@ -1,48 +1,51 @@
 ## Done
 
-- Implemented approved M2 without shared interface changes: STOP-E1 exits 2, prints halt/count diagnostics, retains checkpoint and diagnostics, publishes no partial report, and resumes with the same output directory; replaced the strict xfail and removed the STOP-1 blocker (.venv/bin/python -m pytest tests/eval -q: 321 passed).
-- Made task-set hashing use tracked public inputs only, excluding ignored/untracked generated files; tracked edits still change identity and missing/symlinked tracked inputs are rejected (.venv/bin/python -m pytest tests/eval -q: 321 passed).
-- Created and validated external graders and private final-state reference overlays for all 120 tasks, with family-batch STATUS/summary checkpoints; retained the existing bug-chunk-tail grader after revalidation (.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all > "$PRIVATE_ROOT/validation-final-with-hash.jsonl": exit 0, 120 valid/0 invalid; originals 155 passed/443 failed, references 598 passed/0 failed; bug-chunk-tail original 0/3, reference 3/0).
-- Added reusable isolated grader validation and synthetic-root tests; published per-task counts/grader hashes and enumerated every public specification/metadata change; public workspace sources remain unchanged (.venv/bin/python -m pytest tests/eval -q: 321 passed; git diff --name-only -- eval/tasks: 377 prompt/metadata files, no workspace source changes).
-- Computed the all-task fingerprint through the runner's taskset_digest: 32af2a304d8131ae5291668b502520952cbd5da930eee73d3e1536ba4c58f643 (.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all > "$PRIVATE_ROOT/validation-final-with-hash.jsonl": exit 0, task_count=120, valid_count=120, matching task_set_sha256).
+- Added deterministic reference-overlay mutation validation through grade(), with all requested operators, passing reference controls, bounded deadlines, private review/equivalence records, stale-record rejection and per-task acceptance checks (.venv/bin/python -m pytest tests/eval -q: 332 passed).
+- Reviewed all 94 survivors from the initial expanded 1,985-mutant pass; strengthened 23 private graders for specification-defined behavior and recorded 71 equivalents privately (.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all --mutants 10000 > "$PRIVATE_ROOT/mutation-after-full.jsonl": 120 tasks, 1914 killed, 71 recorded equivalent, 0 survived, exit 0; every task has a 1.00 non-equivalent kill rate).
+- Kept validation/mutation copies and logs inside private temporary storage with cleanup, preserved evaluation retention, and isolated synthetic test retention under pytest storage (.venv/bin/python -m pytest tests/eval -q: 332 passed, including validation/mutation copy-location and cleanup checks).
+- Added Claude transcript storage to protected audit roots, using the existing alias, case-insensitive canonicalization, symlink, denied-access and recursive ancestor behavior (.venv/bin/python -m pytest tests/eval -q: 332 passed).
+- Revalidated all 120 tasks and updated only counts/hashes in the grader inventory; public originals remain 155 passed/443 failed and references 598 passed/0 failed (.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all > "$PRIVATE_ROOT/validation-mutation-final.jsonl": 120 valid, 0 invalid, exit 0).
+- Recomputed task-set SHA-256 ea8e9a6df55b22a01fc87a66298262f3cd7e738f8af8ca0853d3f877f5b9f12f without changing public task inputs (.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all > "$PRIVATE_ROOT/validation-mutation-final.jsonl": matching task_set_sha256).
+- Retained the approved M2 halt/recovery and tracked-public-input digest implementation from the reviewed commit (.venv/bin/python -m pytest tests/eval -q: 332 passed).
 
 ## Remaining
 
-- Claude reviews the task/grader validation and public specification changes; Role 1 records the freeze. All public tasks still have frozen=false; no freeze document was written.
-- Human review of structural helper extraction and submitted regression coverage quality remains necessary: behavioral graders deliberately do not prescribe implementation details.
-- Pending host verification: installed CLI executor/controller/verifier/resume compatibility, actual nested guard, retry behavior, complete event capture, aliases, process termination and sandbox behavior. Network, nested execution, live calls and macOS sandbox-exec are unavailable here and were not attempted.
-- Implement and host-verify two-session handoff execution/observations; current private references and graders check the final day-2 state without any executor.
-- Obtain verified versioned prices and actual per-call accounting; complete done-claim denominator and hash-pinned paired local-minus-cheap_api parity. Missing observations remain undefined.
+- Host reviewer verifies private mutation/equivalence records and the new task-set digest; Role 1 records the freeze. All public tasks remain unfrozen; no freeze document was written.
+- Human review of structural helper extraction and submitted regression coverage quality remains necessary; behavioral grading does not prescribe implementation details.
+- Host verification remains pending for installed CLI executor/controller/verifier/resume compatibility, actual nested guard, retry behavior, complete event capture, aliases, process termination and sandbox behavior.
+- Implement and host-verify two-session handoff execution/observations; private references and graders currently check final day-2 behavior without an executor.
+- Obtain verified versioned prices and actual call accounting; complete done-claim denominator and hash-pinned paired local-minus-cheap_api parity. Missing observations remain undefined.
 - Estimate and obtain approval for the 10-task pilot, manually re-check five baseline samples, then obtain explicit full-run approval. D-2 through D-5 measurements remain pending.
 - Run the full repository suite once before a future merge; this session ran only tests/eval and did not stage or commit.
 
 ## Decisions
 
-- Halt without a report and retain recovery evidence: the approved M2 decision supersedes the earlier schema-change proposal.
-- Hash only version-controlled public files plus private grader contents: generated files cannot silently change task identity.
-- Keep 25 related families and 20 two-session tasks: preserve the approved experimental task-type factor and disclose family correlation.
-- Make submitted unittest requirements explicit: bug fixes need one method, features/refactorings two, multiple-requirement/two-session tasks three; refactoring originals already satisfy functional behavior.
-- Keep graders behavioral: refactoring variants exercise both public APIs; multiple-requirement variants check the public docstring; two-session variants check both APIs, batch semantics and handoff evidence.
-- Keep all reference implementations and grader sources private and apply references only to copies: no public workspace execution, model calls or private source disclosure.
+- Mutate application and submitted regression overlays: reproduce the full reference-artifact validation surface while preserving all private material outside public files.
+- Require a passing reference control at the same deadline and count mutation nontermination as killed: a mutant must retain specified observable behavior, including completion.
+- Bind manually reviewed equivalences to the complete overlay, mutated source, destination and public prompt/expected hashes: stale records cannot silently suppress new survivors.
+- Keep validation storage private and temporary while preserving evaluation retention: validation has no executor audit evidence to retain, and must not scatter private copies.
+- Compare the user's supplied sampled before rates with explicitly identified expanded after rates: the populations differ, so raw rates are not a paired causal estimate.
+- Keep public expected test-group counts and task specifications unchanged: additional private cases exercise already stated behavior.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
-- .venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all > "$PRIVATE_ROOT/validation-final-with-hash.jsonl"
+- .venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all --mutants 10000 > "$PRIVATE_ROOT/mutation-after-full.jsonl"
+- .venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all > "$PRIVATE_ROOT/validation-mutation-final.jsonl"
 - git diff --check -- eval tests/eval state/STATUS-eval.md
 - Before a future merge only: full repository test suite once.
 
 ## Do not touch
 
-- controller/, verifier/, plugin/, shared schemas/configuration, other roles' tests/STATUS files, or concurrent changes; never share task contents with Role 3.
+- controller/, verifier/, plugin/, shared schemas/configuration, other roles' tests/STATUS files, concurrent changes and docs/eval-freeze.md; never share task contents with Role 3.
 - .git and historical reports; do not stage, commit, delete repository files or rewrite history.
 - No executor, controller, judge or live model calls until host prerequisites and pilot authorization are satisfied.
-- Never publish private locations, reference implementations or grader contents. Repository tests use synthetic private roots only.
+- Never publish private locations, graders, references, mutants or equivalence rationales. Repository tests use synthetic roots under pytest temporary storage only.
 
 ## Assumptions
 
-- The user's 2026-10-22 priority order and private-write authorization supersede stale STATUS restrictions and the obsolete M2 blocker.
-- PRIVATE_ROOT in verification commands is a trusted shell variable supplied explicitly; no private location is stored in repository files or inherited by executors.
-- Public regression-method minimums clarify delivery requirements rather than changing family algorithms; quality/structural compliance still require reviewer inspection.
-- Validation counts test methods/groups, with errors counted as failures; it establishes negative/reference discrimination, not executor quality, task independence or read isolation.
-- The task-set fingerprint is a candidate for Claude verification and Role 1 freeze recording, not evidence of a completed evaluation run.
+- The user's current priority order and explicit private-write authorization govern this session; no network, nested execution or model calls are needed for this work.
+- PRIVATE_ROOT in verification commands is supplied explicitly by the trusted caller; its value is never persisted in public files or forwarded to executors.
+- The user's earlier kill rates use a smaller mutation sample. The new all-operator pass covers all 1,985 generated candidates; after rates exclude manually reviewed equivalents.
+- A passing submitted-test mutation is equivalent only if application behavior and specified submitted-test requirements remain satisfied; this does not certify test quality.
+- Offline validation establishes public/reference discrimination and mutation sensitivity, not executor quality, task independence, read isolation or completed measurement deliverables.

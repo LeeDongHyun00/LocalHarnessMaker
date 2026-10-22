@@ -381,3 +381,69 @@ was changed. Bug-chunk-tail public files are unchanged.
 | two-session-strip-prefix | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
 | two-session-window-slices | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
 | two-session-word-counts | `prompt.md`, `expected.json`, `meta.json`, `day2.md` |
+
+## 2026-10-22 mutation and validation hygiene
+
+Strengthened 23 external graders after reviewing all survivors from a deterministic
+1,985-mutant offline pass. Tests remain limited to public prompt/expected behavior;
+public tasks, workspaces and expected test-group counts are unchanged. The initial
+pass killed 1,891 mutants. Review identified 23 behavioral gaps and 71 equivalent
+mutants; equivalence rationales and generated source remain private.
+
+Added `--mutants N` to the standalone grader validator, covering all requested AST
+operator families, both application/regression overlays, exact runner grading,
+passing reference controls, bounded deadlines, private review records and a 90%
+per-task non-equivalent kill threshold. Reference/specification changes invalidate
+recorded equivalences. Mutation stdout contains task IDs and counts only.
+
+Validation/mutation runtimes and grading copies now stay under the explicitly
+supplied private root and are cleaned on exit. Evaluation retention is unchanged.
+Synthetic runner tests use pytest temporary storage. Claude transcript storage is
+protected alongside Codex storage, with alias, case-insensitive, symlink, denied
+access and recursive ancestor coverage.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 332 passed. All 120 untouched
+and reference task pairs validate: originals 155 passed/443 failed, references
+598 passed/0 failed. `GRADERS-PENDING.md` changes only 23 rows' grader hashes;
+method/group counts remain unchanged. Publication checks found no private path or
+task-specific grader line in 550 public evaluation/test/status files. No executor
+or model calls were made; no freeze document was written.
+
+Assumptions: the user's earlier sampled rates describe a different, smaller mutant
+population. Report them as the supplied before values; the new deterministic pass
+covers every generated mutant, including submitted-test overlays. Passing test-only
+mutations are equivalent only when the specified application behavior and submitted
+test requirements remain satisfied. Behavioral grading still leaves structural
+helper extraction and regression quality for human review.
+
+The final mutation command exited 0 for all 120 tasks: 1,914 killed, 71 recorded
+equivalent, zero survived/errors. Every task kills 100% of its non-equivalent
+mutants (raw aggregate 1,914/1,985). The expanded initial/final candidate populations
+are identical; this session's raw count improved from 1,891 to 1,914 killed.
+
+| Task ID | Supplied sampled before | Expanded after, excluding equivalents | Killed / equivalent |
+| --- | --- | --- | --- |
+| multiple-requirements-clamp-values | 0.55 | 1.00 | 12 / 6 |
+| two-session-clamp-values | 0.55 | 1.00 | 13 / 6 |
+| bug-fix-clamp-values | 0.67 | 1.00 | 8 / 2 |
+| feature-plus-test-clamp-values | 0.71 | 1.00 | 10 / 4 |
+| feature-plus-test-ordinal-labels | 0.73 | 1.00 | 24 / 3 |
+| multiple-requirements-ordinal-labels | 0.73 | 1.00 | 25 / 3 |
+| constrained-refactoring-clamp-values | 0.75 | 1.00 | 12 / 4 |
+| constrained-refactoring-ordinal-labels | 0.82 | 1.00 | 26 / 3 |
+| bug-fix-last-index | 0.83 | 1.00 | 11 / 0 |
+| feature-plus-test-last-index | 0.83 | 1.00 | 12 / 0 |
+| multiple-requirements-last-index | 0.83 | 1.00 | 12 / 0 |
+| bug-fix-inclusive-range | 0.86 | 1.00 | 14 / 1 |
+
+Reproduction commands (PRIVATE_ROOT is supplied explicitly by the trusted caller):
+
+```sh
+.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all --mutants 10000 > "$PRIVATE_ROOT/mutation-after-full.jsonl"
+.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all > "$PRIVATE_ROOT/validation-mutation-final.jsonl"
+```
+
+The second command exited 0 with 120 valid/0 invalid and task-set SHA-256
+`ea8e9a6df55b22a01fc87a66298262f3cd7e738f8af8ca0853d3f877f5b9f12f`.
+Host review and Role 1 freeze recording remain pending. No staging or commit was
+attempted; the full repository suite remains a future pre-merge check.

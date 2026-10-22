@@ -265,10 +265,11 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
     errors: list[str] = []
     logs: list[dict[str, Any]] = []
     repository = (repository or Path(__file__).resolve().parents[2]).resolve()
-    roots = [Path.home() / ".codex", repository.parent / "codex-bridge", repository,
+    roots = [Path.home() / ".claude", Path.home() / ".codex", repository.parent / "codex-bridge", repository,
              private.root, *grading_roots]
-    aliases = {"~/.codex": Path.home() / ".codex", "$HOME/.codex": Path.home() / ".codex",
-               "${HOME}/.codex": Path.home() / ".codex"}
+    aliases = {prefix + name: Path.home() / name
+               for name in (".codex", ".claude")
+               for prefix in ("~/", "$HOME/", "${HOME}/")}
     fingerprints = private.line_fingerprints()
     calls: dict[str, str] = {}
     pending_calls: set[str] = set()

@@ -231,3 +231,22 @@ def test_private_line_fingerprint_catches_dynamic_output(tmp_path: Path, private
     assert result['status'] == 'access_detected'
     assert result['matches'][0]['marker'] == 'private_line_fingerprint'
     assert line not in json.dumps(result)
+
+
+@pytest.mark.parametrize('target', ['~/.claude/projects/session.jsonl', '$HOME/.claude/projects',
+                                   '${HOME}/.claude/agents', 'uppercase', 'alias', 'ancestor'])
+def test_claude_transcripts_are_protected(tmp_path: Path, private: PrivateGraders,
+                                          monkeypatch: pytest.MonkeyPatch, target: str) -> None:
+    home = tmp_path / 'home'
+    (home / '.claude/projects').mkdir(parents=True)
+    monkeypatch.setattr(Path, 'home', classmethod(lambda cls: home))
+    workspace = tmp_path / 'workspace'
+    workspace.mkdir()
+    (workspace / 'transcripts').symlink_to(home / '.claude')
+    command = {
+        'uppercase': 'cat ' + str(home).upper() + '/.CLAUDE/projects/session.jsonl',
+        'alias': 'cat transcripts/projects/session.jsonl',
+        'ancestor': 'find ' + str(home) + ' -type f',
+    }.get(target, 'cat ' + target)
+    assert audit_command(tmp_path, private, command, workspace,
+                         aggregated_output='Permission denied', exit_code=1)['status'] == 'access_detected'

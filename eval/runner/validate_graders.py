@@ -6,6 +6,7 @@ must never be named test_*.py. Only counts and content hashes are published.
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path
 import shutil
@@ -15,6 +16,7 @@ from typing import Any
 from eval.runner import core
 from eval.runner.audit import PrivateGraders, digest
 from eval.runner.process import run_process
+from eval.runner.mutations import mutations
 
 
 def apply_reference(reference: Path, workspace: Path) -> None:
@@ -42,7 +44,7 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
     public = core.REPOSITORY / 'eval/tasks' / task_id
     expected = json.loads((public / 'expected.json').read_text())
-    with tempfile.TemporaryDirectory(prefix='lhm-grader-validation-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='lhm-grader-validation-', dir=private.root) as temporary:
         runtime = Path(temporary)
         results = []
         for label in ('public', 'reference'):
@@ -52,7 +54,7 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
             if label == 'reference':
                 apply_reference(private.root / '.references' / task_id, workspace)
             result = core.grade(workspace, private, runtime, runtime / f'{label}.log',
-                                expected, 30, run_process)
+                                expected, 30, run_process, retention_root=runtime / "grading-copies")
             results.append(result)
     baseline, reference = results
     valid = (baseline['result'] == 'fail' and baseline['failed_tests'] >= 1
@@ -64,14 +66,91 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
             'grader_sha256': [digest(p.read_bytes()) for p in private.files]}
 
 
+def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
+    """Grade reference-overlay mutants; keep review/equivalence data private.
+
+    Application and submitted regression overlays are both mutated. Equivalences
+    must be reviewed manually and contain a nonempty rationale, bound to source
+    and public specification hashes. A survivor is never automatically equivalent.
+    """
+    private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
+    public = core.REPOSITORY / 'eval/tasks' / task_id
+    reference = private.root / '.references' / task_id
+    files = json.loads((reference / 'application.json').read_text())['files']
+    expected = json.loads((public / 'expected.json').read_text())
+    specification = digest((public / 'prompt.md').read_bytes() + (public / 'expected.json').read_bytes())
+    records = private.root / '.mutation-records'
+    records.mkdir(mode=0o700, exist_ok=True)
+    equivalence_path = records / (task_id + '.equivalences.json')
+    equivalences = json.loads(equivalence_path.read_text()) if equivalence_path.exists() else {}
+    counts = {'task_id': task_id, 'killed': 0, 'survived': 0, 'recorded_equivalent': 0}
+    reviews = []
+    with tempfile.TemporaryDirectory(prefix='lhm-mutations-', dir=private.root) as temporary:
+        runtime = Path(temporary)
+        baseline = runtime / 'reference'
+        shutil.copytree(public / 'workspace', baseline,
+                        ignore=shutil.ignore_patterns('__pycache__', '.pytest_cache'))
+        apply_reference(reference, baseline)
+        control = core.grade(baseline, private, runtime, runtime / 'reference.log',
+                             expected, 2, run_process, retention_root=runtime / 'grading-copies')
+        if control['result'] != 'pass':
+            raise ValueError('Mutation reference control must pass within the same deadline')
+        overlay_hash = digest(json.dumps([(source, target, digest((reference / source).read_bytes()))
+                                         for source, target in files.items()]).encode())
+        candidates = []
+        for source, target in files.items():
+            if Path(target).suffix == '.py':
+                original = (reference / source).read_text()
+                candidates.extend((target, digest(original.encode()), mutation)
+                                  for mutation in mutations(original))
+        for number, (target, original_hash, mutation) in enumerate(candidates[:limit]):
+            workspace = runtime / str(number)
+            shutil.copytree(public / 'workspace', workspace,
+                            ignore=shutil.ignore_patterns('__pycache__', '.pytest_cache'))
+            apply_reference(reference, workspace)
+            (workspace / target).write_text(mutation.source)
+            result = core.grade(workspace, private, runtime, runtime / f'{number}.log',
+                                expected, 2, run_process, retention_root=runtime / 'grading-copies')
+            identity = digest((target + overlay_hash + mutation.sha256 + specification).encode())
+            record = equivalences.get(identity, {})
+            equivalent = isinstance(record, dict) and isinstance(record.get('reason'), str) and bool(record['reason'].strip())
+            # Nontermination violates the same behavior as a failed assertion.
+            killed = bool(result.get('timed_out')) or (result['result'] == 'fail' and result['failed_tests'] > 0)
+            outcome = 'killed' if killed else 'recorded_equivalent' if equivalent and result['result'] == 'pass' else 'survived'
+            counts[outcome] += 1
+            reviews.append({'id': identity, 'target': target, 'reference_sha256': original_hash,
+                            'mutant_sha256': mutation.sha256, 'specification_sha256': specification,
+                            'kind': mutation.kind, 'line': mutation.line, 'before': mutation.before,
+                            'after': mutation.after, 'source': mutation.source, 'outcome': outcome})
+    (records / (task_id + '.review.json')).write_text(json.dumps(reviews, indent=2) + '\n')
+    return counts
+
+
 def main() -> int:
     """Print task identifiers, counts and hashes only, even on setup failures."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--private-root', type=Path, required=True)
     parser.add_argument('--tasks', nargs='+', required=True)
+    parser.add_argument('--mutants', type=int, help='Maximum reference-overlay mutants per task; offline only')
     args = parser.parse_args()
     tasks = (sorted(p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir() if p.is_dir())
              if args.tasks == ['all'] else args.tasks)
+    if args.mutants is not None:
+        if args.mutants < 1:
+            parser.error('--mutants must be positive')
+        def measure(task: str) -> dict[str, Any]:
+            try:
+                return mutate_task(args.private_root, task, args.mutants)
+            except Exception:
+                return {'task_id': task if task in {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir()} else 'unknown',
+                        'killed': 0, 'survived': 0, 'recorded_equivalent': 0, 'error_count': 1}
+        accepted = True
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            for row in pool.map(measure, tasks):
+                denominator = row['killed'] + row['survived']
+                accepted &= not row.get('error_count') and denominator > 0 and row['killed'] / denominator >= 0.90
+                print(json.dumps(row, sort_keys=True), flush=True)
+        return 0 if accepted else 1
     valid = 0
     for task in tasks:
         try:

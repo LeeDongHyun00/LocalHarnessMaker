@@ -103,10 +103,11 @@ def publish(source: Path, destination: Path, private: PrivateGraders) -> None:
 def grade(
     workspace: Path, private: PrivateGraders, runtime: Path, destination: Path,
     expected: dict[str, Any], timeout: float, execute: Callable[..., ProcessResult],
+    *, retention_root: Path | None = None,
 ) -> dict[str, Any]:
     """Create an independent grading copy only after all executor turns exited."""
     # Retained separately from executor runtimes; every run audits this location.
-    retained = Path(tempfile.gettempdir()) / "lhm-retained-grading"
+    retained = retention_root if retention_root is not None else Path(tempfile.gettempdir()) / "lhm-retained-grading"
     retained.mkdir(mode=0o700, exist_ok=True)
     grading = retained / ("grading-" + uuid.uuid4().hex)
     if any(p.is_symlink() for p in workspace.rglob("*")):

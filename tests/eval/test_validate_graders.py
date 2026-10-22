@@ -16,6 +16,7 @@ def synthetic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Pa
     (public / 'workspace').mkdir(parents=True)
     (public / 'workspace/example.py').write_text('def answer() -> int: return 0\n')
     (public / 'expected.json').write_text(json.dumps({'expected_test_count': 1}))
+    (public / 'prompt.md').write_text('Return the specified synthetic answer.')
     private = tmp_path / 'trusted'
     (private / 'synthetic').mkdir(parents=True)
     (private / 'synthetic/test_private_abc123.py').write_text(
@@ -94,3 +95,74 @@ def test_cli_success_includes_runner_taskset_hash(synthetic: tuple[Path, Path],
     assert rows[-1]['task_set_sha256'] == core.taskset_digest({
         'synthetic': PrivateGraders.load(private, 'synthetic', core.REPOSITORY)})
     assert str(private) not in output.out + output.err
+
+
+def test_validation_keeps_grading_and_runtime_inside_private_root(
+    synthetic: tuple[Path, Path], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private, _ = synthetic
+    original = core.grade
+    copies = []
+
+    def inspect(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        assert Path(args[2]).is_relative_to(private)
+        assert kwargs['retention_root'].is_relative_to(private)
+        result = original(*args, **kwargs)
+        copies.append(Path(result['copy_path']))
+        assert copies[-1].is_relative_to(private)
+        return result
+
+    monkeypatch.setattr(core, 'grade', inspect)
+    assert validate_graders.validate_task(private, 'synthetic')['valid_count'] == 1
+    assert len(copies) == 2
+    assert all(not path.exists() for path in copies)
+
+
+def test_mutation_counts_and_stale_equivalence(synthetic: tuple[Path, Path]) -> None:
+    private, public = synthetic
+    row = validate_graders.mutate_task(private, 'synthetic', 10)
+    assert row == {'task_id': 'synthetic', 'killed': 2, 'survived': 0, 'recorded_equivalent': 0}
+    # A deliberately weak synthetic oracle permits the increment mutant.
+    grader = next((private / 'synthetic').glob('test_*.py'))
+    grader.write_text(grader.read_text().replace('self.assertEqual(answer(), 42)', 'self.assertIsInstance(answer(), int)'))
+    row = validate_graders.mutate_task(private, 'synthetic', 10)
+    assert row['survived'] == 1
+    records = private / '.mutation-records'
+    survivor = next(item for item in json.loads((records / 'synthetic.review.json').read_text())
+                    if item['outcome'] == 'survived')
+    (records / 'synthetic.equivalences.json').write_text(json.dumps({survivor['id']: {'reason': 'Synthetic review only'}}))
+    assert validate_graders.mutate_task(private, 'synthetic', 10)['recorded_equivalent'] == 1
+    (public / 'prompt.md').write_text('Changed synthetic contract')
+    assert validate_graders.mutate_task(private, 'synthetic', 10)['recorded_equivalent'] == 0
+
+
+def test_mutation_cli_counts_only_and_private_cleanup(synthetic: tuple[Path, Path],
+                                                      monkeypatch: pytest.MonkeyPatch,
+                                                      capsys: pytest.CaptureFixture[str]) -> None:
+    private, _ = synthetic
+    original = core.grade
+    copies = []
+
+    def inspect(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        assert Path(args[2]).is_relative_to(private)
+        assert kwargs['retention_root'].is_relative_to(private)
+        result = original(*args, **kwargs)
+        copies.append(Path(result['copy_path']))
+        return result
+
+    monkeypatch.setattr(core, 'grade', inspect)
+    monkeypatch.setattr('sys.argv', ['validate_graders', '--private-root', str(private),
+                                    '--tasks', 'all', '--mutants', '10'])
+    assert validate_graders.main() == 0
+    output = capsys.readouterr()
+    assert json.loads(output.out) == {'task_id': 'synthetic', 'killed': 2,
+                                      'survived': 0, 'recorded_equivalent': 0}
+    assert str(private) not in output.out + output.err
+    assert all(path.is_relative_to(private) and not path.exists() for path in copies)
+
+
+def test_mutation_requires_passing_reference_control(synthetic: tuple[Path, Path]) -> None:
+    private, _ = synthetic
+    (private / '.references/synthetic/example.py').write_text('def answer() -> int: return 0\n')
+    with pytest.raises(ValueError, match='control'):
+        validate_graders.mutate_task(private, 'synthetic', 10)

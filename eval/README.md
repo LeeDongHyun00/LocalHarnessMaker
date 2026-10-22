@@ -133,3 +133,27 @@ keeping an audit-clean executor failure a valid quality sample. Do not treat
 partial STOP-E1 reports as valid comparisons. The strict expected-failure test
 records the requested behavior pending a Role 1 schema decision. No live
 measurement was run during remediation.
+
+Offline grader mutation validation uses
+`.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all --mutants 10000`.
+The limit applies per task, across application and submitted regression overlays;
+10000 currently covers every generated mutant. Operators replace comparisons,
+swap binary addition/subtraction and boolean and/or, increment integer literals,
+replace returns with None, drop slice bounds/steps, and remove not. Each mutant
+has exactly one AST edit. Ordering is deterministic (manifest file order, then
+AST traversal and operator order), with duplicate source results removed.
+
+Mutation mode prints only task identifiers and killed/survived/equivalent counts.
+It returns success only when each task kills at least 90% of its non-equivalent
+mutants. A passing reference control is required under the same two-second
+per-grading deadline; assertion failures and deadline expiry kill mutants.
+At most four offline task validations run concurrently. No executor is launched.
+
+Review data is written beneath the explicitly supplied private root, in
+`.mutation-records/TASK.review.json`. Manually reviewed equivalences belong in
+`.mutation-records/TASK.equivalences.json`, as an object mapping review IDs to
+objects with a nonempty `reason`. IDs bind the entire reference overlay, mutated
+source, target and public prompt/expected hashes. Survivors are never classified
+equivalent automatically. Validation and mutation workspaces, logs and grading
+copies stay under the private root and are cleaned on exit, including failures;
+evaluation runs retain their existing grading-copy behavior.
