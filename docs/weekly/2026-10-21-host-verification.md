@@ -117,3 +117,9 @@ The task set was frozen at 7cdaf3b with digest b78913b04280f6696d419d2afdc96b152
   - gpt-6-luna: input 0.10, cached input 0.01, output 0.50.
   At these prices the recorded baseline A task (58248 input, 54656 cached, 524 output) comes to about 0.018 USD.
 - Plan usage: the primary weekly window was 4 percent at 2026-10-21 06:57 UTC and 21 percent at 2026-10-22 01:52 UTC. In between, the Codex development jobs used 26.7M input tokens (1.35M uncached) and 0.37M output tokens. Resumed long sessions were the most expensive; r2-cont-003 alone sent 5.0M input tokens. The window resets at 2026-10-28 04:03 UTC.
+
+## Codex version change and policy (2026-10-22)
+
+At about 03:57 UTC the ChatGPT app updated its bundled codex CLI from 0.162.0-alpha.17.2 to 0.163.0-alpha.11.1. No other codex binary exists on the Mac. Every run before that used 0.162.0-alpha.17.2: all 30 pilot executor sessions, according to their native session_meta cli_version and their report metadata, and every development job up to 03:50 UTC. The first two-session smoke after the change stopped before any model call: the runner reported "Installed Codex version differs from pinned configuration". The hook probe likewise refuses the new version.
+
+11. Codex version policy (user decision: the version may keep changing). Do not hold or roll back versions. Record the installed version in every run. Compare only reports produced with the same version (SC-3); a mixed-version comparison is diagnostic only. When the version changes, rerun the hook compatibility probe and a one-task audit compatibility smoke before any large run. A run must stop if the version changes in the middle of it. The plugin keeps a list of verified versions instead of a single pin. CLAUDE.md section 2 records the procedure, and Role 1 records decision 0006.

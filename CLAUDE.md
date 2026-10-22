@@ -14,7 +14,14 @@ Reason: the project measures how well a harness makes GPT-6.1 Sol work. Code wri
 
 ## 2. How to run Codex
 
-The codex binary is not on PATH in a plain Terminal. Use the path saved by the bridge in codex-bridge/codex-path.txt (currently /Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex). Version pinned in plugin/CODEX_VERSION: codex-cli 0.162.0-alpha.17.2. Do not upgrade.
+The codex binary is not on PATH in a plain Terminal. Use /Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex (the bridge saves it in codex-bridge/codex-path.txt when started with --codex).
+
+Codex version policy (user decision, 2026-10-22): the ChatGPT app updates the bundled CLI on its own, and the version may keep changing. Do not try to hold or roll back a version. Instead:
+- record the installed version in every run (evaluation reports already carry metadata codex_version);
+- compare only reports produced with the same version (SC-3); a comparison whose configurations ran on different versions is diagnostic only;
+- when the version changes, rerun the hook compatibility probe (plugin/probe.py, exec mode) and a one-task audit compatibility smoke before any large run, and send any new native record types to Role 5;
+- keep the history of versions and their probe evidence in plugin/ and docs/hooks-contract.md.
+The first change was observed on 2026-10-22 at about 03:57 UTC: 0.162.0-alpha.17.2 became 0.163.0-alpha.11.1. All pilots so far ran on 0.162.0-alpha.17.2.
 
 Two ways to run a job. Both reuse the Mac's ChatGPT login; no API key is needed.
 
