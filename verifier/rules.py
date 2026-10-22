@@ -104,9 +104,12 @@ def regex_rule(check: dict[str, Any], workspace: Path) -> Result:
         return Result("unverifiable", evidence, f"cannot evaluate regex: {exc}")
 
 
-def evaluate(check: dict[str, Any], workspace: Path, runner: Runner = run_command) -> Result:
+def evaluate(
+    check: dict[str, Any], workspace: Path, runner: Runner = run_command,
+    timeout: float = 120.0,
+) -> Result:
     if check["type"] == "command":
-        return command_rule(check, workspace, runner)
+        return command_rule(check, workspace, runner, timeout)
     if check["type"] == "file_exists":
         return file_rule(check, workspace)
     if check["type"] == "regex":

@@ -4,7 +4,6 @@ import copy
 import json
 import os
 from pathlib import Path
-import signal
 import subprocess
 import sys
 from typing import Any
@@ -208,78 +207,6 @@ def test_invalid_deadline_before_execution(
     monkeypatch.setattr("verifier.judge.run_judge", forbidden)
     with pytest.raises(ValueError):
         check_contract(contract, workspace, transcript, 1, forbidden)
-
-
-@pytest.mark.parametrize("outcome", ["success", "timeout", "error", "already_exited"])
-def test_process_group_lifecycle_with_injected_runner_and_clock(
-    criterion: dict[str, Any], judgment: dict[str, Any], workspace: Path,
-    monkeypatch: pytest.MonkeyPatch, outcome: str,
-) -> None:
-    events: list[str] = []
-    members = {12345, 12346}  # Controller and its Codex grandchild.
-    ticks = iter((100.0, 100.25))
-    launched: list[dict[str, Any]] = []
-
-    class Process:
-        pid = 12345
-        returncode: int | None = None
-
-        def communicate(self, input: str | None = None, timeout: float | None = None) -> tuple[str, str]:
-            if not events:
-                events.append("communicate")
-                assert input == "" and timeout == 8.75
-                if outcome == "timeout":
-                    raise subprocess.TimeoutExpired("mock controller judge", timeout)
-                if outcome == "error":
-                    raise OSError("mock pipe failure")
-                self.returncode = 0
-                members.discard(self.pid)
-                if outcome == "already_exited":
-                    members.clear()
-                return str(output) + "\n", ""
-            events.append("reap")
-            assert not members
-            assert timeout is None and input is None
-            if self.returncode is None:
-                self.returncode = -signal.SIGKILL
-            return "", ""
-
-    process = Process()
-    output = workspace / "unused"
-
-    def launch(argv: list[str], **kwargs: Any) -> Any:
-        nonlocal output
-        assert argv[:4] == [sys.executable, "-m", "controller", "judge"]
-        assert kwargs["start_new_session"] is True and kwargs["shell"] is False
-        assert kwargs["text"] is True
-        assert kwargs["stdin"] == kwargs["stdout"] == kwargs["stderr"] == subprocess.PIPE
-        assert kwargs["env"]["HARNESS_NESTED"] == "1"
-        launched.append(kwargs)
-        output = Path(argv[argv.index("--out") + 1])
-        output.write_text(json.dumps(judgment))
-        return process
-
-    def kill_group(pid: int, sig: int) -> None:
-        events.append("kill_group")
-        assert pid == process.pid and sig == signal.SIGKILL
-        if not members:
-            raise ProcessLookupError("group already exited")
-        members.clear()
-
-    def run(argv: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
-        return run_judge(argv, **kwargs, runner=launch, clock=lambda: next(ticks), kill_group=kill_group)
-
-    monkeypatch.setattr("verifier.judge.run_judge", run)
-    result = judge_criterion(criterion, workspace, timeout=9.0)
-    assert len(launched) == 1
-    assert events == ["communicate", "kill_group", "reap"]
-    assert not members
-    if outcome in {"success", "already_exited"}:
-        assert result.status == "pass"
-    else:
-        assert result.status == "unverifiable"
-        assert "llm_judge" in result.evidence
-        assert ("timed out after 9 seconds" if outcome == "timeout" else "unavailable") in result.reason
 
 
 def test_spawn_failure_does_not_signal_a_group(workspace: Path) -> None:

@@ -20,6 +20,7 @@ def verifier_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("HARNESS_MAX_ATTEMPTS", raising=False)
     monkeypatch.delenv("HARNESS_BACKEND", raising=False)
     monkeypatch.delenv("HARNESS_JUDGE_TIMEOUT_SECONDS", raising=False)
+    monkeypatch.delenv("HARNESS_VERIFY_BUDGET_SECONDS", raising=False)
 
 
 @pytest.fixture

@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+import math
 import os
 from pathlib import Path
 import sys
 import time
-from typing import Any
+from typing import Any, Callable
 
 from verifier.claims import claimed_criteria, last_report
 from verifier.judge import judge_criterion, judge_timeout
+from verifier.processes import CLEANUP_SECONDS
 from verifier.reinstruct import reinstruct
 from verifier.rules import evaluate
 from verifier.sandbox import Runner, run_command
@@ -18,9 +20,9 @@ from verifier.schema import validate
 
 def check_contract(
     contract: dict[str, Any], workspace: Path, transcript: Path, attempt: int,
-    runner: Runner = run_command,
+    runner: Runner = run_command, *, clock: Callable[[], float] = time.monotonic,
 ) -> dict[str, Any]:
-    started = time.perf_counter()
+    started = clock()
     command_seconds = 0.0
     try:
         validate(contract, "contract.schema.json")
@@ -36,6 +38,13 @@ def check_contract(
         if backend not in {"codex_cli", "cheap_api", "local"}:
             raise ValueError("HARNESS_BACKEND must be codex_cli, cheap_api or local")
         timeout = judge_timeout()
+        try:
+            budget = float(os.environ.get("HARNESS_VERIFY_BUDGET_SECONDS", "450"))
+        except ValueError as exc:
+            raise ValueError("HARNESS_VERIFY_BUDGET_SECONDS must be finite and positive") from exc
+        if not math.isfinite(budget) or budget <= 0:
+            raise ValueError("HARNESS_VERIFY_BUDGET_SECONDS must be finite and positive")
+        deadline = started + budget
         criteria = contract["success_criteria"]
         ids = [criterion["id"] for criterion in criteria]
         if len(set(ids)) != len(ids):
@@ -55,9 +64,21 @@ def check_contract(
                    "evidence": "success_criteria is empty", "reason": "contract cannot be verified"}]
         else:
             for criterion in criteria:
+                remaining = deadline - clock() - CLEANUP_SECONDS
+                if remaining <= 0:
+                    items.append({
+                        "id": criterion["id"], "status": "unverifiable",
+                        "evidence": "criterion not started: HARNESS_VERIFY_BUDGET_SECONDS exhausted",
+                        "reason": f"verification budget ({budget:g} seconds) exhausted; cleanup reserve retained",
+                    })
+                    continue
                 mechanical = criterion["check"]["type"] != "llm_judge"
-                result = (evaluate(criterion["check"], workspace.resolve(), runner) if mechanical
-                          else judge_criterion(criterion, workspace.resolve(), backend, timeout=timeout))
+                if mechanical:
+                    result = evaluate(criterion["check"], workspace.resolve(), runner, min(120.0, remaining))
+                else:
+                    result = judge_criterion(
+                        criterion, workspace.resolve(), backend, timeout=min(timeout, remaining),
+                    )
                 command_seconds += result.command_duration
                 reason = result.reason
                 if mechanical and result.status == "fail" and criterion["id"] in claims:
@@ -73,6 +94,6 @@ def check_contract(
         validate(verdict, "verdict.schema.json")
         return verdict
     finally:
-        elapsed = time.perf_counter() - started
+        elapsed = clock() - started
         print(f"verifier elapsed_seconds={elapsed:.6f} command_seconds={command_seconds:.6f} "
               f"overhead_seconds={max(0.0, elapsed - command_seconds):.6f}", file=sys.stderr)

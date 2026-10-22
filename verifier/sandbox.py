@@ -14,11 +14,12 @@ import os
 from pathlib import Path
 import re
 import shlex
-import signal
 import subprocess
 import sys
 import time
 from typing import Protocol
+
+from verifier.processes import LaunchError, run_owned
 
 
 @dataclass(frozen=True)
@@ -121,32 +122,31 @@ def run_command(command: str, workspace: Path, timeout: float = 120.0) -> Execut
         "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1", "LC_ALL": "C", "LANG": "C",
     }
     try:
-        with subprocess.Popen(
-            [str(sandbox), "-p", seatbelt_profile(workspace), *argv],
-            cwd=workspace, env=environment, stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True,
-        ) as process:
-            try:
-                stdout, stderr = process.communicate(timeout=timeout)
-            except subprocess.TimeoutExpired:
-                os.killpg(process.pid, signal.SIGKILL)
-                stdout, stderr = process.communicate()
-                return Execution(
-                    stdout=stdout.decode("utf-8", errors="replace"),
-                    stderr=stderr.decode("utf-8", errors="replace"),
-                    error=f"command timed out after {timeout:g} seconds",
-                    duration=time.perf_counter() - started,
-                )
-            error = None
-            decoded_err = stderr.decode("utf-8", errors="replace")
-            if "sandbox-exec:" in decoded_err or "sandbox_apply:" in decoded_err:
-                error = "sandbox setup failed; verification unavailable"
-            elif process.returncode is not None and process.returncode < 0:
-                error = f"command terminated by signal {-process.returncode}"
-            return Execution(
-                exit_code=process.returncode,
-                stdout=stdout.decode("utf-8", errors="replace"), stderr=decoded_err,
-                error=error, duration=time.perf_counter() - started,
+        try:
+            process = run_owned(
+                [str(sandbox), "-p", seatbelt_profile(workspace), *argv],
+                cwd=workspace, env=environment, stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout,
             )
-    except OSError as exc:
+        except subprocess.TimeoutExpired as exc:
+            return Execution(
+                stdout=(exc.output or b"").decode("utf-8", errors="replace"),
+                stderr=(exc.stderr or b"").decode("utf-8", errors="replace"),
+                error=f"command timed out after {timeout:g} seconds",
+                duration=time.perf_counter() - started,
+            )
+        error = None
+        decoded_err = process.stderr.decode("utf-8", errors="replace")
+        if "sandbox-exec:" in decoded_err or "sandbox_apply:" in decoded_err:
+            error = "sandbox setup failed; verification unavailable"
+        elif process.returncode is not None and process.returncode < 0:
+            error = f"command terminated by signal {-process.returncode}"
+        return Execution(
+            exit_code=process.returncode,
+            stdout=process.stdout.decode("utf-8", errors="replace"), stderr=decoded_err,
+            error=error, duration=time.perf_counter() - started,
+        )
+    except LaunchError as exc:
         return Execution(error=f"cannot launch command: {exc}", duration=time.perf_counter() - started)
+    except OSError as exc:
+        return Execution(error=f"command execution failed: {exc}", duration=time.perf_counter() - started)

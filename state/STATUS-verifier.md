@@ -1,5 +1,18 @@
 ## Done
 
+- Fixed killpg EPERM/ESRCH handling with exit-checked direct-child signaling and bounded reaping; timeout and shutdown reasons survive group/direct-child exit races, and completed groups are removed from ownership (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
+- Restricted "cannot launch command" to Popen construction failures; later communication failures have a distinct execution reason, and cleanup OS errors cannot replace the original timeout (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
+- Moved verdict writing and path stdout after successful shutdown-scope exit; injected unexpected final cleanup failures return 2, print no path, and leave an existing verdict unchanged (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
+- Added 44 injected regressions for EPERM/ESRCH at TERM/probe/KILL, 6-/60-second budgets, TERM/HUP/INT shutdown, direct-child exit races, judge timeouts and final cleanup publication order; all new lifecycle tests use simulated time (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped in 2.87s).
+- Recorded Claude's host verification as historical user-supplied evidence before this follow-up: all six Seatbelt checks passed and real SIGTERM shutdown left no survivors, but intermittent timeout EPERM broke exit/stdout conventions (.venv/bin/python -m pytest tests/verifier -q: 206 passed on the host, as reported by the user; real process-tree checks at budgets 6 and 60 seconds intermittently exited 1 with a path on stdout).
+- Updated verifier/CHANGES.md and this STATUS for the macOS follow-up; no other role's paths were edited (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
+
+- Added shared process-group ownership for judge and sandbox commands, TERM/HUP/INT shutdown with TERM/two-second grace/KILL, bounded reaping, normal-exit descendant cleanup and launch-race protection; CLI shutdown exits 2 with stderr only (.venv/bin/python -m pytest tests/verifier -q: 200 passed, 6 skipped).
+- Added finite positive HARNESS_VERIFY_BUDGET_SECONDS=450 validation before checks; remaining budget caps command/judge timeouts with a two-second reserve, unstarted checks become unverifiable, verdicts remain schema-valid with exit 0 and H3 feedback (.venv/bin/python -m pytest tests/verifier -q: 200 passed, 6 skipped).
+- Tested both launch sites with injected runner/clock/signals and fake child trees, including timeout cleanup within the budget, cooperative exit, shared grace, launch-time deduction and deferred signal delivery; no lifecycle test uses real sleeps (.venv/bin/python -m pytest tests/verifier -q: 200 passed, 6 skipped in 2.15s).
+- Preserved sandbox command filtering, environment and Seatbelt profile; the six real Seatbelt tests skipped here and real macOS process-tree cleanup remains pending host verification (.venv/bin/python -m pytest tests/verifier -q: 200 passed, 6 skipped, all six skips in tests/verifier/test_sandbox.py).
+- Updated verifier/CHANGES.md and this STATUS; only owned implementation/tests/status paths were edited (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
+
 - Implemented D-3 validate-handoff: offline shared-schema validation, done/remaining overlap rejection, unchanged input bytes, exact supplied-path stdout, no --out flag, input exit 1 and internal exit 2 with stderr-only errors; 19 new cases include the reference handoff through the real module entry point (.venv/bin/python -m pytest tests/verifier -q: 170 passed, 6 skipped).
 - Confirmed the approved command accepts the checked-in reference handoff without controller/model execution (.venv/bin/python -m verifier validate-handoff --handoff schemas/examples/handoff.json: exit 0, stdout exactly schemas/examples/handoff.json followed by a newline).
 - Fixed H3: every non-pass item receives bounded retry feedback before exhaustion, including all-unverifiable and contract-quality cases; the reference failure verdict's named targets and all 243 five-item status mixes are checked (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
@@ -14,10 +27,13 @@
 
 ## Remaining
 
+- Pending host verification, highest priority: Claude must rerun the real macOS sandbox-exec process-tree checks at budgets 6 and 60 seconds and TERM/HUP/INT shutdown after this EPERM/ESRCH fix. Verify exact path/newline plus exit 0 for timeout/budget verdicts, exit 2 with empty stdout for shutdown, original reasons, and zero survivors; rerun the six Seatbelt tests after this change.
+- Pending host verification: observe controller/Codex descendants and the 450-second verifier budget inside Role 2's 480-second hook deadline, including children that might create their own sessions. Injected tests do not establish production process-tree behavior.
+
 - D-3: implement human-review sampling (`python -m verifier sample --reports DIR --n 20`); validate-handoff is complete.
 - Pending host verification: rerun validate-handoff against the live controller-produced handoff and exercise Role 2's Stop/SessionStart integration. No live controller/model calls or nested Codex ran in this session.
 - Pending host verification after this job: rerun the six real macOS Seatbelt tests outside Codex, using .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. They passed on the prior host run but skip in this sandbox; do not weaken isolation or run sandbox-exec here.
-- Cross-role decision required: align plugin/hooks/hooks.json Stop timeout (40 seconds), verifier judge default (120 seconds), and controller/config.yaml codex_cli deadline (180 seconds per call, up to three generation calls per command). Keep 120 seconds until coordinated; validate outer-hook termination and process cleanup on the host. This session did not edit other roles' files.
+- Verify Role 2's concurrent 480-second outer deadline and shutdown protocol on the host; the user approved this coordination and the verifier now defaults to a 450-second total budget. This session did not edit plugin/ or controller/.
 - Pending host verification: exercise real controller/Codex process-group timeout cleanup and confirm no grandchild survives. Mocked signals establish requested group teardown, not observed production process behavior. No nested codex exec or live model call ran this session.
 - Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the approved controller judge CLI after Role 3 is ready. The full-contract smoke helper invokes live judge calls; run only with host/live-call authorization.
 - Pending host verification: real plugin continuation for unverifiable checks and contract-quality warnings, shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency.
@@ -27,6 +43,15 @@
 
 ## Decisions
 
+- Treat killpg EPERM/ESRCH as gone or unsignalable and fall back only to the known Popen child if alive: follow the user's macOS protocol without signaling a reused exited-child PID.
+- Preserve timeout/shutdown across signaling, polling, reaping and pipe-close OS races: cleanup must not fabricate a launch failure or escape from the final CLI scope.
+- Classify launch failure at Popen construction and publish the verdict only after scope cleanup: keep the original criterion reason and prevent success-path stdout with an error exit.
+
+- Track judge and sandbox groups in one CLI shutdown scope: detached sessions require explicit forwarding, and all groups share one two-second grace period.
+- Defer Python shutdown exceptions during launch until PID registration, without blocking signals across fork: avoid orphaning a newly launched child or inheriting a blocked SIGTERM mask.
+- Use immediate group KILL after successful completion, TERM/grace/KILL on abnormal exits, and bounded reaping/closed pipes: leave no unbounded communicate or wait in verifier cleanup.
+- Default total verification budget to 450 seconds and reserve two seconds before dispatch: follow the user's selected protocol while retaining existing per-criterion limits and valid budget-failure verdicts.
+
 - Preserve the original --handoff argument as a string for stdout: converting it to Path for display would normalize supplied relative path spelling.
 - Separate handoff input errors from validator infrastructure failures: unreadable/invalid input exits 1, while schema-loading and unexpected validator errors exit 2 without stdout.
 - Check done/remaining overlap after schema validation without a contract: contradictory states are detectable locally; contract membership, coverage and artifact existence need additional context.
@@ -34,8 +59,8 @@
 - Keep the three-detail/count-rest overflow and 300-character format: the user explicitly requested preserving the existing policy.
 - Keep grouped IDs in one clause and stop extraction at exception phrases: this fixes both reported claim errors while retaining explicit negative predicates and conservative unmapped prose handling.
 - Mark only mechanically failed claimed criteria claimed_without_evidence: unverifiable is not proof of a failed assertion, unclaimed failures retain their own reason, and valid judge reasons remain unchanged.
-- Launch judge in a fresh POSIX session and SIGKILL its group before reaping: subprocess.run only kills the direct child; descendants must be cleaned up on timeout, communication errors and completion.
-- Retain the 120-second default and add verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS: no measured basis supports a new default, and coordinating 40/120/180-second budgets requires other roles rather than unilateral edits.
+- Keep fresh POSIX sessions and replace the earlier KILL-only judge teardown with the shared shutdown protocol: subprocess.run alone only kills the direct child.
+- Retain HARNESS_JUDGE_TIMEOUT_SECONDS=120 as a per-judge limit and cap it by the user-approved 450-second overall budget: Role 2 owns the outer 480-second deadline.
 - Validate deadline configuration before any check and use injected process runner, clock and signal functions for lifecycle tests: malformed settings must not spend calls, and this environment forbids live judge execution.
 - Unset configuration in the autouse test fixture: ordinary tests now exercise real defaults, with explicit unset-default and override regressions.
 - Keep measured response_item/message/assistant/final_answer/output_text parsing and the public workspace judge artifact: published exec/TUI evidence and the approved controller CLI remain the interface boundaries.
@@ -60,12 +85,13 @@
 
 ## Assumptions
 
-- The user's current D-3 validate-handoff priority defines this session's implementation scope; human-review sampling and later deliverables remain unfinished. Prior H3/M3/M4/M5 evidence is retained as historical context.
+- The user's current macOS EPERM/ESRCH cleanup and CLI publication priorities define this follow-up's scope; human-review sampling and later deliverables remain unfinished. Earlier Done bullets and Claude's supplied host results are historical evidence.
 - Same-state handoff entries may represent multiple artifacts or remaining steps; only contradictory done/remaining membership is rejected beyond the schema, without adding an unspecified uniqueness requirement.
 - Rule 6 failed items means status other than pass, as explicitly instructed; this replaces the prior contrary assumption. Up to three items receive details and further items are counted.
 - Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
-- HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. HARNESS_JUDGE_TIMEOUT_SECONDS is verifier-local, defaults to 120 seconds, and must be finite and positive.
-- The judge and controller descendants remain in the new POSIX process group. Host verification must confirm real Codex behavior; forced outer-hook termination is part of the pending cross-role deadline decision.
+- HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. Verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS defaults to 120 and HARNESS_VERIFY_BUDGET_SECONDS to 450; both must be finite and positive.
+- The two-second reserve covers graceful group termination. Post-KILL reaping uses at most two 0.1-second waits per direct child; verdict serialization and scheduling use the margin before the 480-second outer deadline.
+- Cleanup reaches signalable owned POSIX groups. Per user instruction, group EPERM/ESRCH is treated as gone or unsignalable; fallback can address only the known live direct child. Injected tests model descendants already exiting at that race; Claude must confirm actual zero-survivor behavior on macOS. A direct SIGKILL to the verifier is uncatchable and cannot execute Python shutdown handlers.
 - The public workspace is the judge artifact directory. Missing before/after material remains unverifiable under the rubric; judge outcomes and processes are mocked here.
 - Current transcript support is pinned to published exec/TUI evidence. Resume/compaction variants and installed-wheel schema resources remain unverified.
 - No optional FastAPI/httpx provisioning, real macOS sandbox, live model or real controller integration was attempted here. Historical host results do not verify this job's changes.

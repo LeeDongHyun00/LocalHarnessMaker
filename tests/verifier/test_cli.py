@@ -93,3 +93,38 @@ def test_module_entrypoint_bad_arguments() -> None:
     assert result.returncode == 1
     assert result.stdout == ""
     assert "input error:" in result.stderr
+
+
+@pytest.mark.parametrize("existing_output", [False, True])
+@pytest.mark.parametrize("failure", [PermissionError("injected cleanup permission error"),
+                                    RuntimeError("injected cleanup failure")])
+def test_cli_finishes_scope_before_writing_or_printing(
+    contract: dict[str, Any], workspace: Path, transcript: Path,
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch,
+    existing_output: bool, failure: Exception,
+) -> None:
+    from contextlib import contextmanager
+    from typing import Iterator
+
+    contract["success_criteria"] = [{"id": "SC-1", "description": "Report exists", "check": {
+        "type": "file_exists", "path": "report.txt"}}]
+    path = workspace / "contract.json"
+    path.write_text(json.dumps(contract))
+    output = workspace / "verdict.json"
+    if existing_output:
+        output.write_text("previous verdict")
+
+    @contextmanager
+    def broken_scope() -> Iterator[None]:
+        yield
+        raise failure
+
+    monkeypatch.setattr("verifier.__main__.shutdown_scope", broken_scope)
+    assert main(arguments(path, workspace, transcript, output)) == 2
+    captured = capsys.readouterr()
+    assert captured.out == "" and "internal error:" in captured.err
+    assert "Traceback" not in captured.err
+    if existing_output:
+        assert output.read_text() == "previous verdict"
+    else:
+        assert not output.exists()

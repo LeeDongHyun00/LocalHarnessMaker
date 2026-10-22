@@ -12,6 +12,7 @@ from jsonschema import ValidationError
 
 from verifier.check import check_contract
 from verifier.handoff_validate import HandoffInputError, validate_handoff
+from verifier.processes import Shutdown, shutdown_scope
 
 
 class InputParser(argparse.ArgumentParser):
@@ -44,22 +45,33 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(args.handoff)
         return 0
     try:
-        contract = json.loads(args.contract.read_text(encoding="utf-8"))
-        verdict = check_contract(contract, args.workspace, args.transcript, args.attempt)
-        serialized = json.dumps(verdict, indent=2, ensure_ascii=False) + "\n"
-    except (ValueError, OSError, ValidationError) as exc:
-        print(f"input error: {exc}", file=sys.stderr)
-        return 1
+        with shutdown_scope():
+            try:
+                serialized = _check(args)
+            except (ValueError, OSError, ValidationError) as exc:
+                print(f"input error: {exc}", file=sys.stderr)
+                return 1
+    except Shutdown as exc:
+        print(f"internal error: {exc}; child process groups cleaned up", file=sys.stderr)
+        return 2
     except Exception as exc:
         print(f"internal error: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
+    # Exiting shutdown_scope finishes cleanup and restores handlers. Publish
+    # nothing until that exit has succeeded, including its final cleanup pass.
     try:
         args.out.write_text(serialized, encoding="utf-8")
-    except OSError as exc:
+    except Exception as exc:
         print(f"internal error: cannot write verdict: {exc}", file=sys.stderr)
         return 2
     print(args.out)
     return 0
+
+
+def _check(args: argparse.Namespace) -> str:
+    contract = json.loads(args.contract.read_text(encoding="utf-8"))
+    verdict = check_contract(contract, args.workspace, args.transcript, args.attempt)
+    return json.dumps(verdict, indent=2, ensure_ascii=False) + "\n"
 
 
 if __name__ == "__main__":

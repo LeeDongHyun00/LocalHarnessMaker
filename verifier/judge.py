@@ -6,15 +6,14 @@ import json
 import math
 import os
 from pathlib import Path
-import signal
 import subprocess
 import sys
 import tempfile
-import time
 from typing import Any, Callable
 
 from jsonschema import ValidationError
 
+from verifier.processes import run_owned
 from verifier.rules import Result
 from verifier.schema import validate
 
@@ -33,27 +32,12 @@ def run_judge(
     clock: Callable[[], float] | None = None,
     kill_group: Callable[[int, int], None] | None = None,
 ) -> subprocess.CompletedProcess[str]:
-    """Own a process group and reap the judge even if communication times out."""
-    launch = runner or subprocess.Popen
-    now = clock or time.monotonic
-    kill = kill_group or os.killpg
-    started = now()
-    process = launch(
-        argv, cwd=cwd, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, text=True, shell=False, start_new_session=True,
+    """Own and clean up the controller and its descendants on every exit."""
+    return run_owned(
+        argv, cwd=cwd, env=env, timeout=timeout, runner=runner, clock=clock,
+        kill_group=kill_group, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, text=True,
     )
-    try:
-        stdout, stderr = process.communicate(input="", timeout=max(0.0, timeout - (now() - started)))
-        return subprocess.CompletedProcess(argv, process.returncode, stdout, stderr)
-    finally:
-        # SIGKILL also reaches controller-owned Codex grandchildren. Clean up
-        # lingering descendants on success or other errors, not only timeout.
-        try:
-            kill(process.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
-        finally:
-            process.communicate()
 
 
 def judge_criterion(
