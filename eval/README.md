@@ -94,13 +94,19 @@ unobserved. `control_model` and control costs stay null. Full done-claim
 extraction and hash-pinned paired parity are pending; false_done_rate and parity
 are undefined with reasons rather than incomplete headline measurements.
 
-There are 100 single-session and 20 two-session public task drafts across four
-types. New tasks are marked `frozen=false`, `review_status=draft` and
-`grader_status=pending`. `GRADERS-PENDING.md` names all 119 candidates needing
-external graders. The older bug-chunk-tail has historical grader evidence but
-still needs host revalidation. Related variants share 25 families: task diversity,
-specifications and negative/reference grader checks need review before freeze.
-Two-session candidates include a separate day-2 prompt; execution is rejected
+Task set version 1 contains 100 single-session and 20 two-session public tasks
+across four types, all marked `frozen=true`. The user authorized freezing after
+Claude's host verification and independent mutation testing (commits `80205d3`
+and `ad7d7be`); no surviving mutant changes specified behavior.
+`GRADERS-PENDING.md` retains the validation inventory despite its historical name.
+Only the freeze flag changed in public task files; historical review fields remain
+unchanged. Further task-content changes require a separate version 2.
+The runner rejects any selected task whose freeze flag is missing or not boolean
+true before external work, including when resuming a checkpoint.
+Claude must recompute the final digest on the host with
+`python -m eval.runner.validate_graders` and pass it to Role 1 for
+`docs/eval-freeze.md`; the previous digest predates the metadata freeze.
+Two-session tasks include a separate day-2 prompt; execution is rejected
 before model calls until handoff orchestration/observation is implemented.
 
 Offline verification:
@@ -111,28 +117,25 @@ git diff --check -- eval tests/eval state/STATUS-eval.md
 ```
 
 No executor model, nested Codex, network or macOS sandbox-exec is invoked in this
-session. Live CLI compatibility, production retry/guard behavior, private graders
-and sandbox operation are pending host verification. No pilot, freeze, full run
-or quality/cost comparison is claimed.
+session. Live CLI compatibility, production retry/guard behavior and sandbox
+operation are pending host verification. Freeze preparation is complete; the
+final host digest and Role 1 record remain pending. No pilot, full run or
+quality/cost comparison is claimed.
 
 ## Assumptions
 
 - The user's priority order supersedes the older STATUS claim that the shared
   report interface is provisional; version 1 is approved.
-- Public candidates may be prepared without graders, but are not eligible for
-  measurement or freeze until independently graded and reviewed.
+- The user's report of Claude's host verification authorizes the version-1
+  metadata freeze; private validation is not rerun in this sandbox.
 - A reference-only compatibility schema retires the provisional definition
   without deleting a file or changing the shared interface.
 - Model accounting absent from the frozen CLI output remains unknown; the
   runner does not infer actual fallback transport or model identity.
 
-STOP-1 from the 2026-10-22 remediation session remains unresolved: the shared
-schema requires aggregate validity=valid whenever every reported task is valid.
-That prevents recording an aggregate-only STOP-E1 partial-run invalidity while
-keeping an audit-clean executor failure a valid quality sample. Do not treat
-partial STOP-E1 reports as valid comparisons. The strict expected-failure test
-records the requested behavior pending a Role 1 schema decision. No live
-measurement was run during remediation.
+Incomplete runs halt without publishing a report and retain checkpoints for
+recovery. A report requires the complete configured task set; this preserves the
+shared schema without treating partial STOP-E1 evidence as a valid comparison.
 
 Offline grader mutation validation uses
 `.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all --mutants 10000`.

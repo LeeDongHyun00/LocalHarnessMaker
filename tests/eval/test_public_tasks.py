@@ -18,7 +18,8 @@ def test_public_inventory_contains_100_single_and_20_two_session_tasks() -> None
     pending = (REPOSITORY / 'eval/GRADERS-PENDING.md').read_text()
     for task, meta in zip(tasks, metas):
         assert meta['id'] == task.name
-        assert meta['frozen'] is False
+        assert meta['frozen'] is True
+        assert meta['version'] == 1
         assert (task / 'prompt.md').read_text().strip()
         expected = json.loads((task / 'expected.json').read_text())
         assert expected['expected_exit_code'] == 0

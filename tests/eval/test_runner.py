@@ -333,6 +333,33 @@ def two_task_config(root: Path, config: Path, monkeypatch: pytest.MonkeyPatch, t
     monkeypatch.setattr(core, 'build', lambda c, s, t, v, r, **kw: original_build(c, s, t, v, REPOSITORY, **kw))
 
 
+@pytest.mark.parametrize('frozen', [False, None, 'true', 1])
+def test_unfrozen_task_rejected_before_external_work(
+    setup: tuple[Path, Path, Path], tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch, frozen: Any,
+) -> None:
+    import eval.runner.core as core
+
+    root, config, out = setup
+    two_task_config(root, config, monkeypatch, tmp_path)
+    metadata = core.REPOSITORY / 'eval/tasks/second-task/meta.json'
+    value = json.loads(metadata.read_text())
+    if frozen is None:
+        value.pop('frozen')
+    else:
+        value['frozen'] = frozen
+    metadata.write_text(json.dumps(value))
+
+    def unexpected_call(*args: Any, **kwargs: Any) -> Any:
+        pytest.fail('Freeze validation must precede all external work')
+
+    monkeypatch.setattr(core.subprocess, 'run', unexpected_call)
+    monkeypatch.setattr(core.PrivateGraders, 'load', unexpected_call)
+    with pytest.raises(ValueError, match='every selected task to be frozen'):
+        run(config, out, root, execute=unexpected_call)
+    assert not out.exists()
+
+
 @pytest.mark.parametrize('wrap', [False, True])
 @pytest.mark.parametrize('absolute', [False, True])
 @pytest.mark.parametrize('cross_run', [False, True])

@@ -167,8 +167,14 @@ def run(
 ) -> Path:
     """Run or recover baseline tasks without relying on plugin hooks."""
     config = load_config(config_path)
+    metadata = {
+        task: json.loads((REPOSITORY / "eval/tasks" / task / "meta.json").read_text())
+        for task in config["tasks"]
+    }
+    if any(meta.get("frozen") is not True for meta in metadata.values()):
+        raise ValueError("Evaluation requires every selected task to be frozen")
     # Public two-session candidates must not consume a single-session executor run.
-    if any(json.loads((REPOSITORY / "eval/tasks" / task / "meta.json").read_text())["two_session"] for task in config["tasks"]):
+    if any(meta["two_session"] for meta in metadata.values()):
         raise ValueError("Two-session execution is pending host-verified handoff orchestration")
     out = out.resolve()
     config_hash = digest(config_path.read_bytes())

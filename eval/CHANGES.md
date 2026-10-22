@@ -447,3 +447,33 @@ The second command exited 0 with 120 valid/0 invalid and task-set SHA-256
 `ea8e9a6df55b22a01fc87a66298262f3cd7e738f8af8ca0853d3f877f5b9f12f`.
 Host review and Role 1 freeze recording remain pending. No staging or commit was
 attempted; the full repository suite remains a future pre-merge check.
+
+## Version 1 task-set freeze preparation — 2026-10-22
+
+Set `frozen=true` in all 120 `eval/tasks/*/meta.json` files, retaining
+`version=1`. A comparison against HEAD verified that only the freeze flag
+changed in each metadata file and no other public task file changed. No grader,
+reference, inventory hash or task specification was changed. The user authorized
+this freeze after Claude's host verification in `80205d3` and `ad7d7be` and
+independent mutation testing with no behavior-changing survivor.
+
+The runner now rejects any selected task without an exact boolean true freeze
+flag before version probing, private-grader loading, output creation or model
+execution. This also applies to checkpoint recovery. No CLI, schema or hook
+interface changed. Inventory tests require all 120 tasks to remain at version 1
+and frozen; synthetic runner tests cover mixed frozen/unfrozen task sets,
+missing flags and non-boolean flags without invoking external processes.
+
+The prior task-set digest predates this metadata change and is not the final
+freeze digest. Claude must run `python -m eval.runner.validate_graders` with the
+private root on the host, then pass the final digest to Role 1 for
+`docs/eval-freeze.md` (SC-2 remains pending that record). The pilot cost estimate,
+approval and 10-task A/B pilot remain pending. No executor, controller, judge,
+nested Codex or network call was made; no staging or commit was attempted.
+
+Assumptions: the user's report of independent host verification is the basis for
+freezing; private validation cannot be repeated in this sandbox. Historical task
+review fields remain unchanged under the metadata-only instruction.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 336 passed in 33.41s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` — exit 0.
