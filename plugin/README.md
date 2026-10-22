@@ -96,6 +96,15 @@ cleanup to terminate leftover descendants. The runner checks leader exit every
 exits, cleanup starts immediately even if a grandchild holds stdout/stderr; after
 group termination it drains the pipes for at most 250 ms and returns the leader
 status and captured output. The drain also fits inside the cleanup reserve.
+Every group signal and liveness check tolerates EPERM/ESRCH: cleanup reaps the
+leader and retries briefly, then lists live members with a bounded, shell-free
+`ps -A -o pid=,pgid=,stat=` call and signals their PIDs after rechecking group
+membership. It reaps the leader and checks for live survivors after SIGKILL;
+zombies do not count as live work. Signal/reap/listing errors go to stderr and
+preserve the original result, timeout or shutdown. If process inspection or
+signalling is denied, stderr reports that cleanup could not be verified.
+The real inherited-pipe regression runs twenty times per pytest session and
+measures cleanup from the leader's exit announcement to allow startup under load.
 Signals during spawn are deferred
 until the child is registered; repeated signals cannot interrupt cleanup. The
 hook reserves four seconds for cleanup and overhead and caps later calls to the

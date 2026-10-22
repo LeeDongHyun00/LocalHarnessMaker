@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import signal
 import subprocess
 import time
@@ -17,10 +18,16 @@ class ChildGroups:
 
     def __init__(self, *, clock: Callable[[], float] | None = None,
                  sleep: Callable[[float], None] | None = None,
-                 kill: Callable[[int, int], None] | None = None) -> None:
+                 kill: Callable[[int, int], None] | None = None,
+                 members: Callable[[int], list[int]] | None = None,
+                 kill_pid: Callable[[int, int], None] | None = None,
+                 get_group: Callable[[int], int] | None = None) -> None:
         self.clock = clock or time.monotonic
         self.sleep = sleep or time.sleep
         self.kill = kill or os.killpg
+        self.members = members or self.list_members
+        self.kill_pid = kill_pid or os.kill
+        self.get_group = get_group or os.getpgid
         self.children: list[Any] = []
         self.previous: dict[int, Any] = {}
         self.launching = False
@@ -39,36 +46,103 @@ class ChildGroups:
             self.previous[signum] = signal.signal(signum, self.interrupted)
         return self
 
-    def alive(self, pid: int) -> bool:
+    @staticmethod
+    def warn(message: str) -> None:
+        print(f"plugin cleanup: {message}", file=sys.stderr)
+
+    @staticmethod
+    def list_members(group: int) -> list[int]:
+        """Read numeric identities without a shell; zombies are already exited."""
+        result = subprocess.run(['ps', '-A', '-o', 'pid=,pgid=,stat='],
+                                capture_output=True, text=True, timeout=0.2, check=True,
+                                shell=False)
+        members: list[int] = []
+        for line in result.stdout.splitlines():
+            fields = line.split()
+            if (len(fields) != 3 or not fields[0].isascii() or not fields[0].isdigit()
+                    or not fields[1].isascii() or not fields[1].isdigit()):
+                raise ValueError('malformed ps process identity')
+            pid, pgid = int(fields[0]), int(fields[1])
+            if pid > 0 and pgid == group and not fields[2].startswith('Z'):
+                members.append(pid)
+        return members
+
+    def reap(self, group: int) -> None:
+        for child in self.children:
+            if child.pid == group:
+                try:
+                    child.poll()
+                except OSError as exc:
+                    self.warn(f'cannot reap leader {group}: {exc}')
+
+    def signal_group(self, group: int, signum: int) -> bool:
+        """Reap/retry group races, then signal live members individually."""
+        for attempt in range(3):
+            self.reap(group)
+            try:
+                self.kill(group, signum)
+                return True
+            except OSError as exc:
+                if attempt == 0:
+                    self.warn(f'group {group} signal {signum}: {exc}; reaping/retrying')
+                if attempt < 2:
+                    self.sleep(0.01)
         try:
-            self.kill(pid, 0)
-            return True
-        except ProcessLookupError:
-            return False
+            members = self.members(group)
+        except (OSError, subprocess.SubprocessError, ValueError) as exc:
+            self.warn(f'cannot inspect group {group}: {exc}; cleanup unverified')
+            # Still try the known leader when process listing is unavailable.
+            members = [group]
+        live = False
+        for pid in members:
+            try:
+                # A PID from ps may have exited/reused since the snapshot.
+                if self.get_group(pid) != group:
+                    continue
+                self.kill_pid(pid, signum)
+                live = True
+            except ProcessLookupError as exc:
+                self.warn(f'member {pid} exited during signal {signum}: {exc}')
+            except OSError as exc:
+                self.warn(f'cannot signal member {pid} in group {group}: {exc}')
+                live = True
+        return live
+
+    def alive(self, pid: int) -> bool:
+        return self.signal_group(pid, 0)
+
+    def live_members_remain(self, group: int) -> bool:
+        """Verify KILL completion without mistaking unreaped orphans for live work."""
+        self.reap(group)
+        try:
+            return bool(self.members(group))
+        except (OSError, subprocess.SubprocessError, ValueError) as exc:
+            self.warn(f'cannot verify live members of group {group}: {exc}')
+            return self.alive(group)
 
     def cleanup(self) -> None:
         """TERM all owned groups together, grant 2s, KILL survivors, reap parents."""
         for child in self.children:
-            try:
-                self.kill(child.pid, signal.SIGTERM)
-            except ProcessLookupError:
-                pass
+            self.signal_group(child.pid, signal.SIGTERM)
         end = self.clock() + 2.0
         while any(self.alive(child.pid) for child in self.children) and self.clock() < end:
-            # poll reaps exited parents, so their zombies do not extend the grace.
-            for child in self.children:
-                child.poll()
             self.sleep(min(0.02, max(0.0, end - self.clock())))
         for child in self.children:
             if self.alive(child.pid):
-                try:
-                    self.kill(child.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
+                self.signal_group(child.pid, signal.SIGKILL)
             try:
                 child.wait(timeout=0.5)
-            except subprocess.TimeoutExpired:
-                pass
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                self.warn(f'cannot reap leader {child.pid}: {exc}')
+            # KILL delivery and orphan reaping are asynchronous. Verify with a
+            # bounded wait, retrying KILL if live members remain.
+            end = self.clock() + 0.3
+            while self.live_members_remain(child.pid):
+                if self.clock() >= end:
+                    self.warn(f'group {child.pid} cleanup unverified: members may remain')
+                    break
+                self.signal_group(child.pid, signal.SIGKILL)
+                self.sleep(0.01)
         try:
             if self.after_cleanup is not None:
                 self.after_cleanup()
@@ -76,7 +150,10 @@ class ChildGroups:
             for child in self.children:
                 for stream in (child.stdout, child.stderr, child.stdin):
                     if stream is not None:
-                        stream.close()
+                        try:
+                            stream.close()
+                        except OSError as exc:
+                            self.warn(f'cannot close child stream: {exc}')
 
     def __exit__(self, *exception: Any) -> None:
         # A second terminal signal must not interrupt cleanup halfway through.

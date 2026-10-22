@@ -1,6 +1,7 @@
 """Injected shutdown tests plus a short real inherited-pipe regression tree."""
 from __future__ import annotations
 import json
+import errno
 import os
 import sys
 import time
@@ -42,7 +43,7 @@ def test_owned_tree_shutdown(monkeypatch: pytest.MonkeyPatch, ending: str, coope
         handlers[signum] = handler
         return previous
 
-    owner = _process.ChildGroups(clock=lambda: ticks[0], sleep=sleep, kill=kill)
+    owner = _process.ChildGroups(clock=lambda: ticks[0], sleep=sleep, kill=kill, members=lambda group: [])
     monkeypatch.setattr(_process, 'ChildGroups', lambda: owner)
     monkeypatch.setattr(signal, 'signal', install)
 
@@ -104,10 +105,12 @@ def test_all_owned_groups_are_terminated_before_wait(monkeypatch: pytest.MonkeyP
         stdin = stdout = stderr = None
         def __init__(self, pid: int) -> None:
             self.pid = pid
+        def poll(self) -> int | None:
+            return 0 if self.pid in dead else None
         def wait(self, timeout: float) -> int:
             assert sent == [1, 2]
             return 0
-    owner = _process.ChildGroups(kill=kill)
+    owner = _process.ChildGroups(kill=kill, members=lambda group: [])
     owner.children = [Process(1), Process(2)]
     owner.cleanup()
 
@@ -145,35 +148,38 @@ def test_stop_cumulative_budget_with_injected_clock(tmp_path: Path, monkeypatch:
 
 
 
-def test_exited_child_with_grandchild_holding_pipes_returns_promptly(tmp_path: Path) -> None:
+@pytest.mark.parametrize('repeat', range(20))
+def test_exited_child_with_grandchild_holding_pipes_returns_promptly(tmp_path: Path, repeat: int) -> None:
     """Leader exit, not inherited pipe EOF, must start group cleanup."""
     evidence = tmp_path / 'tree.json'
     ready = tmp_path / 'ready'
     grandchild = """
 import pathlib, sys, time
 pathlib.Path(sys.argv[1]).write_text('ready')
-for _ in range(100):
+for _ in range(300):
     time.sleep(0.1)
 """
     child = """
 import json, os, pathlib, subprocess, sys, time
 process = subprocess.Popen([sys.executable, '-c', sys.argv[3], sys.argv[2]])
 pathlib.Path(sys.argv[1]).write_text(json.dumps({'pid': process.pid, 'group': os.getpgrp()}))
-for _ in range(100):
+for _ in range(500):
     if pathlib.Path(sys.argv[2]).exists():
         break
     time.sleep(0.01)
 else:
     raise RuntimeError('grandchild did not start')
+pathlib.Path(sys.argv[1]).write_text(json.dumps({'pid': process.pid, 'group': os.getpgrp(),
+                                               'exiting_at': time.monotonic()}))
 print('leader stdout', flush=True)
 print('leader stderr', file=sys.stderr, flush=True)
 sys.exit(3)
 """
-    started = time.monotonic()
     try:
         result = run_group([sys.executable, '-c', child, str(evidence), str(ready), grandchild],
-                           timeout=5, shell=False, text=True, capture_output=True)
-        elapsed = time.monotonic() - started
+                           timeout=10, shell=False, text=True, capture_output=True)
+        tree = json.loads(evidence.read_text())
+        elapsed = time.monotonic() - tree['exiting_at']
         assert result.returncode == 3
         assert result.stdout == 'leader stdout\n'
         assert result.stderr == 'leader stderr\n'
@@ -200,8 +206,128 @@ sys.exit(3)
         assert not grandchild_alive(), f'grandchild {pid} survived cleanup'
     finally:
         if evidence.exists():
-            group = json.loads(evidence.read_text())['group']
+            tree = json.loads(evidence.read_text())
             try:
-                os.killpg(group, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
+                os.killpg(tree['group'], signal.SIGKILL)
+            except (PermissionError, ProcessLookupError):
+                try:
+                    os.kill(tree['pid'], signal.SIGKILL)
+                except (PermissionError, ProcessLookupError):
+                    pass
+
+
+@pytest.mark.parametrize('failure', [errno.EPERM, errno.ESRCH])
+@pytest.mark.parametrize('ending', ['normal', 'timeout', 'term', 'hup', 'int'])
+@pytest.mark.parametrize('persistent', [False, True])
+def test_group_errors_preserve_result_and_remove_members(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+    failure: int, ending: str, persistent: bool,
+) -> None:
+    ticks = [0.0]
+    live = {12340, 12341}
+    polls: list[int] = []
+    group_calls: list[int] = []
+    pid_calls: list[tuple[int, int]] = []
+    listings: list[set[int]] = []
+    failed: set[int] = set()
+
+    def kill_group(group: int, sig: int) -> None:
+        assert polls, 'reap the leader before retrying killpg'
+        group_calls.append(sig)
+        if persistent or sig not in failed:
+            failed.add(sig)
+            raise OSError(failure, os.strerror(failure))
+        if not live:
+            raise ProcessLookupError(errno.ESRCH, 'gone')
+        if sig == signal.SIGKILL:
+            live.clear()
+
+    def members(group: int) -> list[int]:
+        listings.append(set(live))
+        return sorted(live)
+
+    def kill_pid(pid: int, sig: int) -> None:
+        pid_calls.append((pid, sig))
+        if sig == signal.SIGKILL:
+            live.discard(pid)
+
+    def sleep(seconds: float) -> None:
+        ticks[0] += seconds
+
+    owner = _process.ChildGroups(clock=lambda: ticks[0], sleep=sleep, kill=kill_group,
+                                 members=members, kill_pid=kill_pid, get_group=lambda pid: 12340)
+    monkeypatch.setattr(_process, 'ChildGroups', lambda: owner)
+
+    class Process:
+        pid = 12340
+        returncode = 3
+        stdin = stdout = stderr = None
+
+        def poll(self) -> int | None:
+            polls.append(self.pid)
+            if ending == 'normal':
+                live.discard(self.pid)
+                return 3
+            return None if self.pid in live else 3
+
+        def wait(self, timeout: float) -> int:
+            assert self.pid not in live
+            return 3
+
+        def communicate(self, **kwargs: Any) -> tuple[str, str]:
+            if ending == 'timeout':
+                ticks[0] += kwargs['timeout']
+                raise subprocess.TimeoutExpired('fake', kwargs['timeout'])
+            if ending != 'normal':
+                owner.interrupted({'term': signal.SIGTERM, 'hup': signal.SIGHUP,
+                                   'int': signal.SIGINT}[ending], None)
+            return 'output', 'error'
+
+    monkeypatch.setattr(subprocess, 'Popen', lambda *args, **kwargs: Process())
+    if ending == 'normal':
+        result = run_group(['fake'], timeout=0.1, text=True)
+        assert (result.returncode, result.stdout, result.stderr) == (3, 'output', 'error')
+    else:
+        with pytest.raises(subprocess.TimeoutExpired if ending == 'timeout' else SystemExit):
+            run_group(['fake'], timeout=0.1, text=True)
+    assert not live
+    assert signal.SIGTERM in group_calls and signal.SIGKILL in group_calls and 0 in group_calls
+    assert listings and listings[-1] == set(), 'verify the final group is empty'
+    if persistent:
+        assert (12341, signal.SIGTERM) in pid_calls
+        assert (12341, signal.SIGKILL) in pid_calls
+    assert 'reaping/retrying' in capsys.readouterr().err
+    assert ticks[0] < 3
+
+
+def test_process_listing_filters_groups_and_zombies(monkeypatch: pytest.MonkeyPatch) -> None:
+    def run(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        assert command == ['ps', '-A', '-o', 'pid=,pgid=,stat=']
+        assert kwargs['shell'] is False and kwargs['timeout'] == 0.2
+        return subprocess.CompletedProcess(command, 0, '  11 10 S\n12 10 Z+\n13 20 R\n', '')
+    monkeypatch.setattr(subprocess, 'run', run)
+    assert _process.ChildGroups.list_members(10) == [11]
+
+
+@pytest.mark.parametrize('failure', [errno.EPERM, errno.ESRCH])
+def test_individual_signal_errors_do_not_escape(
+    capsys: pytest.CaptureFixture[str], failure: int,
+) -> None:
+    def deny(pid: int, sig: int) -> None:
+        raise OSError(failure, os.strerror(failure))
+    ticks = [0.0]
+    def sleep(seconds: float) -> None:
+        ticks[0] += seconds
+    owner = _process.ChildGroups(kill=deny, kill_pid=deny, members=lambda group: [101],
+                                 get_group=lambda pid: 100, clock=lambda: ticks[0], sleep=sleep)
+    class Process:
+        pid = 100
+        stdin = stdout = stderr = None
+        def poll(self) -> int:
+            return 0
+        def wait(self, timeout: float) -> int:
+            raise OSError(failure, os.strerror(failure))
+    owner.children = [Process()]
+    owner.cleanup()
+    assert 'cannot reap leader' in capsys.readouterr().err
+    assert ticks[0] < 3
