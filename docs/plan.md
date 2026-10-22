@@ -1,6 +1,6 @@
 # Weekly delivery plan
 
-Source: the read-only export of the Notion page “AI Project: GPT Operating Harness,” last edited 2026-10-21, supplied at `/Users/donghyunlee/Desktop/LocalHarnessMaker/codex-bridge/outbox/r1-cont-001/notion-design.md`, and repository role prompts 01–05. Dates below are in 2026. This plan retains the Notion schedule and maps each role's dated deliverables onto it; discrepancies remain explicit below.
+Source: the Notion page [“AI Project: GPT Operating Harness”](https://app.notion.com/p/3ea42c8af69c80de8915f0e7a422d367), last edited 2026-10-21, and repository role prompts 01–05. Dates below are in 2026. This plan retains the Notion schedule and maps each role's dated deliverables onto it; discrepancies remain explicit below.
 
 Interfaces were frozen early on **2026-10-21**, with `schemas/VERSION = 1` and approved decisions 0002–0004. The original freeze milestone remains October 24. Publication is not evidence that runtime implementation or measurement is complete. Development ends November 13; the final presentation is November 16.
 
