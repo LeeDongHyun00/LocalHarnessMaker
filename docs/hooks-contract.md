@@ -1,11 +1,23 @@
 # Installed Codex hook contract
 
-Date: 2026-10-21 (Asia/Seoul). Pin: `codex-cli 0.162.0-alpha.17.2`.
+Date: 2026-10-21 (Asia/Seoul).
 Status: published by Role 1 on 2026-10-21 with user approval.
 This installed-version evidence is the source of truth under AGENTS.md section 3.3.
 
 Official reference: [Codex hooks](https://learn.chatgpt.com/docs/hooks), fetched on 2026-10-21.
 All JSON samples below are captured runtime values, not fixtures.
+
+## Verified versions
+
+| Codex CLI version | Status | Probe evidence |
+|---|---|---|
+| `0.162.0-alpha.17.2` | Verified startup under interactive CLI and exec on 2026-10-21 | [exec result](../plugin/evidence/2026-10-21-exec/result.json), [interactive result](../plugin/evidence/2026-10-21-tui/result.json); full captures below |
+| `0.163.0-alpha.11.1` | Pending Claude's host compatibility probe | No probe evidence published here |
+
+Under decision 0006 (docs/decisions/0006-codex-version-policy.md), versions are not
+held or rolled back. Each version change requires a new hook compatibility
+probe and a one-task audit compatibility smoke before any large run. The
+observations and samples below apply to `0.162.0-alpha.17.2` only.
 
 ## Observed behavior
 

@@ -19,7 +19,7 @@ Read-only: everything else.
 
 ## Deliverables
 
-- D-1, due 2026-10-24: docs/hooks-contract.md. It must answer: do the three hooks fire; the full input JSON sample for each; how output fields behave (is additionalContext visible to the model; does the Stop hook force continuation and which fields do that); do the hooks fire under codex exec. Attach evidence logs. Pin the installed Codex version in plugin/CODEX_VERSION.
+- D-1, due 2026-10-24: docs/hooks-contract.md. It must answer: do the three hooks fire; the full input JSON sample for each; how output fields behave (is additionalContext visible to the model; does the Stop hook force continuation and which fields do that); do the hooks fire under codex exec. Attach evidence logs. Keep a list of verified Codex versions with their probe evidence in plugin/ and docs/hooks-contract.md, following docs/decisions/0006-codex-version-policy.md.
 - D-2, due 2026-10-27: end-to-end run in stub mode. A request is entered, the contract appears in the model context, the Stop hook re-instructs once, then the run passes. Reproducible with plugin/demo.sh.
 - D-3, due 2026-11-03: real controller and verifier CLIs connected. Re-instruction limit N (default 3, configurable) and the state file.
 - D-4, due 2026-11-10: SessionStart injection of the handoff document. install.sh that registers hooks, copies the skill, checks the Codex version, and supports a --check mode. Fallback on hook failure: any exception produces empty output plus a warning on stderr, and the session continues. Plugin packaging.
@@ -40,7 +40,7 @@ Read-only: everything else.
 - SC-3: the Stop hook forces continuation with reinstruct_message when verdict.overall is fail, and when attempt is greater than or equal to N it lets the session end and shows the list of unmet items to the user.
 - SC-4: an exception in any hook script never breaks the Codex session: whole-script try and except, exit code 0, log on stderr.
 - SC-5: a log line records the hook execution time; the target is under 1 second excluding the control model call.
-- SC-6: install.sh --check reports Codex version mismatch, hooks not registered, and skill missing as three distinct messages.
+- SC-6: install.sh --check reports an unverified Codex version, hooks not registered, and skill missing as three distinct messages.
 
 ## Verification
 
@@ -52,7 +52,7 @@ Read-only: everything else.
 
 In addition to STOP-1 to STOP-4 in AGENTS.md:
 - STOP-P1: the hooks behave differently from the documentation in a way that makes the design impossible, especially if the Stop hook cannot force continuation. Write a draft of the alternative in docs/decisions/ and report. The alternative: the skill instructs the executor to run python -m verifier check before finishing and to continue on its own based on the verdict.
-- STOP-P2: a Codex version upgrade is required. Report it; the version is pinned.
+- STOP-P2: the Codex version changes during a run: stop that run and report it. Do not hold or roll back versions. Record the installed version in every run (evaluation report metadata codex_version and per-session cli_version); compare only same-version reports for SC-3, with mixed-version comparisons diagnostic only. After a version change, require a new hook compatibility probe and a one-task audit compatibility smoke before any large run. Keep a list of verified versions with their probe evidence instead of a single pin; see docs/decisions/0006-codex-version-policy.md.
 - STOP-P3: the control model call inside UserPromptSubmit takes more than 5 seconds. Write down an asynchronous or cached design and report.
 
 ## First task

@@ -134,7 +134,9 @@ Conventions for every command:
 ### 3.3 Hook input, output and nested environment guard
 
 Source of truth: docs/hooks-contract.md, published from Role 2's measured draft.
-It records codex-cli 0.162.0-alpha.17.2 startup under interactive CLI and exec.
+It records the versions verified so far, starting with codex-cli
+0.162.0-alpha.17.2 startup under interactive CLI and exec. Newer versions
+require a hook compatibility probe first; see docs/decisions/0006-codex-version-policy.md.
 Production behavior must be tested separately; startup evidence does not prove
 the new guard, handoff, persisted trust or production retry limits.
 

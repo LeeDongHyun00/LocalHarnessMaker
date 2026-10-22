@@ -4,11 +4,13 @@ Source: the Notion page [“AI Project: GPT Operating Harness”](https://app.no
 
 Interfaces were frozen early on **2026-10-21**, with `schemas/VERSION = 1` and approved decisions 0002–0004. The original freeze milestone remains October 24. Publication is not evidence that runtime implementation or measurement is complete. Development ends November 13; the final presentation is November 16.
 
+Codex versions may change: record every run/session version, compare same-version reports only (mixed versions are diagnostic), probe hooks and run a one-task audit smoke after changes before large runs, stop on a mid-run change, and retain verified versions with evidence; see [decision 0006](decisions/0006-codex-version-policy.md).
+
 ## Milestones
 
 | Date | Notion milestone | Role deliverables / dependencies |
 |---|---|---|
-| 10/24 | Freeze contract schema, handoff format and verifier interface; subsequent changes require approval | Lead D-2 (already published 10/21); Plugin D-1 hook evidence/version pin; Eval D-1 minimal noninteractive runner |
+| 10/24 | Freeze contract schema, handoff format and verifier interface; subsequent changes require approval | Lead D-2 (already published 10/21); Plugin D-1 hook evidence/verified versions; Eval D-1 minimal noninteractive runner |
 | 10/27 | Freeze evaluation set; baselines A and B measured | Lead D-3 plan, direction decision and task-set hash record; Plugin D-2 stub loop; Controller D-1 backends/effort rules; Verifier D-1 mechanical rules; Eval D-2 freeze and pilot-gated A/B runs |
 | 11/03 | Luna input → contract approval → execution → verification → re-instruction loop; baseline C measured | Plugin D-3 real CLI connection/retry state; Controller D-2 contract generation/retrieval; Verifier D-2 claims/re-instruction/sandbox; Eval D-3 C and first system report |
 | 11/10 | Local controller substitution, two-session handoff demo, plugin packaging | Plugin D-4; Controller D-3 (11/06) and D-4 (11/10); Verifier D-3 (11/06) and D-4 (11/10); Eval D-4 parity/handoff/human review |
@@ -22,7 +24,7 @@ Reframe the two target weaknesses, exclude defensive-wording suppression, establ
 | Role | Work and dated deliverables |
 |---|---|
 | 1 Tech Lead | D-1 repository skeleton, root configuration, CI and STATUS files (10/22); D-2 schemas/examples/interfaces and version freeze (10/24, completed early 10/21); D-3 this plan, decision 0005 and `docs/eval-freeze.md` after Role 5 sends the hash (10/27); D-4 integration review (10/27). |
-| 2 Plugin | D-1 verify three hooks, context injection, Stop continuation and exec behavior with logs; pin Codex version (10/24). D-2 reproducible stub loop and demo script (10/27). Role 1 publishes the hook contract. |
+| 2 Plugin | D-1 verify three hooks, context injection, Stop continuation and exec behavior with logs; record verified Codex versions and probe evidence (10/24). D-2 reproducible stub loop and demo script (10/27). Role 1 publishes the hook contract. |
 | 3 Controller | D-1 primary logged-in `codex_cli` Luna backend, same-model HTTP fallback, mocked golden tests, shared call budget/child guard, analyzer and effort rules v1 (10/27). Keep evaluation tasks out of case/template development. |
 | 4 Verifier | D-1 command/file/regex rules, verdict output and pass/fail golden fixtures (10/27). Design checklist and claim/evidence checks against frozen interfaces. |
 | 5 Evaluation | D-1 one-task runner with external private graders and post-exit grading (10/24); confirm hooks under exec using Role 2 evidence. D-2 freeze at least 100 single-session tasks across four types plus 20 two-session tasks, each with private graders; send hash to Lead (10/27). Run the 10-task A/B pilot, report cost, obtain approval before full runs. |
@@ -49,7 +51,7 @@ Week output: a working approved-contract loop in Codex and first comparison agai
 | 2 Plugin | D-4 SessionStart handoff injection, installer with version check and `--check`, packaging, and skill-only fallback when hooks fail (11/10). |
 | 3 Controller | D-3 serve Gemma 4 12B via vLLM or llama.cpp with constrained JSON output; golden tests and memory/serving documentation (11/06). D-4 handoff generator, judge, complete CLI and 30-fixture comparison of CLI/API/local schema validity, assumptions, latency and cost (11/10). |
 | 4 Verifier | D-3 handoff validation, judge delegation and 20-report human-review sampling (11/06). D-4 fix observed misjudgments and publish `verifier/RULES.md` (11/10). |
-| 5 Evaluation | D-4 local-controller measurement, two-session handoff success and table of 20 human-reviewed samples (11/10). Compare matched runs with pinned task set, seed, executor settings and Codex version. |
+| 5 Evaluation | D-4 local-controller measurement, two-session handoff success and table of 20 human-reviewed samples (11/10). Compare matched runs with pinned task set, seed and executor settings, and the same recorded Codex version. |
 
 Week output: interchangeable local control, two-session demo, packaged plugin, parity and handoff measurements. Notion also lists an optional first QLoRA trial here; see Disagreements.
 
