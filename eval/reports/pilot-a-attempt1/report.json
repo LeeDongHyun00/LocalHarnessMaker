@@ -1,0 +1,1011 @@
+{
+  "metadata": {
+    "run_id": "399dd9eca2bd45aa8f153be9d34528b6",
+    "created_at": "2026-10-22T02:04:11.522623+00:00",
+    "config_name": "pilot-a",
+    "config_sha256": "f5e401f8b4f4a5781e1dac245dbe61be449b5dd6dd002f229227be7eb6ab081a",
+    "task_set_sha256": "9781a72e12efbe34fb895e5bf714a0d117d120dee9571f8df62215fe4d93445b",
+    "git_commit": "d38a5dab5f2b0b42b9812ab5ad7fd14a6b1fb5d0",
+    "codex_version": "codex-cli 0.162.0-alpha.17.2",
+    "executor_model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "control_backend": "none",
+    "control_model": null,
+    "seed": 0,
+    "reinstruction_limit": 0,
+    "cost_basis": "api_equivalent_usd",
+    "pricing": {
+      "snapshot_id": "openai-standard-short-2026-10-22-v1",
+      "source": "https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).",
+      "checked_on": "2026-10-22",
+      "rates": [
+        {
+          "model": "gpt-6.1-sol",
+          "input_per_million_usd": 2,
+          "cached_input_per_million_usd": 0.1,
+          "output_per_million_usd": 10
+        },
+        {
+          "model": "gpt-6-luna",
+          "input_per_million_usd": 0.1,
+          "cached_input_per_million_usd": 0.01,
+          "output_per_million_usd": 0.5
+        }
+      ]
+    },
+    "confidence": {
+      "level": 0.95,
+      "method": "task_cluster_percentile_bootstrap",
+      "resamples": 10000,
+      "seed": 0
+    },
+    "parity_comparator": null
+  },
+  "tasks": [
+    {
+      "task_id": "multiple-requirements-interleave",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:04:11.528521+00:00",
+          "exited_at": "2026-10-22T02:04:48.800628+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615a-0425-7872-a23b-b94b5debff8a",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-jgeh3c4o/exec-1.jsonl",
+            "sha256": "f4e793d5bd768b0e99bda1bb5776d258974abda28dec63d26e0c5623bcd88db9"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-04-13-01a1615a-0425-7872-a23b-b94b5debff8a.jsonl:7; unsupported_event:rollout-2026-10-22T11-04-13-01a1615a-0425-7872-a23b-b94b5debff8a.jsonl:14; unsupported_event:rollout-2026-10-22T11-04-13-01a1615a-0425-7872-a23b-b94b5debff8a.jsonl:19; unsupported_event:rollout-2026-10-22T11-04-13-01a1615a-0425-7872-a23b-b94b5debff8a.jsonl:24; unsupported_event:rollout-2026-10-22T11-04-13-01a1615a-0425-7872-a23b-b94b5debff8a.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "multiple-requirements-interleave-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59268,
+            "cached_input_tokens": 52608,
+            "output_tokens": 1091,
+            "usd": 0.029490799999999998,
+            "latency_seconds": 37.271703935000005,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.029490799999999998,
+        "control_usd": 0,
+        "total_usd": 0.029490799999999998
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-interleave/exec-1.jsonl",
+          "sha256": "f4e793d5bd768b0e99bda1bb5776d258974abda28dec63d26e0c5623bcd88db9"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-interleave/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-interleave/final-1.md",
+          "sha256": "38aa5cd9dc20519116518aeb5ed6ab9a4706032c6595b6b2b63aabd4fa3c65ab"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-interleave/result.json",
+          "sha256": "5790b1daa5c06080f425b8acb497e894f3aa0271738d05a38b58ab87632861e3"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-interleave/session-evidence.jsonl",
+          "sha256": "078009c3c7e371a1b055cb1909da8cded89094beb7ccb389bcd48f94149285ea"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-jgeh3c4o/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-04-13-01a1615a-0425-7872-a23b-b94b5debff8a.jsonl",
+          "sha256": "f7b06ed0837ce5dd88d09972183fd6159b525b2f70d0126857392a0aa6042769"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "constrained-refactoring-interval-union",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:05:05.825260+00:00",
+          "exited_at": "2026-10-22T02:05:48.146986+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615a-d840-7590-98aa-a6f98c9d83e8",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-u4o4r4nz/exec-1.jsonl",
+            "sha256": "6f16f3a15a829df0cee26a51b8430bf5b74583e25843ac565532f508549fc701"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-05-07-01a1615a-d840-7590-98aa-a6f98c9d83e8.jsonl:7; unsupported_event:rollout-2026-10-22T11-05-07-01a1615a-d840-7590-98aa-a6f98c9d83e8.jsonl:14; unsupported_event:rollout-2026-10-22T11-05-07-01a1615a-d840-7590-98aa-a6f98c9d83e8.jsonl:19; unresolved_operand:rollout-2026-10-22T11-05-07-01a1615a-d840-7590-98aa-a6f98c9d83e8.jsonl:23; unsupported_event:rollout-2026-10-22T11-05-07-01a1615a-d840-7590-98aa-a6f98c9d83e8.jsonl:24; unsupported_event:rollout-2026-10-22T11-05-07-01a1615a-d840-7590-98aa-a6f98c9d83e8.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "constrained-refactoring-interval-union-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59786,
+            "cached_input_tokens": 55168,
+            "output_tokens": 1172,
+            "usd": 0.026472799999999998,
+            "latency_seconds": 42.321061842999825,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.026472799999999998,
+        "control_usd": 0,
+        "total_usd": 0.026472799999999998
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-interval-union/exec-1.jsonl",
+          "sha256": "6f16f3a15a829df0cee26a51b8430bf5b74583e25843ac565532f508549fc701"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-interval-union/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-interval-union/final-1.md",
+          "sha256": "3167daf185e33c091234af07e82d75f037a4dde97ce18b0ab2b10498108e073e"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-interval-union/result.json",
+          "sha256": "aee3d68623146229bd842d8acacc9b5d823ff00b592edf3e5c2b6396b193763c"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-interval-union/session-evidence.jsonl",
+          "sha256": "32aa868ae12b6165e738cd9497979c74517565aae300c2c2d463091b00a43dcb"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-u4o4r4nz/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-05-07-01a1615a-d840-7590-98aa-a6f98c9d83e8.jsonl",
+          "sha256": "12cb457ba057077872119cd0c274fef09c0596b8a094057923de7a7122fe0da8"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "bug-fix-balanced-brackets",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:05:55.426769+00:00",
+          "exited_at": "2026-10-22T02:06:29.145592+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615b-9a06-70b3-9720-39c44c36988a",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-2bpnoxez/exec-1.jsonl",
+            "sha256": "8ff4b0c0e4656c7f7c29c1c821305b7979db478386747f54acd20ce869af192f"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-05-56-01a1615b-9a06-70b3-9720-39c44c36988a.jsonl:7; unsupported_event:rollout-2026-10-22T11-05-56-01a1615b-9a06-70b3-9720-39c44c36988a.jsonl:14; unsupported_event:rollout-2026-10-22T11-05-56-01a1615b-9a06-70b3-9720-39c44c36988a.jsonl:19; unsupported_event:rollout-2026-10-22T11-05-56-01a1615b-9a06-70b3-9720-39c44c36988a.jsonl:24; unsupported_event:rollout-2026-10-22T11-05-56-01a1615b-9a06-70b3-9720-39c44c36988a.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-fix-balanced-brackets-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 58721,
+            "cached_input_tokens": 52480,
+            "output_tokens": 682,
+            "usd": 0.02455,
+            "latency_seconds": 33.71782272500013,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.02455,
+        "control_usd": 0,
+        "total_usd": 0.02455
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-balanced-brackets/exec-1.jsonl",
+          "sha256": "8ff4b0c0e4656c7f7c29c1c821305b7979db478386747f54acd20ce869af192f"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-balanced-brackets/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-balanced-brackets/final-1.md",
+          "sha256": "0619fc219390d298112bf5d09b11fd598ee134d2d81c0d573434a3b860d65bfe"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-balanced-brackets/result.json",
+          "sha256": "f68986b1212d1d6b7374b5a3e7d4e4ae6adb27fd73f0713056a75c84913e4938"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-balanced-brackets/session-evidence.jsonl",
+          "sha256": "baaa487d40d0735354c46233d782d6a67b5637b04cdc06ce007ed2d9097180d7"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-2bpnoxez/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-05-56-01a1615b-9a06-70b3-9720-39c44c36988a.jsonl",
+          "sha256": "d73db1f69fd28d6530c226284a0df211bc4ab5d218a8a46e549acfbb0f0e670e"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "feature-plus-test-flatten-once",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:06:36.392584+00:00",
+          "exited_at": "2026-10-22T02:07:11.912689+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615c-3a05-72f2-9a54-93e25d1d472a",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3kd379de/exec-1.jsonl",
+            "sha256": "33b660c690fc3927d73e653e14a8433128f58b4510c55a398749129692f5c3d3"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-06-37-01a1615c-3a05-72f2-9a54-93e25d1d472a.jsonl:7; unsupported_event:rollout-2026-10-22T11-06-37-01a1615c-3a05-72f2-9a54-93e25d1d472a.jsonl:14; unsupported_event:rollout-2026-10-22T11-06-37-01a1615c-3a05-72f2-9a54-93e25d1d472a.jsonl:19; unsupported_event:rollout-2026-10-22T11-06-37-01a1615c-3a05-72f2-9a54-93e25d1d472a.jsonl:24; unsupported_event:rollout-2026-10-22T11-06-37-01a1615c-3a05-72f2-9a54-93e25d1d472a.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "feature-plus-test-flatten-once-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 58826,
+            "cached_input_tokens": 53504,
+            "output_tokens": 893,
+            "usd": 0.024924400000000003,
+            "latency_seconds": 35.51788700499992,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.024924400000000003,
+        "control_usd": 0,
+        "total_usd": 0.024924400000000003
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-flatten-once/exec-1.jsonl",
+          "sha256": "33b660c690fc3927d73e653e14a8433128f58b4510c55a398749129692f5c3d3"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-flatten-once/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-flatten-once/final-1.md",
+          "sha256": "1beed06fef69a34c800385766f58feeab6c30ecc9979354cd791aaf72b52c1c6"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-flatten-once/result.json",
+          "sha256": "4750fbd83dad4443b9a4f4773ad3b3f7f0a4728b45ccea7422b2d4bd0644aa47"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-flatten-once/session-evidence.jsonl",
+          "sha256": "dd12bcc955af6b58c6b9a606b075314c9f54e43fec857ea437d0a89704a3fdf2"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3kd379de/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-06-37-01a1615c-3a05-72f2-9a54-93e25d1d472a.jsonl",
+          "sha256": "3bd347a437a452608cbec6364a667e6de3e0a25267af54d9490d3d357bd05d54"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "feature-plus-test-clamp-values",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:07:25.934010+00:00",
+          "exited_at": "2026-10-22T02:08:00.510816+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615c-fb87-7ce1-ad48-f89d08859ad5",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ry6_q190/exec-1.jsonl",
+            "sha256": "d428745c4efff5c1dd56e91c0ffef1fa2f5aa4d04525094e03b4ee20b5d88f16"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-07-26-01a1615c-fb87-7ce1-ad48-f89d08859ad5.jsonl:7; unsupported_event:rollout-2026-10-22T11-07-26-01a1615c-fb87-7ce1-ad48-f89d08859ad5.jsonl:14; unsupported_event:rollout-2026-10-22T11-07-26-01a1615c-fb87-7ce1-ad48-f89d08859ad5.jsonl:19; unsupported_event:rollout-2026-10-22T11-07-26-01a1615c-fb87-7ce1-ad48-f89d08859ad5.jsonl:24; unsupported_event:rollout-2026-10-22T11-07-26-01a1615c-fb87-7ce1-ad48-f89d08859ad5.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "feature-plus-test-clamp-values-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 58770,
+            "cached_input_tokens": 53376,
+            "output_tokens": 860,
+            "usd": 0.024725599999999997,
+            "latency_seconds": 34.5752109,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.024725599999999997,
+        "control_usd": 0,
+        "total_usd": 0.024725599999999997
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-clamp-values/exec-1.jsonl",
+          "sha256": "d428745c4efff5c1dd56e91c0ffef1fa2f5aa4d04525094e03b4ee20b5d88f16"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-clamp-values/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-clamp-values/final-1.md",
+          "sha256": "7ecfaadc41dad3051cf89df4f771d21eaa1aa4dfa8d6a3b11fc1bad12e32a19f"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-clamp-values/result.json",
+          "sha256": "7877f218de2e8e42168a554588ad069f90a21f94b44140d4836a2994f3e95af8"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-clamp-values/session-evidence.jsonl",
+          "sha256": "0538dbdd12b8099a5cd6b92df460395f9ff747cf868dabf2ba8f5ce5081df30a"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ry6_q190/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-07-26-01a1615c-fb87-7ce1-ad48-f89d08859ad5.jsonl",
+          "sha256": "4db05f147faf3aa6fecf56e81ba7a661ecbd985a6f77e19351bb5f50e34e6719"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "feature-plus-test-common-prefix",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:08:15.458657+00:00",
+          "exited_at": "2026-10-22T02:08:52.113678+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615d-bd02-7710-8474-2b8efabb4014",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-y8nbbc2e/exec-1.jsonl",
+            "sha256": "02616d6a2434de843fb35e4ea22ddb275203b423288670e908ca5c4ef65df8e1"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-08-17-01a1615d-bd02-7710-8474-2b8efabb4014.jsonl:7; unsupported_event:rollout-2026-10-22T11-08-17-01a1615d-bd02-7710-8474-2b8efabb4014.jsonl:14; unsupported_event:rollout-2026-10-22T11-08-17-01a1615d-bd02-7710-8474-2b8efabb4014.jsonl:20; unsupported_event:rollout-2026-10-22T11-08-17-01a1615d-bd02-7710-8474-2b8efabb4014.jsonl:24; unsupported_event:rollout-2026-10-22T11-08-17-01a1615d-bd02-7710-8474-2b8efabb4014.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "feature-plus-test-common-prefix-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59033,
+            "cached_input_tokens": 52480,
+            "output_tokens": 929,
+            "usd": 0.027644,
+            "latency_seconds": 34.35903173099996,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.027644,
+        "control_usd": 0,
+        "total_usd": 0.027644
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-common-prefix/exec-1.jsonl",
+          "sha256": "02616d6a2434de843fb35e4ea22ddb275203b423288670e908ca5c4ef65df8e1"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-common-prefix/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-common-prefix/final-1.md",
+          "sha256": "a3429ec4da20b2d2eff24f8bd32201141943287f602d6760ede76d9c0f047fa2"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-common-prefix/result.json",
+          "sha256": "29a33eccc493babf2eb4bb4d4ac72236b78e07016ad0a83e1912d6c4f941c85a"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/feature-plus-test-common-prefix/session-evidence.jsonl",
+          "sha256": "448a21dc2e90d57be6f917a9887fea9add2746b0efd914a13d600a7f32d3d87d"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-y8nbbc2e/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-08-17-01a1615d-bd02-7710-8474-2b8efabb4014.jsonl",
+          "sha256": "b7d87cda83c31c711e217b721ece5fb6ab8a8916d3606c79bff908e8f4659e2e"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "bug-chunk-tail",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:09:00.526371+00:00",
+          "exited_at": "2026-10-22T02:09:27.527572+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615e-6cf6-7181-b938-ce644d1f9f81",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-31gshziw/exec-1.jsonl",
+            "sha256": "a04d724b75db87b430591b03ae05c3d16f1f48bb9d04859aadce25def806944e"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-09-01-01a1615e-6cf6-7181-b938-ce644d1f9f81.jsonl:7; unsupported_event:rollout-2026-10-22T11-09-01-01a1615e-6cf6-7181-b938-ce644d1f9f81.jsonl:14; unsupported_event:rollout-2026-10-22T11-09-01-01a1615e-6cf6-7181-b938-ce644d1f9f81.jsonl:19; unsupported_event:rollout-2026-10-22T11-09-01-01a1615e-6cf6-7181-b938-ce644d1f9f81.jsonl:25; unsupported_event:rollout-2026-10-22T11-09-01-01a1615e-6cf6-7181-b938-ce644d1f9f81.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-chunk-tail-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 58306,
+            "cached_input_tokens": 50304,
+            "output_tokens": 493,
+            "usd": 0.025964400000000002,
+            "latency_seconds": 26.998626275999868,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.025964400000000002,
+        "control_usd": 0,
+        "total_usd": 0.025964400000000002
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-chunk-tail/exec-1.jsonl",
+          "sha256": "a04d724b75db87b430591b03ae05c3d16f1f48bb9d04859aadce25def806944e"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-chunk-tail/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-chunk-tail/final-1.md",
+          "sha256": "720f524635384c8e8b65c2c257feccaddf62c5b8457f79302b558425e1b57f17"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-chunk-tail/result.json",
+          "sha256": "831214e343f0bec94df0a4f83cda91b1824f4689e5609e98820c1135993edcf2"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-chunk-tail/session-evidence.jsonl",
+          "sha256": "bd15d63f39ac1221de276a82ead67ac22a01674ed0164ea24348c4fa8d3f675d"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-31gshziw/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-09-01-01a1615e-6cf6-7181-b938-ce644d1f9f81.jsonl",
+          "sha256": "42bc22e950ebd423de151a6f68cf19d7d64935b1337de3a4bb209b5caaa1e48e"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "bug-fix-adjacent-runs",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:09:34.779739+00:00",
+          "exited_at": "2026-10-22T02:10:02.772513+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615e-f2c4-72f2-a71f-b02d77f94268",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-pp3hkimm/exec-1.jsonl",
+            "sha256": "186738261dca2321e4a8e03b0043afef8c38e67e932ceaef7b8ecd73f4efd2f6"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-09-36-01a1615e-f2c4-72f2-a71f-b02d77f94268.jsonl:7; unsupported_event:rollout-2026-10-22T11-09-36-01a1615e-f2c4-72f2-a71f-b02d77f94268.jsonl:14; unsupported_event:rollout-2026-10-22T11-09-36-01a1615e-f2c4-72f2-a71f-b02d77f94268.jsonl:19; unsupported_event:rollout-2026-10-22T11-09-36-01a1615e-f2c4-72f2-a71f-b02d77f94268.jsonl:24; unsupported_event:rollout-2026-10-22T11-09-36-01a1615e-f2c4-72f2-a71f-b02d77f94268.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-fix-adjacent-runs-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 58601,
+            "cached_input_tokens": 52352,
+            "output_tokens": 603,
+            "usd": 0.0237632,
+            "latency_seconds": 27.989680960999976,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0237632,
+        "control_usd": 0,
+        "total_usd": 0.0237632
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-adjacent-runs/exec-1.jsonl",
+          "sha256": "186738261dca2321e4a8e03b0043afef8c38e67e932ceaef7b8ecd73f4efd2f6"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-adjacent-runs/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-adjacent-runs/final-1.md",
+          "sha256": "f5a7b93866170222636bd2cb1d479aa4e937c7fda79786401a1103d2fa35f52f"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-adjacent-runs/result.json",
+          "sha256": "aac18f3cda04701465c78fd5c39a50cff1953d05d33aea0b9cf16a8a654642dd"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/bug-fix-adjacent-runs/session-evidence.jsonl",
+          "sha256": "f8ff0fb5ba62fa8431aaece0a9f1c13a8722c4b5c56c36874523c3ef4375b011"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-pp3hkimm/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-09-36-01a1615e-f2c4-72f2-a71f-b02d77f94268.jsonl",
+          "sha256": "2bb38fdf2c6cc3fc0b31ff0a9d400fe5cdd329ed535e7c3ab7660034c0b6fbd7"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "constrained-refactoring-invert-groups",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:10:09.833870+00:00",
+          "exited_at": "2026-10-22T02:10:48.190903+00:00",
+          "exit_code": 0,
+          "session_id": "01a1615f-7bb2-7032-9876-8a2380d3ac6a",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-2ldgfmls/exec-1.jsonl",
+            "sha256": "121db14962870fca9a3dc596bf58ca4a6849634b3edf5fd42b7a4575570ed9e6"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-10-11-01a1615f-7bb2-7032-9876-8a2380d3ac6a.jsonl:7; unsupported_event:rollout-2026-10-22T11-10-11-01a1615f-7bb2-7032-9876-8a2380d3ac6a.jsonl:15; unsupported_event:rollout-2026-10-22T11-10-11-01a1615f-7bb2-7032-9876-8a2380d3ac6a.jsonl:20; unsupported_event:rollout-2026-10-22T11-10-11-01a1615f-7bb2-7032-9876-8a2380d3ac6a.jsonl:24; unsupported_event:rollout-2026-10-22T11-10-11-01a1615f-7bb2-7032-9876-8a2380d3ac6a.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "constrained-refactoring-invert-groups-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59378,
+            "cached_input_tokens": 55040,
+            "output_tokens": 1065,
+            "usd": 0.02483,
+            "latency_seconds": 38.35379284800001,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.02483,
+        "control_usd": 0,
+        "total_usd": 0.02483
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-invert-groups/exec-1.jsonl",
+          "sha256": "121db14962870fca9a3dc596bf58ca4a6849634b3edf5fd42b7a4575570ed9e6"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-invert-groups/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-invert-groups/final-1.md",
+          "sha256": "ccd2f8d0835515b8e534f6d2e6fde732701ae55f878d6d337c09ad3e5c68ed76"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-invert-groups/result.json",
+          "sha256": "ca0cf4b6e1deeef913644bce8b2ee40e3bb784225519e99c54c51fb8c5aa74d5"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/constrained-refactoring-invert-groups/session-evidence.jsonl",
+          "sha256": "c85bb0dad6ed5ba720be4428844428fadc4fa43b561466daf9f1645110f81cf5"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-2ldgfmls/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-10-11-01a1615f-7bb2-7032-9876-8a2380d3ac6a.jsonl",
+          "sha256": "8605f42ef4fb68f8956259c7fda029fb188209a0bea051647bcf6cace5aefbf3"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "multiple-requirements-inclusive-range",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T02:11:02.016608+00:00",
+          "exited_at": "2026-10-22T02:11:35.636093+00:00",
+          "exit_code": 0,
+          "session_id": "01a16160-4787-7012-b432-409a5edfe6ee",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-av7ldp49/exec-1.jsonl",
+            "sha256": "b6ba69712523aa85f55ca11f1a8bb622c5ed6f139f1c28fc5e4ac0e998a9fb41"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unsupported_event:rollout-2026-10-22T11-11-03-01a16160-4787-7012-b432-409a5edfe6ee.jsonl:7; unsupported_event:rollout-2026-10-22T11-11-03-01a16160-4787-7012-b432-409a5edfe6ee.jsonl:14; unsupported_event:rollout-2026-10-22T11-11-03-01a16160-4787-7012-b432-409a5edfe6ee.jsonl:19; unsupported_event:rollout-2026-10-22T11-11-03-01a16160-4787-7012-b432-409a5edfe6ee.jsonl:24; unsupported_event:rollout-2026-10-22T11-11-03-01a16160-4787-7012-b432-409a5edfe6ee.jsonl:31",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "multiple-requirements-inclusive-range-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 58973,
+            "cached_input_tokens": 55680,
+            "output_tokens": 869,
+            "usd": 0.020844,
+            "latency_seconds": 33.615534819000004,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.020844,
+        "control_usd": 0,
+        "total_usd": 0.020844
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-inclusive-range/exec-1.jsonl",
+          "sha256": "b6ba69712523aa85f55ca11f1a8bb622c5ed6f139f1c28fc5e4ac0e998a9fb41"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-inclusive-range/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-inclusive-range/final-1.md",
+          "sha256": "ba0af2b5579e415b3dc8a9d43b14da16ce726fea707fa73c4abf1af69e805b91"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-inclusive-range/result.json",
+          "sha256": "1edb177b1518c34c07c949bf017df83b9c43fe7f513d3077d08b623ada2f923d"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-a/multiple-requirements-inclusive-range/session-evidence.jsonl",
+          "sha256": "9918a7849547ada5df4036270c80bb476a3c978441ef16e14f181be5f536ff44"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-av7ldp49/codex-home/sessions/2026/10/22/rollout-2026-10-22T11-11-03-01a16160-4787-7012-b432-409a5edfe6ee.jsonl",
+          "sha256": "77cda70c4fd95a898b48a67c23d9f4d6d51f76854021520a302bf9582331c67c"
+        }
+      ],
+      "handoff": null
+    }
+  ],
+  "metrics": {
+    "pass_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Zero denominator or missing accounting."
+    },
+    "false_done_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "claimed_criterion",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Complete done-claim denominator is not yet observed; verdicts retain negative evidence."
+    },
+    "cost_per_pass": {
+      "value": null,
+      "sample_size": 10,
+      "sample_unit": "attempted_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Zero denominator or missing accounting."
+    },
+    "avg_attempts": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Zero denominator or missing accounting."
+    },
+    "handoff_success": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "eligible_two_session_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Zero denominator or missing accounting."
+    },
+    "parity": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "matched_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No hash-pinned paired local/cheap_api comparator."
+    }
+  },
+  "accounting": {
+    "attempted_tasks": 10,
+    "valid_tasks": 0,
+    "invalid_tasks": 10,
+    "total_cost_usd": 0.2532092
+  },
+  "validity": {
+    "status": "invalid",
+    "reasons": [
+      "multiple-requirements-interleave: incomplete_access_audit",
+      "constrained-refactoring-interval-union: incomplete_access_audit",
+      "bug-fix-balanced-brackets: incomplete_access_audit",
+      "feature-plus-test-flatten-once: incomplete_access_audit",
+      "feature-plus-test-clamp-values: incomplete_access_audit",
+      "feature-plus-test-common-prefix: incomplete_access_audit",
+      "bug-chunk-tail: incomplete_access_audit",
+      "bug-fix-adjacent-runs: incomplete_access_audit",
+      "constrained-refactoring-invert-groups: incomplete_access_audit",
+      "multiple-requirements-inclusive-range: incomplete_access_audit"
+    ]
+  }
+}

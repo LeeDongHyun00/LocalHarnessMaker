@@ -1,0 +1,667 @@
+{
+  "stop_reason": null,
+  "attempted_tasks": 10,
+  "configured_tasks": 10,
+  "executor_runs": [
+    {
+      "task_id": "multiple-requirements-interleave",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:01:29.620704+00:00",
+      "exited_at": "2026-10-22T03:02:04.754883+00:00",
+      "tokens": {
+        "input_tokens": 59338,
+        "cached_input_tokens": 48128,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1104,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:02:02.971Z",
+          "primary_used_percent": 33.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 33.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:01:39.081Z",
+          "primary_used_percent": 32.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 32.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "constrained-refactoring-interval-union",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:02:06.097150+00:00",
+      "exited_at": "2026-10-22T03:02:46.330458+00:00",
+      "tokens": {
+        "input_tokens": 59709,
+        "cached_input_tokens": 52480,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1174,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:02:44.470Z",
+          "primary_used_percent": 33.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 33.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:02:16.317Z",
+          "primary_used_percent": 33.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 33.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "bug-fix-balanced-brackets",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:02:46.641780+00:00",
+      "exited_at": "2026-10-22T03:03:23.597886+00:00",
+      "tokens": {
+        "input_tokens": 58672,
+        "cached_input_tokens": 53248,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 655,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:03:22.212Z",
+          "primary_used_percent": 33.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 33.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:03:01.089Z",
+          "primary_used_percent": 33.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 33.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "feature-plus-test-flatten-once",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:03:23.962975+00:00",
+      "exited_at": "2026-10-22T03:04:00.085738+00:00",
+      "tokens": {
+        "input_tokens": 58775,
+        "cached_input_tokens": 52608,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 854,
+        "reasoning_output_tokens": 33
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:03:57.994Z",
+          "primary_used_percent": 34.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 34.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:03:34.187Z",
+          "primary_used_percent": 34.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 34.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "feature-plus-test-clamp-values",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:04:00.474086+00:00",
+      "exited_at": "2026-10-22T03:04:33.538491+00:00",
+      "tokens": {
+        "input_tokens": 58989,
+        "cached_input_tokens": 52480,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 852,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:04:31.358Z",
+          "primary_used_percent": 34.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 34.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:04:12.393Z",
+          "primary_used_percent": 34.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 34.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "feature-plus-test-common-prefix",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:04:33.944297+00:00",
+      "exited_at": "2026-10-22T03:05:13.031197+00:00",
+      "tokens": {
+        "input_tokens": 59119,
+        "cached_input_tokens": 50432,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 969,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:05:11.164Z",
+          "primary_used_percent": 35.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 35.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:04:45.000Z",
+          "primary_used_percent": 34.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 34.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "bug-chunk-tail",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:05:13.464485+00:00",
+      "exited_at": "2026-10-22T03:05:40.617427+00:00",
+      "tokens": {
+        "input_tokens": 58405,
+        "cached_input_tokens": 50304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 584,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:05:38.748Z",
+          "primary_used_percent": 35.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 35.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:05:23.473Z",
+          "primary_used_percent": 35.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 35.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "bug-fix-adjacent-runs",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:05:42.237892+00:00",
+      "exited_at": "2026-10-22T03:06:07.761882+00:00",
+      "tokens": {
+        "input_tokens": 58652,
+        "cached_input_tokens": 46336,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 603,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:06:05.757Z",
+          "primary_used_percent": 35.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 35.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:05:52.326Z",
+          "primary_used_percent": 35.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 35.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "constrained-refactoring-invert-groups",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:06:08.160809+00:00",
+      "exited_at": "2026-10-22T03:06:46.086492+00:00",
+      "tokens": {
+        "input_tokens": 59304,
+        "cached_input_tokens": 52736,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1074,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:06:44.526Z",
+          "primary_used_percent": 36.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 36.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:06:16.970Z",
+          "primary_used_percent": 36.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 36.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "task_id": "multiple-requirements-inclusive-range",
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-22T03:06:46.506345+00:00",
+      "exited_at": "2026-10-22T03:07:25.861893+00:00",
+      "tokens": {
+        "input_tokens": 59094,
+        "cached_input_tokens": 54912,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 973,
+        "reasoning_output_tokens": 0
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-22T03:07:24.730Z",
+          "primary_used_percent": 36.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 36.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-22T03:06:59.407Z",
+          "primary_used_percent": 36.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 36.0,
+              "window_minutes": 10080,
+              "resets_at": 1793160218
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    }
+  ]
+}

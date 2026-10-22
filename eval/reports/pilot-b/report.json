@@ -1,0 +1,1063 @@
+{
+  "metadata": {
+    "run_id": "41b3de96f1cb4530a85207fd3efc24b1",
+    "created_at": "2026-10-22T03:08:08.948722+00:00",
+    "config_name": "pilot-b",
+    "config_sha256": "17c996137bbe176792c3a6055e967afb66adae2292d94c3ad4097deed6073ee1",
+    "task_set_sha256": "9781a72e12efbe34fb895e5bf714a0d117d120dee9571f8df62215fe4d93445b",
+    "git_commit": "96583d397cbde712b98efb680771b15fef35bf35",
+    "codex_version": "codex-cli 0.162.0-alpha.17.2",
+    "executor_model": "gpt-6.1-sol",
+    "reasoning_effort": "max",
+    "control_backend": "none",
+    "control_model": null,
+    "seed": 0,
+    "reinstruction_limit": 0,
+    "cost_basis": "api_equivalent_usd",
+    "pricing": {
+      "snapshot_id": "openai-standard-short-2026-10-22-v1",
+      "source": "https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).",
+      "checked_on": "2026-10-22",
+      "rates": [
+        {
+          "model": "gpt-6.1-sol",
+          "input_per_million_usd": 2,
+          "cached_input_per_million_usd": 0.1,
+          "output_per_million_usd": 10
+        },
+        {
+          "model": "gpt-6-luna",
+          "input_per_million_usd": 0.1,
+          "cached_input_per_million_usd": 0.01,
+          "output_per_million_usd": 0.5
+        }
+      ]
+    },
+    "confidence": {
+      "level": 0.95,
+      "method": "task_cluster_percentile_bootstrap",
+      "resamples": 10000,
+      "seed": 0
+    },
+    "parity_comparator": null
+  },
+  "tasks": [
+    {
+      "task_id": "multiple-requirements-interleave",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:08:08.954157+00:00",
+          "exited_at": "2026-10-22T03:09:20.208269+00:00",
+          "exit_code": 0,
+          "session_id": "01a16194-9255-7eb2-8922-579017f0b8f1",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-djiszass/exec-1.jsonl",
+            "sha256": "83a394e414a529f906cfecb3a6ec5e1c74b8b2c5f1f9173ef68283e05ab40984"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-08-10-01a16194-9255-7eb2-8922-579017f0b8f1.jsonl:18",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "multiple-requirements-interleave-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 79730,
+            "cached_input_tokens": 70400,
+            "output_tokens": 2703,
+            "usd": 0.05273,
+            "latency_seconds": 71.25005545299973,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.05273,
+        "control_usd": 0,
+        "total_usd": 0.05273
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-interleave/access-audit.json",
+          "sha256": "7119dde265816f802901f38cda9b425fb8518889ddceacfbf46a1f63861d2f70"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-interleave/exec-1.jsonl",
+          "sha256": "83a394e414a529f906cfecb3a6ec5e1c74b8b2c5f1f9173ef68283e05ab40984"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-interleave/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-interleave/final-1.md",
+          "sha256": "34267c2a1f72b03aca5542139dda0c4255c2b73c5360812a668e2b730c259ab2"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-interleave/result.json",
+          "sha256": "d47c176aa135b59c8e9906fab439bde7756577425222d880b6b8ca8cffb55c22"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-interleave/session-evidence.jsonl",
+          "sha256": "acb87fd4d603d34a56ab434351030a7e5bed74dca9c9e7d60318d5f48bd21175"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-djiszass/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-08-10-01a16194-9255-7eb2-8922-579017f0b8f1.jsonl",
+          "sha256": "d4d9416c76663bf027d5af74242d4b7e66196c966f9eb3600fbca6908b0021d2"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "constrained-refactoring-interval-union",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:09:21.807047+00:00",
+          "exited_at": "2026-10-22T03:10:24.049613+00:00",
+          "exit_code": 0,
+          "session_id": "01a16195-ae99-71e1-a6e5-30e9c546ea46",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-xf9r7ex6/exec-1.jsonl",
+            "sha256": "a76192811c371b7521b3c1017f70eb8ecc0bf0c57099bd15011a81846109058f"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-09-22-01a16195-ae99-71e1-a6e5-30e9c546ea46.jsonl:20; unresolved_custom_input:rollout-2026-10-22T12-09-22-01a16195-ae99-71e1-a6e5-30e9c546ea46.jsonl:37",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "constrained-refactoring-interval-union-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 78198,
+            "cached_input_tokens": 69760,
+            "output_tokens": 2649,
+            "usd": 0.050342,
+            "latency_seconds": 62.241438139999445,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.050342,
+        "control_usd": 0,
+        "total_usd": 0.050342
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-interval-union/access-audit.json",
+          "sha256": "3ce6116156a7f1e3197ca67c8a4e9499daac168638179983bfaa3df962648875"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-interval-union/exec-1.jsonl",
+          "sha256": "a76192811c371b7521b3c1017f70eb8ecc0bf0c57099bd15011a81846109058f"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-interval-union/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-interval-union/final-1.md",
+          "sha256": "60faa707944b5a2f8bcdce0c18e39f06096430f81d3923c41760bbbe1cfd7775"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-interval-union/result.json",
+          "sha256": "8fc222b0074b353bfea67aba0abfef6cba45a101aeda3012b9c67e43e6b5810b"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-interval-union/session-evidence.jsonl",
+          "sha256": "41e29c91ade28f08874cd23df06a3abe99eba60793be12f134491c60fa533d0f"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-xf9r7ex6/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-09-22-01a16195-ae99-71e1-a6e5-30e9c546ea46.jsonl",
+          "sha256": "b985521a831a7ade3643e09fee1df9be3c03275e537a87426e470bd463f490af"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "bug-fix-balanced-brackets",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:10:24.358654+00:00",
+          "exited_at": "2026-10-22T03:11:09.396385+00:00",
+          "exit_code": 0,
+          "session_id": "01a16196-a2e2-7d12-854c-387383fe4b30",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-mzjj3oex/exec-1.jsonl",
+            "sha256": "43fd2909674ef351bd6afec3df0dc018a1e02336676ff9281a693de2db6d1388"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-10-25-01a16196-a2e2-7d12-854c-387383fe4b30.jsonl:13; unresolved_custom_input:rollout-2026-10-22T12-10-25-01a16196-a2e2-7d12-854c-387383fe4b30.jsonl:19",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-fix-balanced-brackets-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 75883,
+            "cached_input_tokens": 71040,
+            "output_tokens": 1579,
+            "usd": 0.03258,
+            "latency_seconds": 45.03674675599996,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.03258,
+        "control_usd": 0,
+        "total_usd": 0.03258
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-balanced-brackets/access-audit.json",
+          "sha256": "de70b630e21b8b2b46e8bac3b9fc82506c4a023dcf4b9ef48994fa04adc43b7a"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-balanced-brackets/exec-1.jsonl",
+          "sha256": "43fd2909674ef351bd6afec3df0dc018a1e02336676ff9281a693de2db6d1388"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-balanced-brackets/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-balanced-brackets/final-1.md",
+          "sha256": "87d910b0cf560705f7343bbc53e126921da9125460158ac5cf7567e4fc788351"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-balanced-brackets/result.json",
+          "sha256": "52da40fcdd91b63a884740cb1c57131692fc19b957e144472bb8991a89a94bd9"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-balanced-brackets/session-evidence.jsonl",
+          "sha256": "b916db7cde57b12068a00e3a17dac4cecbf6af16a919261c9c9347eaf11d1864"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-mzjj3oex/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-10-25-01a16196-a2e2-7d12-854c-387383fe4b30.jsonl",
+          "sha256": "fcd107d9811c6ebf1b34e48524c5c00bf21e454c89a165ff1e822f8951a66386"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "feature-plus-test-flatten-once",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:11:09.660293+00:00",
+          "exited_at": "2026-10-22T03:12:16.545876+00:00",
+          "exit_code": 0,
+          "session_id": "01a16197-53e2-7d40-86fe-08304763a772",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-rf993s8_/exec-1.jsonl",
+            "sha256": "a1279f5d8e3feaf8ba1b39c2c9755ec5b839be8af47b79076c0121b35bb7a0ce"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-11-10-01a16197-53e2-7d40-86fe-08304763a772.jsonl:19",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "feature-plus-test-flatten-once-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59883,
+            "cached_input_tokens": 52736,
+            "output_tokens": 1791,
+            "usd": 0.0374776,
+            "latency_seconds": 66.88435399800073,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0374776,
+        "control_usd": 0,
+        "total_usd": 0.0374776
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-flatten-once/access-audit.json",
+          "sha256": "a8e09775c60fb6d244081d90fbad4de27cd77e0947457a7375bce6d4eea32ce1"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-flatten-once/exec-1.jsonl",
+          "sha256": "a1279f5d8e3feaf8ba1b39c2c9755ec5b839be8af47b79076c0121b35bb7a0ce"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-flatten-once/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-flatten-once/final-1.md",
+          "sha256": "4d9b47ad3682fc89e5b0b9bc1d6ee639779d605b4a5fb7afdc604f34929420c2"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-flatten-once/result.json",
+          "sha256": "d3e64158380326d5424ec581d2b5196ec88d839fbbfe1cb154c53b5e810645ea"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-flatten-once/session-evidence.jsonl",
+          "sha256": "f858344f978ad43bf665c095eb68207c26fdf5ba5b68458836a7a57fc4b5c662"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-rf993s8_/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-11-10-01a16197-53e2-7d40-86fe-08304763a772.jsonl",
+          "sha256": "b7fb3e3851447f4426721377c7617c99b595dcc630c2021847ff0e6bc9f63fd4"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "feature-plus-test-clamp-values",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:12:16.824494+00:00",
+          "exited_at": "2026-10-22T03:13:17.017414+00:00",
+          "exit_code": 0,
+          "session_id": "01a16198-5a3b-7f20-b865-70b63af57852",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-6xs_mn1x/exec-1.jsonl",
+            "sha256": "6d6133d374aa4772d7a49d48a7956950982c10e13e23bbbde9fa917aa0314bff"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-3878b9affaa04224a24d7e614a77a963",
+        "copied_at": "2026-10-22T03:13:17.287763+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 5,
+        "failed_tests": 0,
+        "log": {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/grading.log",
+          "sha256": "834640441b9b3d9df67ba81b4ae58ecb95037af47858aaa6b94f1c0e512f941e"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "feature-plus-test-clamp-values-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59888,
+            "cached_input_tokens": 50304,
+            "output_tokens": 1847,
+            "usd": 0.0426684,
+            "latency_seconds": 60.19144189799954,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0426684,
+        "control_usd": 0,
+        "total_usd": 0.0426684
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/access-audit.json",
+          "sha256": "f325070f5002b48d056e17edbefb891a914292142c04265cf8552cbc3decf45a"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/exec-1.jsonl",
+          "sha256": "6d6133d374aa4772d7a49d48a7956950982c10e13e23bbbde9fa917aa0314bff"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/final-1.md",
+          "sha256": "2c390921d1d0efaf72a07814813801bb88952c90dbaf9c8547af8bbaf8586155"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/grading.log",
+          "sha256": "834640441b9b3d9df67ba81b4ae58ecb95037af47858aaa6b94f1c0e512f941e"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/result.json",
+          "sha256": "9b0b7571cfb10d0f8726cbc644a10e31d4bc63e12678c0b389826dd1fcc9f2d2"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-clamp-values/session-evidence.jsonl",
+          "sha256": "d248358c6ced819c23001b62bc58732c5f1dce3bd456de334216280579004223"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-6xs_mn1x/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-12-17-01a16198-5a3b-7f20-b865-70b63af57852.jsonl",
+          "sha256": "7b43a94355803f27aa896831d05f60d63034446f03d296972982706b0977e2e0"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "feature-plus-test-common-prefix",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:13:17.515336+00:00",
+          "exited_at": "2026-10-22T03:14:27.470182+00:00",
+          "exit_code": 0,
+          "session_id": "01a16199-474e-7bd1-80d1-37b8de048b42",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-bp1le8fa/exec-1.jsonl",
+            "sha256": "94656d19c6ff3494890e86bf828b100305c092763581b065da672dac18f5e54e"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-13-18-01a16199-474e-7bd1-80d1-37b8de048b42.jsonl:20",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "feature-plus-test-common-prefix-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 93139,
+            "cached_input_tokens": 85376,
+            "output_tokens": 1946,
+            "usd": 0.043523599999999996,
+            "latency_seconds": 69.95322370200029,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.043523599999999996,
+        "control_usd": 0,
+        "total_usd": 0.043523599999999996
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-common-prefix/access-audit.json",
+          "sha256": "99ebcfec4f45d98084762f6c14244541bfe71486a6dbf537c224977cf46db249"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-common-prefix/exec-1.jsonl",
+          "sha256": "94656d19c6ff3494890e86bf828b100305c092763581b065da672dac18f5e54e"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-common-prefix/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-common-prefix/final-1.md",
+          "sha256": "584e67d3c90ea9a8d1a6af176c2ecd50447f39a2799a5a5b0a722329ebc6060b"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-common-prefix/result.json",
+          "sha256": "609c83f126735f55f21e0714a0b92870e312dc729cf77008bbc357842f59bde2"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/feature-plus-test-common-prefix/session-evidence.jsonl",
+          "sha256": "d9ba7c9055e144b1ae5464fdee1c1a080bb43112d951018c952d5966e0f9f500"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-bp1le8fa/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-13-18-01a16199-474e-7bd1-80d1-37b8de048b42.jsonl",
+          "sha256": "ef55f630ac4fcf910b154f399e72b3178a1f2aae38ad710bdb5263ac1f927e1f"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "bug-chunk-tail",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:14:27.776300+00:00",
+          "exited_at": "2026-10-22T03:15:08.877426+00:00",
+          "exit_code": 0,
+          "session_id": "01a1619a-59bf-7b01-87df-2e922d791f8f",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0_p91d3r/exec-1.jsonl",
+            "sha256": "235f76815e116fb90b6ed5ece40cfd6cd1cf9f0097e3c7a92c03f649f78f6af5"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_operand:exec-1.jsonl:11; unresolved_operand:exec-1.jsonl:13; unresolved_custom_input:rollout-2026-10-22T12-14-29-01a1619a-59bf-7b01-87df-2e922d791f8f.jsonl:18; unresolved_operand:rollout-2026-10-22T12-14-29-01a1619a-59bf-7b01-87df-2e922d791f8f.jsonl:18; unresolved_operand:rollout-2026-10-22T12-14-29-01a1619a-59bf-7b01-87df-2e922d791f8f.jsonl:23",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-chunk-tail-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59321,
+            "cached_input_tokens": 52608,
+            "output_tokens": 1089,
+            "usd": 0.0295768,
+            "latency_seconds": 41.09946368199962,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0295768,
+        "control_usd": 0,
+        "total_usd": 0.0295768
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-chunk-tail/access-audit.json",
+          "sha256": "5571186f48ae415a54d1e277744e61feadc23ef8b00e6063df38cfc0b76d3e29"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-chunk-tail/exec-1.jsonl",
+          "sha256": "235f76815e116fb90b6ed5ece40cfd6cd1cf9f0097e3c7a92c03f649f78f6af5"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-chunk-tail/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-chunk-tail/final-1.md",
+          "sha256": "0f59f3655fc3340f498ac99e5736c13b7c86045edc9c105c944ed9938e2f172d"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-chunk-tail/result.json",
+          "sha256": "59bd25ef24afc364bcce422a8cb3f3b78a9bc420569d3e250778ef14c70c9929"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-chunk-tail/session-evidence.jsonl",
+          "sha256": "6b081f88154c37c7b377ad9213110d7b5fb241e23466e18f7aee428982fc501d"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0_p91d3r/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-14-29-01a1619a-59bf-7b01-87df-2e922d791f8f.jsonl",
+          "sha256": "eb38100e00b8615159412dfc71e333db39810b0e281345359ce9b3381ff14d5c"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "bug-fix-adjacent-runs",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:15:10.481411+00:00",
+          "exited_at": "2026-10-22T03:16:03.202779+00:00",
+          "exit_code": 0,
+          "session_id": "01a1619b-009a-79a0-9ca2-4d2d93f17dc7",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fwd445b6/exec-1.jsonl",
+            "sha256": "fc9da5bf825db9b632a5453e41881afe91c749c9ae6b093fc44e7a8adc811743"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-15-11-01a1619b-009a-79a0-9ca2-4d2d93f17dc7.jsonl:22",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-fix-adjacent-runs-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 76767,
+            "cached_input_tokens": 63744,
+            "output_tokens": 1511,
+            "usd": 0.0475304,
+            "latency_seconds": 52.71977300500021,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0475304,
+        "control_usd": 0,
+        "total_usd": 0.0475304
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-adjacent-runs/access-audit.json",
+          "sha256": "1c123797dfa81930a09ef01c59219d1811127a733ece1dd576105198f89c9408"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-adjacent-runs/exec-1.jsonl",
+          "sha256": "fc9da5bf825db9b632a5453e41881afe91c749c9ae6b093fc44e7a8adc811743"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-adjacent-runs/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-adjacent-runs/final-1.md",
+          "sha256": "eb46c2f026eab1109196e3f337746137bdc86d3aa5136eeadca5622fee625080"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-adjacent-runs/result.json",
+          "sha256": "b05fb463453fc430ee63b807d0da79d212dbce0381d8eff1030ffdcce09108cf"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/bug-fix-adjacent-runs/session-evidence.jsonl",
+          "sha256": "70b9c2176a960e027cc3689bb107db4d9991afdb13846c7fd03db2a8465373a8"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fwd445b6/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-15-11-01a1619b-009a-79a0-9ca2-4d2d93f17dc7.jsonl",
+          "sha256": "6b9b283e5a223cc490c0efdcf6cd09bf8bf5c3f94e75c7f7330b546602f293d6"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "constrained-refactoring-invert-groups",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:16:03.648686+00:00",
+          "exited_at": "2026-10-22T03:17:22.773741+00:00",
+          "exit_code": 0,
+          "session_id": "01a1619b-d04e-79f2-ae50-9a0cb2561b82",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-u5urv7k8/exec-1.jsonl",
+            "sha256": "aa5f142cb43b84aa22e64189d2f843c41e330e9c5763765c1fe57212bbbb214a"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-16-05-01a1619b-d04e-79f2-ae50-9a0cb2561b82.jsonl:20",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "constrained-refactoring-invert-groups-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 77695,
+            "cached_input_tokens": 69504,
+            "output_tokens": 2451,
+            "usd": 0.0478424,
+            "latency_seconds": 79.12264156600031,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0478424,
+        "control_usd": 0,
+        "total_usd": 0.0478424
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-invert-groups/access-audit.json",
+          "sha256": "e98ce624d3d9f148557f70aa64ce8478bc0415f6fe36c308316921e213155d97"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-invert-groups/exec-1.jsonl",
+          "sha256": "aa5f142cb43b84aa22e64189d2f843c41e330e9c5763765c1fe57212bbbb214a"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-invert-groups/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-invert-groups/final-1.md",
+          "sha256": "36912544f41cd6b7179a6ad7e248deca5ba5479fe1e51fc7ab742d96732311b3"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-invert-groups/result.json",
+          "sha256": "7e3cd4f7d3f983527b3f5631bca76f177b7a52191d1170b52cedc0ff55bc596a"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/constrained-refactoring-invert-groups/session-evidence.jsonl",
+          "sha256": "807b5ac5617645f70f5914c267636d439b3564d995a3f90672aa2ef789d76d17"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-u5urv7k8/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-16-05-01a1619b-d04e-79f2-ae50-9a0cb2561b82.jsonl",
+          "sha256": "db61c6621cb47166be83f553b61ce30f36bb02a32c80fb3ec67c26953cf38552"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "multiple-requirements-inclusive-range",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-22T03:17:23.206048+00:00",
+          "exited_at": "2026-10-22T03:18:34.514739+00:00",
+          "exit_code": 0,
+          "session_id": "01a1619d-0702-7722-9f56-b737ae171272",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sa7zk8ie/exec-1.jsonl",
+            "sha256": "dc14131e0067995c7877624fc4a04c2e1a0d5c878c2fcce310f22b9bd80d6638"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-22T12-17-24-01a1619d-0702-7722-9f56-b737ae171272.jsonl:22",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "multiple-requirements-inclusive-range-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 81573,
+            "cached_input_tokens": 73856,
+            "output_tokens": 2336,
+            "usd": 0.0461796,
+            "latency_seconds": 71.30632129700007,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0461796,
+        "control_usd": 0,
+        "total_usd": 0.0461796
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-inclusive-range/access-audit.json",
+          "sha256": "dade771a656231ea7a2567fafe87e630645ec3798aef87c253648730bd72e5f9"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-inclusive-range/exec-1.jsonl",
+          "sha256": "dc14131e0067995c7877624fc4a04c2e1a0d5c878c2fcce310f22b9bd80d6638"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-inclusive-range/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-inclusive-range/final-1.md",
+          "sha256": "8e79f82ab5d102b6db6cbb97583c7016c6125c6d161b47e4aa59df43590cd0d4"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-inclusive-range/result.json",
+          "sha256": "77a8d3f2f1507174ece554a0fb79251d8a03137c0c5a0bfb36ea9e938e2ca14b"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/pilot-b/multiple-requirements-inclusive-range/session-evidence.jsonl",
+          "sha256": "4bee0fad833a75a9f120953fb1bfeb641c28f2fea63ede8408aed8e6154e01ea"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sa7zk8ie/codex-home/sessions/2026/10/22/rollout-2026-10-22T12-17-24-01a1619d-0702-7722-9f56-b737ae171272.jsonl",
+          "sha256": "9f2c301efdbae02903a55d4c6f8a9520a6b675594dd7ae3d19525e2aa7247085"
+        }
+      ],
+      "handoff": null
+    }
+  ],
+  "metrics": {
+    "pass_rate": {
+      "value": 1.0,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "false_done_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "claimed_criterion",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Complete done-claim denominator is not yet observed; verdicts retain negative evidence."
+    },
+    "cost_per_pass": {
+      "value": null,
+      "sample_size": 10,
+      "sample_unit": "attempted_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "A bootstrap replicate has zero denominator or missing accounting."
+    },
+    "avg_attempts": {
+      "value": 1.0,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "handoff_success": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "eligible_two_session_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Zero denominator or missing accounting."
+    },
+    "parity": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "matched_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No hash-pinned paired local/cheap_api comparator."
+    }
+  },
+  "accounting": {
+    "attempted_tasks": 10,
+    "valid_tasks": 1,
+    "invalid_tasks": 9,
+    "total_cost_usd": 0.4304508
+  },
+  "validity": {
+    "status": "invalid",
+    "reasons": [
+      "multiple-requirements-interleave: incomplete_access_audit",
+      "constrained-refactoring-interval-union: incomplete_access_audit",
+      "bug-fix-balanced-brackets: incomplete_access_audit",
+      "feature-plus-test-flatten-once: incomplete_access_audit",
+      "feature-plus-test-common-prefix: incomplete_access_audit",
+      "bug-chunk-tail: incomplete_access_audit",
+      "bug-fix-adjacent-runs: incomplete_access_audit",
+      "constrained-refactoring-invert-groups: incomplete_access_audit",
+      "multiple-requirements-inclusive-range: incomplete_access_audit"
+    ]
+  }
+}
