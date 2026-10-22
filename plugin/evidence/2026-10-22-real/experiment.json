@@ -1,0 +1,14 @@
+{
+  "version": "codex-cli 0.162.0-alpha.17.2",
+  "workspace": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-d2-6w9ciz9a/workspace",
+  "codex_home": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-d2-6w9ciz9a/codex-home",
+  "out": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-22-real",
+  "codex": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+  "mode": "real",
+  "executor": "gpt-6.1-sol",
+  "prompt": "Create result.txt containing exactly ok followed by a newline. Verify its exact contents with Python. This is the whole task. Display the injected contract and wait for approval before writing.",
+  "approval": "scripted demo user",
+  "real_task_verified": true,
+  "max_attempts": 3,
+  "thread_id": "01a16151-94f0-7e80-86c1-bb5d5451b930"
+}

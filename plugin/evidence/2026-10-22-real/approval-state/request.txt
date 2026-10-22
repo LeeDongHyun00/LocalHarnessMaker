@@ -1,0 +1,1 @@
+Create result.txt containing exactly ok followed by a newline. Verify its exact contents with Python. This is the whole task. Display the injected contract and wait for approval before writing.

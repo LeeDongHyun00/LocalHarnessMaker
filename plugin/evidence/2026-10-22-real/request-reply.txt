@@ -1,0 +1,14 @@
+Goal: Create `result.txt` in the workspace root containing exactly `ok` followed by a newline, then verify its exact contents with Python.
+
+Success checklist:
+- [ ] SC-1: Python confirms the contents equal `b'ok\n'`, with exit code 0. The contract calls this “two bytes”; the specified content is actually **three bytes**.
+
+Assumptions: `result.txt` refers to the workspace root, and Python is available.
+
+Reasoning effort: medium, based on the contract’s scope score of 2.
+
+Estimated usage: 14,603 input tokens, 251 output tokens; estimated cost: $0.0015858.
+
+Stop conditions: Do not write without approval; stop if the workspace prevents file creation.
+
+The injected `HARNESS_CONTRACT` requires approval before any tools or file changes. Reply **approve** or provide edits.

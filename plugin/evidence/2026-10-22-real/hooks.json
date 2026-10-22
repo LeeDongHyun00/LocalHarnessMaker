@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env HARNESS_SESSIONSTART_TIMEOUT=10 /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/.venv/bin/python /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/hooks/session_start.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env HARNESS_USERPROMPTSUBMIT_TIMEOUT=40 /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/.venv/bin/python /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/hooks/user_prompt_submit.py",
+            "timeout": 40,
+            "additionalContextLimit": 5000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env HARNESS_STOP_TIMEOUT=660 /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/.venv/bin/python /Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/hooks/stop.py",
+            "timeout": 660
+          }
+        ]
+      }
+    ]
+  }
+}

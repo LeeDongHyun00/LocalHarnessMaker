@@ -1,0 +1,45 @@
+{
+  "task_summary": "Create result.txt with exactly \"ok\" followed by a newline, after displaying the contract and receiving approval.",
+  "constraints": [
+    "Do not write result.txt until the user approves the displayed contract.",
+    "Verify the file's exact contents with Python after writing."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "result.txt contains exactly the two bytes for \"ok\\n\".",
+      "check": {
+        "type": "command",
+        "command": "python -c \"from pathlib import Path; import sys; sys.exit(0 if Path('result.txt').read_bytes() == b'ok\\n' else 1)\"",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c \"from pathlib import Path; import sys; sys.exit(0 if Path('result.txt').read_bytes() == b'ok\\n' else 1)\"",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [
+    "Stop if approval is not received before writing result.txt.",
+    "Stop if the workspace does not permit creating result.txt."
+  ],
+  "assumptions": [
+    "The task's relative path result.txt refers to the workspace root.",
+    "Python is available in the environment for the requested exact-content verification."
+  ],
+  "reasoning_effort": {
+    "value": "medium",
+    "rationale": "effort-v1: utf8_byte_bound=193; distinct_files=1; tests_requested=false; requirement_segments=4; score=2"
+  },
+  "cost_estimate": {
+    "input_tokens": 14603,
+    "output_tokens": 251,
+    "usd": 0.0015858
+  }
+}

@@ -1,0 +1,7 @@
+Created `result.txt` containing exactly `ok\n` (3 bytes).
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| SC-1: Exact contents | Passed | `python3 -c "from pathlib import Path; import sys; sys.exit(0 if Path('result.txt').read_bytes() == b'ok\n' else 1)"` — exit 0, no output |
+
+`python` was unavailable (exit 127); verification succeeded using `python3`.

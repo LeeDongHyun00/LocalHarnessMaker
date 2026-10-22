@@ -1,0 +1,9 @@
+{
+  "contract_visible": true,
+  "approval_pending": false,
+  "reinstructions": 0,
+  "verifier_calls": 1,
+  "overall": "pass",
+  "synthetic": false,
+  "real_task_verified": true
+}

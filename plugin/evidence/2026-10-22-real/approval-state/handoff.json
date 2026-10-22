@@ -1,0 +1,24 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`result.txt` contains exactly `ok\\n`; verdict reports the specified Python verification command exited 0 with empty stdout."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Waited for user approval before writing `result.txt`.",
+      "why": "The injected contract required approval before implementation; user replied `approve`."
+    },
+    {
+      "what": "Used `python3` for the actual write and verification after `python` was unavailable.",
+      "why": "Both `python` invocations failed with exit 127 (`command not found`); the `python3` verification succeeded with exit 0."
+    }
+  ],
+  "verify_commands": [
+    "python -c \"from pathlib import Path; import sys; sys.exit(0 if Path('result.txt').read_bytes() == b'ok\\n' else 1)\" — verdict: exit 0; stdout empty.",
+    "python3 -c \"from pathlib import Path; import sys; sys.exit(0 if Path('result.txt').read_bytes() == b'ok\\n' else 1)\" — transcript: exit 0; stdout empty."
+  ],
+  "do_not_touch": []
+}

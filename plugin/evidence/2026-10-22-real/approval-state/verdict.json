@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -c \"from pathlib import Path; import sys; sys.exit(0 if Path('result.txt').read_bytes() == b'ok\\n' else 1)\"\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}
