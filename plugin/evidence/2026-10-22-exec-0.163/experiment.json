@@ -1,0 +1,8 @@
+{
+  "version": "codex-cli 0.163.0-alpha.11.1",
+  "codex_home": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-ym2edqmq/codex-home",
+  "workspace": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/harness-hook-probe-ym2edqmq/workspace",
+  "evidence_dir": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-22-exec-0.163",
+  "prompt": "This is a hook compatibility experiment. Reply with the two exact markers supplied in extra context, then FIRST_REPLY. Do not use tools or change files. If later asked to print one more line, reply only SECOND_REPLY.",
+  "auth": "existing auth.json symlink outside repository"
+}
