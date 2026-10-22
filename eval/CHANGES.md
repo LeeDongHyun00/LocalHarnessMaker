@@ -698,3 +698,39 @@ staging or commit occurred.
   must rerun with the matching private root; acceptance remains under one minute
   with 10/10 tasks clean unless a task actually accessed a protected path. These
   synthetic checks do not establish that host result or pilot quality.
+
+## 2026-10-22 pilot-B shapes and offline regrading
+
+Replaced code-mode whole-source allowlisting with lexical direct-call extraction.
+Promise combinators, arrays, loops and display spreads no longer make literal
+shell calls unresolved. Dynamic command/workdir operands, aliases, computed tool
+access, unknown tools and eval/Function remain inconclusive. Synthetic regressions
+cover the supplied parallel-call shape, the exact nested-quoting rg wrapper,
+list-form exec file changes, protected targets and macOS temporary-path aliases.
+Path comparisons and private-root redaction now cover both `/var` spellings.
+Earlier protected-access regressions remain in the eval suite.
+
+The runner records workspace content manifests at executor exit and saves the
+configuration in its checkpoint. Added `python -m eval.runner.regrade
+--private-root PATH --from DIR --out NEWDIR`: all-task re-audit and fresh-copy
+`grade()` execution with unchanged executor accounting, regenerated metrics and
+a schema-valid report. It refuses historical missing hashes and mismatches;
+source reports/runtimes remain read-only. Separate diagnostics retain source
+report and audit-code hashes plus every workspace check. No report schema,
+frozen task, pilot artifact or shared interface was edited.
+
+Tests use synthetic graders, mocked executors and local grading subprocesses.
+They cover hash refusal before output, source/runtime immutability, fresh copies,
+all-task recovery from historical inconclusive audits, parity with current runner
+fixture outcomes, and CLI success/refusal output. Host pilot acceptance and the
+new pilot-B executor run remain Claude's work.
+
+### Assumptions
+
+- The supplied host results at `96583d3` are historical user evidence: A has
+  10/10 valid/clean, pass rate 1.0 and cost per pass USD 0.029; B has 9/10 invalid
+  with unresolved_custom_input/unresolved_operand errors. This session did not
+  reproduce these measurements or access real private graders.
+- Retained checkpoint/report evidence is trusted runner output. Regrading
+  requires matching public/private task inputs and exact retained workspaces;
+  it cannot establish exit-time integrity for an older run without hashes.

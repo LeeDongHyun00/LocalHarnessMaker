@@ -14,6 +14,8 @@ import tokenize
 from typing import Any
 from urllib.parse import unquote
 
+from eval.runner.javascript import tool_calls
+
 
 def digest(data: bytes) -> str:
     """Return a stable evidence fingerprint."""
@@ -136,6 +138,11 @@ class PrivateGraders:
         """Include both symlink spellings and platform-canonical paths."""
         markers = {str(self.root): "private_root"}
         markers.update({alias: "private_root" for alias in self.aliases})
+        for marker, label in tuple(markers.items()):
+            if marker == "/private/var" or marker.startswith("/private/var/"):
+                markers[marker[len("/private"):]] = label
+            elif marker == "/var" or marker.startswith("/var/"):
+                markers["/private" + marker] = label
         home = str(Path.home())
         if str(self.root).startswith(home + "/"):
             markers["~" + str(self.root)[len(home):]] = "private_root"
@@ -243,6 +250,14 @@ def shell_tokens(command: str) -> list[tuple[str, str]]:
     return list(zip(values, raw_words))
 
 
+def canonical_path(path: Path) -> str:
+    """Compare macOS temporary paths using the same /private/var spelling."""
+    value = str(path.resolve()).casefold().rstrip("/")
+    if value == "/var" or value.startswith("/var/"):
+        value = "/private" + value
+    return value
+
+
 def workspace_glob(pattern: Path, workspace: Path | None) -> bool:
     """A static directory inside the workspace bounds a non-traversing glob."""
     if workspace is None:
@@ -253,8 +268,8 @@ def workspace_glob(pattern: Path, workspace: Path | None) -> bool:
         return False
     prefix = value[:first]
     directory = Path(prefix.rsplit("/", 1)[0] or "/").resolve()
-    allowed = str(workspace.resolve()).casefold().rstrip("/")
-    canonical = str(directory).casefold().rstrip("/")
+    allowed = canonical_path(workspace)
+    canonical = canonical_path(directory)
     return canonical == allowed or canonical.startswith(allowed + "/")
 
 
@@ -384,71 +399,7 @@ def custom_commands(item: dict[str, Any]) -> tuple[list[dict[str, Any]], list[st
         if name in {"exec_command", "shell", "shell_command"}:
             return [{"cmd": source}], [], False
         return [], [], True
-    # The pinned native `exec` tool carries JavaScript, including calls to
-    # tools.exec_command and tools.apply_patch. Only literal operands are
-    # supported; expressions/interpolations must not establish cleanliness.
-    literal = r'''("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')'''
-    commands: list[dict[str, Any]] = []
-    patches: list[str] = []
-    unresolved = False
-    consumed: list[tuple[int, int]] = []
-    patch_call = re.compile(r"\s*" + literal + r"\s*\)")
-    command_call = re.compile(r"\s*(\{(?:" + literal + r"|[^{}\"'])*\})\s*\)")
-    # Skip complete literals and already decoded calls: model-written patch
-    # content can itself contain text resembling a tools call.
-    for call in re.finditer(literal + r"|\btools\.(?P<tool>\w+)\s*\(", source):
-        if call.group("tool") is None or (consumed and call.start() < consumed[-1][1]):
-            continue
-        try:
-            if call.group("tool") == "apply_patch":
-                match = patch_call.match(source, call.end())
-                if not match:
-                    unresolved = True
-                    continue
-                patches.append(ast.literal_eval(match[1]))
-            elif call.group("tool") == "exec_command":
-                match = command_call.match(source, call.end())
-                if not match:
-                    unresolved = True
-                    continue
-                # Quote JS object keys and translate primitive constants only
-                # outside strings. literal_eval rejects spreads, expressions,
-                # interpolation, calls and unresolved variable references.
-                def python_literal(token: re.Match[str]) -> str:
-                    word = token[0]
-                    if word.startswith(('"', "'")):
-                        return word
-                    if word in {"true", "false", "null"}:
-                        return {"true": "True", "false": "False", "null": "None"}[word]
-                    return repr(word)
-
-                converted = re.sub(literal + r"|[A-Za-z_]\w*(?=\s*:)|\b(?:true|false|null)\b",
-                                   python_literal, match[1])
-                arguments = ast.literal_eval(converted)
-                if not isinstance(arguments, dict) or not any(key in arguments for key in ("cmd", "command")):
-                    unresolved = True
-                else:
-                    commands.append(arguments)
-                    if (not isinstance(arguments.get("cmd", arguments.get("command")), str) or
-                            any(key in arguments and not isinstance(arguments[key], str)
-                                for key in ("workdir", "cwd"))):
-                        unresolved = True
-            else:
-                unresolved = True
-                continue
-            consumed.append((call.start(), match.end()))
-        except (ValueError, SyntaxError):
-            unresolved = True
-    pieces: list[str] = []
-    previous = 0
-    for start, end in consumed:
-        pieces.extend((source[previous:start], "SAFE_CALL"))
-        previous = end
-    pieces.append(source[previous:])
-    remainder = "".join(pieces)
-    if not re.fullmatch(r"(?:\s|\btext\b|\bawait\b|\bSAFE_CALL\b|[();])*", remainder):
-        unresolved = True
-    return commands, patches, unresolved or not consumed
+    return tool_calls(source)
 
 
 def change_paths(item: dict[str, Any]) -> list[str]:
@@ -642,14 +593,14 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                     if any(str(alias).casefold() in text.casefold() for alias in (root, root.resolve())):
                         hits.add("private_context_path")
             def protected(candidate: Path, recursive: bool = False) -> bool:
-                canonical = str(candidate.resolve()).casefold().rstrip("/")
+                canonical = canonical_path(candidate)
                 for root in ((private.root, *grading_roots) if metadata else roots):
                     # Only the repository restriction has a workspace exception.
                     if root == repository and workspace is not None:
-                        allowed = str(workspace.resolve()).casefold().rstrip("/")
+                        allowed = canonical_path(workspace)
                         if canonical == allowed or canonical.startswith(allowed + "/"):
                             continue
-                    target = str(root.resolve()).casefold().rstrip("/")
+                    target = canonical_path(root)
                     if canonical == target or canonical.startswith(target + "/"):
                         return True
                     if recursive and (target.startswith(canonical + "/") or canonical == ""):

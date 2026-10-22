@@ -609,3 +609,82 @@ def test_equivalent_public_literals_are_excluded(tmp_path: Path, private: Privat
     public.write_text(example)
     private.files[0].write_text(f"assert synthetic_check({hidden})\n")
     assert private.line_fingerprints() == set()
+
+
+@pytest.mark.parametrize('dynamic', [False, True])
+def test_parallel_code_mode_literal_calls(tmp_path: Path, private: PrivateGraders,
+                                           native_session: list[dict[str, Any]], dynamic: bool) -> None:
+    """Pilot-B glue is irrelevant; each cmd/workdir must still be literal."""
+    source = '''const results = await Promise.allSettled([
+      tools.exec_command({cmd:"cat solution.py",max_output_tokens:2000}),
+      tools.exec_command({cmd:"python --version",max_output_tokens:1000})
+    ]);
+    for (let i = 0; i < results.length; i++) text({check:i,...results[i]});
+    const show = value => text(value);
+    for await (const value of results) show(value);'''
+    if dynamic:
+        source = source.replace('cmd:"python --version"', 'cmd:commandFromVariable')
+    native_session[22]['payload']['input'] = source
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit['status'] == ('inconclusive' if dynamic else 'clean'), audit
+
+
+@pytest.mark.parametrize('source', [
+    'const run = tools.exec_command; await run({cmd:"cat solution.py"});',
+    'const t = tools; await t.exec_command({cmd:"cat solution.py"});',
+    'await tools["exec_command"]({cmd:"cat solution.py"});',
+    'await tools?.exec_command({cmd:"cat solution.py"});',
+    'await tools.exec_command.call(null, {cmd:"cat solution.py"});',
+    'eval("opaque");', 'new Function("opaque")();',
+    'const {exec_command} = tools; exec_command({cmd:"cat solution.py"});',
+])
+def test_indirect_code_mode_is_inconclusive(tmp_path: Path, private: PrivateGraders,
+                                           native_session: list[dict[str, Any]], source: str) -> None:
+    native_session[22]['payload']['input'] = source
+    assert audit_native(tmp_path, private, native_session)['status'] == 'inconclusive'
+
+
+def test_nested_quoted_rg_payload_is_clean(tmp_path: Path, private: PrivateGraders) -> None:
+    command = '''/bin/zsh -lc "rg --files --hidden --no-ignore -g 'AGENTS.md' -g '\"'!.git'\"' -g '\"'!.aws'\"'"'''
+    workspace = tmp_path / 'workspace'
+    workspace.mkdir()
+    assert audit_command(tmp_path, private, command, workspace)['status'] == 'clean'
+    from eval.runner.audit import shell_tokens, unwrap_shell
+    values = [value for value, _ in shell_tokens(unwrap_shell(command))]
+    assert values[-3:] == ['!.git', '-g', '!.aws']
+
+
+
+@pytest.mark.parametrize('protected', [False, True])
+def test_exec_file_change_list_targets(tmp_path: Path, private: PrivateGraders, protected: bool) -> None:
+    workspace = tmp_path / 'workspace'
+    workspace.mkdir()
+    path = (private.root if protected else workspace) / 'solution.py'
+    log = tmp_path / 'changes.jsonl'
+    log.write_text(json.dumps({'type': 'item.completed', 'item': {
+        'type': 'file_change', 'changes': [{'path': str(path), 'kind': 'update'}]}}) +
+        '\n{"type":"turn.completed"}\n')
+    result = audit_logs([log], private, workspace=workspace)
+    assert result['status'] == ('access_detected' if protected else 'clean')
+
+
+@pytest.mark.parametrize('alias_workspace', [False, True])
+def test_macos_var_aliases_on_both_sides(tmp_path: Path, private: PrivateGraders, alias_workspace: bool) -> None:
+    # No files are created in /var: synthetic absolute operands only.
+    workspace = Path('/private/var/folders/synthetic/workspace')
+    repository = workspace.parent
+    path = '/var/folders/synthetic/workspace/solution.py'
+    if alias_workspace:
+        workspace = Path('/var/folders/synthetic/workspace')
+        path = '/private/var/folders/synthetic/workspace/solution.py'
+    log = tmp_path / 'changes.jsonl'
+    log.write_text(json.dumps({'type': 'item.completed', 'item': {
+        'type': 'file_change', 'changes': [{'path': path, 'kind': 'update'}]}}) +
+        '\n{"type":"turn.completed"}\n')
+    assert audit_logs([log], private, workspace=workspace, repository=repository)['status'] == 'clean'
+
+
+def test_private_root_macos_alias_is_redacted() -> None:
+    private = PrivateGraders(Path('/private/var/folders/synthetic/trusted'), ())
+    assert private.markers()['/var/folders/synthetic/trusted'] == 'private_root'
+    assert private.redact('cat /var/folders/synthetic/trusted/unit/test_one.py') == 'cat <private_root>/unit/test_one.py'

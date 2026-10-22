@@ -7,6 +7,7 @@ from pathlib import Path
 import random
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -34,6 +35,22 @@ def write_json(path: Path, value: Any) -> None:
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
     temporary.replace(path)
+
+
+def workspace_digest(workspace: Path) -> str:
+    """Hash all retained paths, contents, modes and symlink targets without following links."""
+    if not workspace.is_dir() or workspace.is_symlink():
+        raise ValueError("Retained workspace is unavailable")
+    manifest = []
+    for path in sorted(workspace.rglob("*")):
+        info = path.lstat()
+        kind = ("link" if stat.S_ISLNK(info.st_mode) else "file" if stat.S_ISREG(info.st_mode)
+                else "directory" if stat.S_ISDIR(info.st_mode) else None)
+        if kind is None:
+            raise ValueError("Unsupported retained workspace entry")
+        content = os.readlink(path) if kind == "link" else digest(path.read_bytes()) if kind == "file" else None
+        manifest.append([path.relative_to(workspace).as_posix(), kind, stat.S_IMODE(info.st_mode), content])
+    return digest(json.dumps(manifest, ensure_ascii=True, separators=(",", ":")).encode())
 
 
 def load_config(path: Path) -> dict[str, Any]:
@@ -213,7 +230,7 @@ def run(
             raise ValueError("Resume task set differs from checkpoint")
     else:
         state = {"report_schema": "evaluation-report-v1", "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
-                 "task_set_sha256": task_set_hash, "tasks": {}}
+                 "task_set_sha256": task_set_hash, "config": config, "tasks": {}}
         write_json(checkpoint, state)
     order = list(config["tasks"])
     random.Random(config["seed"]).shuffle(order)
@@ -328,6 +345,9 @@ def run(
             segment.update({"exited_at": now(), "exit_code": final_process.returncode,
                             "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
             entry.pop("pid", None)
+            if not interrupted:
+                entry["workspace_exit_sha256"] = workspace_digest(workspace)
+                segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
             write_json(checkpoint, state)
             current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
             if interrupted or current_audit["status"] != "clean":

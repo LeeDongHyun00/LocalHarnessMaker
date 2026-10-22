@@ -573,3 +573,130 @@ def test_post_call_usage_invariant_is_internal_error(setup: tuple[Path, Path, Pa
     with pytest.raises(ReportError):
         run(config, out, root, execute=bad_usage, version='codex-cli 0.162.0-alpha.17.2')
     assert executor.calls == 1
+
+
+def test_regrade_matches_live_outcomes_without_source_writes(setup: tuple[Path, Path, Path], tmp_path: Path) -> None:
+    from eval.runner import regrade
+    from eval.runner.core import audit_roots, workspace_digest
+    root, config, out = setup
+    executor = Executor()
+    original = json.loads(run(config, out, root, execute=executor, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    state = json.loads((out / 'checkpoint.json').read_text())
+    entry = state['tasks']['bug-chunk-tail']
+    assert entry['workspace_exit_sha256'] == workspace_digest(Path(entry['runtime']) / 'workspace')
+    assert entry['segments'][-1]['workspace_exit_sha256'] == entry['workspace_exit_sha256']
+    before = {p.relative_to(out): p.read_bytes() for p in out.rglob('*') if p.is_file()}
+    runtime = Path(entry['runtime'])
+    retained = {p.relative_to(runtime): p.read_bytes() for p in runtime.rglob('*') if p.is_file()}
+    new = tmp_path / 'regraded'
+
+    def only_grader(argv: list[str], **kwargs: Any) -> ProcessResult:
+        assert argv[0] != 'codex', 'Regrade must never call an executor'
+        assert not kwargs['cwd'].is_relative_to(out)
+        assert kwargs['stdout'].parent != runtime
+        assert kwargs['stdout'].parent in audit_roots(runtime)
+        return run_process(argv, **kwargs)
+
+    report = json.loads(regrade.regrade(root, out, new, execute=only_grader).read_text())
+    assert [t['outcome'] for t in report['tasks']] == [t['outcome'] for t in original['tasks']]
+    assert report['metrics'] == original['metrics']
+    assert report['accounting'] == original['accounting']
+    assert report['tasks'][0]['grading']['copy_path'] != original['tasks'][0]['grading']['copy_path']
+    assert report['metadata']['run_id'] != original['metadata']['run_id']
+    assert {p.relative_to(out): p.read_bytes() for p in out.rglob('*') if p.is_file()} == before
+    assert {p.relative_to(runtime): p.read_bytes() for p in runtime.rglob('*') if p.is_file()} == retained
+    diagnostics = json.loads((new / 'run-diagnostics.json').read_text())
+    assert diagnostics['source'] == str(out)
+    from eval.runner.audit import digest
+    assert diagnostics['source_report_sha256'] == digest((out / 'report.json').read_bytes())
+    assert diagnostics['workspace_hash_checks'][0]['matched'] is True
+    assert set(diagnostics['audit_code_version']) == {'audit.py', 'javascript.py', 'regrade.py'}
+
+
+@pytest.mark.parametrize('case', ['changed', 'missing_hash', 'nested_output', 'source_output'])
+def test_regrade_refuses_unpinned_workspace_and_source_output(setup: tuple[Path, Path, Path],
+                                                            tmp_path: Path, case: str) -> None:
+    from eval.runner import regrade
+    root, config, out = setup
+    run(config, out, root, execute=Executor(), version='codex-cli 0.162.0-alpha.17.2')
+    state_path = out / 'checkpoint.json'
+    state = json.loads(state_path.read_text())
+    entry = state['tasks']['bug-chunk-tail']
+    if case == 'changed':
+        (Path(entry['runtime']) / 'workspace/chunking.py').write_text('# modified after executor exit\n')
+    elif case == 'missing_hash':
+        entry.pop('workspace_exit_sha256')
+        state_path.write_text(json.dumps(state))
+    destination = out if case == 'source_output' else out / 'nested' if case == 'nested_output' else tmp_path / 'new'
+    before = {p.relative_to(out): p.read_bytes() for p in out.rglob('*') if p.is_file()}
+
+    def forbidden(*args: Any, **kwargs: Any) -> ProcessResult:
+        pytest.fail('Refusal must precede any grading')
+
+    with pytest.raises(ValueError, match='hash mismatch' if case == 'changed' else
+                       'exit hash missing' if case == 'missing_hash' else 'fresh output'):
+        regrade.regrade(root, out, destination, execute=forbidden)
+    assert {p.relative_to(out): p.read_bytes() for p in out.rglob('*') if p.is_file()} == before
+    if destination != out:
+        assert not destination.exists()
+
+
+def test_regrade_recovers_every_task_after_parser_fix(setup: tuple[Path, Path, Path], tmp_path: Path,
+                                                      monkeypatch: pytest.MonkeyPatch) -> None:
+    """Historical inconclusive tasks gain the same grades as a current live fixture."""
+    from eval.runner import core, regrade
+    root, config, out = setup
+    two_task_config(root, config, monkeypatch, tmp_path)
+    original_audit = core.audit_logs
+
+    def historical_parser(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        audit = original_audit(*args, **kwargs)
+        if any('sessions' in str(path) for path in args[0]):
+            audit['status'] = 'inconclusive'
+            audit['errors'].append('unresolved_custom_input:synthetic-historical-parser')
+        return audit
+
+    monkeypatch.setattr(core, 'audit_logs', historical_parser)
+    historical = json.loads(run(config, out, root, execute=Executor(), version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert [t['outcome'] for t in historical['tasks']] == ['invalid', 'invalid']
+    monkeypatch.setattr(core, 'audit_logs', original_audit)
+    live = json.loads(run(config, tmp_path / 'live', root, execute=Executor(),
+                          version='codex-cli 0.162.0-alpha.17.2').read_text())
+    calls = []
+
+    def only_grade(argv: list[str], **kwargs: Any) -> ProcessResult:
+        assert argv[0] != 'codex'
+        calls.append(argv)
+        return run_process(argv, **kwargs)
+
+    result = json.loads(regrade.regrade(root, out, tmp_path / 'regraded', execute=only_grade).read_text())
+    assert len(calls) == 2
+    assert [t['outcome'] for t in result['tasks']] == [t['outcome'] for t in live['tasks']] == ['pass', 'pass']
+    assert result['metrics'] == live['metrics']
+    assert result['accounting'] == live['accounting']
+
+
+def test_regrade_cli_prints_only_destination(monkeypatch: pytest.MonkeyPatch,
+                                             capsys: pytest.CaptureFixture[str]) -> None:
+    from eval.runner import regrade
+    monkeypatch.setattr('sys.argv', ['regrade', '--private-root', '/synthetic-private',
+                                     '--from', 'source', '--out', 'new'])
+    monkeypatch.setattr(regrade, 'regrade', lambda *args: Path('new/report.json'))
+    assert regrade.main() == 0
+    assert capsys.readouterr().out == 'new\n'
+
+
+def test_regrade_cli_missing_hash_is_clear_and_sanitized(monkeypatch: pytest.MonkeyPatch,
+                                                        capsys: pytest.CaptureFixture[str]) -> None:
+    from eval.runner import regrade
+    monkeypatch.setattr('sys.argv', ['regrade', '--private-root', '/synthetic-private',
+                                     '--from', 'source', '--out', 'new'])
+
+    def missing(*args: Any) -> Path:
+        raise ValueError('Regrade refused: runner-recorded workspace exit hash missing; rerun the executor on the host')
+
+    monkeypatch.setattr(regrade, 'regrade', missing)
+    assert regrade.main() == 1
+    captured = capsys.readouterr()
+    assert captured.out == '' and 'workspace exit hash missing' in captured.err
+    assert '/synthetic-private' not in captured.err

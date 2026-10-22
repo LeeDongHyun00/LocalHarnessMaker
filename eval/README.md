@@ -261,3 +261,50 @@ selected subset using the existing runner algorithm; compare identical A/B
 subset hashes and retain the full source-population digest in the estimate.
 SC-5 results, five manual A reviews, host prerequisites and full-run approval
 remain pending. No executor/model or private-root access occurred in preparation.
+
+## Pilot-B audit shapes and retained-workspace regrading
+
+Code-mode audit extracts each direct `tools.exec_command(...)` and
+`tools.apply_patch(...)` call independently of arrays, Promise combinators,
+loops, spread in display output and other surrounding JavaScript. Only literal
+`cmd` and optional `workdir` operands establish resolved execution. Tool aliases,
+computed/optional tool access, unknown tools, eval/Function and unresolved
+callables remain inconclusive. Command-object spreads remain unresolved because
+they can override an operand. Shell rules apply to extracted commands, never to
+JavaScript glue or authored patch contents. Nested `-lc` wrappers are decoded
+with shlex; the pilot's adjacent quote segments resolve to the literal `!.git`
+and `!.aws` patterns. Exec `file_change.changes` lists of `{path, kind}` use the
+same target/move checks as native FileChange dictionaries. Both sides of path
+comparisons, and private-path redaction, recognize `/var` and `/private/var`.
+
+The runner now saves its configuration and a `workspace_exit_sha256` in the
+checkpoint immediately after each executor process exits, before audit,
+verification or grading. Each segment also retains that hash. The deterministic
+manifest includes every relative path, entry type, file SHA-256, permission mode
+and symlink target; caches are included, and symlinks are never followed.
+Hashes are not backfilled for historical executions.
+
+On the host, regrade a complete run without new executor/controller/judge calls:
+
+```sh
+.venv/bin/python -m eval.runner.regrade --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW
+```
+
+`NEW` must be fresh and separate from the source, retained runtimes and private
+storage. Every configured task must have a runner-recorded exit hash, and every
+retained workspace must match before any output or grading copy is created.
+Missing hashes or changed workspaces cause a clear refusal. Regrade also checks
+the source report, selected public/private task inputs and retained log/grader
+manifests. It re-audits all tasks, grades every audit-clean workspace through the
+same `grade()` function in a fresh post-exit copy, and preserves executor/control
+calls, costs and observations. Other invalid reasons remain invalid. It writes
+new results, audits and a complete schema-validated report, recalculating quality
+metrics over the whole run. It never resumes Codex or writes to the source run
+or original runtime. Grading process output uses a separate retained runtime.
+
+`NEW/run-diagnostics.json` records the source directory, source report SHA-256,
+audit implementation file hashes and all workspace-hash checks. No shared report
+schema fields were added. Successful stdout is `NEW` plus a newline; input
+refusals exit 1, internal errors exit 2. Runs without exit hashes, including the
+existing pilot B, can use read-only `eval.runner.reaudit` for diagnostics but
+require a host executor rerun before regrading is possible.
