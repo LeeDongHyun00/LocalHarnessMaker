@@ -35,8 +35,10 @@ class PrivateGraders:
         resolved = root.expanduser().resolve()
         if resolved.is_relative_to(repository.resolve()) or repository.resolve().is_relative_to(resolved):
             raise ValueError("Private grader root must be outside and separate from the repository")
-        task = (resolved / task_id).resolve()
-        if not task.is_relative_to(resolved) or not task.is_dir():
+        supplied_task = resolved / task_id
+        task = supplied_task.resolve()
+        if (not task_id or task_id.startswith(".") or Path(task_id).name != task_id or
+                supplied_task.is_symlink() or task.parent != resolved or not task.is_dir()):
             raise ValueError("Private task graders are unavailable")
         files = tuple(sorted(task.glob("test_*.py")))
         if not files or any(p.is_symlink() or not p.is_file() for p in files):
@@ -48,8 +50,14 @@ class PrivateGraders:
         return cls(resolved, files, (str(root.expanduser().absolute()),), tuple(names),
                    repository / "eval/tasks")
 
-    def line_fingerprints(self) -> set[str]:
-        """Hash hidden lines with a literal absent from the entire public corpus."""
+    def line_fingerprints(self, cache: "FingerprintCache | None" = None) -> set[str]:
+        """Return hidden-line hashes, optionally sharing an invocation snapshot."""
+        if cache is not None:
+            return set(cache.fingerprints(self))
+        return self._compute_line_fingerprints()
+
+    def _compute_line_fingerprints(self) -> set[str]:
+        """Analyze unique immediate task graders against the public corpus once."""
         public: list[str] = []
         if self.public_root is not None:
             for task in self.public_root.iterdir() if self.public_root.is_dir() else ():
@@ -75,15 +83,20 @@ class PrivateGraders:
                 # cover the entire file, including text after a token error.
                 pass
         fingerprints: set[str] = set()
-        for source in self.root.rglob("test_*.py"):
-            if not source.is_file():
+        seen: set[str] = set()
+        for source in grader_sources(self.root):
+            data = source.read_bytes()
+            content_hash = digest(data)
+            if content_hash in seen:
                 continue
-            text = source.read_text(errors="replace")
+            seen.add(content_hash)
+            text = data.decode("utf-8", errors="replace")
             tree = ast.parse(text)
+            nodes = tuple(ast.walk(tree))
             # Docstrings, the module entry guard and unittest's launcher are
             # scaffolding, even when their literals happen to be absent publicly.
             boilerplate: set[int] = set()
-            for node in ast.walk(tree):
+            for node in nodes:
                 if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
                     boilerplate.add(id(node.value))
                 if ((isinstance(node, ast.If) and any(isinstance(child, ast.Name) and child.id == "__name__"
@@ -94,12 +107,20 @@ class PrivateGraders:
                     expression = node.test if isinstance(node, ast.If) else node
                     boilerplate.update(id(child) for child in ast.walk(expression))
             lines = text.splitlines()
-            for node in ast.walk(tree):
+            # AST columns are UTF-8 byte offsets. Avoid get_source_segment's
+            # full-source split for every literal in a large grader.
+            encoded = text.encode("utf-8")
+            offsets = [0]
+            for line in encoded.splitlines(keepends=True):
+                offsets.append(offsets[-1] + len(line))
+            for node in nodes:
                 if (not isinstance(node, ast.Constant) or id(node) in boilerplate or
                         type(node.value) not in {str, int, float, complex}):
                     continue
                 value = str(node.value)
-                spelling = ast.get_source_segment(text, node) or value
+                spelling = encoded[offsets[node.lineno - 1] + node.col_offset:
+                                   offsets[(node.end_lineno or node.lineno) - 1] +
+                                   (node.end_col_offset or 0)].decode("utf-8") or value
                 # Substring exclusion is deliberately conservative: a short
                 # common number/string cannot establish hidden provenance.
                 if (not value.strip() or node.value in public_literals or
@@ -154,6 +175,28 @@ class PrivateGraders:
             if "\n" in text.rstrip("\n"):
                 return "".join(self.redact(line) for line in text.splitlines(keepends=True))
             return plain(text)
+
+
+def grader_sources(root: Path) -> list[Path]:
+    """Enumerate ROOT/task/test_*.py only; never descend into dot storage."""
+    return [source for task in sorted(root.iterdir())
+            if not task.name.startswith(".") and not task.is_symlink() and task.is_dir()
+            for source in sorted(task.glob("test_*.py"))
+            if not source.is_symlink() and source.is_file()]
+
+
+class FingerprintCache:
+    """Share immutable corpus analysis within one runner/re-audit invocation."""
+
+    def __init__(self) -> None:
+        self._snapshots: dict[tuple[Path, Path | None], frozenset[str]] = {}
+
+    def fingerprints(self, private: PrivateGraders) -> frozenset[str]:
+        """Cache across tasks with the same private and public corpus roots."""
+        key = (private.root.resolve(), private.public_root.resolve() if private.public_root else None)
+        if key not in self._snapshots:
+            self._snapshots[key] = frozenset(private._compute_line_fingerprints())
+        return self._snapshots[key]
 
 
 def executor_environment(private: PrivateGraders, codex_home: Path) -> dict[str, str]:
@@ -327,12 +370,14 @@ def custom_commands(item: dict[str, Any]) -> tuple[list[dict[str, Any]], list[st
         arguments = json.loads(source)
     except ValueError:
         arguments = None
+    name = item.get("name", "")
     if isinstance(arguments, dict):
-        if item.get("name", "").endswith("apply_patch"):
+        if name.endswith("apply_patch"):
             patch = arguments.get("patch", arguments.get("input"))
             return [], [patch] if isinstance(patch, str) else [], not isinstance(patch, str)
-        return [arguments], [], not any(key in arguments for key in ("cmd", "command"))
-    name = item.get("name", "")
+        if name in {"exec_command", "shell", "shell_command"}:
+            return [arguments], [], not any(key in arguments for key in ("cmd", "command"))
+        return [], [], True
     if name.endswith("apply_patch"):
         return [], [source], not source.startswith("*** Begin Patch")
     if name != "exec":
@@ -347,17 +392,22 @@ def custom_commands(item: dict[str, Any]) -> tuple[list[dict[str, Any]], list[st
     patches: list[str] = []
     unresolved = False
     consumed: list[tuple[int, int]] = []
-    for call in re.finditer(r"\btools\.(\w+)\s*\(", source):
-        body = source[call.end():]
+    patch_call = re.compile(r"\s*" + literal + r"\s*\)")
+    command_call = re.compile(r"\s*(\{(?:" + literal + r"|[^{}\"'])*\})\s*\)")
+    # Skip complete literals and already decoded calls: model-written patch
+    # content can itself contain text resembling a tools call.
+    for call in re.finditer(literal + r"|\btools\.(?P<tool>\w+)\s*\(", source):
+        if call.group("tool") is None or (consumed and call.start() < consumed[-1][1]):
+            continue
         try:
-            if call[1] == "apply_patch":
-                match = re.match(r"\s*" + literal + r"\s*\)", body)
+            if call.group("tool") == "apply_patch":
+                match = patch_call.match(source, call.end())
                 if not match:
                     unresolved = True
                     continue
                 patches.append(ast.literal_eval(match[1]))
-            elif call[1] == "exec_command":
-                match = re.match(r"\s*(\{(?:" + literal + r"|[^{}\"'])*\})\s*\)", body)
+            elif call.group("tool") == "exec_command":
+                match = command_call.match(source, call.end())
                 if not match:
                     unresolved = True
                     continue
@@ -379,18 +429,48 @@ def custom_commands(item: dict[str, Any]) -> tuple[list[dict[str, Any]], list[st
                     unresolved = True
                 else:
                     commands.append(arguments)
+                    if (not isinstance(arguments.get("cmd", arguments.get("command")), str) or
+                            any(key in arguments and not isinstance(arguments[key], str)
+                                for key in ("workdir", "cwd"))):
+                        unresolved = True
             else:
                 unresolved = True
                 continue
-            consumed.append((call.start(), call.end() + match.end()))
+            consumed.append((call.start(), match.end()))
         except (ValueError, SyntaxError):
             unresolved = True
-    remainder = source
-    for start, end in reversed(consumed):
-        remainder = remainder[:start] + "SAFE_CALL" + remainder[end:]
+    pieces: list[str] = []
+    previous = 0
+    for start, end in consumed:
+        pieces.extend((source[previous:start], "SAFE_CALL"))
+        previous = end
+    pieces.append(source[previous:])
+    remainder = "".join(pieces)
     if not re.fullmatch(r"(?:\s|\btext\b|\bawait\b|\bSAFE_CALL\b|[();])*", remainder):
         unresolved = True
     return commands, patches, unresolved or not consumed
+
+
+def change_paths(item: dict[str, Any]) -> list[str]:
+    """Extract file-change targets and moves, excluding authored contents/diffs."""
+    paths = [value for key, value in item.items()
+             if key in {"path", "file_path", "move_path"} and isinstance(value, str)]
+    changes = item.get("changes")
+    if isinstance(changes, dict):
+        paths.extend(changes)
+        for change in changes.values():
+            if isinstance(change, dict):
+                paths.extend(change_paths(change))
+    elif isinstance(changes, list):
+        for change in changes:
+            if isinstance(change, dict):
+                paths.extend(change_paths(change))
+    return paths
+
+
+def patch_paths(patch: str) -> list[str]:
+    """Return literal patch header paths; added/deleted text is not an operand."""
+    return re.findall(r"^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)$", patch, re.MULTILINE)
 
 
 def valid_native_metadata(kind: str, payload: Any) -> bool:
@@ -412,7 +492,8 @@ def valid_native_metadata(kind: str, payload: Any) -> bool:
 
 def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion: bool = True,
                workspace: Path | None = None, repository: Path | None = None,
-               grading_roots: tuple[Path, ...] = ()) -> dict[str, Any]:
+               grading_roots: tuple[Path, ...] = (),
+               fingerprint_cache: FingerprintCache | None = None) -> dict[str, Any]:
     """Audit tool access and native metadata disclosure; retain every error."""
     matches: list[dict[str, Any]] = []
     errors: list[str] = []
@@ -423,7 +504,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
     aliases = {prefix + name: Path.home() / name
                for name in (".codex", ".claude")
                for prefix in ("~/", "$HOME/", "${HOME}/")}
-    fingerprints = private.line_fingerprints()
+    fingerprints = private.line_fingerprints(fingerprint_cache)
     calls: dict[str, str] = {}
     pending_calls: set[str] = set()
     pending_items: set[str] = set()
@@ -527,12 +608,25 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             if not tool:
                 continue
             custom, patches, unknown = custom_commands(item) if item_type == "custom_tool_call" else ([], [], False)
+            patch_call = item_type in {"function_call", "custom_tool_call"} and tool.endswith("apply_patch")
+            if patch_call and item_type == "function_call":
+                arguments = item.get("arguments")
+                custom, patches, unknown = custom_commands({"name": tool, "input": arguments})
             if unknown:
                 errors.append(f"unresolved_custom_input:{path.name}:{number}")
-            item = {**item, "decoded_custom_commands": custom, "decoded_patches": patches}
-            text = "\n".join(leaves(item))
+            targets = [target for patch in patches for target in patch_paths(patch)]
+            if item_type == "file_change":
+                targets.extend(change_paths(item))
+                scanned = {"paths": targets}
+            elif item_type == "custom_tool_call" or patch_call:
+                scanned = {"commands": custom, "paths": targets}
+                if unknown:
+                    scanned["unresolved_input"] = item.get("input", item.get("arguments"))
+            else:
+                scanned = item
+            text = "\n".join(leaves(scanned))
             # Native arguments are often a JSON string containing escaped path text.
-            for value in leaves(item):
+            for value in leaves(scanned):
                 try:
                     text += "\n" + "\n".join(leaves(json.loads(value)))
                 except ValueError:
@@ -577,6 +671,10 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             if cwd is not None and not cwd.is_absolute():
                 cwd = workspace / cwd if workspace else None
             commands = [{"command": command, "cwd": str(cwd) if cwd else None}, *custom]
+            if item_type == "custom_tool_call":
+                commands = custom
+            elif patch_call or item_type == "file_change":
+                commands = []
             for command_item in ([] if metadata else commands):
                 command = command_item.get("command", command_item.get("cmd"))
                 if isinstance(command, list) and all(isinstance(word, str) for word in command):
@@ -586,13 +684,16 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                         errors.append(f"unresolved_operand:{path.name}:{number}")
                     continue
                 directory = command_item.get("workdir", command_item.get("cwd"))
+                if directory is not None and (not isinstance(directory, str) or "$" in directory or "`" in directory):
+                    errors.append(f"unresolved_operand:{path.name}:{number}")
                 command_cwd = Path(directory).expanduser() if isinstance(directory, str) else cwd
                 if command_cwd is not None and not command_cwd.is_absolute():
                     command_cwd = workspace / command_cwd if workspace else None
                 operands, unresolved = command_operands(command, command_cwd, workspace=workspace)
                 if unresolved:
                     errors.append(f"unresolved_operand:{path.name}:{number}")
-                if any(protected(candidate, recursive) for candidate, recursive in operands):
+                if ((command_cwd is not None and protected(command_cwd)) or
+                        any(protected(candidate, recursive) for candidate, recursive in operands)):
                     hits.add("protected_path")
             def explicit_paths(value: Any) -> list[str]:
                 if isinstance(value, dict):
@@ -604,9 +705,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                     return [p for v in value for p in explicit_paths(v)]
                 return []
 
-            path_operands = [] if metadata else explicit_paths(item)
-            for patch in patches:
-                path_operands.extend(re.findall(r"^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)$", patch, re.MULTILINE))
+            path_operands = [] if metadata else targets + explicit_paths(scanned)
             for operand in path_operands:
                 candidate = Path(operand).expanduser()
                 if not candidate.is_absolute():
@@ -617,7 +716,9 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 if protected(candidate):
                     hits.add("protected_path")
             # Structured non-shell tools and results still carry concrete paths.
-            for token in re.findall(r"(?:/|\.\.?/|~/|[A-Za-z0-9_.-]+/)[^\s\"'<>;,|(){}\[\]]+", text):
+            # A boundary prevents retrying the variable-length prefix at every
+            # character of a long slash-free word (quadratic on large inputs).
+            for token in re.findall(r"(?<![A-Za-z0-9_.-])(?:/|\.\.?/|~/|[A-Za-z0-9_.-]+/)[^\s\"'<>;,|(){}\[\]]+", text):
                 candidate = Path(token.rstrip(":.")).expanduser()
                 if not candidate.is_absolute():
                     if cwd is None:
@@ -627,10 +728,8 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                     candidate = cwd / candidate
                 if protected(candidate):
                     hits.add("protected_path")
-            if not metadata and ("$" in text or "`" in text):
-                errors.append(f"unresolved_operand:{path.name}:{number}")
             # Fingerprints establish observed output, never executor authorship.
-            # Keep the full-record path/operand checks above on inputs as well.
+            # Input checks above use shell operands or file targets, not contents.
             output = (item.get("output") if item_type in {"function_call_output", "custom_tool_call_output"}
                       else item.get("aggregated_output") if item_type == "command_execution" else None)
             for value in leaves(output):

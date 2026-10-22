@@ -8,6 +8,7 @@ from typing import Any
 import pytest
 
 from eval.runner.core import REPOSITORY, IncompleteRun, load_config, run
+from eval.runner.audit import PrivateGraders
 from eval.runner.process import ProcessResult, run_process
 
 
@@ -72,10 +73,20 @@ class Executor:
         return ProcessResult(0)
 
 
-def test_baseline_grades_after_exit_and_completed_checkpoint_does_not_repeat(setup: tuple[Path, Path, Path]) -> None:
+def test_baseline_grades_after_exit_and_completed_checkpoint_does_not_repeat(setup: tuple[Path, Path, Path],
+                                                                            monkeypatch: pytest.MonkeyPatch) -> None:
     root, config, out = setup
     executor = Executor()
+    computations: list[Path] = []
+    original = PrivateGraders._compute_line_fingerprints
+
+    def counted(private: PrivateGraders) -> set[str]:
+        computations.append(private.root)
+        return original(private)
+
+    monkeypatch.setattr(PrivateGraders, "_compute_line_fingerprints", counted)
     report = json.loads(run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2").read_text())
+    assert computations == [root.resolve()]
     result = report["tasks"][0]
     assert result["outcome"] == "pass"
     assert result["grading"]["passed_tests"] == 3

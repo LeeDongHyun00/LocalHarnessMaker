@@ -65,7 +65,14 @@ inconclusive; concrete canonical paths compare without case. Environment
 variable expansion, including `$HOME`, remains conservative.
 Recursive search/list/copy/archive operands covering an ancestor of a protected
 root are access_detected. Fingerprints cover distinctive hidden grader lines
-of at least 16 normalized characters across the private root. A candidate
+of at least 16 normalized characters from `ROOT/<task>/test_*.py`, where task
+directories have non-dot names. Root-level files, deeper descendants,
+dot-directories (including quarantine/reference copies) and symlinks never feed
+fingerprints. The entire private root remains protected against path access.
+Source contents are deduplicated by SHA-256 before parsing. The runner and
+read-only re-audit share one fingerprint/public-corpus analysis across tasks,
+retries and streams per invocation; a new invocation gets a new cache.
+A candidate
 must contain a number or string literal absent from every public task's
 `prompt.md`, `day2.md`, `expected.json`, `meta.json` and `workspace/` files;
 lines already present publicly, docstrings, module entry guards and unittest
@@ -73,7 +80,9 @@ launchers are excluded. Literal comparison includes decoded strings and numeric
 spellings, with conservative substring exclusion for common values.
 Only command `aggregated_output` and function/custom tool output contents are
 matched. Executor-authored patches, file changes, arguments and metadata are
-never fingerprint evidence. Path and operand checks still cover those inputs.
+never fingerprint evidence. File changes and patches are checked only through
+their target and move paths; authored content/diffs are not operands or path
+access evidence, even when they contain `$`, backticks, quotes or path strings.
 Distinctive hidden output remains access_detected even when a read hides its path.
 Only hashes, labels and redacted evidence are retained in audit results.
 Decode-and-execute pipelines such as `base64 -d | sh` are inconclusive.
@@ -88,15 +97,20 @@ that a private location reached executor context and prevents grading. These
 records are metadata; ordinary session settings are not shell operands.
 Native `event_msg.item_completed` command/file-change records are inspected,
 while user/assistant message items remain prose. Native `custom_tool_call.input`
-and `custom_tool_call_output` are paired and inspected for paths; fingerprints
-apply only to outputs.
+and `custom_tool_call_output` are paired; decoded input operands and output paths
+are inspected, and fingerprints apply only to outputs.
 Literal `exec` JavaScript wrappers around `tools.exec_command` and
-`tools.apply_patch` are decoded without executing code; shell arguments and patch
-targets receive operand checks, including bare symlink filenames. Dynamic or
-unsupported custom code stays inconclusive. Other unknown record/item kinds
+`tools.apply_patch` are decoded without executing code. Every literal shell
+command and its literal `workdir` (when supplied) is audited separately;
+JavaScript glue and patch contents are never parsed as shell commands. Patch
+targets receive path checks, including moves and bare symlink filenames.
+Dynamic commands (including string concatenation), dynamic directories, unknown
+tools and unsupported custom code stay inconclusive. Other unknown record/item kinds
 also stay inconclusive. The synthetic 33-record regression fixture preserves
 the supplied host session's structure and record order, with categorical
 discriminators retained and all task, identity, path and usage content replaced.
+Additional synthetic cases preserve the retained interval-union session's
+line-23 patch-plus-unittest call and line-25 absolute-path FileChange map.
 Detected or inconclusive access invalidates the task and aggregate report and
 prevents grading. This is observed access auditing, not filesystem isolation
 or proof that all unlogged activity is safe. Dynamic execution and additional

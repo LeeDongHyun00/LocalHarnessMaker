@@ -123,7 +123,8 @@ def test_reaudit_uses_real_roots_and_retained_manifests(finished: tuple[Path, Pa
     assert snapshot(out.parent) == before
 
 
-def test_reaudit_keeps_all_tasks_and_errors_without_paths(finished: tuple[Path, Path, Path]) -> None:
+def test_reaudit_keeps_all_tasks_and_errors_without_paths(finished: tuple[Path, Path, Path],
+                                                         monkeypatch: pytest.MonkeyPatch) -> None:
     private, out, runtime = finished
     second_runtime = runtime.parent / "second-runtime"
     shutil.copytree(runtime, second_runtime)
@@ -144,12 +145,23 @@ def test_reaudit_keeps_all_tasks_and_errors_without_paths(finished: tuple[Path, 
     log = runtime / "exec-1.jsonl"
     log.write_text('{"type":"unknown-one"}\n{"type":"unknown-two"}\n{"type":"turn.completed"}\n')
     before = snapshot(out.parent)
+    computations: list[Path] = []
+    original = PrivateGraders._compute_line_fingerprints
+
+    def counted(private: PrivateGraders) -> set[str]:
+        computations.append(private.root)
+        return original(private)
+
+    monkeypatch.setattr(PrivateGraders, "_compute_line_fingerprints", counted)
     rows = reaudit.reaudit(private, out)
+    assert len(computations) == 1
     assert rows[0] == {"task_id": "second-task", "status": "clean", "error_kinds": [], "match_labels": []}
     row = rows[1]
     assert row["error_kinds"] == ["retained_log_manifest_mismatch", "unsupported_event"]
     assert set(row) == {"task_id", "status", "error_kinds", "match_labels"}
     assert snapshot(out.parent) == before
+    assert reaudit.reaudit(private, out) == rows
+    assert len(computations) == 2  # A new invocation gets a new snapshot.
 
 
 @pytest.mark.parametrize("case", ["running", "pid", "partial_report", "unsafe_task_id"])

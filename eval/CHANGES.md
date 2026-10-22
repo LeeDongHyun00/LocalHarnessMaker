@@ -613,3 +613,88 @@ Validation: `.venv/bin/python -m pytest tests/eval -q` — 425 passed in 33.24s.
 `git diff --check -- eval tests/eval state/STATUS-eval.md` and
 `git diff --exit-code -- eval/tasks` — exit 0. The full repository suite is
 deferred to a future merge; only the owned eval tests ran here.
+
+## 2026-10-22 shell and file-change operand separation
+
+The user reports Claude committed the fingerprint fix as `d73b41f` and re-audited
+pilot A on the host: 9/10 tasks clean, versus 10/10 inconclusive before the fixes.
+Read the two indicated records in the authorized retained interval-union runtime.
+Line 23 combines a literal apply_patch with a literal unittest command; line 25
+is a FileChange map. Their authored assertion contains `$`, which triggered a
+whole-record unresolved-operand check.
+
+Shell expansion/quoting rules now apply to decoded shell commands and their
+directories only. Every supported literal `tools.exec_command` call is checked,
+including its workdir. JavaScript glue is not a shell command. Concatenated or
+otherwise dynamic commands/directories and unknown tools stay inconclusive.
+The literal decoder skips quoted patch contents that resemble nested tool calls.
+FileChange and apply_patch inputs supply only target/move paths to access checks;
+content/diff text cannot trigger shell errors, path matches or fingerprints.
+Canonical protected paths, symlinks and traversal checks remain in force.
+
+Added 29 synthetic cases using the real line-23/25 envelopes: unittest is clean,
+protected reads and later commands are detected, dynamic/unknown calls are
+inconclusive, and authored `$`, backticks, quotes and private-looking strings
+stay clean at workspace targets. Native/list FileChanges and literal custom,
+code-mode and function-call patches cover protected targets, symlinks and moves.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 454 passed in 47.54s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks` — exit 0.
+
+## Assumptions
+
+- The user's 9/10 result and commit identity are supplied host evidence. No real
+  private graders are available here, and no host acceptance result is claimed.
+- Claude will rerun the read-only re-audit with the matching private graders;
+  the target is 10/10 clean unless actual protected access is detected. Reports,
+  frozen tasks and CLI/schema interfaces remain unchanged. No model call,
+  private-root lookup, staging or commit occurred in this session.
+
+## 2026-10-22 bounded grader corpus and payload processing
+
+Claude's supplied host check passed 454 eval tests, but re-audit exceeded nine
+minutes with a stack inside ast.walk. The user reports 14,669 test files under
+the private root, only 120 immediate task graders and 847 unique contents;
+recursive enumeration included validation/mutation/reference storage.
+
+Fingerprint inputs now come only from `ROOT/<non-dot-task>/test_*.py`, without
+following symlink directories/files. Dot storage, root-level tests and deeper
+descendants never feed fingerprints. PrivateGraders.load also requires an
+immediate non-dot task directory. Whole-root path protection remains in force,
+including every dot-directory and its copies.
+
+SHA-256 content deduplication precedes AST parsing. One invocation-scoped cache
+shares the public-corpus/distinctive-line/fingerprint analysis across all tasks,
+streams and retries in both the runner and read-only re-audit. It is discarded
+between invocations; task-specific manifest hashes still read current files.
+AST nodes are collected once per unique grader, and literal source extraction
+uses precomputed byte offsets instead of repeatedly splitting the entire file.
+
+The code-mode decoder now matches at source offsets and builds its remainder in
+one pass rather than copying the remaining source for each call. A boundary on
+the generic path regex prevents quadratic retries across long slash-free words.
+The previous command-only shell and path-only FileChange/patch fix is retained.
+
+Nine new regressions cover 120 task graders plus 5,000 quarantined duplicate
+copies, exact fingerprint equality, no dot-file reads, one parse per unique
+content, cache lifetime and rejected non-task paths. Large-payload cases cover
+200 KB patches, commands and malformed literals, 3,000 sequential tool calls,
+and a 1 MB FileChange. Corpus analysis across 120 tasks and each large-payload
+audit must finish within five seconds. Runner and multi-task re-audit tests
+also assert one corpus computation per invocation and fresh analysis next time.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 463 passed in 34.19s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports/pilot-a` — exit 0. Frozen public
+tasks and pilot artifacts are unchanged; no model call, private-root lookup,
+staging or commit occurred.
+
+## Assumptions
+
+- Public inputs and immediate task graders are immutable within one invocation;
+  the cache is in memory only and is never reused by a later invocation.
+- The host counts, hang and 454-test result are user-supplied evidence. Claude
+  must rerun with the matching private root; acceptance remains under one minute
+  with 10/10 tasks clean unless a task actually accessed a protected path. These
+  synthetic checks do not establish that host result or pilot quality.

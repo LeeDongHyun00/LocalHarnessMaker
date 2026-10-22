@@ -9,7 +9,7 @@ import sys
 from typing import Any
 
 from eval.runner import core
-from eval.runner.audit import PrivateGraders, audit_logs, digest
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest
 
 
 class InputParser(argparse.ArgumentParser):
@@ -31,6 +31,7 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
     if any(entry.get("phase") != "finished" or entry.get("pid") for entry in tasks.values()):
         raise ValueError("Every executor must have finished")
     rows = []
+    fingerprint_cache = FingerprintCache()
     for task, entry in sorted(tasks.items()):
         errors: set[str] = set()
         labels: list[str] = []
@@ -45,7 +46,7 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
             paths = [runtime / segment["events"] for segment in segments]
             paths.extend(sorted((runtime / "codex-home/sessions").rglob("*.jsonl")))
             audit = audit_logs(paths, private, workspace=workspace, repository=core.REPOSITORY,
-                               grading_roots=core.audit_roots(runtime))
+                               grading_roots=core.audit_roots(runtime), fingerprint_cache=fingerprint_cache)
             errors = {error.split(":", 1)[0] for error in audit["errors"]}
             labels = sorted({match["marker"] for match in audit["matches"]})
             # Detect lost/changed retained evidence as well as parser errors.

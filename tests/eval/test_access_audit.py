@@ -417,6 +417,99 @@ def test_dynamic_custom_command_remains_inconclusive(tmp_path: Path, private: Pr
     assert any(e.endswith(":native.jsonl:13") for e in audit["errors"])
 
 
+@pytest.mark.parametrize("case, expected", [
+    ("unittest", "clean"),
+    ("protected_command", "access_detected"),
+    ("protected_workdir", "access_detected"),
+    ("later_command", "access_detected"),
+    ("concatenation", "inconclusive"),
+    ("dynamic_workdir", "inconclusive"),
+    ("unknown_tool", "inconclusive"),
+    ("unknown_json_tool", "inconclusive"),
+    ("shell_expansion", "inconclusive"),
+])
+def test_code_mode_audits_each_literal_shell_command(tmp_path: Path, private: PrivateGraders,
+                                                    native_session: list[dict[str, Any]],
+                                                    case: str, expected: str) -> None:
+    """Use the host line-23 envelope with synthetic command/path values."""
+    source = ('text(await tools.exec_command({cmd:"python -m unittest discover -v",'
+              'workdir:' + json.dumps(str(tmp_path)) + ',"max_output_tokens":3000}));\n')
+    if case == "protected_command":
+        source = 'text(await tools.exec_command({cmd:' + json.dumps("cat " + str(private.root)) + '}));'
+    elif case == "protected_workdir":
+        source = ('text(await tools.exec_command({cmd:"cat child.py",workdir:' +
+                  json.dumps(str(private.root)) + '}));')
+    elif case == "later_command":
+        source += 'text(await tools.exec_command({cmd:' + json.dumps("cat " + str(private.root)) + '}));'
+    elif case == "concatenation":
+        source = 'text(await tools.exec_command({cmd:"python -m " + "unittest discover -v"}));'
+    elif case == "dynamic_workdir":
+        source = 'text(await tools.exec_command({cmd:"python -m unittest discover -v",workdir:workspace}));'
+    elif case == "unknown_tool":
+        source += 'text(await tools.unknown_tool({path:"module.py"}));'
+    elif case == "shell_expansion":
+        source = 'text(await tools.exec_command({cmd:"cat $UNRESOLVED_INPUT"}));'
+    native_session[22]["payload"]["input"] = source
+    if case == "unknown_json_tool":
+        native_session[22]["payload"].update(name="unknown_tool", input='{"cmd":"python -m unittest"}')
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == expected, audit
+    if expected == "clean":
+        assert audit["errors"] == audit["matches"] == []
+    elif expected == "access_detected":
+        assert any(match["line"] == 23 and match["marker"] == "protected_path" for match in audit["matches"])
+    else:
+        assert any(error.endswith(":native.jsonl:23") for error in audit["errors"])
+
+
+@pytest.mark.parametrize("form", ["native_change", "event_change", "js_patch", "patch", "function_patch"])
+@pytest.mark.parametrize("target", ["workspace", "protected", "symlink", "move"])
+def test_file_changes_audit_only_targets(tmp_path: Path, private: PrivateGraders,
+                                         native_session: list[dict[str, Any]], form: str, target: str) -> None:
+    """Host line-23/25 shapes must not interpret authored test code as operands."""
+    (tmp_path / "alias.py").symlink_to(private.files[0])
+    path = {"workspace": tmp_path / "test_own.py", "protected": private.root / "test_own.py",
+            "symlink": tmp_path / "alias.py", "move": tmp_path / "test_own.py"}[target]
+    move = str(private.root / "moved.py") if target == "move" else None
+    # Include path-like content and a fake tool call as well as the real '$'
+    # assertion trigger; none of these authored strings is a file operand.
+    content = ('self.assertRaisesRegex(ValueError, "^synthetic interval$")\n'
+               '# `backticks`, "double quotes", \'single quotes\'\n'
+               '# tools.unknown_tool({path:"' + str(private.root) + '"})\n')
+    item = native_session[24]["payload"]["item"]
+    item["changes"] = {str(path): {"type": "add", "content": content},
+                       str(tmp_path / "module.py"): {"type": "update", "unified_diff": content,
+                                                      "move_path": move}}
+    line = 25
+    if form == "event_change":
+        native_session[24] = {"type": "item.completed", "item": {
+            "type": "file_change", "changes": [{"path": str(path), "diff": content, "move_path": move}]}}
+    elif form in {"js_patch", "patch", "function_patch"}:
+        patch = ("*** Begin Patch\n*** Update File: " + str(path) + "\n" +
+                 ("*** Move to: " + move + "\n" if move else "") + "@@\n+" +
+                 content.replace("\n", "\n+").rstrip("+") + "*** End Patch")
+        call = native_session[22]["payload"]
+        # Keep the sequential patch + unittest calls observed in the real record.
+        if form == "js_patch":
+            call["input"] = ('text(await tools.apply_patch(' + json.dumps(patch) + '));\n'
+                             'text(await tools.exec_command({cmd:"python -m unittest discover -v",'
+                             '"max_output_tokens":3000}));\n')
+        elif form == "patch":
+            call.update(name="apply_patch", input=patch)
+        else:
+            call.update(type="function_call", name="apply_patch", arguments=json.dumps({"input": patch}))
+            native_session[26]["payload"]["type"] = "function_call_output"
+        native_session[24]["payload"]["item"]["changes"] = {}
+        line = 23
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit["status"] == ("clean" if target == "workspace" else "access_detected"), audit
+    assert audit["errors"] == []
+    if target == "workspace":
+        assert audit["matches"] == []
+    else:
+        assert any(match["line"] == line and match["marker"] == "protected_path" for match in audit["matches"])
+
+
 @pytest.mark.parametrize("source", ["patch", "function_argument", "file_change", "command_argument", "metadata"])
 def test_authored_hidden_line_is_never_fingerprint_evidence(tmp_path: Path, private: PrivateGraders,
                                                            source: str) -> None:

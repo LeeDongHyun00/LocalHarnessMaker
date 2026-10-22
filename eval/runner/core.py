@@ -16,7 +16,7 @@ import uuid
 
 from eval.runner import harness
 from eval.runner.report import build, build_task
-from eval.runner.audit import PrivateGraders, audit_logs, digest, executor_environment
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.telemetry import collect, collect_runs, records, session_id
 
@@ -191,6 +191,7 @@ def run(
     if actual_version != config["codex_version"]:
         raise ValueError("Installed Codex version differs from pinned configuration")
     private_by_task = {task: PrivateGraders.load(private_root, task, REPOSITORY) for task in config["tasks"]}
+    fingerprint_cache = FingerprintCache()
     task_set_hash = taskset_digest(private_by_task)
     # A private root must never appear in config or public task inputs.
     for task, private in private_by_task.items():
@@ -266,7 +267,7 @@ def run(
             last = entry["segments"][-1]
             final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
         interrupted = False
-        prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime)) if prior else None
+        prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if prior else None
         blocked = prior_audit is not None and prior_audit["status"] != "clean"
         control_error = entry.get("control_error")
         if config["harness"] and not blocked and not execution_finished and not (runtime / "contract.json").exists():
@@ -328,7 +329,7 @@ def run(
                             "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
             entry.pop("pid", None)
             write_json(checkpoint, state)
-            current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
+            current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
             if interrupted or current_audit["status"] != "clean":
                 break
             resumed_id = session_id([event_path]) or resumed_id
@@ -339,7 +340,7 @@ def run(
                     break
                 try:
                     native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                    native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
+                    native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                     if native_audit["status"] != "clean":
                         break
                     attempt = len(entry.get("verdicts", [])) + 1
@@ -367,7 +368,7 @@ def run(
             write_json(checkpoint, state)
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
-        audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime))
+        audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
         write_json(task_out / "access-audit.json", json.loads(private.redact(json.dumps(audit))))
         telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"])
         telemetry["executor_runs"] = collect_runs(event_paths, native_paths, entry["segments"])
