@@ -6,10 +6,15 @@ import argparse
 import json
 from pathlib import Path
 from typing import Any
+from plugin.versions import validate_version
 
 
-def audit(root: Path) -> dict[str, Any]:
+def audit(root: Path, expected_version: str | None = None) -> dict[str, Any]:
     """Require captured inputs, context delivery, bounded Stop, and final reply."""
+    metadata = json.loads((root / "experiment.json").read_text())
+    version = validate_version(metadata["version"])
+    if expected_version is not None:
+        assert version == validate_version(expected_version), (version, expected_version)
     records = [json.loads(p.read_text()) for p in sorted((root / "hooks").glob("*.json"))]
     events = [r["input"]["hook_event_name"] for r in records]
     assert events == ["SessionStart", "UserPromptSubmit", "Stop", "Stop"], events
@@ -37,7 +42,7 @@ def audit(root: Path) -> dict[str, Any]:
     assert assistant[1] == "SECOND_REPLY"
     result = json.loads((root / "result.json").read_text())
     assert result["exit_code"] == 0
-    return {"directory": str(root), "events": events, "assistant_messages": len(assistant),
+    return {"directory": str(root), "version": version, "events": events, "assistant_messages": len(assistant),
             "context_visible": True, "continued_once": True, "exit_code": 0}
 
 
@@ -45,9 +50,10 @@ def main() -> int:
     """Check one or more previously captured runs."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directories", nargs="+", type=Path)
+    parser.add_argument("--expected-version", help="exact codex-cli identity to verify")
     args = parser.parse_args()
     for root in args.directories:
-        print(json.dumps(audit(root), sort_keys=True))
+        print(json.dumps(audit(root, args.expected_version), sort_keys=True))
     return 0
 
 

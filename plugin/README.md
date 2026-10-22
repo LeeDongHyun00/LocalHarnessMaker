@@ -37,8 +37,9 @@ renamed to `session.bad.UUID.json`, warned about, and reset as a new session.
 
 ## Install from a fresh clone
 
-On the host, install Python 3.11+ and the exact Codex version in
-[CODEX_VERSION](CODEX_VERSION). From the fresh repository root:
+On the host, install Python 3.11+ and use the available Codex CLI. The app may
+update it automatically; installation accepts unverified versions. From the
+fresh repository root:
 
 ```sh
 python3 -m venv .venv
@@ -70,7 +71,10 @@ macOS bundled binary:
 `/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex`.
 The five-second version probe uses the same shutdown protocol as other child
 calls. `--check` independently reports `Codex CLI not found`, `Codex version
-mismatch`, `Hooks not registered`, and `Skill missing`, returning 1 if any fail.
+unverified`, `Hooks not registered`, and `Skill missing`, returning 1 if any fail.
+The unverified-version message replaces the old SC-6 single-pin mismatch and
+includes instructions to run the probe and add passing evidence to the list.
+An unverified version warns during installation but does not prevent it.
 A failed/timed-out probe has its own diagnostic. No executor or model is run.
 
 Checks compare event/script registrations semantically and validate JSON integer
@@ -80,7 +84,7 @@ the install-time environment overrides. Float, string, boolean, out-of-range or
 changed JSON timeouts report a timeout type or value mismatch. The current
 source defaults do not override an installed manifest during `--check`.
 
-Review and approve the installed hook commands using the pinned CLI's normal
+Review and approve the installed hook commands using the installed CLI's normal
 trust UI on the host. Registration checks do not prove persisted trust. This
 session tested only temporary HOME/CODEX_HOME targets and did not modify the
 user's real Codex configuration.
@@ -100,7 +104,9 @@ Every group signal and liveness check tolerates EPERM/ESRCH: cleanup reaps the
 leader and retries briefly, then lists live members with a bounded, shell-free
 `ps -A -o pid=,pgid=,stat=` call and signals their PIDs after rechecking group
 membership. It reaps the leader and checks for live survivors after SIGKILL;
-zombies do not count as live work. Signal/reap/listing errors go to stderr and
+zombies do not count as live work. ESRCH group errors after leader exit are
+quiet; retries and survivor inspection remain active. Unexpected signal errors,
+reap/listing errors and unresolved survivors go to stderr and
 preserve the original result, timeout or shutdown. If process inspection or
 signalling is denied, stderr reports that cleanup could not be verified.
 The real inherited-pipe regression runs twenty times per pytest session and
@@ -145,6 +151,36 @@ caller allows 480 seconds. The contract path is a user-approved exception to
 deadline and perform deadline-triggered fallback on that path. Other callers
 outlast their callee budgets. Contract calls log latency; hooks log elapsed and
 CLI time. Real latency and nested shutdown require host verification.
+
+## Verified Codex versions
+
+[VERIFIED_VERSIONS.json](VERIFIED_VERSIONS.json) is the ordered history of verified
+versions, each with evidence directories relative to `plugin/`. Its first entry
+is `codex-cli 0.162.0-alpha.17.2`, with passing exec and interactive startup
+probes. [CODEX_VERSION](CODEX_VERSION) retains the first historical version for
+older references; it is no longer an installation or execution pin.
+
+Probe and demo preparation accept any well-formed installed version and save
+its exact identity in `experiment.json`. Probe audits validate that identity,
+include it in their result, and optionally require an exact expected version.
+They can audit an unlisted version before it is added to the registry. Preparation
+prints a launch command; execute it on the host and retain hook records,
+transcript excerpt and result.json as in the original evidence directories.
+Use fresh evidence directories and never overwrite earlier captures.
+
+```sh
+.venv/bin/python -m plugin.probe --mode exec --out plugin/evidence/NEW-exec
+# Run the printed command on the host and capture the evidence.
+.venv/bin/python -m plugin.check_probe_evidence \
+  --expected-version "codex-cli 0.163.0-alpha.11.1" plugin/evidence/NEW-exec
+```
+
+Only after this audit passes, append the version and evidence paths to the JSON
+list, rerun plugin tests and rerun installation `--check`. The tests audit every
+listed directory against its recorded version and events. The new
+`0.163.0-alpha.11.1` entry remains pending Claude's host probe. A passing hook
+probe does not replace the one-task audit compatibility smoke required before
+large evaluation runs, or establish compatibility for other CLI versions.
 
 ## Host demos and evidence
 
@@ -201,6 +237,8 @@ The opt-in live SC-2 test remains disabled by default.
 
 ## Change summary
 
+Replaced single-version gating with an evidence-backed version history, retained
+version recording in probes/demos, and silenced expected post-exit ESRCH logs.
 Addressed R2 shutdown/deadline findings with owned-group signal cleanup and
 budget tests; integer timeout and installer findings with preflight, repair and
 semantic checks; hook findings with project scoping, exhaustion handoffs and
@@ -208,6 +246,8 @@ atomic session recovery; demo findings with pre-approval workspace evidence.
 Offline tests cover these cases with fake trees/signals and temporary homes.
 
 ## Assumptions
+
+- The 2026-10-22 user decision supersedes the role prompt single-pin and STOP-P2 policy. Unlisted versions may install and run probes/demos; verification status remains explicit until passing host evidence is added. Existing evidence is immutable.
 
 - The latest user-approved review decisions supersede Stop 600 seconds, handoff 90 seconds, and preservation of an old handoff after generation failure. The 30-second contract cutoff remains approved despite the controller's 35-second per-call deadline.
 - A real demonstration may pass on its first check; a synthetic forced failure is not appropriate in real mode.

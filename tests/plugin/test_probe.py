@@ -101,14 +101,64 @@ def test_prepare_isolated_configuration(tmp_path: Path, monkeypatch: pytest.Monk
     assert set(hooks["hooks"]) == {"SessionStart", "UserPromptSubmit", "Stop"}
 
 
-def test_version_mismatch_stops_before_config_creation(tmp_path: Path) -> None:
+def test_unlisted_version_runs_and_records_identity(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CODEX_HOME", str(tmp_path / "no-auth"))
     def run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        return subprocess.CompletedProcess(command, 0, "codex-cli unsupported\n", "")
+        return subprocess.CompletedProcess(command, 0, "codex-cli 0.163.0-alpha.11.1\n", "")
 
-    with pytest.raises(ValueError, match="Codex version mismatch"):
+    output = tmp_path / "evidence"
+    metadata = prepare(output, run=run)
+    assert metadata["version"] == "codex-cli 0.163.0-alpha.11.1"
+    assert json.loads((output / "experiment.json").read_text())["version"] == metadata["version"]
+
+
+@pytest.mark.parametrize("code,stdout", [(1, "codex-cli 0.163.0-alpha.11.1"), (0, "")])
+def test_invalid_version_probe_writes_nothing(tmp_path: Path, code: int, stdout: str) -> None:
+    def run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(command, code, stdout, "")
+    with pytest.raises(ValueError):
         prepare(tmp_path / "evidence", run=run)
+    assert not (tmp_path / "evidence").exists()
 
 
 def test_existing_evidence_cannot_be_overwritten(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="new evidence directory"):
         prepare(tmp_path)
+
+
+def test_verified_versions_have_passing_matching_evidence() -> None:
+    from plugin.versions import verified_versions
+    from plugin.check_probe_evidence import audit
+    plugin = Path(__file__).resolve().parents[2] / "plugin"
+    versions = verified_versions()
+    assert next(iter(versions)) == "codex-cli 0.162.0-alpha.17.2"
+    for version, directories in versions.items():
+        for directory in directories:
+            assert audit(plugin / directory, expected_version=version)["version"] == version
+
+
+@pytest.mark.parametrize("rows", [[], [{"version": "wrong", "evidence": ["evidence/x"]}],
+    [{"version": "codex-cli 1.0.0", "evidence": []}],
+    [{"version": "codex-cli 1.0.0", "evidence": ["evidence/../escape"]}],
+    [{"version": "codex-cli 1.0.0", "evidence": ["evidence/x"]}] * 2])
+def test_invalid_verified_versions_rejected(tmp_path: Path, rows: object) -> None:
+    from plugin.versions import verified_versions
+    path = tmp_path / "versions.json"
+    path.write_text(json.dumps(rows))
+    with pytest.raises(ValueError):
+        verified_versions(path)
+
+
+def test_probe_audit_checks_recorded_version(tmp_path: Path) -> None:
+    import shutil
+    from plugin.check_probe_evidence import audit
+    source = Path(__file__).resolve().parents[2] / "plugin/evidence/2026-10-21-exec"
+    with pytest.raises(AssertionError):
+        audit(source, expected_version="codex-cli 0.163.0-alpha.11.1")
+    copy = tmp_path / "copy"
+    shutil.copytree(source, copy)
+    metadata = json.loads((copy / "experiment.json").read_text())
+    metadata["version"] = ""
+    (copy / "experiment.json").write_text(json.dumps(metadata))
+    with pytest.raises(ValueError, match="invalid Codex version"):
+        audit(copy)

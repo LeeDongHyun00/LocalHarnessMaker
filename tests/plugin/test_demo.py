@@ -59,13 +59,14 @@ def test_demo_does_not_overwrite_an_attempted_approval(tmp_path: Path) -> None:
         finish({"out": str(tmp_path)}, scripted=True, run=forbidden)
 
 
-def test_demo_rejects_version_upgrade_before_registration(tmp_path: Path) -> None:
+def test_demo_records_unlisted_version(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv('CODEX_HOME', str(tmp_path / 'no-auth'))
     def run(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
-        return subprocess.CompletedProcess(command, 0, "codex-cli wrong-version\n", "")
-
-    with pytest.raises(ValueError, match="STOP-P2"):
-        prepare(tmp_path / "evidence", run=run)
-    assert not (tmp_path / "evidence").exists()
+        return subprocess.CompletedProcess(command, 0, "codex-cli 0.163.0-alpha.11.1\n", "")
+    output = tmp_path / "evidence"
+    metadata = prepare(output, run=run)
+    assert metadata['version'] == 'codex-cli 0.163.0-alpha.11.1'
+    assert json.loads((output / 'experiment.json').read_text())['version'] == metadata['version']
 
 
 def test_recorded_demo_and_missing_continuation(tmp_path: Path) -> None:

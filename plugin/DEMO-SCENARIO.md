@@ -1,7 +1,8 @@
 # Host recording sequence
 
-1. Show plugin/CODEX_VERSION and the three registered hooks in the temporary
-   demo home's hooks.json. Explain the 30/480/120-second child deadlines and
+1. Show plugin/VERIFIED_VERSIONS.json, the actual version saved in the demo
+   experiment.json, and the three registered hooks in the temporary demo
+   home's hooks.json. Explain the 30/480/120-second child deadlines and
    40/660-second UserPromptSubmit/Stop deadlines.
 2. Run `bash plugin/demo.sh --real --out plugin/evidence/DATE-real` from the
    checkout. Show the saved contract summary: goal, criteria, assumptions,

@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 from plugin.hooks._process import run_group
+from plugin.versions import validate_version
 from collections.abc import Callable
 
 
@@ -27,11 +28,11 @@ def prepare(output_dir: Path, run: Callable[..., subprocess.CompletedProcess[str
     output_dir = output_dir.resolve()
     if output_dir.exists():
         raise ValueError("use a new evidence directory for each run")
-    version = run(["codex", "--version"], text=True, capture_output=True, check=False, timeout=5, shell=False,
-                  env={**os.environ, "HARNESS_NESTED": "1"}).stdout.strip()
-    pin = Path(__file__).with_name("CODEX_VERSION").read_text().strip()
-    if version != pin:
-        raise ValueError(f"Codex version mismatch: expected {pin}; found {version}")
+    result = run(["codex", "--version"], text=True, capture_output=True, check=False, timeout=5, shell=False,
+                  env={**os.environ, "HARNESS_NESTED": "1"})
+    if result.returncode != 0:
+        raise ValueError("Codex version probe failed")
+    version = validate_version(result.stdout.strip())
     output_dir.mkdir(parents=True)
     sandbox_dir = Path(tempfile.mkdtemp(prefix="harness-hook-probe-"))
     config_home = sandbox_dir / "codex-home"

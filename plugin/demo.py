@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 from typing import Any
+from plugin.versions import validate_version
 
 from plugin.hooks._runtime import run_group, seconds
 from plugin.hooks._config import validate_settings
@@ -83,11 +84,11 @@ def prepare(out: Path, run: Runner = run_group, mode: str = "stub") -> dict[str,
     validate_settings()
     hooks = configuration(ROOT)
     executable = resolve_codex() or "codex"
-    version = run([executable, "--version"], capture_output=True, text=True, check=False, timeout=5, shell=False,
-                  env={**os.environ, "HARNESS_NESTED": "1"}).stdout.strip()
-    expected = (PLUGIN / "CODEX_VERSION").read_text().strip()
-    if version != expected:
-        raise ValueError(f"STOP-P2: Codex version mismatch: expected {expected}; found {version}")
+    result = run([executable, "--version"], capture_output=True, text=True, check=False, timeout=5, shell=False,
+                  env={**os.environ, "HARNESS_NESTED": "1"})
+    if result.returncode != 0:
+        raise ValueError("Codex version probe failed")
+    version = validate_version(result.stdout.strip())
     out.mkdir(parents=True)
     temporary = Path(tempfile.mkdtemp(prefix="harness-d2-"))
     home, workspace = temporary / "codex-home", temporary / "workspace"

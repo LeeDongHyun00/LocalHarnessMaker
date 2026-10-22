@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import errno
 import sys
 import signal
 import subprocess
@@ -83,7 +84,9 @@ class ChildGroups:
                 self.kill(group, signum)
                 return True
             except OSError as exc:
-                if attempt == 0:
+                exited = any(child.pid == group and getattr(child, "returncode", None) is not None
+                             for child in self.children)
+                if attempt == 0 and not (exc.errno == errno.ESRCH and exited):
                     self.warn(f'group {group} signal {signum}: {exc}; reaping/retrying')
                 if attempt < 2:
                     self.sleep(0.01)

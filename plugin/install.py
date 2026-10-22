@@ -18,7 +18,7 @@ REQUIRED = ('controller/__main__.py', 'verifier/__main__.py', 'schemas/contract.
             'schemas/verdict.schema.json', 'schemas/handoff.schema.json',
             'plugin/hooks/_runtime.py', 'plugin/hooks/_entrypoint.py', 'plugin/hooks/_scope.py',
             'plugin/hooks/_config.py', 'plugin/hooks/_process.py', 'plugin/skills/harness/SKILL.md',
-            'plugin/CODEX_VERSION', *(f'plugin/hooks/{name}' for name in EVENTS.values()))
+            'plugin/CODEX_VERSION', 'plugin/VERIFIED_VERSIONS.json', 'plugin/versions.py', *(f'plugin/hooks/{name}' for name in EVENTS.values()))
 APP_CODEX = '/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex'
 
 
@@ -169,7 +169,8 @@ def plan_install(home: Path, project: Path) -> dict[Path, bytes]:
         for source in sorted((ROOT / name).rglob('*')):
             if source.is_file() and '__pycache__' not in source.parts and source.suffix != '.pyc':
                 plan[snapshot / source.relative_to(ROOT)] = source.read_bytes()
-    plan[snapshot / 'plugin/CODEX_VERSION'] = (ROOT / 'plugin/CODEX_VERSION').read_bytes()
+    for name in ('CODEX_VERSION', 'VERIFIED_VERSIONS.json', 'versions.py'):
+        plan[snapshot / 'plugin' / name] = (ROOT / 'plugin' / name).read_bytes()
     for source in (ROOT / 'plugin/skills/harness').rglob('*'):
         if source.is_file():
             plan[home / 'skills/harness' / source.relative_to(ROOT / 'plugin/skills/harness')] = source.read_bytes()
@@ -203,6 +204,7 @@ def main() -> int:
     plan = None if args.check else plan_install(home, project)
     executable = resolve_codex()
     version_ok = False
+    version_verified = False
     if executable is None:
         print('Codex CLI not found', file=sys.stderr)
     else:
@@ -210,19 +212,27 @@ def main() -> int:
         try:
             result = run_group([executable, '--version'], capture_output=True, text=True, timeout=5,
                                check=False, shell=False, env={**os.environ, 'HARNESS_NESTED': '1'})
-            expected = (ROOT / 'plugin/CODEX_VERSION').read_text().strip()
-            version_ok = result.returncode == 0 and result.stdout.strip() == expected
-            if not version_ok:
-                print(f'Codex version mismatch: expected {expected}; found {result.stdout.strip()}', file=sys.stderr)
+            from plugin.versions import validate_version, verified_versions
+            if result.returncode != 0:
+                raise ValueError('version command failed')
+            version = validate_version(result.stdout.strip())
+            version_ok = True
+            version_verified = version in verified_versions()
+            if not version_verified:
+                print(f'Codex version unverified: {version}. Run python -m plugin.probe '
+                      '--mode exec --out plugin/evidence/NEW-exec, check the captured evidence '
+                      'with python -m plugin.check_probe_evidence --expected-version '
+                      f'"{version}" plugin/evidence/NEW-exec, then add the version and evidence '
+                      'directory to plugin/VERIFIED_VERSIONS.json.', file=sys.stderr)
         except (OSError, TimeoutError) as exc:
             print(f'Codex version probe failed: {exc}', file=sys.stderr)
         except Exception as exc:
             print(f'Codex version probe failed: {exc}', file=sys.stderr)
     if args.check:
         installed_ok = check_install(home, project)
-        if version_ok and installed_ok:
+        if version_ok and version_verified and installed_ok:
             print('LocalHarnessMaker installation OK')
-        return 0 if version_ok and installed_ok else 1
+        return 0 if version_ok and version_verified and installed_ok else 1
     if not version_ok:
         return 1
     assert plan is not None

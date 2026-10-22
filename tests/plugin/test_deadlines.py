@@ -260,7 +260,7 @@ def test_group_errors_preserve_result_and_remove_members(
 
     class Process:
         pid = 12340
-        returncode = 3
+        returncode = 3 if ending == 'normal' else None
         stdin = stdout = stderr = None
 
         def poll(self) -> int | None:
@@ -268,7 +268,8 @@ def test_group_errors_preserve_result_and_remove_members(
             if ending == 'normal':
                 live.discard(self.pid)
                 return 3
-            return None if self.pid in live else 3
+            self.returncode = None if self.pid in live else 3
+            return self.returncode
 
         def wait(self, timeout: float) -> int:
             assert self.pid not in live
@@ -296,7 +297,11 @@ def test_group_errors_preserve_result_and_remove_members(
     if persistent:
         assert (12341, signal.SIGTERM) in pid_calls
         assert (12341, signal.SIGKILL) in pid_calls
-    assert 'reaping/retrying' in capsys.readouterr().err
+    errors = capsys.readouterr().err
+    if failure == errno.ESRCH and ending == 'normal':
+        assert 'reaping/retrying' not in errors
+    else:
+        assert 'reaping/retrying' in errors
     assert ticks[0] < 3
 
 
@@ -331,3 +336,20 @@ def test_individual_signal_errors_do_not_escape(
     owner.cleanup()
     assert 'cannot reap leader' in capsys.readouterr().err
     assert ticks[0] < 3
+
+
+def test_normal_exit_esrch_is_quiet(capsys: pytest.CaptureFixture[str]) -> None:
+    def gone(group: int, signum: int) -> None:
+        raise ProcessLookupError(errno.ESRCH, 'No such process')
+    class Process:
+        pid = 12340
+        returncode = 0
+        stdin = stdout = stderr = None
+        def poll(self) -> int:
+            return 0
+        def wait(self, timeout: float) -> int:
+            return 0
+    owner = _process.ChildGroups(kill=gone, members=lambda group: [], sleep=lambda seconds: None)
+    owner.children = [Process()]
+    owner.cleanup()
+    assert capsys.readouterr().err == ''

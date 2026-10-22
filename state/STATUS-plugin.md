@@ -1,5 +1,10 @@
 ## Done
 
+- Replaced active single-pin checks with plugin/VERIFIED_VERSIONS.json and its validated reader; the first entry retains 0.162.0-alpha.17.2 exec/TUI evidence. Probe/demo accept unlisted versions and save the exact installed identity; offline probe audit validates identity and optional expected version, and tests audit every registry entry against passing evidence (.venv/bin/python -m pytest tests/plugin -q: 185 passed, 1 opt-in live Codex test skipped in 14.66s).
+- Allowed installation on unverified versions while --check returns 1 with a distinct Codex version unverified diagnostic and instructions to probe/audit/add evidence; hooks and skill checks remain independent and installed snapshots include the registry/reader (.venv/bin/python -m pytest tests/plugin -q: 185 passed, 1 skipped in 14.66s; fake CLI and isolated-home tests cover verified/unverified installation and diagnostics).
+- Silenced ESRCH group warnings after leader exit while retaining bounded retry, member inspection, unexpected-error and unresolved-survivor diagnostics; corrected process fakes to keep returncode consistent with poll (.venv/bin/python -m pytest tests/plugin -q: 185 passed, 1 skipped in 14.66s; quiet ESRCH, EPERM/ESRCH cleanup paths and twenty real inherited-pipe trees passed).
+- Updated plugin/README.md and recording sequence for the changing-version policy and evidence workflow (.venv/bin/python -m pytest tests/plugin -q: 185 passed, 1 skipped in 14.66s; all registry evidence audits passed offline).
+
 - Pinned the installed executor at codex-cli 0.162.0-alpha.17.2 in plugin/CODEX_VERSION (codex --version: codex-cli 0.162.0-alpha.17.2).
 - Completed D-1 startup evidence for both interactive CLI and codex exec; Role 1 published the canonical document, resolving the earlier STOP-2 (.venv/bin/python -m plugin.check_probe_evidence plugin/evidence/2026-10-21-exec plugin/evidence/2026-10-21-tui: context_visible=true, continued_once=true, exit_code=0 for both; cat docs/hooks-contract.md: published by Role 1 on 2026-10-21 with user approval).
 - Added the exact HARNESS_NESTED=1 silent fast path to the three lifecycle hooks and the original probe. Tests leave stdin open, poison imports/I/O/subprocesses, exercise stub precedence and unset/empty/0/true/01 normal behavior, and require exit 0 with zero bytes on both streams (.venv/bin/python -m pytest tests/plugin -q: 70 passed, 1 opt-in live test skipped in 4.93s).
@@ -35,14 +40,20 @@
 
 ## Remaining
 
-- First priority, pending Claude host verification: repeatedly exercise macOS EPERM cleanup with SIGTERM, group SIGHUP and child exit with a pipe-holding grandchild; the sandbox suite passed all twenty direct trees but cannot exercise real ps enumeration. Rerun the previously hanging child-exits-3/pipe-holding-grandchild case through plugin/hooks/stop.py with HARNESS_PYTHON pointing to the fake child. The direct real-tree runner regression passes in this sandbox. The user reports prior host SIGTERM and group SIGHUP cases had zero survivors and unmarked UserPromptSubmit produced no output/state; repeat those to confirm no regression, plus SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants. Coordinate with the concurrent Role 4 implementation; its owned judge/sandbox sessions must receive grace through the verifier. SIGKILL cannot be caught; this protocol cannot guarantee cleanup when an owner itself is killed with SIGKILL.
+- First priority: Claude runs a fresh host exec compatibility probe for codex-cli 0.163.0-alpha.11.1, retains its evidence, and audits it with .venv/bin/python -m plugin.check_probe_evidence --expected-version "codex-cli 0.163.0-alpha.11.1" plugin/evidence/NEW-exec. Add that version/evidence to plugin/VERIFIED_VERSIONS.json only after passing host evidence is supplied. No new version was declared verified here; host audit compatibility smoke remains necessary before large evaluation runs.
+
+- Pending Claude host verification: repeatedly exercise macOS EPERM cleanup with SIGTERM, group SIGHUP and child exit with a pipe-holding grandchild; the sandbox suite passed all twenty direct trees but cannot exercise real ps enumeration. Rerun the previously hanging child-exits-3/pipe-holding-grandchild case through plugin/hooks/stop.py with HARNESS_PYTHON pointing to the fake child. The direct real-tree runner regression passes in this sandbox. The user reports prior host SIGTERM and group SIGHUP cases had zero survivors and unmarked UserPromptSubmit produced no output/state; repeat those to confirm no regression, plus SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants. Coordinate with the concurrent Role 4 implementation; its owned judge/sandbox sessions must receive grace through the verifier. SIGKILL cannot be caught; this protocol cannot guarantee cleanup when an owner itself is killed with SIGKILL.
 - Pending host verification: measure revised Stop 660s / check 480s / handoff 120s / validation 5s behavior and Role 4's internal 450s verifier budget. Confirm contract cutoff at 30s inside 40s despite the controller's 35s per-call deadline, including the documented lack of deadline-triggered fallback on that path.
-- Pending host verification: install/repair from a fresh clone in temporary homes, confirm the pinned CLI accepts generated integer timeouts, test bundled-binary discovery and persisted hook trust, and verify unrelated project prompts remain silent without creating .harness.
+- Pending host verification: install/repair from a fresh clone in temporary homes, confirm the installed CLI accepts generated integer timeouts, test bundled-binary discovery and persisted hook trust, and verify unrelated project prompts remain silent without creating .harness.
 - Pending host verification: capture a fresh real-mode demo with all three pre-approval workspace inventories, then test real two-session handoff injection after both pass and exhaustion. Also check failed handoff generation/validation prevents stale-context injection. No real demo was run here.
 - Pending host verification: record plugin/DEMO-SCENARIO.md and retain new evidence under plugin/evidence/DATE-real/ without overwriting prior evidence; macOS sandbox isolation remains untested here.
 - Before merge: coordinating role runs the full suite once. This job ran only tests/plugin as requested; .git remains read-only and all work is unstaged/uncommitted.
 
 ## Decisions
+
+- Follow the 2026-10-22 user-approved changing-version policy: no hold, rollback or STOP-P2 single-pin refusal; CODEX_VERSION stays as the historical first identity, and VERIFIED_VERSIONS.json is the compatibility history.
+- Treat unlisted versions as unverified rather than incompatible: installation warns and proceeds, --check reports failure until evidence is listed, and probes can collect the evidence needed for promotion.
+- Suppress only ESRCH group warnings after leader exit: retain the earlier defensive retries and member fallback so real survivors and unexpected cleanup errors remain diagnosable.
 
 - Handle group errors inside plugin-owned code without importing verifier: reap before three group attempts separated by 10ms, then enumerate live group members and recheck membership before signalling each PID. Preserve the original run result/exception and report errors on stderr.
 - Verify post-KILL live membership for up to 300ms using ps states, excluding zombies: orphan exit-record collection belongs to init/launchd. Inspection denial explicitly reports unverified cleanup; the known direct leader still receives a fallback attempt.
@@ -64,6 +75,8 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/plugin -q (latest: 185 passed, 1 skipped in 14.66s)
+
 - .venv/bin/python -m pytest tests/plugin -q
 - bash -n plugin/install.sh plugin/demo.sh
 - git diff --check -- plugin tests/plugin state/STATUS-plugin.md
@@ -81,6 +94,10 @@
 - Never infer real task success, control-model latency, actual cost, fork/clear behavior, real handoff success or installed packaging from synthetic fixture verdicts.
 
 ## Assumptions
+
+- This job's explicit changing-version instructions supersede the role prompt pin and STOP-P2 text. No shared schema, production CLI or hook interface changes are needed.
+- The observed 0.163.0-alpha.11.1 update is user-supplied information; this session never invoked Codex, live models, sandbox-exec or the real-home installer. New-version compatibility remains pending host evidence.
+- No PR, stage or commit was performed. Copy these assumptions and the README change summary into any future PR; the final report supplies an exact unstaged commit plan.
 
 - The latest STOP-P3 decision changes the prototype's synchronous deadline and logging only; no fresh paid benchmark, asynchronous implementation, shared interface edit or model substitution is requested. Tests simulate elapsed time without waiting or calling a model.
 - The latest instruction authorizes D-2 executor demonstrations and a scripted demo user after the summary is shown. Normal user sessions require actual approve/edit input; scripted approval is never injected by the production hooks.

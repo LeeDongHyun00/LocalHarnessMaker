@@ -14,7 +14,7 @@ def test_fresh_snapshot_and_distinct_check_messages(tmp_path: Path) -> None:
     codex_home = home / '.codex'
     home.mkdir()
     fake = tmp_path / 'fake-codex'
-    fake.write_text('#!/bin/sh\nprintf "%s\\n" "codex-cli wrong"\n')
+    fake.write_text('#!/bin/sh\nprintf "%s\\n" "codex-cli 9.0.0"\n')
     fake.chmod(0o755)
     env = {**os.environ, 'HOME': str(home), 'CODEX_HOME': str(codex_home),
            'HARNESS_CODEX': str(fake), 'HARNESS_PYTHON': sys.executable}
@@ -22,7 +22,7 @@ def test_fresh_snapshot_and_distinct_check_messages(tmp_path: Path) -> None:
                '--project', str(tmp_path / 'project')]
     result = subprocess.run([*command, '--check'], env=env, capture_output=True, text=True)
     assert result.returncode == 1
-    assert all(message in result.stderr for message in ('Codex version mismatch', 'Hooks not registered', 'Skill missing'))
+    assert all(message in result.stderr for message in ('Codex version unverified', 'Hooks not registered', 'Skill missing'))
     fake.write_text('#!/bin/sh\nprintf "%s\\n" "' + (ROOT / 'plugin/CODEX_VERSION').read_text().strip() + '"\n')
     result = subprocess.run(command, env=env, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
@@ -174,3 +174,15 @@ def test_version_probe_failure_writes_nothing(installer: dict[str, Any], monkeyp
     assert installer['run']() == 1
     assert 'Codex version probe failed' in capsys.readouterr().err
     assert not installer['home'].exists() and not installer['project'].exists()
+
+
+def test_unverified_version_installs_but_check_requires_evidence(installer: dict[str, Any], monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    def version(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(command, 0, 'codex-cli 0.163.0-alpha.11.1\n', '')
+    monkeypatch.setattr(_process, 'run_group', version)
+    assert installer['run']() == 0
+    assert installer['run'](True) == 1
+    errors = capsys.readouterr().err
+    assert 'Codex version unverified: codex-cli 0.163.0-alpha.11.1' in errors
+    assert 'plugin.probe' in errors and 'then add the version' in errors
+    assert 'Hooks not registered' not in errors and 'Skill missing' not in errors
