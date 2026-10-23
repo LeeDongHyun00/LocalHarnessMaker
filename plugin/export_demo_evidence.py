@@ -4,9 +4,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from plugin import demo
+from plugin.evidence_paths import recorded_path_aliases
 
 
 def export(source: Path, destination: Path) -> None:
@@ -20,12 +21,13 @@ def export(source: Path, destination: Path) -> None:
         meta = json.loads(path.read_text())
         replacements[meta['workspace']] = '${WORKSPACE}'
         replacements[meta['codex_home']] = '${CODEX_HOME}'
-        replacements[str(Path(meta['codex_home']).parent)] = '${DEMO}'
-        original = Path(meta['out'])
+        replacements[str(PurePosixPath(meta['codex_home']).parent)] = '${DEMO}'
+        original = PurePosixPath(meta['out'])
         replacements[str(original.parent if path.parent.name in {'day1', 'day2'} else original)] = '${EVIDENCE}'
-    # macOS reports canonical /private/var aliases in hook payloads.
+    # Expand recorded macOS aliases without consulting the checking filesystem.
     for prefix, replacement in list(replacements.items()):
-        replacements[str(Path(prefix).resolve())] = replacement
+        for alias in recorded_path_aliases(prefix):
+            replacements[alias] = replacement
     files = list(source.rglob('*'))
     if any(p.is_symlink() for p in files):
         raise ValueError('evidence must not contain symlinks')

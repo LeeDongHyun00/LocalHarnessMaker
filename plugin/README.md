@@ -237,6 +237,12 @@ The opt-in live SC-2 test remains disabled by default.
 
 ## Change summary
 
+Demo audits compare recorded POSIX paths lexically, treating `/private/var`,
+`/private/tmp` and `/private/etc` as `/var`, `/tmp` and `/etc`. Placeholder paths
+remain exact strings; arbitrary host symlinks are never followed. Portable export
+uses the same aliases. Committed evidence remains unchanged, and regression tests
+force identity path resolution to reproduce Linux behavior on macOS.
+
 Replaced single-version gating with an evidence-backed version history, retained
 version recording in probes/demos, and silenced expected post-exit ESRCH logs.
 Addressed R2 shutdown/deadline findings with owned-group signal cleanup and

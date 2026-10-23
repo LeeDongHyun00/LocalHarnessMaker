@@ -1,5 +1,7 @@
 ## Done
 
+- Made recorded-path comparisons filesystem-independent across two_session_demo, handoff_failure_demo and check_demo_evidence, with matching lexical aliases in portable export. Added identity-resolution checks of committed evidence/export plus rejection of unrelated workspaces, macOS aliases pointing elsewhere, symlinks and mismatched placeholders; committed evidence is unchanged (.venv/bin/python -m pytest tests/plugin -q: 252 passed, 1 opt-in live Codex test skipped in 16.36s; .venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session: overall=pass; .venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real: overall=pass; git diff --name-only -- plugin/evidence: empty).
+
 - Prepared host-only plugin.handoff_failure_demo day1/day2/check for real retry exhaustion and separately injected handoff generation/validation failures, with offline evidence rejection tests and documented Claude steps. Added portable export for future captures and kept committed evidence unchanged (.venv/bin/python -m pytest tests/plugin -q: 219 passed, 1 opt-in live test skipped in 20.38s; git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
 
 - Recorded Claude's real two-session host demonstration on 2026-10-23 at de38626, retained in plugin/evidence/2026-10-23-two-session/ and committed as 4fa9ec2. Day 1 waited for approval, created result.txt, passed the real verifier at attempt 1 with zero re-instructions and saved a validated handoff retaining the random release label. Day 2 used a new session in the same project, received exactly that handoff in SessionStart/model context, used the label in its contract without user restatement and verified followup.txt after approval (.venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session: approval_gates=true, context_visible=true, new_session=true, saved_handoff_validated=true, session_start_injected=true, user_restatement_needed=false, overall=pass).
@@ -52,12 +54,16 @@
 
 ## Remaining
 
+- Claude commits the recorded-path portability fix, pushes it and confirms GitHub CI on Ubuntu/Python 3.11 and 3.14. Local plugin tests pass; GitHub CI was not run in this network-disabled session.
+
 - Claude runs plugin.handoff_failure_demo day1/day2/check separately for exhaustion, generation and validation after host evaluation capacity is available, following plugin/DEMO-SCENARIO.md. Export future evidence with plugin.export_demo_evidence and rerun the matching checker on the portable copy. These new lifecycle checks are prepared with offline tests; live outcomes remain pending.
 - Separate host checks remain for persisted hook trust, bundled-binary discovery, unrelated-project silence and macOS sandbox isolation. The completed README temporary-home install/--check, real-mode demo and two-session pass-path demonstration are no longer pending.
 - Pending host measurement: revised Stop 660s / check 480s / handoff 120s / validation 5s budgets and Role 4's internal 450s verifier budget, plus contract cutoff at 30s inside 40s despite the controller's 35s deadline. SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants remains separate from the completed host SIGTERM/SIGHUP/child-exit checks.
 - Before merge: coordinating role runs the full suite once. This job runs only tests/plugin; .git is read-only and all work remains unstaged/uncommitted. Do not disturb the in-progress host evaluation or edit eval/, controller/ or verifier/.
 
 ## Decisions
+
+- Canonicalize recorded paths using POSIX lexical normalization and only /private/var, /private/tmp and /private/etc aliases; compare any placeholder-bearing path exactly: evidence semantics must not depend on the checking host filesystem or arbitrary symlinks. Keep real source/destination filesystem safety checks in the exporter.
 
 - Use HARNESS_MAX_ATTEMPTS=1 in copied demo child environments and one deliberately impossible mechanical criterion: exhaustion needs no paid re-instruction loop, while real Stop saves remaining work for a fresh session.
 - Inject generation/validation failures only at the selected CLI boundary through a temporary interpreter wrapper: keep the real hooks, task verification and fresh day-2 SessionStart, with validation failure occurring only after real pending-handoff generation.
@@ -100,7 +106,7 @@
 - Offline after host capture: .venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/DATE-two-session
 - .venv/bin/python -m plugin.check_probe_evidence --expected-version "codex-cli 0.163.0-alpha.11.1" plugin/evidence/2026-10-22-exec-0.163
 
-- .venv/bin/python -m pytest tests/plugin -q (latest: 200 passed, 1 skipped in 14.35s)
+- .venv/bin/python -m pytest tests/plugin -q (latest: 252 passed, 1 skipped in 16.36s)
 
 - .venv/bin/python -m pytest tests/plugin -q
 - bash -n plugin/install.sh plugin/demo.sh
@@ -112,6 +118,8 @@
 
 ## Do not touch
 
+- This session: .git is read-only; do not stage or commit. Host evaluations are in progress; leave eval/, controller/ and verifier/ untouched.
+
 - Other roles' code, tests, STATUS files, root configuration, schemas or CLI/hook interfaces; the canonical docs/hooks-contract.md is published and read-only for Role 2.
 - Existing user changes and concurrent role commits/staging. Stage and commit only plugin/, tests/plugin/, state/STATUS-plugin.md with explicit pathspecs.
 - Normal Codex configuration and installed hooks. Use explicit temporary HOME/CODEX_HOME targets; the demo trust bypass is not proof of persisted trust.
@@ -119,6 +127,8 @@
 - Never infer real task success, control-model latency, actual cost, fork/clear behavior, real handoff success or installed packaging from synthetic fixture verdicts.
 
 ## Assumptions
+
+- No additional product assumptions were required for the user-specified portability fix. Identity Path.resolve tests simulate the missing macOS aliases on Linux; actual Ubuntu/Python 3.11 and 3.14 CI confirmation belongs to Claude after push. No live models, Codex, network, real configuration changes, staging or commits ran in this session.
 
 - Claude's supplied host run/commit account is accepted as host evidence and corroborated by the retained offline checker; this session performed no live Codex/model calls, installation, network access, staging or commit.
 - The failure demonstrations deliberately inject CLI errors, rather than asserting a naturally occurring provider/validation failure. Their seed is synthetic old context; their lifecycle, controller generation where not intercepted, verification and executor sessions are real host operations still to be run.

@@ -10,6 +10,7 @@ import sys
 from typing import Any
 
 from plugin import demo
+from plugin.evidence_paths import recorded_path
 from plugin.hooks._runtime import validate
 from plugin.two_session_demo import capture, check_version, demo_metadata, records, visible
 
@@ -109,12 +110,16 @@ def audit(root: Path) -> dict[str, Any]:
     scenario = first['scenario']
     if scenario not in {'exhaustion', 'generation', 'validation'} or second['scenario'] != scenario:
         raise ValueError('unknown or changed scenario')
-    if first['thread_id'] == second['thread_id'] or any(first[k] != second[k] for k in ('version', 'workspace', 'codex_home')):
+    if (first['thread_id'] == second['thread_id'] or first['version'] != second['version']
+            or any(recorded_path(first[k]) != recorded_path(second[k])
+                   for k in ('workspace', 'codex_home'))):
         raise ValueError('day 2 must be a fresh session in the same environment')
     for day, meta, stages in [('day1', first, ('request', 'approval')), ('day2', second, ('request',))]:
         folder = root / day
         events = records(folder / 'hooks.jsonl')
-        if not events or any(e['input']['session_id'] != meta['thread_id'] or Path(e['input']['cwd']).resolve() != Path(meta['workspace']).resolve() for e in events):
+        if not events or any(e['input']['session_id'] != meta['thread_id']
+                             or recorded_path(e['input']['cwd']) != recorded_path(meta['workspace'])
+                             for e in events):
             raise ValueError('missing or unrelated hooks')
         if any(e['error'] is not None for e in events if not (day == 'day1' and scenario != 'exhaustion' and e['event'] == 'Stop')):
             raise ValueError('unexpected hook error')

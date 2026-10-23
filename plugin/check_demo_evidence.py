@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from plugin.evidence_paths import recorded_path
+
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "schemas/examples"
 
@@ -28,6 +30,9 @@ def audit(root: Path) -> dict[str, Any]:
     events = [json.loads(line) for line in (root / "hooks.jsonl").read_text().splitlines()]
     if not events or any(event["error"] is not None for event in events):
         raise ValueError("missing or failed hooks")
+    if any(recorded_path(event["input"]["cwd"]) != recorded_path(metadata["workspace"])
+           for event in events):
+        raise ValueError("unrelated hook workspace")
     request_result, approval_result = read(root / "request-result.json"), read(root / "approval-result.json")
     if request_result["exit_code"] != 0 or approval_result["exit_code"] != 0:
         raise ValueError("an executor stage did not exit successfully")

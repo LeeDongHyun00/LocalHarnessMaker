@@ -6,13 +6,14 @@ import hashlib
 from datetime import date
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import sys
 from typing import Any
 from uuid import uuid4
 
 from plugin import demo
+from plugin.evidence_paths import recorded_path
 from plugin.check_demo_evidence import audit as audit_day_one
 from plugin.hooks._runtime import validate
 
@@ -59,13 +60,15 @@ def audit(root: Path) -> dict[str, Any]:
     command = validation['command']
     if (validation['exit_code'] != 0 or not command or not command[0]
             or command[1:-1] != ['-m', 'verifier', 'validate-handoff', '--handoff']
-            or Path(command[-1]).parts[-3:] != ('day1', 'approval-state', 'handoff.json')
+            or PurePosixPath(command[-1]).parts[-3:] != ('day1', 'approval-state', 'handoff.json')
             or validation['stdout'] != command[-1] + '\n'
             or validation['sha256'] != hashlib.sha256((root / 'day1/approval-state/handoff.json').read_bytes()).hexdigest()):
         raise ValueError('saved handoff CLI validation failed')
     if second['prompt'] != FOLLOWUP or label in FOLLOWUP:
         raise ValueError('follow-up restated context')
-    if first['version'] != second['version'] or first['workspace'] != second['workspace'] or first['codex_home'] != second['codex_home']:
+    if (first['version'] != second['version']
+            or any(recorded_path(first[k]) != recorded_path(second[k])
+                   for k in ('workspace', 'codex_home'))):
         raise ValueError('version/home/workspace changed')
     if first['thread_id'] == second['thread_id']:
         raise ValueError('day 2 must be a new session')
@@ -77,7 +80,7 @@ def audit(root: Path) -> dict[str, Any]:
         raise ValueError('incoming handoff changed')
     events = records(day2 / 'hooks.jsonl')
     if not events or any(e['error'] is not None or e['input']['session_id'] != second['thread_id']
-                         or Path(e['input']['cwd']).resolve() != Path(second['workspace']).resolve() for e in events):
+                         or recorded_path(e['input']['cwd']) != recorded_path(second['workspace']) for e in events):
         raise ValueError('missing, failed or unrelated hooks')
     context = 'HARNESS_HANDOFF\n' + handoff_path.read_text()
     if not (events[0]['event'] == 'SessionStart'
