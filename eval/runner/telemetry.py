@@ -110,7 +110,7 @@ def collect_runs(event_paths: list[Path], native_paths: list[Path],
         evidence = collect([path], [], "", "")["usage"]
         result.append({"attempt": segment["attempt"], "events": path.name,
                        "started_at": segment.get("started_at"), "exited_at": segment.get("exited_at"),
-                       "tokens": evidence["tokens"],
+                       "tokens": segment.get("capacity_refusal_usage", segment.get("native_usage", evidence["tokens"])),
                        "plan_usage": {"source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
                                       "before": before[-1] if before else None,
                                       "after": during[-1] if during else None,
@@ -118,3 +118,34 @@ def collect_runs(event_paths: list[Path], native_paths: list[Path],
                                       "exact_task_consumption": None,
                                       "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."}})
     return result
+
+
+def native_token_totals(paths: list[Path]) -> dict[str, tuple[int, dict[str, int]]]:
+    """Read cumulative native counters once per session, without billing reasoning twice."""
+    result: dict[str, tuple[int, dict[str, int]]] = {}
+    for path in paths:
+        counters = [e.get("payload", {}).get("info", {}).get("total_token_usage")
+                    for e in records(path) if e.get("type") == "event_msg"
+                    and e.get("payload", {}).get("type") == "token_count"
+                    and isinstance(e.get("payload", {}).get("info"), dict)]
+        if counters and isinstance(counters[-1], dict):
+            counts = {k: counters[-1].get(k) for k in
+                      ("input_tokens", "cached_input_tokens", "output_tokens")}
+            if all(type(v) is int and v >= 0 for v in counts.values()):
+                result[str(path)] = (len(counters), counts)
+    return result
+
+
+def native_token_delta(before: dict[str, tuple[int, dict[str, int]]],
+                       after: dict[str, tuple[int, dict[str, int]]]) -> dict[str, int] | None:
+    """Price only newly observed native counters; absent counters remain unknown."""
+    deltas = []
+    for name, (length, counts) in after.items():
+        old_length, old = before.get(name, (0, dict.fromkeys(counts, 0)))
+        if length <= old_length:
+            continue
+        delta = {k: v - old[k] for k, v in counts.items()}
+        if any(v < 0 for v in delta.values()):
+            return None
+        deltas.append(delta)
+    return {k: sum(d[k] for d in deltas) for k in deltas[0]} if deltas else None

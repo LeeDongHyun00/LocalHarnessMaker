@@ -156,3 +156,37 @@ def test_zero_judge_delegations(entry: dict[str, Any], mode: str, expected: floa
         if mode == 'bad_hash':
             verdict.write_text('{}')
     assert control_calls(entry, 'task', PRICES) == ([], expected)
+
+
+@pytest.mark.parametrize('items', [False, True])
+@pytest.mark.parametrize('logged_call', [False, True])
+def test_capacity_refusal_usage_from_envelope(entry: dict[str, Any], items: bool, logged_call: bool) -> None:
+    message = 'Selected model is at capacity. Please try a different model.'
+    events = ([{'type': 'item.started', 'item': {'type': 'reasoning'}}] if items else []) + [
+        {'type': 'error', 'message': message},
+        {'type': 'turn.failed', 'error': {'message': message}},
+    ]
+    text = 'control_cli_events ' + json.dumps({'model': 'gpt-6-luna',
+        'events': ''.join(json.dumps(e) + '\n' for e in events)}) + '\n'
+    if logged_call:
+        text += generation(status='error', input_tokens=None, cached_input_tokens=None, output_tokens=None)
+    retain(entry, 'control-interruptions/one/contract.stderr', text, code=2)
+    calls, cost = control_calls(entry, 'task', PRICES)
+    assert len(calls) == 1
+    expected = None if items else 0
+    assert cost == expected and calls[0]['usage']['usd'] == expected
+    assert calls[0]['usage']['input_tokens'] == expected
+    assert calls[0]['usage']['cached_input_tokens'] == expected
+    assert calls[0]['usage']['output_tokens'] == expected
+
+
+def test_capacity_does_not_zero_previous_success_or_http_fallback(entry: dict[str, Any]) -> None:
+    message = 'Selected model is at capacity. Please try a different model.'
+    CAPACITY_STREAM = json.dumps({'type': 'error', 'message': message}) + '\n'
+    envelope = 'control_cli_events ' + json.dumps({'model': 'gpt-6-luna', 'events': CAPACITY_STREAM}) + '\n'
+    retain(entry, 'contract.stderr', generation() + envelope +
+           generation(status='error', input_tokens=None, cached_input_tokens=None, output_tokens=None) +
+           generation(backend='cheap_api'))
+    calls, cost = control_calls(entry, 'task', PRICES)
+    assert [c['usage']['input_tokens'] for c in calls] == [1000, 0, 1000]
+    assert cost == pytest.approx(2 * .000132)

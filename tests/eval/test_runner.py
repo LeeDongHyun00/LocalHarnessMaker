@@ -1288,8 +1288,11 @@ def test_regrade_preserves_executor_failure_class(setup: tuple[Path, Path, Path]
         result = executor(argv, **kwargs)
         return process if argv[0] == 'codex' and executor.calls == (2 if two else 1) else result
 
-    with pytest.raises(IncompleteRun):
+    if process.timed_out:
         run(config, out, root, execute=fail_final, version='codex-cli 0.162.0-alpha.17.2')
+    else:
+        with pytest.raises(IncompleteRun):
+            run(config, out, root, execute=fail_final, version='codex-cli 0.162.0-alpha.17.2')
     original = json.loads(run(config, out, root, execute=fail_final,
                               version='codex-cli 0.162.0-alpha.17.2').read_text())
 
@@ -1697,3 +1700,177 @@ def test_population_digest_separate_from_selected_inputs(setup: tuple[Path, Path
     (root / other / 'test_private_synthetic.py').write_text('import unittest\n# changed\n')
     with pytest.raises(ValueError, match='task set differs'):
         run(config, out, root, execute=Executor(), version=cfg['codex_version'])
+
+
+CAPACITY_MESSAGE = 'Selected model is at capacity. Please try a different model.'
+CAPACITY_STREAM = (json.dumps({'type': 'error', 'message': CAPACITY_MESSAGE}) + '\n' +
+                   json.dumps({'type': 'turn.failed', 'error': {'message': CAPACITY_MESSAGE}}) + '\n')
+
+
+@pytest.mark.parametrize('persistent', [False, True])
+def test_executor_capacity_recovery_is_not_an_attempt(setup: tuple[Path, Path, Path],
+                                                      monkeypatch: pytest.MonkeyPatch,
+                                                      persistent: bool) -> None:
+    root, config, out = setup
+    executor = Executor()
+    waits: list[int] = []
+    monkeypatch.setattr('eval.runner.core.sleep', waits.append)
+    refusals = 0
+    calls = 0
+
+    def capacity(argv: list[str], **kwargs: Any) -> ProcessResult:
+        nonlocal refusals, calls
+        if argv[0] == 'codex':
+            calls += 1
+            if calls > 1:
+                assert 'resume' in argv and 'unit-session' in argv
+                assert kwargs['stdin'] == 'Continue the original task from the current workspace.'
+            if persistent or refusals == 0:
+                executor(argv, **kwargs)
+                kwargs['stdout'].write_text(json.dumps({'type': 'thread.started', 'thread_id': 'unit-session'}) +
+                                            '\n' + CAPACITY_STREAM)
+                refusals += 1
+                return ProcessResult(1)
+        return executor(argv, **kwargs)
+
+    if persistent:
+        with pytest.raises(IncompleteRun, match='capacity error.*resumable'):
+            run(config, out, root, execute=capacity, version='codex-cli 0.162.0-alpha.17.2')
+        assert waits == [60, 120, 300, 600] and calls == 5
+        entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+        assert entry['phase'] == 'capacity_limited' and 'result' not in entry
+        assert not (out / 'bug-chunk-tail/result.json').exists()
+        assert all(s['capacity_error'] for s in entry['segments'])
+        persistent = False
+    report = json.loads(run(config, out, root, execute=capacity, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    task = report['tasks'][0]
+    assert task['outcome'] == 'pass' and task['attempts'] == 1
+    assert report['metrics']['avg_attempts']['value'] == 1
+    assert len(task['executor_segments']) == refusals + 1
+    assert all(c['usage']['input_tokens'] == 0 and c['usage']['usd'] == 0 for c in task['calls'][:-1])
+    diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
+    assert len(diagnostics['infrastructure_recoveries']) >= refusals
+    assert all(s['infrastructure_recovery'] for s in diagnostics['infrastructure_recoveries'])
+    if refusals == 1:
+        assert waits == [60]
+
+
+@pytest.mark.parametrize('stage', ['contract', 'check', 'handoff', 'day2-contract', 'day2-check'])
+@pytest.mark.parametrize('persistent', [False, True])
+def test_control_capacity_retries_archives_and_never_reinstructs(setup: tuple[Path, Path, Path],
+                                                                monkeypatch: pytest.MonkeyPatch,
+                                                                tmp_path: Path, stage: str,
+                                                                persistent: bool) -> None:
+    root, config, out = two_session_config(setup, monkeypatch, tmp_path, harness_on=True)
+    executor = TwoSessionExecutor()
+    waits: list[int] = []
+    monkeypatch.setattr('eval.runner.harness.sleep', waits.append)
+    refusals = 0
+
+    def capacity(argv: list[str], **kwargs: Any) -> ProcessResult:
+        nonlocal refusals
+        if '-m' in argv and argv[argv.index('-m') + 1] in {'controller', 'verifier'}:
+            operation = argv[argv.index('-m') + 2]
+            key = ('day2-' + operation if operation in {'contract', 'check'} and executor.calls >=
+                   (1 if operation == 'contract' else 2) else operation)
+            if key == stage and (persistent or refusals == 0):
+                refusals += 1
+                kwargs['stdout'].write_text('')
+                kwargs['stderr'].write_text('INFO:verifier:control_cli_events ' + json.dumps({
+                    'model': 'gpt-6-luna', 'events': CAPACITY_STREAM}) + '\n')
+                Path(argv[argv.index('--out') + 1]).write_text('{partial output')
+                return ProcessResult(2)
+        return executor(argv, **kwargs)
+
+    if persistent:
+        with pytest.raises(IncompleteRun, match='capacity error'):
+            run(config, out, root, execute=capacity, version='codex-cli 0.162.0-alpha.17.2')
+        assert waits == [60, 120, 300, 600] and refusals == 5
+        entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+        assert 'result' not in entry and 'control_error' not in entry
+        assert not (out / 'bug-chunk-tail/result.json').exists()
+        assert executor.grades == 0
+        diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
+        assert len(diagnostics['infrastructure_recoveries']) == 5
+        persistent = False
+    report = json.loads(run(config, out, root, execute=capacity, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert report['tasks'][0]['outcome'] == 'pass'
+    assert report['tasks'][0]['attempts'] == 2 and executor.calls == 2
+    entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+    assert not entry.get('reinstruction') and 'control_error' not in entry
+    archived = [n for n in entry['control_files'] if n.endswith('.stderr') and n.startswith('control-interruptions/')]
+    assert len(archived) == refusals
+    assert all((out / 'bug-chunk-tail' / n).is_file() for n in archived)
+    if refusals == 1:
+        assert waits == [60]
+
+
+def test_timeout_records_sample_and_continues_next_task(setup: tuple[Path, Path, Path],
+                                                       monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    root, config, out = setup
+    two_task_config(root, config, monkeypatch, tmp_path)
+    executor = Executor()
+
+    def timeout(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = executor(argv, **kwargs)
+        if argv[0] == 'codex' and executor.calls == 1:
+            return ProcessResult(-9, timed_out=True)
+        return result
+
+    report = json.loads(run(config, out, root, execute=timeout, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert sorted(t['outcome'] for t in report['tasks']) == ['pass', 'timeout']
+    assert report['accounting']['valid_tasks'] == 2 and executor.calls == 2
+    assert json.loads((out / 'run-diagnostics.json').read_text())['stop_reason'] is None
+
+
+@pytest.mark.parametrize('items', [False, True])
+def test_executor_capacity_usage_and_native_counts(tmp_path: Path, items: bool) -> None:
+    from eval.runner.report import usage
+    from eval.runner.telemetry import native_token_delta, native_token_totals
+    path = tmp_path / 'events'
+    item = json.dumps({'type': 'item.completed', 'item': {'type': 'reasoning', 'text': 'work'}}) + '\n'
+    path.write_text((item if items else '') + CAPACITY_STREAM)
+    pricing = json.loads((REPOSITORY / 'eval/prices.yaml').read_text())
+    priced = usage(path, 1, 'gpt-6.1-sol', pricing)
+    assert priced['input_tokens'] == (None if items else 0)
+    assert priced['usd'] == (None if items else 0)
+    native = tmp_path / 'native'
+    native.write_text(json.dumps({'type': 'event_msg', 'payload': {'type': 'token_count', 'info': {
+        'total_token_usage': {'input_tokens': 100, 'cached_input_tokens': 20, 'output_tokens': 30,
+                              'reasoning_output_tokens': 10}}}}) + '\n')
+    counts = native_token_delta({}, native_token_totals([native]))
+    assert counts == {'input_tokens': 100, 'cached_input_tokens': 20, 'output_tokens': 30}
+    assert native_token_delta(native_token_totals([native]), native_token_totals([native])) is None
+    priced = usage(path, 1, 'gpt-6.1-sol', pricing, native_counts=counts)
+    assert priced['output_tokens'] == (30 if items else 0)
+
+
+def test_capacity_after_work_retains_native_cost_and_resume_delta(setup: tuple[Path, Path, Path],
+                                                                 monkeypatch: pytest.MonkeyPatch) -> None:
+    root, config, out = setup
+    executor = Executor()
+    monkeypatch.setattr('eval.runner.core.sleep', lambda seconds: None)
+
+    def execute(argv: list[str], **kwargs: Any) -> ProcessResult:
+        if argv[0] != 'codex':
+            return executor(argv, **kwargs)
+        native = Path(kwargs['env']['CODEX_HOME']) / 'sessions/rollout-unit.jsonl'
+        before = native.read_text() if native.exists() else ''
+        result = executor(argv, **kwargs)
+        counts = {'input_tokens': 100 if executor.calls == 1 else 120,
+                  'cached_input_tokens': 0, 'output_tokens': 10 if executor.calls == 1 else 18,
+                  'reasoning_output_tokens': 3}
+        native.write_text(before + native.read_text() + json.dumps({'type': 'event_msg',
+            'payload': {'type': 'token_count', 'info': {'total_token_usage': counts}}}) + '\n')
+        if executor.calls == 1:
+            kwargs['stdout'].write_text(json.dumps({'type': 'thread.started', 'thread_id': 'unit-session'}) + '\n' +
+                json.dumps({'type': 'item.completed', 'item': {'type': 'reasoning', 'text': 'work'}}) + '\n' + CAPACITY_STREAM)
+            return ProcessResult(1)
+        return result
+
+    report = json.loads(run(config, out, root, execute=execute, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    task = report['tasks'][0]
+    assert task['outcome'] == 'pass' and task['attempts'] == 1
+    assert [c['usage']['input_tokens'] for c in task['calls']] == [100, 20]
+    assert [c['usage']['output_tokens'] for c in task['calls']] == [10, 8]
+    assert task['costs']['executor_usd'] == pytest.approx(.00042)

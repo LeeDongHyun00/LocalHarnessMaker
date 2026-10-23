@@ -1,5 +1,11 @@
 ## Done
 
+- Completed capacity classification/recovery, refused-request accounting, timeout continuation and documentation; regression tests include unchanged usage-limit handling (`.venv/bin/python -m pytest tests/eval -q`: 678 passed in 79.26s).
+- Preserved the isolated branch, frozen tasks and retained reports (`git symbolic-ref --short HEAD`: r5/harness-smoke; `git rev-parse --short HEAD`: f844d27; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/reports`: exit 0).
+
+- Added executor/control capacity recovery with retained evidence, four backoff waits, resumable exhaustion and recovery excluded from attempts (focused `.venv/bin/python -m pytest tests/eval/test_runner.py tests/eval/test_control_accounting.py -q -k 'capacity or timeout or regrade_preserves_executor_failure_class'`: 25 passed, 136 deselected in 22.21s).
+- Verified native usage deltas retain partial-work costs without double-counting reasoning across capacity resumes (`.venv/bin/python -m pytest tests/eval/test_runner.py -q -k 'capacity_after_work or capacity_recovery'`: 3 passed, 125 deselected in 2.87s).
+
 - Prepared seed-0 metadata-only C selection with five tasks per type and twenty families, twenty unfilled skeletons, human-only fill-once rules, config and estimate (.venv/bin/python -m pytest tests/eval -q: 649 passed in 60.49s).
 - Added static-template preflight before processes, exact day-1 harness-wrapper injection, report artifact hashes, checkpoint hashes and changed-template resume refusal (.venv/bin/python -m pytest tests/eval -q: 649 passed, including real mocked-runner injection and completed-run resume drift).
 - Added paired finished-report JSON/Markdown comparison with provenance refusal, matched valid intersections, diagnostic invalid handling, per-type metrics, handoff and seeded 10000-resample task-cluster intervals (.venv/bin/python -m pytest tests/eval -q: 649 passed, including CLI output, mismatches, pairing and undefined denominators).
@@ -9,6 +15,8 @@
 
 ## Remaining
 
+- Host: integrate this patch and validate capacity recovery and timeout continuation in live smoke. Preserve full-a-attempt1 as historical interrupted-run evidence; this session does not rewrite its existing recorded outcome or run any models.
+
 - The user fills all twenty C skeletons once using only each public prompt/workspace, before any C run starts. Agents must never fill them or revise them from outcomes.
 - Host: integrate Role 4 forwarding/delegation implementation; run smoke-harness with a fresh destination and real grader population. Verify contract, day-2 contract, judge retries/fallback, handoff, reinstruction, model/effort, access audit, termination, nested guards and developer instructions. Mocked evidence does not establish live compatibility.
 - Host: run C, reduced B and full harness under approved spending workflow. New B/C configs fingerprint all 120 population graders before selecting executor tasks. Existing subset-hash reports cannot be relabeled or compared to full-population reports.
@@ -17,6 +25,12 @@
 - Run the full repository suite once before future merge. Do not stage or commit in this sandbox; final response supplies a Commit plan.
 
 ## Decisions
+
+- Classify only case-insensitive at capacity in error/turn.failed events: this is the user's observed service refusal; all other errors and immediate usage-limit stops retain existing handling.
+- Use four waits of 60/120/300/600 seconds per operation per invocation: exhausted capacity stops before assigning an outcome, and the same --out resumes pending work with a fresh schedule.
+- Keep consecutive executor segment indexes and all costs while excluding capacity refusals from attempt metrics: the frozen schema stays unchanged; checkpoint and diagnostics carry recovery markers.
+- Record pre-item refusals as zero tokens with evidence; preserve unknown usage after partial work: native cumulative token deltas price retained executor work without billing reasoning twice.
+- Continue the task loop after a final runner-deadline timeout: existing validity checks still apply, while unclassified nonzero exits retain STOP-E1.
 
 - Keep C guidance entirely human-authored: template fields use the exact token __HUMAN_FILL__; preparation never reads outcomes, private graders or references.
 - Pin template bytes for every selected task at run start: missing/unfilled templates block processes, and resume checks include completed tasks; report artifacts retain the actual injected bytes.
@@ -47,7 +61,7 @@
 
 ## Assumptions
 
-- This session starts on r5/harness-smoke at 9c81ecb with its own .venv; decision 0007 is supplied by the user but absent here. No shared decision record was edited.
+- This session starts on r5/harness-smoke at f844d27 with its own .venv and decision 0007, as specified by the user and confirmed locally. Main's concurrent smoke is outside this session. No shared decision record was edited.
 - A config's optional task_population defines its source universe; host B/C has access to all 120 frozen population graders for content hashing, while only selected tasks execute. Legacy configs retain selected-only behavior.
 - The frozen population digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f and freeze commit 7cdaf3b remain authoritative; actual population hashes are recomputed on the host, not fabricated here.
 - The legacy bug-chunk-tail metadata has no family field: derive chunk-tail from its public task ID, explicitly recorded in the selection procedure.

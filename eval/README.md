@@ -351,6 +351,43 @@ attempts still count; missing usage/cost stays null. Control commands finish
 within their existing bounded subprocess deadline; the runner checks their
 retained events on return and makes no later call on a limit.
 
+Capacity refusals use the same structured error sources, including controller
+and forwarded verifier `control_cli_events` envelopes. The complete capacity
+wording list is **`at capacity`**, case-insensitive, observed as `Selected model
+is at capacity. Please try a different model.` Other errors retain their existing
+classification. For each interrupted operation the runner waits 60, 120, 300,
+then 600 seconds before retrying. Executor retries resume the same session with
+the existing continuation/reinstruction prompt. Control operations archive
+interrupted stdout, stderr, sidecars and partial outputs before rerunning; a
+capacity-refused judge never produces a criterion failure or reinstruction.
+
+Every executor segment remains retained, audited and priced. Capacity recovery
+does not consume transport retries, verifier reinstructions or executor attempt
+counts (`avg_attempts`); `executor_segments.attempt` remains a consecutive log
+segment index under the unchanged report schema. The checkpoint and
+`run-diagnostics.json` mark infrastructure recoveries, waits and capacity errors;
+control recoveries also have hash-pinned `recovery.json` evidence. If the fifth
+call is still refused, the run exits 2 as `capacity_limited`, with no outcome for
+the interrupted task and no aggregate report. Reusing the same config and
+`--out` resumes the pending session/control operation with a fresh backoff
+schedule. A refusal without a session ID halts resumably instead of starting a
+different session during automatic recovery.
+
+A capacity refusal before any `item.started` or `item.completed` in that turn
+records zero input/cache/output tokens and evidence explaining the zero. After
+items, missing usage stays unknown. Control envelopes are paired with their own
+`control_call` records; a missing capacity call record is retained from its
+envelope with the measured operation latency. Executor accounting prefers
+native `event_msg.token_count.info.total_token_usage` deltas across each process;
+output already includes reasoning tokens. Existing `turn.completed.usage`
+evidence remains the fallback when native counters are absent. Native counts
+and refused-request evidence survive in the segment/checkpoint artifacts.
+
+Runner-deadline timeouts retain their outcome and continue to the next task,
+subject to the existing access-audit/settings/observation validity checks.
+Unclassified nonzero executor exits still halt with STOP-E1. Account usage-limit
+stops retain their immediate-stop behavior and do not use capacity backoff.
+
 Offline grader mutation validation uses
 `.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all --mutants 10000`.
 The limit applies per task, across application and submitted regression overlays;

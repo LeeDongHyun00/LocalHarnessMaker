@@ -7,6 +7,7 @@ from typing import Any
 
 from eval.metrics import total
 from eval.runner.audit import digest
+from eval.runner.limits import capacity_refusal_without_items
 
 
 def control_calls(entry: dict[str, Any], task_id: str,
@@ -46,7 +47,42 @@ def control_calls(entry: dict[str, Any], task_id: str,
         successful = False
         delegations: list[dict[str, Any]] = []
         count_before = len(calls)
-        for line in text.splitlines():
+        pending_events: dict[str, Any] | None = None
+        lines = text.splitlines()
+        # Each CLI transport emits its events immediately before its control_call.
+        # If interrupted before that accounting line, retain the capacity call too.
+        expanded: list[str] = []
+        pending_line: str | None = None
+        for line in lines + [""]:
+            if ("control_cli_events " in line or line == "") and pending_line:
+                envelope = json.loads(pending_line.split("control_cli_events ", 1)[1])
+                try:
+                    events = [json.loads(row) for row in envelope.get("events", "").splitlines()]
+                except (ValueError, AttributeError):
+                    events = []
+                if any(e.get("type") in {"error", "turn.failed"} and "at capacity" in str(e).lower()
+                       for e in events if isinstance(e, dict)):
+                    expanded.append("control_call " + json.dumps({"backend": "codex_cli",
+                        "model": envelope.get("model"), "status": "error",
+                        "latency_seconds": process.get("latency_seconds")}))
+                pending_line = None
+            expanded.append(line)
+            if "control_cli_events " in line:
+                try:
+                    envelope = json.loads(line.split("control_cli_events ", 1)[1])
+                    if isinstance(envelope, dict) and isinstance(envelope.get("events"), str):
+                        pending_line = line
+                except ValueError:
+                    pass
+            if line.startswith("control_call "):
+                pending_line = None
+        for line in expanded:
+            if "control_cli_events " in line:
+                try:
+                    pending_events = json.loads(line.split("control_cli_events ", 1)[1])
+                except ValueError:
+                    pending_events = None
+                continue
             marker = next((m for m in ("control_call ", "judge_delegation ") if line.startswith(m)), None)
             if marker is None:
                 continue
@@ -74,6 +110,14 @@ def control_calls(entry: dict[str, Any], task_id: str,
                 continue
             counts = {k: value.get(k) if type(value.get(k)) is int and value[k] >= 0 else None
                       for k in ("input_tokens", "cached_input_tokens", "output_tokens")}
+            if backend == "codex_cli" and isinstance(pending_events, dict):
+                try:
+                    events = [json.loads(row) for row in pending_events.get("events", "").splitlines()]
+                except (ValueError, AttributeError):
+                    events = []
+                if capacity_refusal_without_items([e for e in events if isinstance(e, dict)]):
+                    counts = dict.fromkeys(counts, 0)
+            pending_events = None
             i, c, o = counts.values()
             if i is not None and c is not None and c > i:
                 counts["cached_input_tokens"] = c = None

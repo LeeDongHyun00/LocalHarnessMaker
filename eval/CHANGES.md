@@ -1,3 +1,38 @@
+# Capacity recovery and timeout continuation — 2026-10-23
+
+Recognize only case-insensitive `at capacity` in structured `error` and
+`turn.failed` events, including controller and forwarded judge stderr envelopes.
+Retain executor segments and resume the same session after 60/120/300/600-second
+waits, independent of attempt/retry/reinstruction limits. Control operations
+archive interrupted evidence before rerunning. Exhausted recovery halts with no
+task outcome and resumes from the same `--out`; capacity never becomes a failed
+criterion, reinstruction or control CLI error. Checkpoints and run diagnostics
+mark infrastructure recovery and waits; control recovery evidence is hash-pinned.
+
+Zero tokens apply only to capacity refusals before any item event. Partial work
+with missing usage remains unknown. Native cumulative token-count deltas retain
+executor work across resumes; output already includes reasoning. Each control
+envelope affects its own call, including interrupted envelope-only evidence with
+measured operation latency. Final executor timeouts continue the task loop;
+unclassified nonzero exits keep STOP-E1 and usage limits still halt immediately.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 678 passed in 79.26s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports` both exited 0.
+Mocked recovery tests cover both exact error events, one-wait success, exhausted
+recovery and later resume, contract/verifier/handoff/day-2 operations, zero versus
+unknown usage, native deltas, timeout continuation and unchanged usage limits.
+No model calls, live private-root lookup, retained report edits, staging or commits.
+
+## Assumptions
+
+- The user's two observed capacity events define the entire capacity vocabulary;
+  no other service-error wording or retry classification is added.
+- This worktree is r5/harness-smoke at f844d27, with its own `.venv`; main's
+  concurrent smoke and historical full-a-attempt1 evidence are untouched.
+- Live validation and full-run measurements remain host work. Report schema and
+  CLI flags remain unchanged; recovery classification is retained in artifacts.
+
 # Harness accounting, configurations and run provenance — 2026-10-23
 
 Price each hash-pinned controller/verifier `control_call` stderr record with the

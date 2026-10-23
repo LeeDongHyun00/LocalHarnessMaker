@@ -13,6 +13,7 @@ from eval.metrics import METHOD, compute, metric, total
 from eval.runner.audit import digest
 from eval.runner.control_accounting import control_calls
 from eval.runner.telemetry import records, session_id
+from eval.runner.limits import capacity_message, capacity_refusal_without_items
 
 
 def artifact(path: Path) -> dict[str, str]:
@@ -20,11 +21,15 @@ def artifact(path: Path) -> dict[str, str]:
     return {"path": str(path), "sha256": digest(path.read_bytes())}
 
 
-def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str = "standard") -> dict[str, Any]:
+def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str = "standard", native_counts: dict[str, int] | None = None) -> dict[str, Any]:
     """Use complete per-segment counts; cache is a subset, output includes reasoning."""
     turns = [e.get("usage", {}) for e in records(events) if e.get("type") == "turn.completed"]
     counts = {key: sum(t[key] for t in turns) if turns and all(type(t.get(key)) is int and t[key] >= 0 for t in turns) else None
               for key in ("input_tokens", "cached_input_tokens", "output_tokens")}
+    if native_counts is not None:
+        counts = native_counts
+    if capacity_refusal_without_items(records(events)):
+        counts = dict.fromkeys(counts, 0)
     i, c, o = (counts[k] for k in counts)
     if i is not None and c is not None and c > i:
         raise ValueError("Cached tokens exceed input tokens")
@@ -58,7 +63,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
                       "backend": "codex_cli", "model": config["model"],
                       "status": "timeout" if segment.get("timed_out") else "completed" if segment["exit_code"] == 0 else "failed",
                       "usage": usage(path, segment.get("latency_seconds", 0), config["model"], pricing,
-                                     tier=result.get("pricing_evidence", {}).get("tier", "standard"))})
+                                     tier=result.get("pricing_evidence", {}).get("tier", "standard"),
+                                     native_counts=segment.get("native_usage"))})
     audit = result["grader_access_audit"]
     status = audit["status"]
     reason = "Observed forbidden access." if status == "access_detected" else "; ".join(audit["errors"]) if status == "inconclusive" else None
@@ -172,7 +178,7 @@ def validate(report: dict[str, Any], repository: Path) -> None:
         raise ValueError("Duplicate call identifiers")
     for task in tasks:
         validate_session_versions(task, report["metadata"]["codex_version"])
-        if task["attempts"] != len(task["executor_segments"]) and task["outcome"] != "invalid":
+        if task["attempts"] != max(1, sum(not capacity_message([Path(s["events"]["path"])]) for s in task["executor_segments"])) and task["outcome"] != "invalid":
             raise ValueError("Attempt/segment count mismatch")
         previous = None
         for index, seg in enumerate(task["executor_segments"], 1):

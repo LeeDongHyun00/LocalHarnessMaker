@@ -5,13 +5,15 @@ import os
 import re
 from pathlib import Path
 import sys
+import time
+from time import sleep
 from typing import Any, Callable
 import uuid
 
 from jsonschema import Draft202012Validator, FormatChecker
 
 from eval.runner.audit import digest
-from eval.runner.limits import UsageLimitError, usage_limit_message
+from eval.runner.limits import BACKOFF_SECONDS, CapacityError, UsageLimitError, capacity_message, usage_limit_message
 from eval.runner.process import ProcessResult
 
 
@@ -74,6 +76,15 @@ class ControlFiles:
             stream.write(content)
         self.remember(path)
 
+    def recovery(self, operation: str, message: str, wait: int | None) -> None:
+        """Pin recovery evidence alongside the interrupted control operation."""
+        path = self.runtime / "control-interruptions" / uuid.uuid4().hex / "recovery.json"
+        self.fresh(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"infrastructure_recovery": True, "operation": operation,
+                                    "message": message, "wait_seconds": wait}) + "\n")
+        self.remember(path)
+
     def archive_interruption(self, paths: list[Path]) -> None:
         """Retain interrupted outputs under fresh names so the operation can retry."""
         self.verify()
@@ -91,6 +102,24 @@ class ControlFiles:
 
 
 def invoke(module: str, operation: str, arguments: list[str], destination: Path, *,
+           repository: Path, timeout: float, execute: Callable[..., ProcessResult],
+           overrides: dict[str, str] | None = None,
+           guard: ControlFiles) -> dict[str, Any]:
+    """Retry only observed capacity refusals, preserving each interrupted operation."""
+    for recovery in range(len(BACKOFF_SECONDS) + 1):
+        try:
+            return _invoke_once(module, operation, arguments, destination, repository=repository,
+                                timeout=timeout, execute=execute, overrides=overrides, guard=guard)
+        except CapacityError as exc:
+            wait = BACKOFF_SECONDS[recovery] if recovery < len(BACKOFF_SECONDS) else None
+            guard.recovery(operation, str(exc), wait)
+            if wait is None:
+                raise
+            sleep(wait)
+    raise AssertionError("Unreachable recovery state")
+
+
+def _invoke_once(module: str, operation: str, arguments: list[str], destination: Path, *,
            repository: Path, timeout: float, execute: Callable[..., ProcessResult],
            overrides: dict[str, str] | None = None,
            guard: ControlFiles) -> dict[str, Any]:
@@ -113,6 +142,7 @@ def invoke(module: str, operation: str, arguments: list[str], destination: Path,
     record = {"operation": operation, "exit_code": None, "timed_out": False}
     accounting.write_text(json.dumps(record) + "\n")
     guard.remember(accounting)
+    started = time.monotonic()
     try:
         process = execute([sys.executable, "-m", module, operation, *arguments, *output_args],
                           cwd=repository, env=env, stdin="", stdout=stdout, stderr=stderr, timeout=timeout)
@@ -123,7 +153,8 @@ def invoke(module: str, operation: str, arguments: list[str], destination: Path,
                 guard.remember(path)
         guard.archive_interruption([accounting, *interrupted])
         raise
-    record.update(exit_code=process.returncode, timed_out=process.timed_out)
+    record.update(exit_code=process.returncode, timed_out=process.timed_out,
+                  latency_seconds=time.monotonic() - started)
     accounting.write_text(json.dumps(record) + "\n")
     guard.remember(accounting)
     for path in [stdout, stderr, *([] if operation == "validate-handoff" else [destination])]:
@@ -131,9 +162,15 @@ def invoke(module: str, operation: str, arguments: list[str], destination: Path,
             guard.remember(path)
     guard.verify()
     limit = usage_limit_message([stdout, stderr])
+    capacity = capacity_message([stdout, stderr]) if not limit else None
+    limit = limit or capacity
+    if capacity:
+        record["usage_evidence"] = "Capacity-refused CLI envelopes: zero before any item; missing usage after items stays unknown"
+        accounting.write_text(json.dumps(record) + "\n")
+        guard.remember(accounting)
     if limit:
         guard.archive_interruption([accounting, stdout, stderr, *([] if operation == "validate-handoff" else [destination])])
-        raise UsageLimitError(limit)
+        raise (CapacityError if capacity else UsageLimitError)(limit)
     if process.returncode != 0 or process.timed_out:
         raise HarnessError(f"{module} {operation} failed")
     if stdout.read_text() != str(destination) + "\n":

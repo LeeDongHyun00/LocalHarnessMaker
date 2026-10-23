@@ -12,15 +12,16 @@ import subprocess
 import sys
 import tempfile
 import time
+from time import sleep
 from typing import Any, Callable
 import uuid
 
 from eval.runner import harness
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
-from eval.runner.limits import UsageLimitError, usage_limit_message
+from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
-from eval.runner.telemetry import collect, collect_runs, records, session_id
+from eval.runner.telemetry import collect, collect_runs, native_token_delta, native_token_totals, records, session_id
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -468,13 +469,16 @@ def run(
                     except harness.HarnessError as exc:
                         entry["control_invalid_reason"] = exc.invalid_reason
                         control_error = entry["control_error"] = str(exc)
-            remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - len(day_segments)
+            remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - sum(not s.get("capacity_error") for s in day_segments)
             if not config["harness"]:
-                remaining = config["retry_limit"] + 1 - len(day_segments)
-            if entry["phase"] in {"interrupted", "usage_limited"}:
+                remaining = config["retry_limit"] + 1 - sum(not s.get("capacity_error") for s in day_segments)
+            if entry["phase"] in {"interrupted", "usage_limited", "capacity_limited"}:
                 remaining = max(1, remaining)
             transport_retries = entry.get("transport_retries", 0)
-            for retry in range(0 if blocked or day_finished or control_error else remaining):
+            if blocked or day_finished or control_error:
+                remaining = 0
+            recovery = 0
+            while remaining > 0:
                 observed_version = version_reader()
                 if observed_version != actual_version:
                     write_json(checkpoint, state)
@@ -514,6 +518,10 @@ def run(
                     elif config["harness"]:
                         prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + (control_runtime / "contract.json").read_text()
                 segment = {"attempt": index, "started_at": now(), "events": event_path.name, "stderr": stderr_path.name, "day": day, "cli_version": observed_version}
+                if recovery or (resumed_id and entry["segments"] and
+                                entry["segments"][-1].get("capacity_error") and
+                                entry["segments"][-1].get("day", 1) == day):
+                    segment["infrastructure_recovery"] = True
                 if day == 2 and not resumed_id:
                     delivered = runtime / "day2-delivered.md"
                     delivered.write_bytes(prompt.encode("utf-8"))
@@ -530,6 +538,7 @@ def run(
                     write_json(checkpoint, state)
 
                 native_before = {p: digest(p.read_bytes()) for p in (codex_home / "sessions").rglob("*.jsonl")}
+                tokens_before = native_token_totals(list(native_before))
                 start = time.monotonic()
                 try:
                     final_process = execute(
@@ -545,6 +554,10 @@ def run(
                 entry.pop("pid", None)
                 native_changed = [p for p in (codex_home / "sessions").rglob("*.jsonl")
                                   if native_before.get(p) != digest(p.read_bytes())]
+                native_usage = native_token_delta(tokens_before, native_token_totals(native_changed))
+                if native_usage is not None:
+                    segment["native_usage"] = native_usage
+                    segment["usage_evidence"] = "Native event_msg.token_count cumulative delta; output includes reasoning"
                 segment["native_logs"] = [str(p) for p in native_changed]
                 segment["settings_verified"] = collect([event_path], native_changed,
                                                        config["model"], config["reasoning_effort"])["settings_evidence"]["verified"]
@@ -554,6 +567,32 @@ def run(
                 write_json(checkpoint, state)
                 current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 infrastructure_stop = usage_limit_message([event_path])
+                capacity = capacity_message([event_path])
+                if capacity:
+                    current_audit = audit_logs([event_path, *native_changed], private, workspace=workspace,
+                                               repository=REPOSITORY, grading_roots=audit_roots(runtime),
+                                               fingerprint_cache=fingerprint_cache)
+                if capacity and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
+                    segment.update(capacity_error=True, infrastructure_recovery=True,
+                                   usage_evidence="Capacity refusal before any item: zero tokens" if
+                                   capacity_refusal_without_items(records(event_path)) else
+                                   "Capacity refusal after work: missing usage remains unknown")
+                    if capacity_refusal_without_items(records(event_path)):
+                        segment["capacity_refusal_usage"] = dict.fromkeys(
+                            ("input_tokens", "cached_input_tokens", "output_tokens"), 0)
+                    resumed_id = session_id([event_path]) or resumed_id
+                    wait = BACKOFF_SECONDS[recovery] if recovery < len(BACKOFF_SECONDS) and resumed_id else None
+                    segment["recovery_wait_seconds"] = wait
+                    entry["phase"] = "capacity_limited"
+                    write_json(checkpoint, state)
+                    if wait is None:
+                        infrastructure_stop = capacity
+                        break
+                    sleep(wait)
+                    recovery += 1
+                    continue
+                remaining -= 1
+                recovery = 0
                 if infrastructure_stop:
                     break
                 if interrupted or current_audit["status"] != "clean":
@@ -621,7 +660,7 @@ def run(
                 entry["phase"] = "ready"
                 write_json(checkpoint, state)
         if infrastructure_stop:
-            entry["phase"] = "usage_limited"
+            entry["phase"] = "capacity_limited" if "at capacity" in infrastructure_stop.lower() else "usage_limited"
             entry["infrastructure_stop"] = infrastructure_stop
             write_json(checkpoint, state)
         elif not interrupted:
@@ -650,7 +689,7 @@ def run(
             evidence = runtime / name
             if (guard.safe(evidence) and evidence.is_file() and
                     digest(evidence.read_bytes()) == expected_hash and
-                    (evidence.name in {"contract.json", "handoff.json"} or
+                    (evidence.name in {"contract.json", "handoff.json", "recovery.json"} or
                      re.fullmatch(r"verdict-[0-9]+\.json", evidence.name) or evidence.name.endswith(".control.json") or
                      re.fullmatch(r"(?:contract|verdict-[0-9]+|handoff|handoff-validation)\.std(?:out|err)", evidence.name))):
                 target = (task_out / evidence.relative_to(runtime) if evidence.is_relative_to(runtime / "control-interruptions")
@@ -659,7 +698,7 @@ def run(
                 target.parent.mkdir(parents=True, exist_ok=True)
                 publish(evidence, target, private)
         if infrastructure_stop:
-            stop_reason = private.redact("STOP-E1: usage limit; run remains resumable. " + infrastructure_stop)
+            stop_reason = private.redact("STOP-E1: " + ("capacity error" if "at capacity" in infrastructure_stop.lower() else "usage limit") + "; run remains resumable. " + infrastructure_stop)
             break
         if config["harness"]:
             try:
@@ -681,7 +720,7 @@ def run(
         if audit["status"] != "clean":
             invalid.append("grader_access_detected" if audit["status"] == "access_detected" else "incomplete_access_audit")
         if not telemetry["settings_evidence"]["verified"] or (two_session and
-                any(not s.get("settings_verified") for s in entry["segments"])):
+                any(not s.get("settings_verified") for s in entry["segments"] if not s.get("capacity_error"))):
             invalid.append("executor_settings_unverified")
         if interrupted:
             invalid.append("execution_interrupted")
@@ -699,7 +738,7 @@ def run(
             outcome = grading["result"]
         meta = json.loads((public / "meta.json").read_text())
         result = {"task_id": task_id, "task_type": meta["type"], "outcome": outcome,
-                  "invalid_reasons": invalid, "attempts": max(1, len(entry["segments"])),
+                  "invalid_reasons": invalid, "attempts": max(1, sum(not s.get("capacity_error") for s in entry["segments"])),
                   "session_id": session_id(event_paths), "segments": entry["segments"],
                   "two_session": two_session, "day2_observation": observation,
                   "grader_access_audit": audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
@@ -711,7 +750,7 @@ def run(
         if not interrupted:
             entry["result"] = json.loads(private.redact(json.dumps(result)))
         write_json(checkpoint, state)
-        if interrupted or (final_process and (final_process.returncode != 0 or final_process.timed_out)):
+        if interrupted or (final_process and (final_process.returncode != 0 and not final_process.timed_out)):
             stop_reason = "STOP-E1: executor interrupted or could not complete non-interactively; inspect retained logs before another live call."
             break
     tasks = [json.loads((out / task / "result.json").read_text()) for task in order if (out / task / "result.json").exists()]
@@ -719,6 +758,12 @@ def run(
     configured = len(config["tasks"])
     write_json(out / "run-diagnostics.json", {
         "stop_reason": stop_reason, "attempted_tasks": attempted, "configured_tasks": configured,
+        "infrastructure_recoveries": [
+            {"task_id": task_id, **segment} for task_id, entry in state["tasks"].items()
+            for segment in entry["segments"] if segment.get("infrastructure_recovery")
+        ] + [{"task_id": task_id, **json.loads((Path(entry["runtime"]) / name).read_text())}
+             for task_id, entry in state["tasks"].items()
+             for name in entry.get("control_files", {}) if name.endswith("/recovery.json")],
         "executor_runs": [{"task_id": t["task_id"], **segment}
                           for t in tasks for segment in t.get("executor_runs", [])],
     })
