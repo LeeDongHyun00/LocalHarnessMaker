@@ -1,3 +1,350 @@
+# Explicit recovery of unpinned executor captures — 2026-10-23
+
+Add optional `--allow-unpinned` to republication. Recover only regular
+`exec-N.stderr` and `final-N.md` captures from the recorded runtime or BACKUP/TASK,
+with the same redaction and destination-conflict checks. Existing control/log
+pins are always enforced. Without the flag, publication and counts stay as
+before; missing captures remain skipped even with the flag.
+
+Record per-capture artifact entries in
+`run-diagnostics.json.republication.artifacts`, containing task_id, path,
+sha256 of the published redacted bytes and provenance=republished_unpinned.
+The frozen shared report schema accepts path/sha256 only; its artifact
+references retain that shape. Preserve existing diagnostics, refresh any
+report references to the changed diagnostics hash, and refuse altered
+provenance. Preflight all tasks before writing, and reuse identical evidence
+without duplicate records or repeated metadata writes. CLI output contains
+only task IDs and counts, including opt-in published_unpinned counts.
+
+Runtime capture pinning already shipped in 6dbc684. Strengthen mocked runner
+tests for both stderr and final messages: require persisted per-segment hashes
+before trusted grading and verify each capture restores without the flag.
+No retrospective checkpoint pins, model calls, grading, workspace copies or
+metric/classification rewrites are introduced by republication.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1476 passed in
+139.70s. Focused republication/runtime checks — 70 passed in 12.11s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md` — exit 0.
+Authorized scope/STATUS-format check passed; branch r5/v2. No retained report,
+frozen task, shared schema, private storage or other checkout was changed.
+No staging, commits or live executor/controller/judge calls were performed.
+
+## Assumptions
+
+- The requested provenance field belongs to the richer diagnostic artifact
+  entries; report artifact references remain valid under the frozen schema.
+- Claude's 34 published/6 skipped smoke-copy result is a user-supplied host
+  observation. This session uses only synthetic runtimes and mocked executors.
+- Restored final messages enable later retained-evidence classification;
+  republication itself preserves historical metrics and classifications.
+
+# macOS evidence publication and offline republication — 2026-10-23
+
+Bound symlink checks to the runtime/source root. Permit system aliases above
+that boundary; reject root/inner links and traversal. Share the check across
+publication, control guards/accounting, day-2 copy validation, infrastructure
+reruns and static templates. Preserve the existing workspace publication rule.
+
+Add `python -m eval.runner.republish --private-root P --out REPORT_DIR
+[--runtime-root BACKUP]` for completed v1/v2 runs. Preflight all tasks against
+checkpoint control pins, executor/native audit hashes and byte counts, segment
+metadata and existing publication pins/bytes. Restore only allowlisted redacted
+evidence from recorded runtimes or BACKUP/TASK, retain the normal flattened
+day-2/interruption layout, and update only per-task report artifact entries.
+Never invoke models/graders, copy workspaces or rewrite checkpoints, metrics,
+costs, results or task-completion classifications. Success output contains only
+counts and task IDs; input failures contain no paths or evidence contents.
+
+The sampled historical full-A/full-B/smoke checkpoints do not pin executor
+stderr/final bytes. Count those captures as unpinned and skip them; do not
+fabricate retrospective hashes. Pinned controls (including control stderr) and
+audited events remain restorable. New executor segments pin events, stderr and
+any final message immediately on exit in internal evidence_sha256 manifests.
+
+Synthetic regressions create an explicit symlinked parent, rather than relying
+on pytest's resolved tmp_path. Cover normal runner publication/pins, continuation
+copying, infrastructure reruns, static templates, backup-only recovery, v1/v2,
+redaction/newlines, repeated runs, unchanged non-artifact report fields,
+workspace exclusion, all-task preflight, altered/missing evidence, inner links,
+manifest links and conflicting destinations/artifact references.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1448 passed in
+132.21s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md` — exit 0. Branch/scope check: r5/v2; only authorized paths changed.
+No retained report, frozen public task, private storage or other checkout was
+modified; no live executor/controller/judge call was made.
+
+## Assumptions
+
+- Claude owns the five host republications and the external BACKUP/RUN/TASK
+  layout. Host backups and private graders were unavailable in this sandbox.
+- A historical file without a retained pin cannot be verified merely because
+  it exists in a backup. Its contents must not be adopted as trusted evidence.
+- Republication runs after all host runner activity has stopped; it preserves
+  historical raw external references and does not migrate executor segments.
+
+# First-occurrence fingerprints and executor corpus warnings — 2026-10-23
+
+Track each qualifying fingerprint's first tool-input/output provenance across
+executor JSON and native rollout streams. Decode literal command payloads and
+patch additions; context/deletion lines and current workspace files never
+establish authorship. Exempt later echoed output only when an authored input
+provably precedes every output occurrence. Earlier output remains access evidence
+after copying, and private-path checks remain independent.
+
+Use within-stream record order, strict timezone-aware timestamps and matching
+command-result anchors within a known session. Match exact command/output
+representations with IDs, or equal-count ordered repetitions in one native and
+one CLI stream. Unknown session identity, unequal repetitions, missing timestamps
+without an anchor and unresolved cross-stream order keep the fingerprint match.
+Do not use caller path order as chronology. Retained/fresh filesystem contexts
+share only provenance, and malformed/incomplete evidence still invalidates.
+
+Audit accumulated executor/native history before runner continuation decisions.
+Pin fingerprint_history.py in retained recovery implementation hashes. Keep
+existing access and performance probes unchanged; update only the recovery hash
+inventory expectation to include the new implementation file.
+
+Normal grader validation optionally reads regular Python files recursively from
+private .corpus/ storage. Report corpus_file_count,
+shared_corpus_assertion_line_count and corpus_warning_count per task, with warning
+task/shared-line totals in the summary. Counts describe grader-line occurrences,
+so duplicate corpus copies do not inflate them. Corpus matches never change
+validity or exit status; v2 public assertion copies still fail validation. An
+absent corpus has zero files. Publish no corpus/grader contents or private paths.
+
+Regression coverage includes patch/heredoc/printf/Python/raw-template writes
+followed by cat or test execution, output-first opaque/private reads followed by
+copying, cross-stream timestamps and untimed duplicates, repeated results,
+ambiguous chronology, session-ID reuse, retained contexts, per-line provenance
+and mocked harness retries. Corpus tests cover missing/populated corpora, both
+task versions, warning-only CLI output, duplicate lines and public-copy failure.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1406 passed in
+138.46s. Existing access/performance probes remain unchanged; the initial full
+run exposed extra Python parses of plain shell operands, corrected before the
+passing rerun. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md` — exit 0.
+Scope/private-path scan passed. No live evaluation or real corpus validation
+was performed; retained reports and private files were not modified.
+
+## Assumptions
+
+- Claude's 22 shared executor-written assertion lines across 20 pilot tasks are
+  user-supplied findings. The actual corpus will be supplied later; this session
+  uses synthetic graders/logs/corpus files and makes no model calls.
+- Corpus layout is unspecified. Read regular .py files recursively below
+  .corpus/ across task/run directories. File count distinguishes an absent
+  corpus from a checked corpus with no matching assertion lines.
+- Ambiguous cross-stream chronology cannot establish input-first authorship.
+  Retain the fingerprint match rather than infer order from filenames or waive
+  malformed/incomplete evidence. Host re-audit remains Claude's task.
+
+# Calibration pilot audit corrections — 2026-10-23
+
+Exclude shared public lines across both shipped task-set versions at audit time,
+because the private grader corpus spans v1 and v2. Exclude generic imports,
+comments, blank/punctuation-only lines, decorator spans, TestCase headers and
+test method headers. Preserve distinctive-literal filtering, output-only
+fingerprints, immutable shipped-input exclusions and fail-closed detection of
+qualifying hidden lines. Synthetic regressions cover graders sharing public
+workspace, prompt and day-2 lines across versions, plus generic scaffolding and
+executor-written lines that must remain eligible.
+
+Report per-task shared_public_line_count and shared_assertion_line_count in
+offline grader validation. Count nonempty normalized line occurrences; assertion
+spans include Python assert statements and assert* calls. Reject shared assertion
+lines for v2 in ordinary and mutation validation; v1 reports counts without
+changing its acceptance rule. Revise private input/expectation pairs across all
+four pilot families, preserve every requirement mapping and archive originals
+privately. Refresh the counts-only validation table. Current local graders had
+zero exact shared assertion lines before the revision as well.
+
+Decode substitution-free String.raw templates as literals with raw backslashes
+and normalized newlines. Audit their contained shell command normally, including
+quoted heredoc data. Interpolation, other/dynamic tags and uncertain String
+bindings remain inconclusive. Expand bounded relative globs in literal for-loop
+word lists before variable substitution. Preserve concrete symlink/private-path
+detection and reject absolute, parent-traversing, variable-built and quoted glob
+words. Regression cases cover executor JSON plus native command/function/custom
+records, no matches, whitespace in matches, suffixes and private symlinks.
+
+Offline candidate validation: 20/20 valid starter/reference pairs, 249 reference
+checks, 156 starter failures, 252/252 requirement mappings covered, 100 shared
+public lines, 0 shared assertion lines, 1121 killed mutants, 18 reviewed
+equivalents and 0 unreviewed survivors. Per-task IDs and counts are in
+reports/pilot-v2-validation.md. No live executor/controller/judge calls were made.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1351 passed in
+179.73s. Offline validation and mutation CLIs — exit 0.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` — exit 0.
+Frozen public tasks, schemas, retained run reports and other roles remain unchanged.
+
+## Assumptions
+
+- The host's four invalidities and absence of access attempts are user-supplied
+  findings. This session verifies synthetic logs and offline graders; Claude
+  owns host retained-run re-audit and recovery.
+- Host retained-run recovery must use the original hash-pinned graders with the
+  updated audit code. Revised private candidates have different hashes and are
+  for subsequent calibration; privately archived originals preserve recovery.
+
+# Read-only command-array display callbacks — 2026-10-23
+
+Resolve the retained const-array shape with a later
+`results.forEach((result, i) => text({command: commands[i], result}))` callback.
+Permit indexed reads only in this read-only display grammar, after the single
+collection use. Continue auditing every command element independently. Existing
+support for `Promise.allSettled`/`Promise.all` and shorthand `cmd` followed by
+literal options now has explicit regression coverage.
+
+Retain whole-input binding checks. Index assignments/updates, push, splice, pop,
+shift, unshift, sort, reverse, aliases and reassignment before, inside or after
+the callback remain inconclusive. Computed indices, transformed values, opaque
+callbacks and reads before the collection use also remain inconclusive.
+
+Add a synthetic JavaScript fixture preserving the supplied complete structure,
+including a Python one-liner with embedded double quotes. Verify native audit
+cleanliness and access detection through a middle-element synthetic alias.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1279 passed in
+123.01s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas` — exit 0.
+
+## Assumptions
+
+- The user reports commit 64a825b and a clean host re-audit of the template case.
+  The const-array host record still needs re-audit after this follow-up. This
+  session uses synthetic evidence only, without host streams or private graders.
+
+# Code-mode templates and immutable command arrays — 2026-10-23
+
+Decode substitution-free backtick literals with JavaScript escape and newline
+semantics. Accept quoted strings and these templates in const/let command arrays
+used once through a direct tool argument, map callback or for-of loop. Expand
+every element into a separate audited command without evaluating JavaScript.
+
+Require one binding and one collection use, direct element arguments, and no
+rebinding, mutation, aliases, extra uses or scope escapes. Interpolation,
+nonliteral array elements, unsupported argument forms and uncertain identifier
+identity remain inconclusive. Preserve existing command/path checks and access
+invalidation, including a private-path command in a middle array element.
+
+Regression tests replay native custom_tool_call records with both exact host
+shapes, const/let bindings, quoted/template elements, map/for-of/direct-array
+uses, and synthetic private paths. Near misses cover interpolation, nonliterals,
+reassignment, push/splice/index mutation, aliases, repeated uses, transformed
+elements, scope escapes and escaped identifiers.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1218 passed in
+114.77s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas` — exit 0.
+
+## Assumptions
+
+- Supplied input shapes describe the two host failures. Actual host streams and
+  private graders are unavailable; this session verifies synthetic evidence
+  only. Retained-evidence recovery remains a host step.
+
+# Restart recovery, selective reruns and audit precision — 2026-10-23
+
+Exempt only missing terminal events in explicitly interrupted executor segments;
+retain every other inconclusive rule in run, re-audit and regrade. Reuse valid
+manifest-pinned pre-launch contracts and archive verified partial preparation
+without deleting evidence. SIGINT/SIGTERM retain stop diagnostics and exit 130
+without a traceback, including control preparation and executor cleanup.
+
+Add `eval.runner.rerun_invalid` with the requested private-root/source/output/
+reason selector. Require infrastructure causes, re-audit before selection,
+refuse access matches and changed manifests, and start eligible tasks in fresh
+runtimes. Regrade unselected tasks from retained evidence. Retain prior costs
+once, propagate unknown accounting, and pin per-task/run rerun provenance.
+
+Use newline-only JSONL framing in audit, native telemetry, control accounting,
+limit detection and redaction. Find heredoc boundaries before shell tokenization;
+quoted body data cannot corrupt parsing of later compile/test commands.
+Regression coverage includes mixed raw-regex quotes/backslashes, Unicode line
+separators, hard restarts, pre-launch files, signals, rerun refusal, provenance,
+source immutability and accounting across resume/regrade.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1092 passed in
+103.45s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports` — exit 0.
+No task files, retained reports, report schemas or existing CLI flags changed.
+
+## Assumptions
+
+- The supplied four host failures are infrastructure/parser cases without access
+  attempts. Host artifacts and private graders are unavailable here; recovery is
+  verified using synthetic retained runs and mocked model/executor calls.
+- Fresh reruns require a completed source report; halted checkpoint-only runs
+  use the existing resume path first. Host outcome recovery remains pending.
+
+# Version 2 candidate pilot and executor service tier — 2026-10-23
+
+Add optional task_root and service_tier configuration. Keep default v1 hashes,
+CLI defaults, frozen tasks and report schema unchanged. Select public inputs,
+full populations, freeze checks, digests, regrade and day-2 observations from
+the configured root. Namespace nondefault-root digests so compare rejects
+cross-set reports. Pass explicit tiers on every executor launch and verify
+native applied settings per process; missing/different tier invalidates before
+grading. Retain tier requests and evidence in checkpoints and diagnostics.
+
+Write the v2 design before constructing a 4-family, 20-task unfrozen pilot.
+Public packages include regression tests, constraints and generated verification
+artifacts; private graders, references, requirement coverage and mutation reviews
+remain external. Candidate validation supports explicit v2 IDs and untracked
+candidate hashing without relaxing frozen-input execution. Mutation equivalence
+records include day-2 specification bytes. Publish only per-task numerical
+validation results in reports/pilot-v2-validation.md.
+
+Add pilot-v2-a configuration and the 24-launch STOP-3 estimate. Priority pricing
+is unavailable in the pinned offline snapshot; retain null costs and require
+host verification before spending. Calibration, candidate freeze and the planned
+remaining 16 families are pending. No live model calls, staging or commits.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1058 passed in
+122.14s. `git diff --exit-code -- eval/tasks` — exit 0.
+
+# Literal JavaScript expressions and day-2 continuation — 2026-10-23
+
+Decode quoted string expressions using literal concatenation and literal
+`replace`/`replaceAll` chains without evaluating JavaScript. Preserve first-only
+string-pattern replacement, replacement-dollar substitutions, empty patterns,
+escapes and UTF-16 semantics. Resolved command/workdir/patch inputs pass through
+the existing access checks. Synthetic native regressions cover the stray-X
+patch wrapper, replacement into a private path, and unresolved near misses.
+
+Add the host-only `python -m eval.runner.continue_day2 --private-root P --from
+SOURCE --out NEW` command. Select only audit-recoverable pre-day-2 invalid tasks,
+requiring all retained day-1 logs clean under current code and unchanged
+manifests. Regrade other tasks, copy the selected workspace/evidence into a
+fresh external runtime, verify its exit hash, and reuse the normal runner's
+version checks, exact prompt delivery, harness orchestration and retries.
+Grade completed eligible work once after exit in a fresh trusted copy.
+
+Preserve source evidence and accounting, append new calls/costs, and record
+source/code/config hashes, copy checks, both days' timestamps and their gap.
+Copied day-1 logs retain their original audit context with hash checks; new
+access to the source runtime remains protected. Re-audit/regrade understands
+continued evidence, and regrade checks full-population hashes where configured.
+No frozen tasks, retained reports, shared schemas or existing CLI flags change.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1023 passed in 97.92s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports` both exited 0. Mocked executors
+only; no model calls, real private-root lookup, staging or commits occurred.
+
+## Assumptions
+
+- Full A results and the balanced-brackets day-1 failure are user-provided host
+  evidence. This session uses synthetic paths/graders; historical regrading and
+  day-2 execution remain host work with the recorded CLI version and pricing.
+- The source checkpoint supplies the recorded semantic configuration; its
+  original config byte hash is retained and the materialized copy is separately
+  hashed. A fresh output command does not resume an incomplete continuation.
+
 # Heredoc regression in literal-loop audit — 2026-10-23
 
 Restrict loop discovery to shell syntax. Heredoc payloads/delimiters and comments
@@ -1030,3 +1377,52 @@ was modified. Verification and remaining host work are recorded in STATUS-eval.
 Verification: `.venv/bin/python -m pytest tests/eval -q` — 649 passed in
 60.49s. Frozen task and pilot-report diffs are empty; no full repository suite
 was run in this session.
+
+# Calibration, observed-tier pricing and interface v2 metrics — 2026-10-23
+
+Add boolean calibration (default false) for the decision 0008 pre-freeze pilot.
+Calibration checkpoints, run diagnostics and pinned report artifacts identify
+nonheadline evidence, stderr explains that status, and compare refuses it.
+The baseline-A pilot and estimate enable calibration before its later freeze.
+
+Preserve the original Standard snapshot, add the user-supplied 2026-10-23 Fast
+snapshot at 2× Standard and a separate Standard Sol 6 supplement. Capture newly
+emitted native applied tiers at each process exit; control calls require a tier
+on their control_call line. Unknown tiers remain null. Per-call artifacts and
+schema-compatible metadata pin tier/rate/source provenance. Recovery preserves
+historical accounting. README records Luna's priority CLI default and the
+retained v1 control-cost underpricing for disclosure in the final evaluation.
+
+Give all four multiple_requirements variants materially different family
+specifications and independent private graders/references/coverage. Archive the
+previous candidate privately. Revalidate all twenty starter/reference pairs and
+the changed references' complete mutation populations. The counts-only report
+records 249 reference checks, 136 starter failures, 252/252 covered requirements,
+1121 killed mutants, 18 reviewed equivalents and zero unreviewed survivors;
+20 starter public suites and 20 reference verification commands pass.
+
+Implement task_false_done_rate using the retained final message of the last
+required session, a task-scope adapter applying verifier.claims.claimed_criteria,
+valid-task populations and seeded task-cluster bootstrap. Pin final/segment and
+extractor hashes, evidence, numerator/denominator and exclusions through existing
+artifacts. Preserve criterion-level false_done_rate. Missing final messages are
+excluded with reasons; missing hidden grading never establishes false done.
+Version-aware schema validation supports retained v1 reports in regrade,
+continuation, rerun, re-audit and compare; task-level comparison requires v2 on
+both sides. No retained v1 report, schema or existing CLI flag is changed.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1126 passed in
+113.59s. All nine retained shared-schema reports validate by declared version;
+the provisional report remains unchanged. `git diff --check -- eval tests/eval
+state/STATUS-eval.md` and `git diff --exit-code -- eval/tasks schemas` pass.
+The four prior bug-fix references fail 22 checks against the revised variants.
+
+## Assumptions
+
+- Pricing is the user's supplied official-page observation; network verification
+  and live executor/controller/judge calls are unavailable in this session.
+- The existing verifier exposes criterion extraction only. The eval-owned adapter
+  binds task-scoped completion prose to one synthetic ID, uses the same clause
+  rules and excludes criterion-only/test-only statements; no verifier edit occurs.
+- The new candidate remains unfrozen. Paid calibration, later freeze and the
+  full repository check before merge remain host work.

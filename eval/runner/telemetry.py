@@ -10,7 +10,7 @@ def records(path: Path) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     if not path.is_file():
         return events
-    for line in path.read_text(errors="replace").splitlines():
+    for line in path.read_text(errors="replace").split("\n"):
         try:
             value = json.loads(line)
         except ValueError:
@@ -29,7 +29,7 @@ def session_id(paths: list[Path]) -> str | None:
     return None
 
 
-def collect(event_paths: list[Path], native_paths: list[Path], model: str, effort: str) -> dict[str, Any]:
+def collect(event_paths: list[Path], native_paths: list[Path], model: str, effort: str, service_tier: str | None = None) -> dict[str, Any]:
     """Extract token counts, applied effort and account-wide plan snapshots."""
     events = [event for path in event_paths for event in records(path)]
     native = [event for path in native_paths for event in records(path)]
@@ -43,6 +43,11 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
     settings_source = " + ".join((["native_session_jsonl.turn_context"] if contexts else []) +
                                  (["native_session_jsonl.event_msg.thread_settings_applied"] if applied else []))
     verified = bool(observed) and all(p == {"model": model, "effort": effort} for p in observed)
+    tier_verified = service_tier is None or (bool(applied) and
+        all(isinstance(p, dict) and p.get("service_tier") == service_tier for p in applied) and
+        all(p["service_tier"] == service_tier for p in contexts if "service_tier" in p))
+    if service_tier is not None:
+        verified = verified and tier_verified
     totals: dict[str, int] = {}
     for event in events:
         if event.get("type") == "turn.completed":
@@ -55,13 +60,17 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
         if event.get("type") == "event_msg" and event.get("payload", {}).get("type") == "token_count"
         and event["payload"].get("rate_limits") is not None
     ]
-    tiers = {p.get("service_tier", "standard") for p in contexts}
-    pricing_tier = next(iter(tiers)) if len(tiers) == 1 else "unknown" if tiers else "standard"
+    values = [p.get("service_tier") if isinstance(p, dict) else None for p in applied]
+    tiers = {value if isinstance(value, str) else "unknown" for value in values}
+    pricing_tier = next(iter(tiers)) if len(tiers) == 1 else "unknown"
     return {
         "pricing_evidence": {"tier": pricing_tier,
-                             "basis": "native turn_context when present; otherwise Standard baseline assumption"},
+                             "basis": "native event_msg.thread_settings_applied.service_tier only"},
         "settings_evidence": {"verified": verified, "source": settings_source or "native_session_jsonl",
                               "observed": observed,
+                              **({"requested_service_tier": service_tier, "service_tier_verified": tier_verified,
+                                  "observed_service_tiers": [p.get("service_tier") if isinstance(p, dict) else None for p in applied]}
+                                 if service_tier is not None else {}),
                               "exec_json_exposes_effort": any("reasoning_effort" in event or "effort" in event for event in events)},
         "usage": {"billing_basis": "chatgpt_subscription", "tokens": totals or None, "billed_usd": None,
                   "plan_usage": {"availability": "account_snapshots" if snapshots else "unavailable",
@@ -149,3 +158,36 @@ def native_token_delta(before: dict[str, tuple[int, dict[str, int]]],
             return None
         deltas.append(delta)
     return {k: sum(d[k] for d in deltas) for k in deltas[0]} if deltas else None
+
+
+def applied_tier_records(paths: list[Path]) -> dict[str, list[dict[str, Any]]]:
+    """Read applied records separately so later resumes cannot reprice old calls."""
+    return {str(path): [event for event in records(path) if event.get("type") == "event_msg"
+            and isinstance(event.get("payload"), dict)
+            and event["payload"].get("type") == "thread_settings_applied"] for path in paths}
+
+
+def capture_tier(paths: list[Path], before: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    """Capture only newly emitted applied settings, including repeated records."""
+    from collections import Counter
+    from hashlib import sha256
+
+    def fingerprint(event: dict[str, Any]) -> str:
+        return sha256(json.dumps(event, sort_keys=True).encode()).hexdigest()
+
+    observations = []
+    for path, events in applied_tier_records(paths).items():
+        prior = Counter(fingerprint(event) for event in before.get(path, []))
+        for event in events:
+            identity = fingerprint(event)
+            if prior[identity]:
+                prior[identity] -= 1
+                continue
+            settings = event["payload"].get("thread_settings", {})
+            value = settings.get("service_tier") if isinstance(settings, dict) else None
+            observations.append({"native_log": path, "record_sha256": identity,
+                                 "observed_service_tier": value if isinstance(value, str) else None})
+    tiers = {o["observed_service_tier"] or "unknown" for o in observations}
+    return {"tier": next(iter(tiers)) if len(tiers) == 1 else "unknown",
+            "basis": "new native thread_settings_applied records captured at process exit",
+            "records": observations}

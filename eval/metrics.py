@@ -49,7 +49,7 @@ def metric(clusters: list[dict[str, Any]], unit: str, size: int,
 
 
 def compute(tasks: list[dict[str, Any]], *, seed: int, resamples: int = 10000) -> dict[str, Any]:
-    """Compute the six frozen metrics; parity needs an explicit paired report."""
+    """Compute seven metrics; parity needs an explicit paired report."""
     valid = [t for t in tasks if t["outcome"] != "invalid"]
     eligible = [t for t in valid if t["two_session"]]
 
@@ -62,10 +62,15 @@ def compute(tasks: list[dict[str, Any]], *, seed: int, resamples: int = 10000) -
         usd = total([t["costs"]["total_usd"] for t in sample])
         return usd / n if usd is not None and n else None
 
+    from eval.runner.task_completion import population, rate
+    task_claims, counts = population(tasks)
     kwargs = {"seed": seed, "resamples": resamples}
     return {
         "pass_rate": metric(valid, "valid_task", len(valid), pass_rate, **kwargs),
         "false_done_rate": metric(valid, "claimed_criterion", sum(t["done_claims"]["claimed_items"] for t in valid), claims, **kwargs),
+        "task_false_done_rate": metric(task_claims, "claimed_complete_task", counts["denominator"], rate,
+            reason="No claimed-complete valid tasks with retained final messages and hidden grading; "
+                   + str({"exclusions": counts["exclusions"], "undefined_outcomes": counts["undefined_outcomes"]}), **kwargs),
         "cost_per_pass": metric(tasks, "attempted_task", len(tasks), cost, **kwargs),
         "avg_attempts": metric(valid, "valid_task", len(valid), lambda s: sum(t["attempts"] for t in s) / len(s), **kwargs),
         "handoff_success": metric(eligible, "eligible_two_session_task", len(eligible),

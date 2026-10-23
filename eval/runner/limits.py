@@ -41,7 +41,7 @@ def _error_message(paths: list[Path], expression: str) -> str | None:
         return next((text for text in candidates if isinstance(text, str) and pattern.search(text)), None)
 
     def scan(text: str, *, envelopes: bool = False) -> str | None:
-        for line in text.splitlines():
+        for line in text.split("\n"):
             envelope = envelopes and "control_cli_events " in line
             raw = line.split("control_cli_events ", 1)[1] if envelope else line
             try:

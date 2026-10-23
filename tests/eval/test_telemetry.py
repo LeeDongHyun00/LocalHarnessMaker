@@ -96,4 +96,4 @@ def test_native_unknown_tier_is_not_assumed_standard(tmp_path: Path) -> None:
     native = tmp_path / 'native.jsonl'
     native.write_text(json.dumps({'type': 'turn_context', 'payload': {
         'model': 'gpt-6.1-sol', 'effort': 'medium', 'service_tier': 'priority'}}) + '\n')
-    assert collect([], [native], 'gpt-6.1-sol', 'medium')['pricing_evidence']['tier'] == 'priority'
+    assert collect([], [native], 'gpt-6.1-sol', 'medium')['pricing_evidence']['tier'] == 'unknown'

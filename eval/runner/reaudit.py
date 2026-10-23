@@ -9,7 +9,7 @@ import sys
 from typing import Any
 
 from eval.runner import core
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
 
 
 class InputParser(argparse.ArgumentParser):
@@ -23,8 +23,14 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
     """Return labels only; never rewrite a checkpoint, report or audit artifact."""
     state = json.loads((out / "checkpoint.json").read_text())
     report = json.loads((out / "report.json").read_text())
+    from eval.runner.schema_compat import validate_schema
+    from jsonschema import ValidationError
+    try:
+        validate_schema(report, core.REPOSITORY)
+    except ValidationError as exc:
+        raise ValueError("Report schema validation failed") from exc
     tasks = state.get("tasks")
-    if (state.get("report_schema") != "evaluation-report-v1" or not isinstance(tasks, dict) or
+    if (state.get("report_schema") not in {"evaluation-report-v1", "evaluation-report-v2"} or not isinstance(tasks, dict) or
             not tasks or any(not re.fullmatch(r"[a-z0-9][a-z0-9-]*", task) for task in tasks) or
             {task["task_id"] for task in report["tasks"]} != set(tasks)):
         raise ValueError("A complete version-1 run is required")
@@ -36,7 +42,8 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
         errors: set[str] = set()
         labels: list[str] = []
         try:
-            private = PrivateGraders.load(private_root, task, core.REPOSITORY)
+            private = PrivateGraders.load(private_root, task, core.REPOSITORY,
+                                          task_root=state.get('config', {}).get('task_root'))
             runtime = Path(entry["runtime"])
             workspace = runtime / "workspace"
             segments = entry["segments"]
@@ -45,7 +52,7 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
                 raise ValueError("Invalid retained runtime manifest")
             paths = [runtime / segment["events"] for segment in segments]
             paths.extend(sorted((runtime / "codex-home/sessions").rglob("*.jsonl")))
-            audit = audit_logs(paths, private, workspace=workspace, repository=core.REPOSITORY,
+            audit = audit_retained_logs(paths, private, interrupted_paths=interrupted_logs(runtime, entry["segments"]), retained_context=entry.get("retained_audit_context"), workspace=workspace, repository=core.REPOSITORY,
                                grading_roots=core.audit_roots(runtime), fingerprint_cache=fingerprint_cache)
             errors = {error.split(":", 1)[0] for error in audit["errors"]}
             labels = sorted({match["marker"] for match in audit["matches"]})

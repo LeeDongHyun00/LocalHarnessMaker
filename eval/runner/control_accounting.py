@@ -6,12 +6,14 @@ import re
 from typing import Any
 
 from eval.metrics import total
+from eval.runner.pricing import select
 from eval.runner.audit import digest
 from eval.runner.limits import capacity_refusal_without_items
+from eval.runner.publication import safe_source
 
 
 def control_calls(entry: dict[str, Any], task_id: str,
-                  pricing: dict[str, Any]) -> tuple[list[dict[str, Any]], float | None]:
+                  pricing: dict[str, Any], *, provenance: list[dict[str, Any]] | None = None) -> tuple[list[dict[str, Any]], float | None]:
     """Read only hash-pinned runner evidence, including archived interruptions."""
     runtime = Path(entry["runtime"])
     pinned = entry.get("control_files", {})
@@ -23,8 +25,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
     def read(name: str) -> str | None:
         path = runtime / name
         if (Path(name).is_absolute() or not path.is_relative_to(runtime) or ".." in Path(name).parts or
-                not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)
-                                          if p == runtime or p.is_relative_to(runtime)) or
+                not path.is_file() or not safe_source(path, runtime) or
                 digest(path.read_bytes()) != pinned.get(name)):
             return None
         return path.read_text(errors="replace")
@@ -50,7 +51,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
         delegations: list[dict[str, Any]] = []
         count_before = len(calls)
         pending_events: dict[str, Any] | None = None
-        lines = text.splitlines()
+        lines = text.split("\n")
         # Each CLI transport emits its events immediately before its control_call.
         # If interrupted before that accounting line, retain the capacity call too.
         expanded: list[str] = []
@@ -59,7 +60,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
             if ("control_cli_events " in line or line == "") and pending_line:
                 envelope = json.loads(pending_line.split("control_cli_events ", 1)[1])
                 try:
-                    events = [json.loads(row) for row in envelope.get("events", "").splitlines()]
+                    events = [json.loads(row) for row in envelope.get("events", "").removesuffix("\n").split("\n")]
                 except (ValueError, AttributeError):
                     events = []
                 if any(e.get("type") in {"error", "turn.failed"} and "at capacity" in str(e).lower()
@@ -114,7 +115,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
                       for k in ("input_tokens", "cached_input_tokens", "output_tokens")}
             if backend == "codex_cli" and isinstance(pending_events, dict):
                 try:
-                    events = [json.loads(row) for row in pending_events.get("events", "").splitlines()]
+                    events = [json.loads(row) for row in pending_events.get("events", "").removesuffix("\n").split("\n")]
                 except (ValueError, AttributeError):
                     events = []
                 if capacity_refusal_without_items([e for e in events if isinstance(e, dict)]):
@@ -123,7 +124,10 @@ def control_calls(entry: dict[str, Any], task_id: str,
             i, c, o = counts.values()
             if i is not None and c is not None and c > i:
                 counts["cached_input_tokens"] = c = None
-            rate = next((r for r in pricing["rates"] if r["model"] == model), None)
+            tier = value.get("service_tier")
+            rate, pricing_ref = select(pricing, model, tier)
+            if i is not None and i > 272000:
+                rate, pricing_ref = None, None
             usd = None
             if rate and all(v is not None for v in (i, c, o)) and i <= 272000:
                 usd = ((i - c) * rate["input_per_million_usd"] +
@@ -136,7 +140,12 @@ def control_calls(entry: dict[str, Any], task_id: str,
                                     "completed" if value.get("status") == "success" else "failed",
                           "usage": {**counts, "usd": usd, "latency_seconds": value.get("latency_seconds"),
                                     "cost_basis": "api_equivalent_usd",
-                                    "pricing_ref": pricing["snapshot_id"] if rate else None}})
+                                    "pricing_ref": pricing_ref}})
+            if provenance is not None:
+                provenance.append({"call_id": calls[-1]["call_id"], "observed_service_tier": tier,
+                    "basis": "controller control_call.service_tier only", "pricing_ref": pricing_ref,
+                    "stderr_sha256": pinned[name],
+                    "record_sha256": digest(json.dumps(value, sort_keys=True).encode())})
         exit_code = process.get("exit_code")
         if (type(exit_code) is not int or exit_code < 0 or process.get("timed_out") or
                 (exit_code != 0 and len(calls) == count_before and not delegations)):

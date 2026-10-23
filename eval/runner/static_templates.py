@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import Any
+from eval.runner.publication import safe_source
 
 PLACEHOLDER = "__HUMAN_FILL__"
 
@@ -16,7 +17,7 @@ def load_templates(config: dict[str, Any], repository: Path) -> dict[str, bytes]
     templates = {}
     for task in config["tasks"]:
         path = directory / f"{task}.md"
-        if any(p.is_symlink() for p in (path, *path.parents)) or not path.is_file():
+        if not safe_source(path, directory) or not path.is_file():
             raise ValueError(f"Missing or linked static template for {task}")
         content = path.read_bytes()
         if not content.strip() or PLACEHOLDER in content.decode("utf-8"):

@@ -8,18 +8,98 @@ shared schema. Historical reports in `reports/baseline-a-first-task/` remain
 unaltered provisional evidence; they have not been reclassified as approved
 reports or rerun.
 
+## Version 2 candidate pilot
+
+[DESIGN.md](tasks-v2/DESIGN.md) specifies the separate harder population before
+construction: 20 planned families × 5 task variants. The unfrozen pilot contains
+ledger, reservations, routing and inventory, with four single-session types and
+one two-session task per family (20 tasks, 24 executor sessions). Each task has
+seven production modules, public regressions, 12 numbered requirements (15 over
+two sessions), explicit constraints and a protected verification command.
+Final graders and references remain external. No version 1 public task or grader
+is changed. [Validation counts](reports/pilot-v2-validation.md) contain task IDs
+and numbers only.
+
+`task_root` is an optional config field, default `eval/tasks`; v2 selects
+`eval/tasks-v2`. It is a canonical repository-relative public directory under
+`eval/`. Task population, selected/population digests, freeze checks, grading,
+resume/regrade and exact day-2 validation use the selected root. V1's default
+digest format is preserved; other roots are included in the digest namespace.
+The existing compare command refuses different task-set hashes, including
+comparisons between different task-set versions. Report-interface versions 1
+and 2 can be compared on their shared metrics. IDs are unique across sets and v2 IDs start `v2-`.
+
+`service_tier` is optional. Omit it to leave the CLI default in effect. When set,
+every executor launch, retry, resume and fresh day-2 session passes
+`-c service_tier="VALUE"`. Each process needs matching native
+`event_msg.thread_settings_applied.thread_settings.service_tier` evidence;
+context-only evidence does not verify the tier. Missing/different evidence adds
+`executor_service_tier_missing_or_different` and prevents grading. Checkpoint
+config, segment verification, task telemetry and run diagnostics retain the
+request and observations. The shared report schema and CLI flags are unchanged.
+Executor pricing reads the native applied tier separately for every segment.
+Control pricing reads only service_tier on the controller's control_call line.
+Absent or unsupported tiers have null price and cost; config requests and CLI
+defaults never substitute for observed evidence. pricing-provenance.json pins
+per-call tier, source evidence and selected snapshot through task artifacts.
+
+[pilot-v2-a.yaml](configs/pilot-v2-a.yaml) uses full A's gpt-6.1-sol / medium,
+priority, Codex 0.163.0-alpha.11.1, zero retries and 900-second process deadlines
+(1800 seconds per process for two-session tasks).
+[STOP-3 estimate](reports/pilot-v2-a-estimate.md) bounds 24 planned executor
+launches and applies the sourced 2× Fast multiplier to the planning proxy.
+No live pilot was run in this worktree. calibration is a boolean config field,
+default false. With true, the runner accepts frozen=false candidates, pins their
+input bytes, records calibration=true in checkpoint and run diagnostics, and
+prints a stderr notice that the report is calibration evidence, not a headline
+result. A hash-pinned calibration.json artifact carries that status in each
+report task; compare refuses it. With false, all freeze checks remain in force.
+The pilot config enables calibration=true. Host review and spending approval
+precede the live calibration; freeze follows calibration review.
+Target baseline A at roughly 30–70%; revise design across whole families/types,
+never select or drop individual tasks by pilot outcome. Preserve all candidates.
+
+The existing `eval.runner.validate_graders` command accepts explicit v2 IDs in
+`--tasks`; `--tasks all` retains its v1 meaning. V2 validation checks a private
+requirement-to-executed-test manifest, references and failing starters through
+the normal trusted grading path. Each task also reports
+`shared_public_line_count` and `shared_assertion_line_count`: counts of nonempty,
+whitespace-normalized grader-line occurrences found in that task's shipped
+public inputs. Python `assert` statements and unittest `assert*` calls include
+every line of a multiline assertion. V2 validation fails on any shared assertion
+line, including in mutation mode; v1 reports the counts without changing its
+acceptance rule. Counts are published without source lines. The four pilot
+families use independent private input/expectation values while preserving
+their requirement mappings. It can hash untracked candidate bytes offline;
+that is not a run freeze. `--mutants 100000` exceeds the current complete AST
+mutation population for each pilot task. Mutation source/reviews and hash-bound
+equivalence rationales remain external; the v2 specification hash includes day 2.
+Public regression and reference verification commands run separately, without
+executors, controllers, judges, network or timing-dependent assertions.
+
+Optional private `.corpus/` storage can contain executor-written Python test
+files in any task/run subdirectory layout. Normal validation reads its regular
+`.py` files recursively and reports `corpus_file_count`,
+`shared_corpus_assertion_line_count` and `corpus_warning_count`. Shared assertion
+lines count grader-line occurrences, regardless of duplication in the corpus.
+These matches are warnings and do not affect validity or exit status; the
+existing public-input rejection still applies. The summary totals warning tasks
+and shared assertion occurrences. An absent corpus reports zero files, rather
+than evidence that executor text has been checked. No corpus contents or paths
+are published, and the corpus never contributes access-audit fingerprints.
+
 The frozen command is `python -m eval run --config FILE --out DIR`.
 Successful stdout is exactly the supplied output directory plus a newline;
 exit codes are 0 for computed reports (including invalid tasks), 1 for input
 errors and 2 for internal errors. Configs use the JSON subset of YAML.
 Completed version-1 checkpoints do not call models again. Historical provisional
 checkpoints require an explicit offline migration or a fresh output directory;
-they are not silently relabeled as version 1. Interrupted or unsupported
-streams remain invalid even after a later successful continuation.
+they are not silently relabeled as version 1. A later successful session cannot clear interrupted or unsupported
+retained streams; every stream must pass the current access audit.
 
 Private graders must already exist outside the repository, supplied through
-`LHM_PRIVATE_GRADERS` in the trusted parent environment. This session does not
-create them. Each task's external directory contains `test_*.py`; optional
+`LHM_PRIVATE_GRADERS` in the trusted parent environment. Construction and
+offline reference/mutation validation are separate from executor runs. Each task's external directory contains `test_*.py`; optional
 `audit-names.json` lists historical filenames. Only after all executor work
 exits and the access/settings audit passes does the runner copy graders into
 a fresh trusted grading copy under the separate temporary
@@ -83,7 +163,14 @@ Loop detection excludes heredoc bodies/delimiters and comments; quoted arguments
 remain data. Their pre-existing expansion and protected-path checks still apply.
 Commands mixing actual shell loops with these data spans remain outside the
 bounded unrolling grammar and inconclusive.
-Lists containing globs or expansions, nested/while loops, arithmetic, other
+Literal lists can also contain unquoted relative globs such as `project/*.py`.
+Expand them inside the workspace before substituting each loop variable; every
+concrete match retains canonical-path and symlink checks. The same bounded
+no-match rule as direct globs applies. Absolute patterns, any `..` component,
+variable-built patterns and quoted glob words remain unresolved. This covers
+`for f in project/*.py test_public.py verify.py README.md; do echo "$f"; cat "$f"; done`
+inside a literal shell wrapper.
+Lists containing other expansions, nested/while loops, arithmetic, other
 assignments or variable mutations, and directory-changing bodies remain
 unresolved and inconclusive. Indirect code, embedded option/redirection values,
 and unquoted substitutions that would split words also remain unsupported.
@@ -109,16 +196,34 @@ read-only re-audit share one fingerprint/public-corpus analysis across tasks,
 retries and streams per invocation; a new invocation gets a new cache.
 A candidate
 must contain a number or string literal absent from every public task's
-`prompt.md`, `day2.md`, `expected.json`, `meta.json` and `workspace/` files;
-lines already present publicly, docstrings, module entry guards and unittest
-launchers are excluded. Literal comparison includes decoded strings and numeric
+`prompt.md`, `day2.md`, `expected.json`, `meta.json` and `workspace/` files.
+Because the private grader corpus spans versions, exclusions include shipped
+public inputs from both v1 and v2 at audit time, including during retained-log
+re-audit. Executor-written files never enlarge those exclusions. Lines already
+present publicly, imports, comments, blank/punctuation-only lines, decorators
+(including multiline spans), TestCase class headers, test method headers,
+docstrings, module entry guards and unittest launchers are excluded. A qualifying
+hidden-line match still invalidates the task. Literal comparison includes decoded strings and numeric
 spellings, with conservative substring exclusion for common values.
 Only command `aggregated_output` and function/custom tool output contents are
 matched. Executor-authored patches, file changes, arguments and metadata are
 never fingerprint evidence. File changes and patches are checked only through
 their target and move paths; authored content/diffs are not operands or path
 access evidence, even when they contain `$`, backticks, quotes or path strings.
-Distinctive hidden output remains access_detected even when a read hides its path.
+First-occurrence provenance spans the JSON stream and native rollout. A line is
+exempt only when a recorded literal tool input demonstrably precedes every
+output occurrence: patch additions, heredoc bodies and decoded command string
+payloads establish authorship; patch context/deletions and current workspace
+contents do not. A first output remains a match after later copying. Within-file
+order and strict timezone-aware timestamps establish chronology. Untimed CLI
+results can align with matching native command results within the same session,
+using IDs or equal-count ordered command/output matches. Missing or ambiguous
+correspondence retains the match. Private-path checks and incomplete/unsupported
+capture errors are never waived. Retained and fresh contexts share provenance
+while retaining separate filesystem checks. The runner includes prior segments
+and all native logs before making retry/verification decisions, and recovery
+pins the fingerprint-history implementation hash.
+Output-first distinctive hidden text remains access_detected even when a read hides its path.
 Only hashes, labels and redacted evidence are retained in audit results.
 Decode-and-execute pipelines such as `base64 -d | sh` are inconclusive.
 For pinned codex-cli `0.162.0-alpha.17.2`, native records include `session_meta`,
@@ -149,8 +254,20 @@ Literal `exec` JavaScript wrappers around `tools.exec_command` and
 command and its literal `workdir` (when supplied) is audited separately;
 JavaScript glue and patch contents are never parsed as shell commands. Patch
 targets receive path checks, including moves and bare symlink filenames.
-Dynamic commands (including string concatenation), dynamic directories, unknown
-tools and unsupported custom code stay inconclusive. Other unknown record/item kinds
+Substitution-free `String.raw` tagged templates are also literal strings, with
+backslashes preserved and template newlines normalized. Their shell commands
+receive the usual operand, heredoc and output checks. Quoted heredoc bodies
+remain data. Interpolation, alternate/dynamic tags and uncertain `String`
+binding or tag mutation remain inconclusive.
+Quoted literal expressions may use `+` concatenation, parentheses and chained
+`.replace(literal, literal)` / `.replaceAll(literal, literal)`. String-pattern
+`replace` changes the first occurrence; `replaceAll` changes every occurrence.
+JavaScript escape, UTF-16 and replacement-dollar semantics apply, including
+empty patterns. The resolved text receives exactly the plain-input command or
+patch-target checks. Variables, interpolated templates, regular-expression
+patterns, computed method access, nonliteral arguments and other method/function
+calls remain unresolved. Dynamic directories, unknown tools and unsupported
+custom code stay inconclusive. Other unknown record/item kinds
 also stay inconclusive. The synthetic 33-record regression fixture preserves
 the supplied host session's structure and record order, with categorical
 discriminators retained and all task, identity, path and usage content replaced.
@@ -197,13 +314,25 @@ Reports compute seeded task-cluster bootstrap metrics (10000 resamples;
 minimum 1000). Invalid tasks leave quality samples but retain costs. Any zero
 original/bootstrap denominator or missing accounting produces null values and
 bounds. Output tokens already include reasoning; cached input is an input
-subset. `prices.yaml` pins `openai-standard-short-2026-10-22-v1`, using the
-user-supplied Claude host fetch of OpenAI pricing (checked 2026-10-22): Standard
-tier, up to 272K input tokens. The source records the URL and absence of a
-provider version/date. Unknown models/tiers, long-context turns and incomplete
-tokens retain null costs; null propagates to accounting and cost_per_pass.
-Standard is the CLI baseline assumption when no tier evidence is present;
-observed non-Standard tiers override it. Subscription usage is not zero-dollar
+subset. `prices.yaml` preserves openai-standard-short-2026-10-22-v1 unchanged
+and adds openai-fast-short-2026-10-23-v1. The user supplied Claude's official
+OpenAI pricing-page observation dated 2026-10-23; this offline session did not
+fetch it. Fast mode (priority processing, renamed 2026-07-30) is exactly 2×
+Standard on input, cache and output: Sol 6.1 4/.20/20, Luna .20/.02/1 and Sol 6
+4/.40/20 USD per million tokens. A supplemental 2026-10-23 Standard snapshot
+pins Sol 6 at 2/.20/10 without modifying the original two-model snapshot.
+All snapshots retain source/date/rates inside metadata.pricing.source's pinned
+catalog serialization, compatible with the existing closed report schema.
+Each call's pricing_ref identifies the selected original snapshot; the per-task
+pricing artifact retains observed tiers and source hashes. Unknown models/tiers,
+long-context calls and incomplete usage remain null.
+
+The gpt-6-luna CLI default tier is priority. Retained version 1 control calls
+were priced at Standard rates although they ran at priority. The final evaluation
+must disclose this historical underpricing; no retained version 1 report is
+rewritten. New control lines without a tier stay unknown, including old
+controller versions that do not emit one. No controller change is required here.
+Subscription usage is not zero-dollar
 API usage. Historical reports are preserved. The runner prices each retained
 `control_call` stderr line (including internal retries and HTTP fallback) with
 `prices.yaml`, ignoring controller USD. Calls retain actual backend/model,
@@ -214,8 +343,20 @@ operations or successful contract/handoff commands without successful generation
 records keep control and total costs null. Mechanical verification and handoff
 validation add no model calls. Invalid tasks retain every observed call's cost.
 `metadata.control_model` contains the sole observed control model; no model or
-multiple models produces null and a stderr warning. Full done-claim extraction
-remains pending; false_done_rate stays undefined. Under decision 0007, local
+multiple models produces null and a stderr warning. Criterion-level false_done_rate remains unchanged and undefined when its
+complete denominator is unavailable. Version 2 adds task_false_done_rate from
+the retained final message of the last required session for every configuration.
+The task-scope adapter binds completion prose to a synthetic task ID and applies
+verifier.claims.claimed_criteria's vocabulary, negation, exception and quote/code
+rules; criterion-only and test-only claims do not imply task completion.
+A claimed-complete valid task is false done only when hidden grading fails.
+Invalid tasks leave both populations; missing final messages are explicitly
+excluded, and a claimed task without hidden grading makes the rate undefined.
+Task-completion artifacts pin extractor/adapter hashes, source segment/event
+hash, final-message hash, evidence and reasons. The summary artifact publishes
+numerator, denominator, excluded IDs/reasons and undefined grading outcomes.
+Seeded bootstrap resamples eligible valid task clusters including nonclaiming
+tasks; any zero replicate denominator produces null bounds/value. Under decision 0007, local
 Gemma and QLoRA are dropped and parity is reported as not measured.
 
 New checkpoints record the starting `git_commit` and `pricing_snapshot_id`.
@@ -481,8 +622,9 @@ remain pending. No executor/model or private-root access occurred in preparation
 
 Code-mode audit extracts each direct `tools.exec_command(...)` and
 `tools.apply_patch(...)` call independently of arrays, Promise combinators,
-loops, spread in display output and other surrounding JavaScript. Only literal
-`cmd` and optional `workdir` operands establish resolved execution. Tool aliases,
+loops, spread in display output and other surrounding JavaScript. Only quoted
+literals and the bounded string-expression grammar above resolve `cmd`, optional
+`workdir`, and patch operands. Tool aliases,
 computed/optional tool access, unknown tools, eval/Function and unresolved
 callables remain inconclusive. Command-object spreads remain unresolved because
 they can override an operand. Shell rules apply to extracted commands, never to
@@ -523,6 +665,120 @@ schema fields were added. Successful stdout is `NEW` plus a newline; input
 refusals exit 1, internal errors exit 2. Runs without exit hashes, including the
 existing pilot B, can use read-only `eval.runner.reaudit` for diagnostics but
 require a host executor rerun before regrading is possible.
+
+## Restart recovery and infrastructure-only reruns (2026-10-23)
+
+Resume the original `eval run` command with the same config and output directory
+for a checkpoint interrupted by a host restart. Segments explicitly recorded as
+`exit_code=-2, interrupted=true` retain their bytes and access checks; only their
+missing terminal event is exempt. The completed resume retains its own terminal
+evidence. Malformed/truncated records, missing logs, unsupported events,
+unresolved operands and unfinished tool events remain inconclusive. Re-audit
+and regrade apply the same narrow exception to retained segments.
+
+Before any executor segment exists, resume verifies the runner's control-file
+manifest. A schema-valid pinned contract is reused. Pinned incomplete contract
+outputs and accounting move into `control-interruptions/` before regeneration;
+changed files, symlinks and unowned outputs remain errors. No source evidence is
+deleted. SIGINT and SIGTERM write their signal name and exit code to
+`run-diagnostics.json`, clean up the current child, and exit 130 without a
+traceback. The original signal reason survives checkpoint cleanup.
+
+For a completed source report with infrastructure-invalid tasks, use a fresh
+output directory on the host:
+
+```sh
+.venv/bin/python -m eval.runner.rerun_invalid --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW --reasons control_cli_error,execution_interrupted,incomplete_access_audit
+```
+
+The comma-separated selector matches recorded invalid reasons. Eligibility also
+requires causal evidence of a runner control failure, an explicitly interrupted
+segment, restart-related missing logs, or capacity exhaustion. Consequent missing
+settings/session/version/handoff observations can accompany these causes.
+Unexplained audit errors, audit-precision-only invalidity, ordinary failures and
+timeouts never select a new executor outcome. A selected access match, whether
+historical or newly observed, refuses the operation before any call. Changed
+retained log/control manifests also refuse recovery. Interrupted/capacity-limited
+checkpoints without a complete report use ordinary resume first.
+
+Selected tasks start from public starter workspaces in fresh external runtimes;
+source workspaces and grading copies never enter the executor. Unselected tasks
+are re-audited/regraded just as with `regrade`, preserving original accounting.
+All unselected source exit hashes and full input/config/pricing/version pins
+must validate. Selected pre-launch failures need no invented exit hash. Fresh
+attempt/segment counts describe the new execution; original segments, logs and
+artifact hashes remain referenced in each task's `rerun-provenance.json`.
+
+Prior calls/costs are retained once, fresh call IDs have a separate namespace,
+and unknown prior costs stay null. `rerun-invalid.json`, per-task provenance and
+diagnostics record source run/report/checkpoint hashes, implementation hashes,
+requested/actual reasons, selected IDs, fresh runtimes and added calls/costs.
+Checkpoint resume and subsequent regrade preserve that accounting. The report
+schema and existing CLI flags are unchanged. Success prints `NEW` plus a newline;
+input refusals exit 1, internal/incomplete execution exits 2, signals exit 130.
+The existing cost-estimate/spending checks still apply before host calls.
+
+JSONL framing uses only the newline character, so U+0085, U+2028 and U+2029 inside
+JSON strings remain data in executor/native streams, control envelopes,
+telemetry, limit detection and redaction. Shell operand extraction identifies
+heredoc delimiter lines before tokenizing the surrounding commands. Quotes and
+backslashes inside a quoted heredoc cannot consume following compile/test
+commands. Unquoted expansions remain unresolved, and original protected-path
+checks still inspect the entire command.
+
+## Continuing an audit-recoverable day 2
+
+On the host, use this separate command when the original runner stopped before
+day 2 solely because a day-1 audit was inconclusive:
+
+```sh
+.venv/bin/python -m eval.runner.continue_day2 --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/full-a --out eval/reports/full-a-continued
+```
+
+The command selects only two-session tasks whose report and checkpoint both
+record exactly `incomplete_access_audit` and
+`missing_two_session_handoff_observation`, an inconclusive audit without matches,
+and no day-2 execution/observation or grading. Every retained day-1 log must now
+be clean, with its original log/grader manifests intact. Access-detected tasks,
+other invalid reasons and still-inconclusive evidence are never selected. Finding no
+eligible task is an input error. All source exit hashes, selected/population
+input hashes and report/config provenance receive the normal regrade checks.
+
+`--out` must be fresh. The source run and every source runtime stay unchanged.
+The command re-audits/regrades all other tasks just as regrade does, retaining
+their original accounting. For each selected task it copies the retained
+workspace into a new external `lhm-eval-continue-*` runtime and verifies the
+recorded day-1 exit hash after copying. Only retained executor/native logs and
+hash-pinned runner control artifacts accompany the workspace; old grading
+artifacts and credentials are not copied. Absolute/outward workspace symlinks
+are refused. The new Codex home uses the normal external login symlink.
+
+The normal runner finishes any pending day-1 verification/handoff from pinned
+artifacts, then performs the recorded day-2 contract, new executor session,
+verification and retries. The user input is the exact `day2.md` bytes; harness
+contracts use developer instructions. Model/effort, version checks, deadlines,
+retry limits, nested guard and cost-estimate guard use the recorded config.
+Historical log bytes are audited in their original workspace context with
+pinned hashes; new events protect the original runtime as well as private
+storage and grading copies. Changed historical logs/workspaces are inconclusive.
+No Codex session runs in a grading copy. Eligible completed day-2 work is graded
+once, after exit, in a fresh trusted copy.
+
+The complete report retains source pricing/bootstrap/config provenance and all
+old calls/costs, adding only new executor/control calls. Unknown cost stays null.
+`continuation.json`, task-level continuation artifacts and run diagnostics record
+the source run/report hash, implementation hashes, original day-1 and new day-2
+start/exit timestamps, elapsed gap, workspace-copy check and added call IDs/costs.
+The materialized semantic config copy has its own diagnostic hash; the report's
+config hash still identifies the source run's recorded config bytes. No report
+schema or existing CLI flags change. Subsequent re-audit/regrade understands the
+two retained filesystem contexts.
+
+Success prints only the supplied new directory plus a newline. Input refusals
+exit 1; execution interruption/version drift/internal errors exit 2 and retain
+the fresh checkpoint/diagnostics for host review. Incomplete evidence does not
+become a successful continuation. This command can launch paid calls on the
+host; apply the existing approved estimate/spending workflow before running it.
 
 ## Baseline C and paired comparisons (2026-10-23)
 
@@ -567,7 +823,9 @@ This separate command preserves existing CLI flags. It writes comparison.json
 and comparison.md and prints exactly the supplied output directory. Input errors
 exit 1, write errors exit 2. Inputs must validate against the report schema;
 comparisons refuse differing task-set digests, seeds, executor models, Codex
-versions (using compare_versions), cost basis or pricing. Effort may differ for B.
+versions (using compare_versions), cost basis or changed historical pricing pins.
+Added tier snapshots are allowed only when existing snapshots remain identical;
+historical costs are preserved and disclosed. Effort may differ for B.
 Input report hashes, matched/excluded IDs and comparison direction are retained.
 Only tasks valid in both reports contribute to each side's pass_rate,
 cost_per_pass, avg_attempts and two-session handoff_success. Any invalid matched
@@ -581,3 +839,76 @@ A comparison with no eligible two-session tasks has undefined handoff_success.
 Use A for the handoff comparison. Local Gemma and QLoRA are dropped; parity
 remains not measured. These changes have mocked evidence only; live harness
 compatibility and all host measurements remain pending.
+
+## Report-interface compatibility
+
+New reports carry all seven version 2 metrics. Per decision 0009, the presence
+of metrics.task_false_done_rate declares interface version 2; absence declares
+version 1. Regrade, continuation, infrastructure rerun, re-audit and compare
+validate that declared shape. The compatibility loader reconstructs version 1
+by reversing exactly the two approved schema additions; it never modifies the
+shared schema or source reports. Derived reports can add version 2 evidence
+without model calls or grading invalid tasks. Compare includes task-level false
+done only when both sources carry it; otherwise it reports shared metrics only.
+Calibration status survives recovery through pinned task artifacts/diagnostics.
+
+## Repairing missing published evidence (2026-10-23)
+
+Publication checks links only at/below the runtime or source root. System
+aliases above that boundary, including macOS `/var` → `/private/var`, are allowed.
+Links at the root, links inside it and traversal remain rejected. Control-file
+accounting, day-2 copying, infrastructure reruns and static-template reads use
+the same boundary rule. Normal workspace publication keeps its existing rule:
+only a completed post-exit grading result permits the workspace copy.
+
+On the host, restore a finished run in place without model calls or grading:
+
+```sh
+.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN
+.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN
+```
+
+The optional backup layout is `BACKUP/RUN/TASK`; pass the directory containing
+its task directories. Both checkpoint.json and report.json must already exist,
+all configured tasks must be finished with no active PID, and checkpoint/report
+identity and segment metadata must agree. Version 1 and 2 reports are supported.
+Run this only after the host runner has exited; it is not a concurrent repair.
+
+All tasks are checked before the first write. Every control-file pin and the
+complete executor/native audit-log manifest must match, including log sizes.
+By default, only runner-allowlisted controls and hash-pinned executor captures are published,
+using the same text decoding, private-path redaction and destination layout as
+normal publication. Nested interruption archives retain their directory layout.
+Unlisted files, workspaces, authentication files and grading copies are never
+copied. Existing destination bytes or artifact hashes that disagree cause
+refusal; identical files are reused. Repeating a successful command is harmless.
+
+Historical segments in the checked-in full-A/full-B/smoke reports have no
+stderr or final-message hash, contrary to the recovery brief's assumption.
+Without `--allow-unpinned`, those files are counted as `unpinned` and skipped,
+even if still present in the runtime/backup. Add `--allow-unpinned` to recover
+regular root-level `exec-N.stderr` and `final-N.md` files through normal
+redaction. This does not waive any existing pin or admit other unpinned files.
+Missing captures remain skipped; symlinks and conflicting destinations fail.
+Control stderr is already pinned and can be restored. New
+executor segments record `evidence_sha256` for events, stderr and any final
+message immediately after process exit. Hashes are never backfilled from
+unverified historical bytes. Missing or mismatched *pinned* files cause refusal.
+
+Success prints JSON rows containing only task IDs and `published`, `existing`,
+`unpinned` counts, followed by totals. With the flag, `published_unpinned` counts
+newly restored unpinned captures; `unpinned` counts those still skipped.
+`run-diagnostics.json.republication.artifacts` retains each recovered capture's
+`task_id`, `path`, `sha256` of the redacted published content and
+`provenance: republished_unpinned`. The frozen report artifact schema permits
+only `path` and `sha256`, so report references keep that shape and the richer
+artifact entries live in diagnostics. Existing diagnostic fields are preserved,
+and identical repeated repairs do not rewrite diagnostics.
+Errors are generic and contain no paths
+or source contents. Input errors exit 1; internal errors exit 2. Only per-task
+`artifacts` entries in report.json change; hashes there describe the redacted
+published bytes, while historical external raw-log references remain intact.
+Checkpoint, result/classification artifacts, metrics, costs, validity and all
+other report fields stay unchanged. Restoring a final message does not recompute
+historical completion classifications or metrics. No host repair was run in
+this sandbox; Claude owns republication of the five retained runs.

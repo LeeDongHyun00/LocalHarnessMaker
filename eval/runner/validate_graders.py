@@ -6,15 +6,17 @@ must never be named test_*.py. Only counts and content hashes are published.
 """
 
 import argparse
+import ast
 from concurrent.futures import ThreadPoolExecutor
 import json
+import re
 from pathlib import Path
 import shutil
 import tempfile
 from typing import Any
 
 from eval.runner import core
-from eval.runner.audit import PrivateGraders, digest
+from eval.runner.audit import PrivateGraders, digest, normalize_line, public_inputs
 from eval.runner.process import run_process
 from eval.runner.mutations import mutations
 
@@ -37,12 +39,30 @@ def apply_reference(reference: Path, workspace: Path) -> None:
         shutil.copy2(origin, destination)
 
 
+def public_task(task_id: str) -> Path:
+    """Locate globally unique versioned IDs without adding CLI flags."""
+    root = "eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks"
+    public = core.task_directory({"task_root": root}) / task_id
+    if Path(task_id).name != task_id or not public.is_dir() or public.is_symlink():
+        raise ValueError("Unknown task")
+    return public
+
+
+def safe_task_id(task_id: str) -> str:
+    """Keep failure output limited to known public task identifiers."""
+    try:
+        public_task(task_id)
+    except (OSError, TypeError, ValueError):
+        return 'unknown'
+    return task_id
+
+
 def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
     """Exercise the exact trusted runner grader on two independent public copies."""
-    if task_id not in {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir() if p.is_dir()}:
-        raise ValueError("Unknown task")
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
-    public = core.REPOSITORY / 'eval/tasks' / task_id
+    public = public_task(task_id)
+    overlap = public_overlap(private, public)
+    corpus = corpus_overlap(private)
     expected = json.loads((public / 'expected.json').read_text())
     with tempfile.TemporaryDirectory(prefix='lhm-grader-validation-', dir=private.root) as temporary:
         runtime = Path(temporary)
@@ -55,15 +75,81 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
                 apply_reference(private.root / '.references' / task_id, workspace)
             result = core.grade(workspace, private, runtime, runtime / f'{label}.log',
                                 expected, 30, run_process, retention_root=runtime / "grading-copies")
+            if label == 'reference' and task_id.startswith('v2-'):
+                coverage = json.loads((private.root / task_id / 'coverage.json').read_text())
+                requirements = set(re.findall(r"(?m)^([RD][0-9]+)\.", (public / 'prompt.md').read_text() +
+                    ((public / 'day2.md').read_text() if (public / 'day2.md').exists() else '')))
+                observed = (runtime / 'reference.log').read_text()
+                covered = {key for key, tests in coverage.items() if isinstance(tests, list) and tests and
+                           all(isinstance(test, str) and test + ')' in observed for test in tests)}
+                result['coverage'] = {'requirement_count': len(requirements),
+                                      'covered_requirement_count': len(requirements & covered),
+                                      'uncovered_requirement_count': len(requirements - covered)}
             results.append(result)
     baseline, reference = results
     valid = (baseline['result'] == 'fail' and baseline['failed_tests'] >= 1
              and baseline.get('total_tests') == expected['expected_test_count']
-             and reference['result'] == 'pass' and reference['failed_tests'] == 0)
+             and reference['result'] == 'pass' and reference['failed_tests'] == 0
+             and reference.get('coverage', {}).get('uncovered_requirement_count', 0) == 0
+             and (not task_id.startswith('v2-') or overlap['shared_assertion_line_count'] == 0))
     return {'task_id': task_id, 'public_passed': baseline['passed_tests'],
             'public_failed': baseline['failed_tests'], 'reference_passed': reference['passed_tests'],
             'reference_failed': reference['failed_tests'], 'valid_count': int(valid),
-            'grader_sha256': [digest(p.read_bytes()) for p in private.files]}
+            'grader_sha256': [digest(p.read_bytes()) for p in private.files],
+            **overlap, **corpus, **reference.get('coverage', {})}
+
+
+def assertion_lines(text: str) -> set[int]:
+    """Locate complete Python assert statements and assert* call spans."""
+    lines: set[int] = set()
+    for node in ast.walk(ast.parse(text)):
+        if (isinstance(node, ast.Assert) or isinstance(node, ast.Call) and
+                (isinstance(node.func, ast.Attribute) and node.func.attr.startswith('assert')
+                 or isinstance(node.func, ast.Name) and node.func.id.startswith('assert'))):
+            lines.update(range(node.lineno, (node.end_lineno or node.lineno) + 1))
+    return lines
+
+
+def corpus_overlap(private: PrivateGraders) -> dict[str, int]:
+    """Warn about predictable assertion text in the optional private .corpus/.
+
+    Read regular Python files recursively, regardless of task/run layout. Never
+    follow symlinks outside the corpus, publish source, or alter task validity.
+    """
+    corpus = private.root / '.corpus'
+    if corpus.is_symlink():
+        raise ValueError('Executor corpus must be a regular directory')
+    files = sorted(path for path in corpus.rglob('*.py') if path.is_file())
+    if any(path.is_symlink() or not path.resolve().is_relative_to(corpus.resolve()) for path in files):
+        raise ValueError('Executor corpus requires regular private files')
+    lines = {normalize_line(line) for path in files for line in path.read_text(errors='replace').splitlines()}
+    shared = 0
+    for source in private.files:
+        text = source.read_text()
+        assertions = assertion_lines(text)
+        shared += sum(bool(normalize_line(line)) and normalize_line(line) in lines
+                      for number, line in enumerate(text.splitlines(), 1) if number in assertions)
+    return {'corpus_file_count': len(files), 'shared_corpus_assertion_line_count': shared,
+            'corpus_warning_count': int(shared > 0)}
+
+
+def public_overlap(private: PrivateGraders, public: Path) -> dict[str, int]:
+    """Count nonempty shared grader lines and assertion lines without publishing them.
+
+    Counts include occurrences across grader files; assertion spans include
+    multiline assert statements and unittest assert* calls, including helpers.
+    """
+    public_lines = {normalize_line(line) for text in public_inputs(public) for line in text.splitlines()}
+    shared = shared_assertions = 0
+    for source in private.files:
+        text = source.read_text()
+        assertions = assertion_lines(text)
+        for number, line in enumerate(text.splitlines(), 1):
+            line = normalize_line(line)
+            if line and line in public_lines:
+                shared += 1
+                shared_assertions += int(number in assertions)
+    return {'shared_public_line_count': shared, 'shared_assertion_line_count': shared_assertions}
 
 
 def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
@@ -74,11 +160,16 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
     and public specification hashes. A survivor is never automatically equivalent.
     """
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
-    public = core.REPOSITORY / 'eval/tasks' / task_id
+    public = public_task(task_id)
     reference = private.root / '.references' / task_id
+    if task_id.startswith('v2-') and public_overlap(private, public)['shared_assertion_line_count']:
+        raise ValueError('V2 grader assertions must be independent of public lines')
     files = json.loads((reference / 'application.json').read_text())['files']
     expected = json.loads((public / 'expected.json').read_text())
-    specification = digest((public / 'prompt.md').read_bytes() + (public / 'expected.json').read_bytes())
+    specification_bytes = (public / 'prompt.md').read_bytes() + (public / 'expected.json').read_bytes()
+    if task_id.startswith('v2-') and (public / 'day2.md').is_file():
+        specification_bytes += (public / 'day2.md').read_bytes()
+    specification = digest(specification_bytes)
     records = private.root / '.mutation-records'
     records.mkdir(mode=0o700, exist_ok=True)
     equivalence_path = records / (task_id + '.equivalences.json')
@@ -126,6 +217,22 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
     return counts
 
 
+def validation_digest(private_by_task: dict[str, PrivateGraders], config: dict[str, Any]) -> str:
+    """Hash unfrozen v2 candidates offline; execution still requires tracked inputs."""
+    if config.get('task_root') != 'eval/tasks-v2':
+        return core.configured_digest(private_by_task, config)
+    hashes = {}
+    for task, private in private_by_task.items():
+        public = public_task(task)
+        paths = sorted(p for p in public.rglob('*')
+                       if not {'__pycache__', '.pytest_cache'} & set(p.parts) and p.is_file())
+        if not paths or any(p.is_symlink() for p in public.rglob('*')):
+            raise ValueError('Candidate requires regular files')
+        hashes[task] = {'public': [[str(p.relative_to(public)), digest(p.read_bytes())] for p in paths],
+                        'graders': sorted(digest(p.read_bytes()) for p in private.files)}
+    return digest(json.dumps({'task_root': config['task_root'], 'tasks': hashes}, sort_keys=True).encode())
+
+
 def main() -> int:
     """Print task identifiers, counts and hashes only, even on setup failures."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -142,7 +249,7 @@ def main() -> int:
             try:
                 return mutate_task(args.private_root, task, args.mutants)
             except Exception:
-                return {'task_id': task if task in {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir()} else 'unknown',
+                return {'task_id': safe_task_id(task),
                         'killed': 0, 'survived': 0, 'recorded_equivalent': 0, 'error_count': 1}
         accepted = True
         with ThreadPoolExecutor(max_workers=4) as pool:
@@ -151,22 +258,29 @@ def main() -> int:
                 accepted &= not row.get('error_count') and denominator > 0 and row['killed'] / denominator >= 0.90
                 print(json.dumps(row, sort_keys=True), flush=True)
         return 0 if accepted else 1
-    valid = 0
+    valid = corpus_warnings = corpus_shared = 0
     for task in tasks:
         try:
             row = validate_task(args.private_root, task)
         except Exception:
-            row = {'task_id': task if task in {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir()} else 'unknown',
+            row = {'task_id': safe_task_id(task),
                    'valid_count': 0}
         print(json.dumps(row, sort_keys=True), flush=True)
         valid += row['valid_count']
+        corpus_warnings += row.get('corpus_warning_count', 0)
+        corpus_shared += row.get('shared_corpus_assertion_line_count', 0)
     summary: dict[str, Any] = {'task_count': len(tasks), 'valid_count': valid,
-                               'invalid_count': len(tasks) - valid}
+                               'invalid_count': len(tasks) - valid,
+                               'corpus_warning_count': corpus_warnings,
+                               'shared_corpus_assertion_line_count': corpus_shared}
     if valid == len(tasks):
         try:
-            summary['task_set_sha256'] = core.taskset_digest({
+            roots = {public_task(task).parent.relative_to(core.REPOSITORY).as_posix() for task in tasks}
+            if len(roots) != 1:
+                raise ValueError("Validation hash requires one task set")
+            summary['task_set_sha256'] = validation_digest({
                 task: PrivateGraders.load(args.private_root, task, core.REPOSITORY) for task in tasks
-            })
+            }, {"task_root": roots.pop()})
         except Exception:
             summary['hash_error_count'] = 1
     print(json.dumps(summary, sort_keys=True))

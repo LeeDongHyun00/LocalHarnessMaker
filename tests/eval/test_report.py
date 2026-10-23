@@ -54,13 +54,13 @@ def test_cache_and_reasoning_are_not_double_counted(tmp_path: Path) -> None:
         'input_tokens': 1000, 'cached_input_tokens': 120, 'output_tokens': 100, 'reasoning_output_tokens': 60}}) + '\n')
     prices = {'snapshot_id': 'synthetic-v1', 'rates': [{'model': 'synthetic',
               'input_per_million_usd': 1, 'cached_input_per_million_usd': .5, 'output_per_million_usd': 2}]}
-    assert usage(events, 1, 'synthetic', prices)['usd'] == pytest.approx(.00114)
+    assert usage(events, 1, 'synthetic', prices, tier='standard')['usd'] == pytest.approx(.00114)
     assert usage(events, 1, 'unpriced', prices)['usd'] is None
     events.write_text('{"type":"turn.failed"}\n')
-    assert usage(events, 1, 'synthetic', prices)['input_tokens'] is None
+    assert usage(events, 1, 'synthetic', prices, tier='standard')['input_tokens'] is None
     events.write_text('{"type":"turn.completed","usage":{"input_tokens":1,"cached_input_tokens":2,"output_tokens":0}}\n')
     with pytest.raises(ValueError, match='Cached'):
-        usage(events, 1, 'synthetic', prices)
+        usage(events, 1, 'synthetic', prices, tier='standard')
 
 
 def test_retired_schema_is_only_an_offline_reference_to_shared_schema() -> None:

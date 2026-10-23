@@ -17,12 +17,12 @@ from typing import Any, Callable
 import uuid
 
 from eval.runner import harness
-from eval.runner.publication import checkout_text
+from eval.runner.publication import checkout_text, control_target, review_bytes, safe_source
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, interrupted_logs, digest, executor_environment
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
-from eval.runner.telemetry import collect, collect_runs, native_token_delta, native_token_totals, records, session_id
+from eval.runner.telemetry import collect, collect_runs, applied_tier_records, capture_tier, native_token_delta, native_token_totals, records, session_id
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -82,8 +82,10 @@ def load_config(path: Path) -> dict[str, Any]:
     config = json.loads(path.read_text())
     required = {"name", "model", "reasoning_effort", "harness", "control_backend", "reinstruction_limit",
                 "retry_limit", "seed", "codex_version", "tasks", "timeout_seconds", "grading_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population"} != required:
+    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population", "task_root", "service_tier", "calibration"} != required:
         raise ValueError("Config must contain exactly the documented baseline fields")
+    if type(config.get("calibration", False)) is not bool:
+        raise ValueError("calibration must be boolean")
     if type(config["harness"]) is not bool:
         raise ValueError("harness must be boolean")
     if config["harness"]:
@@ -116,6 +118,10 @@ def load_config(path: Path) -> dict[str, Any]:
         if (config["harness"] or config["control_backend"] != "none" or
                 not isinstance(config["static_template_dir"], str) or not config["static_template_dir"]):
             raise ValueError("Static templates require a standalone baseline and a directory")
+    task_directory(config)
+    if "service_tier" in config and (not isinstance(config["service_tier"], str) or
+            not re.fullmatch(r"[a-z][a-z0-9_-]*", config["service_tier"])):
+        raise ValueError("service_tier must be a nonempty tier identifier")
     require_call_estimate(config)
     for key in ("name", "model", "codex_version"):
         if not isinstance(config[key], str) or not config[key]:
@@ -123,9 +129,25 @@ def load_config(path: Path) -> dict[str, Any]:
     return config
 
 
+def task_directory(config: dict[str, Any]) -> Path:
+    """Resolve a canonical public task root inside eval, without aliases or traversal."""
+    root = config.get("task_root", "eval/tasks")
+    if (not isinstance(root, str) or not re.fullmatch(r"eval/[a-z0-9][a-z0-9-]*", root)
+            or (REPOSITORY / root).is_symlink()
+            or not (REPOSITORY / root).resolve().is_relative_to((REPOSITORY / "eval").resolve())):
+        raise ValueError("task_root must be a canonical public directory under eval")
+    return REPOSITORY / root
+
+
+def configured_digest(private_by_task: dict[str, PrivateGraders], config: dict[str, Any]) -> str:
+    """Keep the historical v1 digest byte-for-byte compatible."""
+    root = config.get("task_root", "eval/tasks")
+    return taskset_digest(private_by_task) if root == "eval/tasks" else taskset_digest(private_by_task, root)
+
+
 def paid_call_bound(config: dict[str, Any], judges: dict[str, int] | None = None) -> int:
     """Count both days, transport retries, three-call control budgets and handoffs."""
-    two = sum((REPOSITORY / "eval/tasks" / task / "day2.md").is_file() for task in config["tasks"])
+    two = sum((task_directory(config) / task / "day2.md").is_file() for task in config["tasks"])
     sessions = len(config["tasks"]) + two
     turns = config["reinstruction_limit"] + 1
     executor = sessions * (config["retry_limit"] + 1) * turns
@@ -164,10 +186,11 @@ def installed_version() -> str:
                           check=True, timeout=10).stdout.strip()
 
 
-def public_files(task: str) -> list[Path]:
+def public_files(task: str, task_root: str = "eval/tasks") -> list[Path]:
     """Hash only version-controlled inputs; generated/untracked files never enter."""
+    task_directory({"task_root": task_root})
     result = subprocess.run(
-        ["git", "ls-files", "-z", "--", f"eval/tasks/{task}/"],
+        ["git", "ls-files", "-z", "--", f"{task_root}/{task}/"],
         cwd=REPOSITORY, capture_output=True, check=True, timeout=10,
     )
     files = [REPOSITORY / os.fsdecode(name) for name in result.stdout.split(b"\0") if name]
@@ -176,22 +199,23 @@ def public_files(task: str) -> list[Path]:
     return sorted(files)
 
 
-def taskset_digest(private_by_task: dict[str, PrivateGraders]) -> str:
+def taskset_digest(private_by_task: dict[str, PrivateGraders], task_root: str = "eval/tasks") -> str:
     """Fingerprint tracked public inputs and private test contents without locations."""
     hashes = {
         task: {"public": [
-            [str(p.relative_to(REPOSITORY / "eval/tasks" / task)), digest(p.read_bytes())]
-            for p in public_files(task)
+            [str(p.relative_to(REPOSITORY / task_root / task)), digest(p.read_bytes())]
+            for p in (public_files(task) if task_root == "eval/tasks" else public_files(task, task_root))
         ], "graders": sorted(digest(p.read_bytes()) for p in private.files)}
         for task, private in private_by_task.items()
     }
-    return digest(json.dumps(hashes, sort_keys=True).encode())
+    payload = hashes if task_root == "eval/tasks" else {"task_root": task_root, "tasks": hashes}
+    return digest(json.dumps(payload, sort_keys=True).encode())
 
 
-def publish(source: Path, destination: Path, private: PrivateGraders) -> None:
+def publish(source: Path, destination: Path, private: PrivateGraders, *, source_root: Path | None = None) -> None:
     """Retain original logs externally and publish a redacted review copy."""
-    if source.is_file() and not any(p.is_symlink() for p in (source, *source.parents)):
-        destination.write_text(checkout_text(private.redact(source.read_text(errors="replace"))))
+    if source.is_file() and safe_source(source, source_root if source_root is not None else source.parent):
+        destination.write_bytes(review_bytes(source.read_bytes(), private))
 
 
 def grading_summary(text: str) -> str:
@@ -271,6 +295,7 @@ def run(
     config_path: Path, out: Path, private_root: Path, *,
     execute: Callable[..., ProcessResult] = run_process,
     version: str | Callable[[], str] | None = None,
+    _recorded_config_sha256: str | None = None,
 ) -> Path:
     """Run or recover baseline tasks without relying on plugin hooks."""
     config = load_config(config_path)
@@ -278,33 +303,35 @@ def run(
     templates = load_templates(config, REPOSITORY)
     template_hashes = {task: digest(content) for task, content in templates.items()}
     metadata = {
-        task: json.loads((REPOSITORY / "eval/tasks" / task / "meta.json").read_text())
+        task: json.loads((task_directory(config) / task / "meta.json").read_text())
         for task in config["tasks"]
     }
-    if any(meta.get("frozen") is not True for meta in metadata.values()):
+    if not config.get("calibration", False) and any(meta.get("frozen") is not True for meta in metadata.values()):
         raise ValueError("Evaluation requires every selected task to be frozen")
+    if config.get("calibration", False):
+        print("Calibration evidence only; this report is not a headline result.", file=sys.stderr)
     out = out.resolve()
-    config_hash = digest(config_path.read_bytes())
+    config_hash = _recorded_config_sha256 or digest(config_path.read_bytes())
     version_reader = version if callable(version) else (lambda: version) if version else installed_version
     actual_version = version_reader()
     if actual_version != config["codex_version"]:
         if (out / "checkpoint.json").exists():
             raise IncompleteRun("Codex version changed; run is resumable only with its recorded version")
         raise ValueError("Installed Codex version differs from pinned configuration")
-    private_by_task = {task: PrivateGraders.load(private_root, task, REPOSITORY) for task in config["tasks"]}
+    private_by_task = {task: PrivateGraders.load(private_root, task, REPOSITORY, task_root=config.get("task_root")) for task in config["tasks"]}
     fingerprint_cache = FingerprintCache()
-    selected_hash = taskset_digest(private_by_task)
+    selected_hash = configured_digest(private_by_task, config)
     population = dict(private_by_task)
     for task in config.get("task_population", []):
         if task not in population:
-            meta = json.loads((REPOSITORY / "eval/tasks" / task / "meta.json").read_text())
-            if meta.get("frozen") is not True:
+            meta = json.loads((task_directory(config) / task / "meta.json").read_text())
+            if not config.get("calibration", False) and meta.get("frozen") is not True:
                 raise ValueError("Population includes unfrozen task")
-            population[task] = PrivateGraders.load(private_root, task, REPOSITORY)
-    task_set_hash = taskset_digest(population) if "task_population" in config else selected_hash
+            population[task] = PrivateGraders.load(private_root, task, REPOSITORY, task_root=config.get("task_root"))
+    task_set_hash = configured_digest(population, config) if "task_population" in config else selected_hash
     # A private root must never appear in config or public task inputs.
     for task, private in private_by_task.items():
-        public = REPOSITORY / "eval/tasks" / task
+        public = task_directory(config) / task
         for path in [config_path, *public.rglob("*")]:
             if path.is_file() and any(marker in path.read_text(errors="replace") for marker in private.markers()):
                 raise ValueError("Public task/config includes a private grader marker")
@@ -314,29 +341,34 @@ def run(
     checkpoint = out / "checkpoint.json"
     if checkpoint.exists():
         state = json.loads(checkpoint.read_text())
-        if state.get("report_schema") != "evaluation-report-v1":
+        if state.get("report_schema") not in {"evaluation-report-v1", "evaluation-report-v2"}:
             raise ValueError("Historical provisional checkpoint requires offline migration; use a fresh output directory")
+        if state.get("pricing_catalog_sha256") is not None and state["pricing_catalog_sha256"] != digest((REPOSITORY / "eval/prices.yaml").read_bytes()):
+            raise ValueError("Resume pricing catalog differs from checkpoint")
         if state.get("static_templates", {}) != template_hashes:
             raise ValueError("Static templates changed since run start")
-        if state["config_sha256"] != config_hash:
+        if state["config_sha256"] != config_hash or state.get("config") != config:
             raise ValueError("Resume configuration differs from checkpoint")
         if state.get("selected_task_set_sha256", selected_hash) != selected_hash:
             raise ValueError("Resume selected inputs differ from checkpoint")
         if state.get("task_set_sha256") != task_set_hash:
             raise ValueError("Resume task set differs from checkpoint")
     else:
-        state = {"report_schema": "evaluation-report-v1", "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
+        if _recorded_config_sha256 is not None:
+            raise ValueError("Recorded configuration requires an existing checkpoint")
+        state = {"report_schema": "evaluation-report-v2", "calibration": config.get("calibration", False), "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
                  "task_set_sha256": task_set_hash, "config": config, "tasks": {},
                  "static_templates": template_hashes, "selected_task_set_sha256": selected_hash,
                  "git_commit": current_commit(REPOSITORY),
-                 "pricing_snapshot_id": json.loads((REPOSITORY / "eval/prices.yaml").read_text())["snapshot_id"]}
+                 "pricing_snapshot_id": json.loads((REPOSITORY / "eval/prices.yaml").read_text())["snapshot_id"],
+                 "pricing_catalog_sha256": digest((REPOSITORY / "eval/prices.yaml").read_bytes())}
         write_json(checkpoint, state)
     order = list(config["tasks"])
     random.Random(config["seed"]).shuffle(order)
     stop_reason: str | None = None
     for task_id in order:
         private = private_by_task[task_id]
-        public = REPOSITORY / "eval/tasks" / task_id
+        public = task_directory(config) / task_id
         task_out = out / task_id
         task_out.mkdir(exist_ok=True)
         if task_id in templates:
@@ -361,10 +393,16 @@ def run(
                 raise ValueError("Existing ChatGPT login is required")
             (codex_home / "auth.json").symlink_to(auth.resolve())
             entry = {"runtime": str(runtime), "phase": "ready", "segments": []}
+            if task_id in state.get("fresh_reruns", {}):
+                entry["rerun_history"] = state["fresh_reruns"][task_id]
             state["tasks"][task_id] = entry
             write_json(checkpoint, state)
         runtime = Path(entry["runtime"])
         workspace, codex_home = runtime / "workspace", runtime / "codex-home"
+        def audit(paths: list[Path], private: PrivateGraders, **kwargs: Any) -> dict[str, Any]:
+            return audit_retained_logs(paths, private, retained_context=entry.get("retained_audit_context"),
+                                       interrupted_paths=interrupted_logs(runtime, entry["segments"]),
+                                       _audit=audit_logs, **kwargs)
         guard = harness.ControlFiles(runtime, entry.setdefault("control_files", {}),
                                      lambda: write_json(checkpoint, state))
         if entry.get("pid"):
@@ -398,7 +436,7 @@ def run(
             final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
         interrupted = False
         infrastructure_stop: str | None = None
-        prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if prior else None
+        prior_audit = audit(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if prior else None
         blocked = prior_audit is not None and prior_audit["status"] != "clean"
         two_session = metadata[task_id]["two_session"]
         control_error = entry.get("control_error")
@@ -414,7 +452,7 @@ def run(
             day_segments = [s for s in entry["segments"] if s.get("day", 1) == day]
             day_paths = [runtime / s["events"] for s in day_segments]
             resumed_id = session_id(day_paths)
-            current_audit = audit_logs(day_paths, private, workspace=workspace, repository=REPOSITORY,
+            current_audit = audit(day_paths, private, workspace=workspace, repository=REPOSITORY,
                                        grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if day_paths else None
             day_finished = execution_finished or day in entry.get("completed_days", [])
             if day_segments:
@@ -423,6 +461,8 @@ def run(
             control_error = entry.get("control_error")
             if config["harness"] and not blocked and not execution_finished:
                 try:
+                    if not entry["segments"]:
+                        guard.recover_prelaunch(control_runtime, REPOSITORY)
                     guard.verify()
                 except harness.HarnessError as exc:
                     entry["control_invalid_reason"] = exc.invalid_reason
@@ -470,7 +510,7 @@ def run(
 
             if entry.get("pending_verification") and not blocked and not control_error:
                 native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                current_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY,
+                current_audit = audit(native, private, workspace=workspace, repository=REPOSITORY,
                                            grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 if current_audit["status"] != "clean":
                     blocked = True
@@ -498,7 +538,8 @@ def run(
                     write_json(checkpoint, state)
                     write_json(out / "run-diagnostics.json", {
                         "stop_reason": "Codex version changed before executor session",
-                        "recorded_version": actual_version, "observed_version": observed_version})
+                        "recorded_version": actual_version, "observed_version": observed_version,
+                        "calibration": config.get("calibration", False), "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier")})
                     raise IncompleteRun("Codex version changed before executor session; run halted and remains resumable")
                 if config["harness"]:
                     try:
@@ -517,6 +558,8 @@ def run(
                          "-c", "features.hooks=false", "-c", "features.plugins=false",
                          "-c", "features.remote_plugin=false", "-c", "mcp_servers={}",
                          "-o", str(runtime / f"final-{index}.md")]
+                if "service_tier" in config:
+                    argv += ["-c", "service_tier=" + json.dumps(config["service_tier"])]
                 if resumed_id:
                     argv += ["-c", 'sandbox_mode="workspace-write"', resumed_id, "-"]
                     prompt = entry.get("reinstruction") or "Continue the original task from the current workspace."
@@ -553,6 +596,7 @@ def run(
 
                 native_before = {p: digest(p.read_bytes()) for p in (codex_home / "sessions").rglob("*.jsonl")}
                 tokens_before = native_token_totals(list(native_before))
+                tiers_before = applied_tier_records(list((codex_home / "sessions").rglob("*.jsonl")))
                 start = time.monotonic()
                 try:
                     final_process = execute(
@@ -563,29 +607,38 @@ def run(
                     interrupted = True
                     entry["phase"] = "interrupted"
                     final_process = ProcessResult(-2)
+                    segment["interrupted"] = True
                 segment.update({"exited_at": now(), "exit_code": final_process.returncode,
                                 "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
+                # Pin captures before verification/grading; historical hashes are never backfilled.
+                segment["evidence_sha256"] = {
+                    path.name: digest(path.read_bytes())
+                    for path in (event_path, stderr_path, runtime / f"final-{index}.md")
+                    if guard.safe(path) and path.is_file()}
                 entry.pop("pid", None)
                 native_changed = [p for p in (codex_home / "sessions").rglob("*.jsonl")
                                   if native_before.get(p) != digest(p.read_bytes())]
+                segment["pricing_evidence"] = capture_tier(native_changed, tiers_before)
                 native_usage = native_token_delta(tokens_before, native_token_totals(native_changed))
                 if native_usage is not None:
                     segment["native_usage"] = native_usage
                     segment["usage_evidence"] = "Native event_msg.token_count cumulative delta; output includes reasoning"
                 segment["native_logs"] = [str(p) for p in native_changed]
-                segment["settings_verified"] = collect([event_path], native_changed,
-                                                       config["model"], config["reasoning_effort"])["settings_evidence"]["verified"]
+                settings = collect([event_path], native_changed,
+                                   config["model"], config["reasoning_effort"], config.get("service_tier"))["settings_evidence"]
+                segment["settings_verified"] = settings["verified"]
+                if "service_tier" in config:
+                    segment["service_tier_verified"] = settings["service_tier_verified"]
                 if not interrupted:
                     entry["workspace_exit_sha256"] = workspace_digest(workspace)
                     segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
                 write_json(checkpoint, state)
-                current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                current_audit = audit([runtime / saved['events'] for saved in entry['segments']] +
+                                      sorted((codex_home / 'sessions').rglob('*.jsonl')),
+                                      private, workspace=workspace, repository=REPOSITORY,
+                                      grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 infrastructure_stop = usage_limit_message([event_path])
                 capacity = capacity_message([event_path])
-                if capacity:
-                    current_audit = audit_logs([event_path, *native_changed], private, workspace=workspace,
-                                               repository=REPOSITORY, grading_roots=audit_roots(runtime),
-                                               fingerprint_cache=fingerprint_cache)
                 if capacity and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
                     segment.update(capacity_error=True, infrastructure_recovery=True,
                                    usage_evidence="Capacity refusal before any item: zero tokens" if
@@ -619,7 +672,7 @@ def run(
                         break
                     try:
                         native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                        native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                        native_audit = audit(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                         if native_audit["status"] != "clean":
                             break
                         if verify_executor():
@@ -646,7 +699,7 @@ def run(
                 write_json(checkpoint, state)
             if two_session and day == 1 and not execution_finished:
                 native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                day1_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY,
+                day1_audit = audit(native, private, workspace=workspace, repository=REPOSITORY,
                                         grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 if day1_audit["status"] != "clean":
                     break
@@ -682,9 +735,9 @@ def run(
             write_json(checkpoint, state)
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
-        audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
-        write_json(task_out / "access-audit.json", json.loads(private.redact(json.dumps(audit))))
-        telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"])
+        access_audit = audit(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+        write_json(task_out / "access-audit.json", json.loads(private.redact(json.dumps(access_audit))))
+        telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"], config.get("service_tier"))
         telemetry["executor_runs"] = collect_runs(event_paths, native_paths, entry["segments"])
         # Extract only settings and token/rate-limit evidence from native transcripts.
         selected = [event for path in native_paths for event in records(path)
@@ -693,24 +746,20 @@ def run(
                      {"token_count", "thread_settings_applied"})]
         (task_out / "session-evidence.jsonl").write_text(checkout_text(private.redact("".join(json.dumps(e) + "\n" for e in selected))))
         for segment, path in zip(entry["segments"], event_paths):
-            publish(path, task_out / path.name, private)
-            publish(runtime / segment["stderr"], task_out / segment["stderr"], private)
+            publish(path, task_out / path.name, private, source_root=runtime)
+            publish(runtime / segment["stderr"], task_out / segment["stderr"], private, source_root=runtime)
             final = runtime / f'final-{segment["attempt"]}.md'
             if final.exists():
-                publish(final, task_out / final.name, private)
+                publish(final, task_out / final.name, private, source_root=runtime)
         # Only the explicit runner manifest is eligible. Never search workspace.
         for name, expected_hash in guard.hashes.items():
             evidence = runtime / name
+            target = control_target(evidence, runtime, task_out)
             if (guard.safe(evidence) and evidence.is_file() and
                     digest(evidence.read_bytes()) == expected_hash and
-                    (evidence.name in {"contract.json", "handoff.json", "recovery.json"} or
-                     re.fullmatch(r"verdict-[0-9]+\.json", evidence.name) or evidence.name.endswith(".control.json") or
-                     re.fullmatch(r"(?:contract|verdict-[0-9]+|handoff|handoff-validation)\.std(?:out|err)", evidence.name))):
-                target = (task_out / evidence.relative_to(runtime) if evidence.is_relative_to(runtime / "control-interruptions")
-                          else task_out / (evidence.parent.name + "-" + evidence.name
-                                           if evidence.parent != runtime else evidence.name))
+                    target is not None):
                 target.parent.mkdir(parents=True, exist_ok=True)
-                publish(evidence, target, private)
+                publish(evidence, target, private, source_root=runtime)
         if infrastructure_stop:
             stop_reason = private.redact("STOP-E1: " + ("capacity error" if "at capacity" in infrastructure_stop.lower() else "usage limit") + "; run remains resumable. " + infrastructure_stop)
             break
@@ -731,11 +780,14 @@ def run(
             invalid.append("missing_two_session_handoff_observation")
         if two_session and observation:
             write_json(task_out / "handoff-evidence.json", observation)
-        if audit["status"] != "clean":
-            invalid.append("grader_access_detected" if audit["status"] == "access_detected" else "incomplete_access_audit")
+        if access_audit["status"] != "clean":
+            invalid.append("grader_access_detected" if access_audit["status"] == "access_detected" else "incomplete_access_audit")
         if not telemetry["settings_evidence"]["verified"] or (two_session and
                 any(not s.get("settings_verified") for s in entry["segments"] if not s.get("capacity_error"))):
             invalid.append("executor_settings_unverified")
+        if "service_tier" in config and (not telemetry["settings_evidence"]["service_tier_verified"] or
+                any(not s.get("service_tier_verified") for s in entry["segments"] if not s.get("capacity_error"))):
+            invalid.append("executor_service_tier_missing_or_different")
         if interrupted:
             invalid.append("execution_interrupted")
         invalid.extend(native_version_reasons(native_paths,
@@ -755,7 +807,7 @@ def run(
                   "invalid_reasons": invalid, "attempts": max(1, sum(not s.get("capacity_error") for s in entry["segments"])),
                   "session_id": session_id(event_paths), "segments": entry["segments"],
                   "two_session": two_session, "day2_observation": observation,
-                  "grader_access_audit": audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
+                  "grader_access_audit": access_audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
         write_json(task_out / "result.json", json.loads(private.redact(json.dumps(result))))
         # Preserve completed source only; no private grader or grading copy is published.
         if grading and grading.get("executor_already_exited") and not (task_out / "workspace").exists():
@@ -771,6 +823,7 @@ def run(
     attempted = sum(bool(entry.get("segments")) for entry in state["tasks"].values())
     configured = len(config["tasks"])
     write_json(out / "run-diagnostics.json", {
+        "calibration": config.get("calibration", False), "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier"),
         "stop_reason": stop_reason, "attempted_tasks": attempted, "configured_tasks": configured,
         "infrastructure_recoveries": [
             {"task_id": task_id, **segment} for task_id, entry in state["tasks"].items()
@@ -788,7 +841,7 @@ def run(
     pricing = json.loads((REPOSITORY / "eval/prices.yaml").read_text())
     try:
         shared_tasks = [build_task(t, state["tasks"][t["task_id"]], out / t["task_id"], config, pricing,
-                                  json.loads((REPOSITORY / "eval/tasks" / t["task_id"] / "meta.json").read_text())) for t in tasks]
+                                  json.loads((task_directory(config) / t["task_id"] / "meta.json").read_text())) for t in tasks]
         report = build(config, state, shared_tasks, actual_version, REPOSITORY)
     except ValueError as exc:
         raise ReportError("Runtime report accounting or validation failed") from exc

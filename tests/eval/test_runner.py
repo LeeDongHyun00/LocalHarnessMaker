@@ -58,6 +58,15 @@ class Executor:
             json.dumps({"type": "session_meta", "payload": {"id": "unit-session",
                         "cli_version": "0.162.0-alpha.17.2"}}) + "\n" +
             json.dumps({"type": "turn_context", "payload": {"model": "gpt-6.1-sol", "effort": "medium"}}) + "\n")
+        if not any(v.startswith('service_tier=') for v in argv):
+            fixture = Path(__file__).parent / 'fixtures/native-session-0.163.jsonl'
+            applied = next(json.loads(line) for line in fixture.read_text().splitlines()
+                           if json.loads(line).get('payload', {}).get('type') == 'thread_settings_applied')
+            applied['ordinal'] = self.calls
+            applied['payload']['thread_id'] = 'unit-session'
+            applied['payload']['thread_settings']['service_tier'] = 'standard'
+            with (session / "rollout-unit.jsonl").open('a') as stream:
+                stream.write(json.dumps(applied) + '\n')
         events = [{"type": "thread.started", "thread_id": "unit-session"}]
         if self.leak:
             events.append({"type": "item.completed", "item": {"type": "command_execution", "command": "cat test_private_synthetic.py"}})
@@ -163,8 +172,9 @@ def test_interrupted_turn_resumes_same_session_before_grading(setup: tuple[Path,
         run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2")
     assert not (out / "report.json").exists()
     second = json.loads(run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2").read_text())
-    # Recovery cannot erase the interrupted stream's incomplete audit evidence.
-    assert second["tasks"][0]["outcome"] == "invalid"
+    # Only the interrupted stream's missing terminal is exempted.
+    assert second["tasks"][0]["outcome"] == "pass"
+    assert second["tasks"][0]["grader_access_audit"]["status"] == "clean"
     assert second["tasks"][0]["attempts"] == 2
     assert executor.calls == 2
 
@@ -736,7 +746,7 @@ def test_regrade_matches_live_outcomes_without_source_writes(setup: tuple[Path, 
     from eval.runner.audit import digest
     assert diagnostics['source_report_sha256'] == digest((out / 'report.json').read_bytes())
     assert diagnostics['workspace_hash_checks'][0]['matched'] is True
-    assert set(diagnostics['audit_code_version']) == {'audit.py', 'javascript.py', 'regrade.py'}
+    assert set(diagnostics['audit_code_version']) == {'audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py'}
 
 
 @pytest.mark.parametrize('case', ['changed', 'missing_hash', 'nested_output', 'source_output'])
@@ -1831,7 +1841,7 @@ def test_executor_capacity_usage_and_native_counts(tmp_path: Path, items: bool) 
     item = json.dumps({'type': 'item.completed', 'item': {'type': 'reasoning', 'text': 'work'}}) + '\n'
     path.write_text((item if items else '') + CAPACITY_STREAM)
     pricing = json.loads((REPOSITORY / 'eval/prices.yaml').read_text())
-    priced = usage(path, 1, 'gpt-6.1-sol', pricing)
+    priced = usage(path, 1, 'gpt-6.1-sol', pricing, tier='standard')
     assert priced['input_tokens'] == (None if items else 0)
     assert priced['usd'] == (None if items else 0)
     native = tmp_path / 'native'
@@ -1935,3 +1945,54 @@ def test_checkout_paths_are_relative_and_resolve_outside_checkout(
         assert str(core.REPOSITORY) not in '\n'.join(
             p.read_text() for p in destination.rglob('*') if p.is_file()
             and p.name != 'legacy-review.log')
+
+
+@pytest.mark.parametrize('output_first', [False, True])
+def test_runner_uses_full_native_authorship_before_retry_or_grading(
+    setup: tuple[Path, Path, Path], output_first: bool,
+) -> None:
+    root, config, out = setup
+    harness_config(config)
+    assertion = 'assert "opaque-runner-91735" != "opaque-runner-82419"'
+    grader = root / 'bug-chunk-tail/test_private_synthetic.py'
+    grader.write_text(grader.read_text() + assertion + '\n')
+
+    class ProvenanceExecutor(HarnessExecutor):
+        def __call__(self, argv: list[str], **kwargs: Any) -> ProcessResult:
+            result = super().__call__(argv, **kwargs)
+            if argv[0] != 'codex':
+                return result
+            session = Path(kwargs['env']['CODEX_HOME']) / 'sessions'
+            events: list[dict[str, Any]] = [{'type': 'session_meta', 'payload': {
+                'id': 'unit-session', 'cli_version': '0.162.0-alpha.17.2'}}]
+            echo = {'type': 'event_msg', 'timestamp': f'2000-01-01T00:00:0{self.calls * 2}Z',
+                    'payload': {'type': 'item_completed', 'item': {'type': 'CommandExecution',
+                    'id': 'proof-' + str(self.calls), 'command': ['sh', '-lc', 'cat test_regression.py'],
+                    'aggregated_output': assertion}}}
+            if self.calls == 1:
+                patch = '*** Begin Patch\n*** Add File: test_regression.py\n+' + assertion + '\n*** End Patch'
+                writing = [{'type': 'response_item', 'timestamp': '2000-01-01T00:00:01Z',
+                            'payload': {'type': 'custom_tool_call', 'name': 'apply_patch',
+                                        'call_id': 'own-writing', 'input': patch}},
+                           {'type': 'response_item', 'timestamp': '2000-01-01T00:00:01Z',
+                            'payload': {'type': 'custom_tool_call_output', 'call_id': 'own-writing', 'output': 'Success'}}]
+                if output_first:
+                    events.append(dict(echo, timestamp='2000-01-01T00:00:00Z'))
+                events.extend(writing)
+            events.append(echo)
+            (session / f'proof-{self.calls}.jsonl').write_text(''.join(json.dumps(event) + '\n' for event in events))
+            (kwargs['cwd'] / 'test_regression.py').write_text(assertion + '\n')
+            capture = [json.loads(line) for line in kwargs['stdout'].read_text().splitlines()]
+            capture.insert(-1, {'type': 'item.completed', 'item': {
+                'type': 'command_execution', 'id': 'proof-' + str(self.calls),
+                'command': 'cat test_regression.py', 'aggregated_output': assertion}})
+            kwargs['stdout'].write_text(''.join(json.dumps(event) + '\n' for event in capture))
+            return result
+
+    executor = ProvenanceExecutor()
+    report = json.loads(run(config, out, root, execute=executor, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    task = report['tasks'][0]
+    assert task['outcome'] == ('invalid' if output_first else 'pass')
+    assert task['grader_access_audit']['status'] == ('access_detected' if output_first else 'clean')
+    assert executor.calls == (1 if output_first else 2)
+    assert executor.operations == (['contract'] if output_first else ['contract', 'check', 'check'])

@@ -12,10 +12,11 @@ from pathlib import Path
 import re
 import shlex
 import tokenize
-from typing import Any
+from typing import Any, Callable
 from urllib.parse import unquote
 
 from eval.runner.javascript import tool_calls
+from eval.runner.fingerprint_history import FingerprintHistory, input_texts
 
 
 def digest(data: bytes) -> str:
@@ -34,7 +35,7 @@ class PrivateGraders:
     public_root: Path | None = None
 
     @classmethod
-    def load(cls, root: Path, task_id: str, repository: Path) -> "PrivateGraders":
+    def load(cls, root: Path, task_id: str, repository: Path, *, task_root: str | None = None) -> "PrivateGraders":
         resolved = root.expanduser().resolve()
         if resolved.is_relative_to(repository.resolve()) or repository.resolve().is_relative_to(resolved):
             raise ValueError("Private grader root must be outside and separate from the repository")
@@ -51,7 +52,7 @@ class PrivateGraders:
         if not isinstance(names, list) or any(not isinstance(name, str) or Path(name).name != name for name in names):
             raise ValueError("Historical grader aliases must be bare filenames")
         return cls(resolved, files, (str(root.expanduser().absolute()),), tuple(names),
-                   repository / "eval/tasks")
+                   repository / (task_root or ("eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks")))
 
     def line_fingerprints(self, cache: "FingerprintCache | None" = None) -> set[str]:
         """Return hidden-line hashes, optionally sharing an invocation snapshot."""
@@ -63,12 +64,14 @@ class PrivateGraders:
         """Analyze unique immediate task graders against the public corpus once."""
         public: list[str] = []
         if self.public_root is not None:
-            for task in self.public_root.iterdir() if self.public_root.is_dir() else ():
-                if not task.is_dir():
-                    continue
-                paths = [task / name for name in ("prompt.md", "day2.md", "expected.json", "meta.json")]
-                paths.extend((task / "workspace").rglob("*"))
-                public.extend(path.read_text(errors="replace") for path in paths if path.is_file())
+            roots = {self.public_root}
+            # Grader sources span versions, so public exclusions must too.
+            if self.public_root.name in {"tasks", "tasks-v2"}:
+                roots.update(self.public_root.parent / name for name in ("tasks", "tasks-v2"))
+            for root in sorted(roots):
+                for task in root.iterdir() if root.is_dir() else ():
+                    if task.is_dir():
+                        public.extend(public_inputs(task))
         public_lines = {normalize_line(line) for text in public for line in text.splitlines()}
         public_literals: set[str | int | float | complex] = set()
         for text in public:
@@ -99,7 +102,11 @@ class PrivateGraders:
             # Docstrings, the module entry guard and unittest's launcher are
             # scaffolding, even when their literals happen to be absent publicly.
             boilerplate: set[int] = set()
+            decorator_lines: set[int] = set()
             for node in nodes:
+                if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                    for decorator in node.decorator_list:
+                        decorator_lines.update(range(decorator.lineno, (decorator.end_lineno or decorator.lineno) + 1))
                 if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
                     boilerplate.add(id(node.value))
                 if ((isinstance(node, ast.If) and any(isinstance(child, ast.Name) and child.id == "__name__"
@@ -131,7 +138,8 @@ class PrivateGraders:
                     continue
                 for number in range(node.lineno, (node.end_lineno or node.lineno) + 1):
                     line = normalize_line(lines[number - 1])
-                    if len(line) >= 16 and line not in public_lines:
+                    if (len(line) >= 16 and line not in public_lines and number not in decorator_lines
+                            and not generic_grader_line(line)):
                         fingerprints.add(digest(line.encode()))
         return fingerprints
 
@@ -181,7 +189,7 @@ class PrivateGraders:
             return text
         except ValueError:
             if "\n" in text.rstrip("\n"):
-                return "".join(self.redact(line) for line in text.splitlines(keepends=True))
+                return "\n".join(self.redact(line) for line in text.split("\n"))
             return plain(text)
 
 
@@ -221,6 +229,22 @@ def executor_environment(private: PrivateGraders, codex_home: Path) -> dict[str,
     return environment
 
 
+def public_inputs(task: Path) -> list[str]:
+    """Read shipped task inputs, never an executor's mutable workspace."""
+    paths = [task / name for name in ("prompt.md", "day2.md", "expected.json", "meta.json")]
+    paths.extend((task / "workspace").rglob("*"))
+    return [path.read_text(errors="replace") for path in paths if path.is_file()]
+
+
+def generic_grader_line(line: str) -> bool:
+    """Exclude Python scaffolding that cannot establish private provenance."""
+    return (not line or line.startswith(("#", "@", "import ", "from "))
+            or not re.search(r"\w", line)
+            or bool(re.fullmatch(r"class\s+\w+\s*\(\s*(?:unittest\.)?TestCase\s*\)\s*:", line))
+            or bool(re.fullmatch(r"(?:async\s+)?def\s+test_\w+\s*\(\s*self\s*\)\s*(?:->\s*None\s*)?:", line))
+            or bool(re.match(r"if\s+__name__\s*==", line)))
+
+
 def normalize_line(line: str) -> str:
     """Ignore indentation/spacing, retaining only a digest in audit records."""
     return " ".join(line.split())
@@ -229,6 +253,8 @@ def normalize_line(line: str) -> str:
 def unwrap_shell(command: str) -> str:
     """Remove literal executor shell wrappers while preserving the inner syntax."""
     for _ in range(8):
+        if not re.match(r"^\s*(?:/[^\s]+/)?(?:zsh|bash|sh|dash)\s", command):
+            return command
         words = shlex.split(command)
         if (len(words) == 3 and Path(words[0]).name in {"zsh", "bash", "sh", "dash"}
                 and words[1] in {"-c", "-lc", "-cl"}):
@@ -274,17 +300,17 @@ def workspace_glob(pattern: Path, workspace: Path | None) -> bool:
     return canonical == allowed or canonical.startswith(allowed + "/")
 
 
-def shell_data_spans(command: str) -> list[tuple[int, int]]:
+def shell_data_spans(command: str, *, expansions: list[str] | None = None) -> list[tuple[int, int]]:
     """Locate heredoc bodies/delimiters and comments for shell-loop detection.
 
-    These spans only prevent interpreting data as new shell syntax. The legacy
-    operand, expansion and protected-path checks still inspect the original text.
-    Quoted arguments already remain single raw words in shell_tokens.
+    Bodies end at literal delimiter lines, regardless of quotes in their data.
+    Unquoted bodies return expansion text separately; protected-path checks
+    still inspect the original command. Quoted arguments stay single words.
     """
     if "<<" not in command and "#" not in command:
         return []
     spans: list[tuple[int, int]] = []
-    pending: list[tuple[str, bool]] = []
+    pending: list[tuple[str, bool, bool]] = []
     word = re.compile(r"(?:[^\s;&|()<>'\"\\]|\\.|'[^']*'|\"(?:[^\"\\]|\\.)*\")+", re.DOTALL)
     index = 0
     quote: str | None = None
@@ -325,28 +351,39 @@ def shell_data_spans(command: str) -> list[tuple[int, int]]:
             if match is not None:
                 delimiter = shlex.split(match.group())
                 if len(delimiter) == 1:
-                    pending.append((delimiter[0], strip_tabs))
+                    pending.append((delimiter[0], strip_tabs, any(ch in match.group() for ch in "\\'\"")))
                 index = match.end()
             continue
         elif ch == "\n" and pending:
             index += 1
-            for delimiter, strip_tabs in pending:
+            for delimiter, strip_tabs, quoted in pending:
                 start = index
+                found = False
                 while index < len(command):
                     end = command.find("\n", index)
                     end = len(command) if end < 0 else end + 1
+                    line_start = index
                     line = command[index:end].removesuffix("\n")
                     index = end
                     if (line.lstrip("\t") if strip_tabs else line) == delimiter:
+                        found = True
+                        if not quoted and expansions is not None:
+                            expansions.append(command[start:line_start])
                         break
+                if not found:
+                    raise ValueError("Unterminated heredoc")
                 spans.append((start, index))
             pending.clear()
             continue
         index += 1
+    if pending:
+        raise ValueError("Unterminated heredoc")
     return spans
 
 
-def literal_loop_tokens(tokens: list[tuple[str, str]], command: str) -> tuple[list[tuple[str, str]], bool]:
+def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
+                        data: list[tuple[int, int]] | None = None,
+                        cwd: Path | None = None, workspace: Path | None = None) -> tuple[list[tuple[str, str]], bool]:
     """Unroll one literal for loop, retaining uncertainty for every other form.
 
     This is operand extraction, not shell execution: inspect both sides of an
@@ -354,7 +391,7 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str) -> tuple[li
     Rejected forms retain their original tokens so concrete access still wins.
     """
     separators = {";", "&&", "||", "|", "&"}
-    data = shell_data_spans(command)
+    data = shell_data_spans(command) if data is None else data
     loops: list[int] = []
     offset = 0
     for i, (value, raw) in enumerate(tokens):
@@ -385,10 +422,22 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str) -> tuple[li
     if boundary < 0 or tokens[boundary + 1:boundary + 2] != [("do", "do")]:
         return tokens, True
     words = tokens[start + 3:boundary]
-    # Reject expansions even when quoted; the supported list is strictly literal.
-    if not words or any(not value or any(ch in raw for ch in "$`*?[]{}~\\\n") or
+    # Relative static globs are the only supported word-list expansion.
+    if not words or any(not value or any(ch in raw for ch in "$`{}~\\\n") or
                         raw in separators | {"(", ")"} for value, raw in words):
         return tokens, True
+    resolved_words: list[str] = []
+    for value, raw in words:
+        if glob.has_magic(value):
+            if (raw != value or Path(value).is_absolute() or ".." in Path(value).parts
+                    or cwd is None or not workspace_glob(cwd / value, workspace)):
+                return tokens, True
+            matches = glob.glob(str(cwd / value), recursive=True)
+            resolved_words.extend(str(Path(match).relative_to(cwd)) for match in matches)
+            if not matches:
+                resolved_words.append(value)  # Same bounded no-match rule as direct globs.
+        else:
+            resolved_words.append(value)
     ends = [i for i, pair in enumerate(tokens) if pair == ("done", "done")]
     if len(ends) != 1:
         return tokens, True
@@ -445,7 +494,7 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str) -> tuple[li
         return tokens, True
     reference = re.compile(r"\$(?:\{" + variable + r"\}|" + variable + r"(?![A-Za-z0-9_]))")
     expanded: list[tuple[str, str]] = []
-    for word, _ in words:
+    for word in resolved_words:
         for group in commands:
             for value, raw in group:
                 if "$" in raw or "`" in raw:
@@ -485,10 +534,18 @@ def command_operands(command: str, cwd: Path | None, *,
     unresolved = False
     try:
         command = unwrap_shell(command)
+        expansions: list[str] = []
+        spans = shell_data_spans(command, expansions=expansions)
+        # Shell quote parsing never enters a heredoc body. Keep line positions
+        # while removing data and delimiters from operand extraction.
+        for start, end in reversed(spans):
+            command = command[:start] + re.sub(r"[^\n]", " ", command[start:end]) + command[end:]
+        unresolved = any("$" in body or "`" in body for body in expansions)
         tokens = shell_tokens(command)
     except ValueError:
         return [], True
-    tokens, unresolved = literal_loop_tokens(tokens, command)
+    tokens, loop_unknown = literal_loop_tokens(tokens, command, data=spans, cwd=cwd, workspace=workspace)
+    unresolved |= loop_unknown
     if any("$" in raw or "`" in raw for _, raw in tokens):
         unresolved = True
     if re.search(r"(?:base64|xxd|openssl).*\|.*(?:sh|bash|python|perl|ruby)\b", command):
@@ -687,10 +744,66 @@ def valid_native_metadata(kind: str, payload: Any) -> bool:
     return True
 
 
+def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
+                        retained_context: dict[str, Any] | None = None,
+                        _audit: Callable[..., dict[str, Any]] | None = None, **kwargs: Any) -> dict[str, Any]:
+    """Audit copied day-1 bytes in their original filesystem context only.
+
+    Day-2 events always use the new workspace and protected roots. A changed
+    retained log cannot inherit the historical context without invalidation.
+    """
+    audit = _audit or audit_logs
+    if not retained_context:
+        return audit(paths, private, **kwargs)
+    runtime = Path(retained_context['runtime'])
+    pinned = retained_context['logs']
+    retained = [path for path in paths if str(path) in pinned]
+    fresh = [path for path in paths if str(path) not in pinned]
+    history = FingerprintHistory(private.line_fingerprints(kwargs.get('fingerprint_cache')))
+    kwargs = dict(kwargs, _fingerprint_history=history)
+    results = []
+    if retained:
+        historical = dict(kwargs, workspace=Path(retained_context['workspace']),
+                          grading_roots=tuple(Path(p) for p in retained_context['grading_roots']))
+        results.append(audit(retained, private, **historical))
+        for path in retained:
+            if (not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)
+                                        if p.is_relative_to(Path(retained_context['copied_runtime']))) or
+                    digest(path.read_bytes()) != pinned[str(path)]):
+                results[-1]['errors'].append('retained_context_log_hash_mismatch:' + path.name)
+        from eval.runner.core import workspace_digest
+        try:
+            workspace_matches = workspace_digest(Path(retained_context['workspace'])) == retained_context['workspace_exit_sha256']
+        except (OSError, ValueError):
+            workspace_matches = False
+        if not workspace_matches:
+            results[-1]['errors'].append('retained_context_workspace_hash_mismatch')
+        if not runtime.is_absolute():
+            results[-1]['errors'].append('invalid_retained_context')
+    if fresh or not paths:
+        current = dict(kwargs, grading_roots=(*kwargs.get('grading_roots', ()), runtime))
+        results.append(audit(fresh, private, **current))
+    combined = dict(results[0])
+    for key in ('logs', 'matches', 'errors'):
+        combined[key] = [item for result in results for item in result[key]]
+    combined['matches'].extend(history.matches())
+    combined['status'] = ('access_detected' if combined['matches'] else
+                          'inconclusive' if combined['errors'] else 'clean')
+    return combined
+
+
+def interrupted_logs(runtime: Path, segments: list[dict[str, Any]]) -> set[Path]:
+    """Exempt only the absent terminal of explicitly interrupted captures."""
+    return {runtime / segment["events"] for segment in segments
+            if segment.get("exit_code") == -2 and segment.get("interrupted") is True}
+
+
 def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion: bool = True,
+               interrupted_paths: set[Path] | None = None,
                workspace: Path | None = None, repository: Path | None = None,
                grading_roots: tuple[Path, ...] = (),
-               fingerprint_cache: FingerprintCache | None = None) -> dict[str, Any]:
+               fingerprint_cache: FingerprintCache | None = None,
+               _fingerprint_history: FingerprintHistory | None = None) -> dict[str, Any]:
     """Audit tool access and native metadata disclosure; retain every error."""
     matches: list[dict[str, Any]] = []
     errors: list[str] = []
@@ -702,6 +815,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                for name in (".codex", ".claude")
                for prefix in ("~/", "$HOME/", "${HOME}/")}
     fingerprints = private.line_fingerprints(fingerprint_cache)
+    history = _fingerprint_history or FingerprintHistory(fingerprints)
     calls: dict[str, str] = {}
     pending_calls: set[str] = set()
     pending_items: set[str] = set()
@@ -723,9 +837,10 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
         logs.append({"name": path.name, "sha256": digest(data), "bytes": len(data)})
         terminal = False
         native = False
+        session: str | None = None
         if not data or not data.endswith(b"\n"):
             errors.append(f"empty_or_truncated_log:{path.name}")
-        for number, line in enumerate(data.decode("utf-8", errors="replace").splitlines(), 1):
+        for number, line in enumerate(data.decode("utf-8", errors="replace").removesuffix("\n").split("\n"), 1):
             try:
                 event = json.loads(line)
                 if not isinstance(event, dict) or not isinstance(event.get("type"), str):
@@ -734,6 +849,12 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 errors.append(f"malformed_event:{path.name}:{number}")
                 continue
             kind = event["type"]
+            if kind == 'thread.started':
+                session = event.get('thread_id')
+            elif kind == 'session_meta' and isinstance(event.get('payload'), dict):
+                session = event['payload'].get('session_id', event['payload'].get('id'))
+            if not isinstance(session, str):
+                session = None
             terminal |= kind in {"turn.completed", "turn.failed", "error"}
             native_kinds = {"session_meta", "turn_context", "response_item", "event_msg",
                             "world_state", "token_usage_record"}
@@ -876,6 +997,18 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 commands = custom
             elif patch_call or item_type == "file_change":
                 commands = []
+            authored_commands = [value for command_item in commands
+                                 if isinstance(value := command_item.get('command', command_item.get('cmd')), str)]
+            # Array-form native shell commands preserve literal code operands too.
+            authored_commands.extend(shlex.join(value) for command_item in commands
+                                     if isinstance(value := command_item.get('command', command_item.get('cmd')), list)
+                                     and all(isinstance(word, str) for word in value))
+            alignment_command = None
+            if item_type == 'command_execution' and authored_commands:
+                try:
+                    alignment_command = unwrap_shell(authored_commands[0])
+                except ValueError:
+                    pass
             for command_item in ([] if metadata else commands):
                 command = command_item.get("command", command_item.get("cmd"))
                 if isinstance(command, list) and all(isinstance(word, str) for word in command):
@@ -929,26 +1062,30 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                     candidate = cwd / candidate
                 if protected(candidate):
                     hits.add("protected_path")
-            # Fingerprints establish observed output, never executor authorship.
-            # Input checks above use shell operands or file targets, not contents.
             output = (item.get("output") if item_type in {"function_call_output", "custom_tool_call_output"}
                       else item.get("aggregated_output") if item_type == "command_execution" else None)
-            for value in leaves(output):
-                if any(digest(normalize_line(output_line).encode()) in fingerprints
-                       for output_line in value.splitlines()):
-                    hits.add("private_line_fingerprint")
+            evidence = {"log": path.name, "line": number, "tool": tool,
+                        "operation": "execute" if "command" in tool or "exec" in tool else "unknown",
+                        "evidence_sha256": digest(line.encode()),
+                        "redacted_evidence": "Observed protected access; see external stream hash."}
+            if fingerprints:
+                history.observe(path=path, line=number, event=event, item=item,
+                                authored=input_texts(authored_commands, patches), output=leaves(output),
+                                session=session, command=alignment_command, evidence=evidence)
             for hit in sorted(hits):
                 matches.append({"log": path.name, "line": number, "marker": hit, "tool": tool,
                                 "operation": "read" if metadata else "execute" if "command" in tool or "exec" in tool else "unknown",
                                 "evidence_sha256": digest(line.encode()), "redacted_evidence":
                                 "Private location reached executor context through native metadata." if metadata else
                                 "Observed protected access; see external stream hash."})
-        if require_completion and not native and not terminal:
+        if require_completion and not native and not terminal and path not in (interrupted_paths or set()):
             errors.append(f"missing_terminal_event:{path.name}")
     if require_completion and (pending_calls or pending_items):
         errors.append("unfinished_tool_events")
     if not paths:
         errors.append("missing_logs")
+    if _fingerprint_history is None:
+        matches.extend(history.matches())
     return {"method": "access_audit", "status": "access_detected" if matches else "inconclusive" if errors else "clean",
             "root_fingerprint": digest(str(private.root).encode()),
             "grader_fingerprints": [digest(p.read_bytes()) for p in private.files],

@@ -13,8 +13,9 @@ import uuid
 
 from eval.metrics import compute, total
 from eval.runner import core
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
 from eval.runner.process import ProcessResult, run_process
+from eval.runner.signals import stop_signals
 from eval.runner.reaudit import InputParser
 from eval.runner.report import build_task, validate
 
@@ -22,11 +23,13 @@ from eval.runner.report import build_task, validate
 def audit_code_version() -> dict[str, str]:
     """Pin the audit implementation, including uncommitted parser changes."""
     directory = Path(__file__).parent
-    return {name: digest((directory / name).read_bytes()) for name in ('audit.py', 'javascript.py', 'regrade.py')}
+    return {name: digest((directory / name).read_bytes())
+            for name in ('audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py')}
 
 
 def regrade(private_root: Path, source: Path, out: Path, *,
-            execute: Callable[..., ProcessResult] = run_process) -> Path:
+            execute: Callable[..., ProcessResult] = run_process,
+            _fresh_tasks: frozenset[str] = frozenset()) -> Path:
     """Reuse executor evidence and accounting; execute only the trusted grade() path."""
     source, out = source.resolve(), out.resolve()
     if out.exists() or out.is_relative_to(source) or source.is_relative_to(out):
@@ -36,13 +39,16 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     state = json.loads((source / 'checkpoint.json').read_text())
     entries = state.get('tasks')
     config = state.get('config')
-    if (state.get('report_schema') != 'evaluation-report-v1' or not isinstance(entries, dict) or
+    if (state.get('report_schema') not in {'evaluation-report-v1', 'evaluation-report-v2'} or not isinstance(entries, dict) or
             not entries or set(entries) != {task['task_id'] for task in original['tasks']} or
             any(not re.fullmatch(r'[a-z0-9][a-z0-9-]*', task) for task in entries) or
             any(e.get('phase') != 'finished' or e.get('pid') for e in entries.values())):
         raise ValueError("Regrade requires a complete finished version-1 run")
     # Never reconstruct an exit hash from today's workspace for a historical run.
-    if any(not re.fullmatch(r'[0-9a-f]{64}', e.get('workspace_exit_sha256', '')) for e in entries.values()):
+    if not _fresh_tasks <= set(entries):
+        raise ValueError("Regrade refused: unknown fresh task")
+    if any(not re.fullmatch(r'[0-9a-f]{64}', e.get('workspace_exit_sha256', ''))
+           for task, e in entries.items() if task not in _fresh_tasks):
         raise ValueError("Regrade refused: runner-recorded workspace exit hash missing; rerun the executor on the host")
     if not isinstance(config, dict) or set(config.get('tasks', [])) != set(entries):
         raise ValueError("Regrade requires the runner-recorded configuration")
@@ -54,8 +60,13 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     if (any(state.get(key) != metadata[key] for key in ('run_id', 'config_sha256', 'task_set_sha256')) or
             any(config.get(key) != metadata[field] for key, field in config_metadata.items())):
         raise ValueError("Regrade refused: source report and checkpoint provenance differ")
-    private_by_task = {task: PrivateGraders.load(private_root, task, core.REPOSITORY) for task in entries}
-    if core.taskset_digest(private_by_task) != state['task_set_sha256']:
+    private_by_task = {task: PrivateGraders.load(private_root, task, core.REPOSITORY, task_root=config.get("task_root")) for task in entries}
+    population = dict(private_by_task)
+    for task in config.get('task_population', []):
+        if task not in population:
+            population[task] = PrivateGraders.load(private_root, task, core.REPOSITORY, task_root=config.get("task_root"))
+    if (core.configured_digest(population, config) != state['task_set_sha256'] or
+            core.configured_digest(private_by_task, config) != state.get('selected_task_set_sha256', state['task_set_sha256'])):
         raise ValueError("Regrade refused: public/private task inputs differ from the source run")
     if out.is_relative_to(private_root.resolve()) or private_root.resolve().is_relative_to(out):
         raise ValueError("Regrade output must be separate from private grader storage")
@@ -64,13 +75,15 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     for task, entry in entries.items():
         runtime = Path(entry['runtime'])
         if (not runtime.is_absolute() or out.is_relative_to(runtime.resolve()) or
-                runtime.resolve().is_relative_to(out) or not entry['segments'] or any(
+                runtime.resolve().is_relative_to(out) or (not entry['segments'] and task not in _fresh_tasks) or any(
                     Path(s['events']).name != s['events'] for s in entry['segments'])):
             raise ValueError("Invalid retained runtime manifest or output location")
+        if task in _fresh_tasks:
+            continue  # Fresh reruns never reuse the source workspace or grading.
         if old_by_id[task]['two_session'] and not (
                 old_by_id[task]['outcome'] == 'invalid' and not entry.get('day2_observation') and
                 not any(s.get('day') == 2 for s in entry['segments'])):
-            if not core.valid_day2_observation(entry, core.REPOSITORY / 'eval/tasks' / task):
+            if not core.valid_day2_observation(entry, core.task_directory(config) / task):
                 raise ValueError("Regrade refused: two-session exit hashes or day-2 observation missing")
         observed = core.workspace_digest(runtime / 'workspace')
         expected = entry['workspace_exit_sha256']
@@ -88,11 +101,15 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     for old_task in original['tasks']:
         task = old_task['task_id']
         entry, private = entries[task], private_by_task[task]
+        if task in _fresh_tasks:
+            (out / task).mkdir()
+            tasks.append(copy.deepcopy(old_task))
+            continue
         runtime = Path(entry['runtime'])
         workspace = runtime / 'workspace'
         paths = [runtime / segment['events'] for segment in entry['segments']]
         paths.extend(sorted((runtime / 'codex-home/sessions').rglob('*.jsonl')))
-        audit = audit_logs(paths, private, workspace=workspace, repository=core.REPOSITORY,
+        audit = audit_retained_logs(paths, private, interrupted_paths=interrupted_logs(runtime, entry["segments"]), retained_context=entry.get("retained_audit_context"), workspace=workspace, repository=core.REPOSITORY,
                            grading_roots=core.audit_roots(runtime), fingerprint_cache=cache)
         previous = entry['result']['grader_access_audit']
         manifest = lambda logs: Counter((log['name'], log['sha256'], log['bytes']) for log in logs)
@@ -117,7 +134,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         for path in (source / task).iterdir():
             if path.is_file() and not path.is_symlink() and path.name not in {
                     'result.json', 'access-audit.json', 'grading.log'}:
-                core.publish(path, task_out / path.name, private)
+                core.publish(path, task_out / path.name, private, source_root=source / task)
         core.write_json(task_out / 'access-audit.json', json.loads(private.redact(json.dumps(audit))))
         result['grading'] = None
         last = entry['segments'][-1]
@@ -129,7 +146,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
             scratch = Path(tempfile.mkdtemp(prefix='lhm-eval-regrade-'))
             result['grading'] = core.grade(
                 workspace, private, scratch, task_out / 'grading.log',
-                json.loads((core.REPOSITORY / 'eval/tasks' / task / 'expected.json').read_text()),
+                json.loads((core.task_directory(config) / task / 'expected.json').read_text()),
                 config['grading_timeout_seconds'], execute)
             if core.workspace_digest(workspace) != entry['workspace_exit_sha256']:
                 raise ValueError(f"Regrade refused: workspace changed during grading for {task}")
@@ -144,6 +161,8 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         # Regrading does not change executor/control accounting or observations.
         for key in ('calls', 'costs', 'done_claims'):
             shared[key] = copy.deepcopy(old_task[key])
+        from eval.runner.pricing import preserve_provenance
+        preserve_provenance(shared, task_out, prior=old_task)
         tasks.append(shared)
     report['tasks'] = tasks
     report['metrics'] = compute(tasks, seed=original['metadata']['confidence']['seed'],
@@ -156,9 +175,12 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                             'total_cost_usd': total([t['costs']['total_usd'] for t in tasks])}
     reasons = [f"{t['task_id']}: {reason}" for t in tasks for reason in t['invalid_reasons']]
     report['validity'] = {'status': 'invalid' if reasons else 'valid', 'reasons': reasons}
+    from eval.runner.task_completion import publish_summary
+    publish_summary(tasks, out)
     validate(report, core.REPOSITORY)
     core.write_json(out / 'checkpoint.json', new_state)
     core.write_json(out / 'run-diagnostics.json', {
+        'calibration': config.get('calibration', False), 'task_root': config.get('task_root', 'eval/tasks'), 'service_tier': config.get('service_tier'),
         'source': str(source), 'source_report_sha256': digest(source_bytes),
         'audit_code_version': audit_code_version(), 'workspace_hash_checks': checks})
     text = json.dumps(report, indent=2) + '\n'
@@ -176,7 +198,11 @@ def main() -> int:
     parser.add_argument('--out', type=Path, required=True)
     try:
         args = parser.parse_args()
-        regrade(args.private_root, args.source, args.out)
+        with stop_signals(args.out):
+            regrade(args.private_root, args.source, args.out)
+    except KeyboardInterrupt:
+        print('Regrade interrupted; stop diagnostics retained', file=sys.stderr)
+        return 130
     except FileNotFoundError:
         print('Regrade input error: retained evidence unavailable', file=sys.stderr)
         return 1
