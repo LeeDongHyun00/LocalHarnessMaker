@@ -34,8 +34,22 @@ and are globally unique. The pilot uses the first four planned families:
 | inventory | stock deltas, aggregate validation and atomic batches |
 | Planned expansion | dependency graph, layered settings, event replay, access policy, job queues, calendar windows, CSV import, text indexing, schema migration, filesystem manifests, rate budgets, workflow state, search facets, document patches, command dispatch, cache invalidation |
 
-Each family uses one domain package but distinct starting defects and requested
-changes across the five types. Related tasks are marked with family metadata;
+Each family uses one domain package with distinct target specifications as well
+as distinct starting defects. The multiple_requirements variant now changes the
+family's domain behavior; it cannot be solved by the bug_fix reference:
+
+| Family | Additional or changed multiple_requirements specification |
+| --- | --- |
+| ledger | Repeated IDs revise amounts in their original entry position; balances use final revisions, while changed accounts still conflict. |
+| reservations | After validating and rejecting conflicts/duplicate IDs, coalesce maximal chains of touching bookings per resource; preserve the earliest booking ID. |
+| routing | Equal-priority paths select the smallest canonical target; remove rules shadowed by a segment ancestor with the same target and at least equal priority. |
+| inventory | Validate all row shapes first, then reject negative stock at any input prefix per canonical item/location, even if later replenishment would recover. |
+
+These changes interact with canonicalization, error precedence, ordering,
+rendering, batch atomicity and input copying. Each variant has its own private
+grader, reference and requirement coverage manifest. The earlier candidate's
+public inputs, graders and references are archived privately before revision;
+retained version 1 artifacts remain unchanged. Related tasks are marked with family metadata;
 task-level bootstrap in the approved report remains unchanged. Family-stratified
 and family-cluster sensitivity analysis should accompany final reporting, because
 five related tasks are not five independent domain samples. No report schema is
@@ -76,6 +90,11 @@ executor-event observation; an artifact alone cannot prove when a command ran.
 ## Calibration rule
 
 Run baseline A first on the complete 20-task pilot with full A's model/effort.
+Set calibration=true for this pre-freeze procedure. The runner pins candidate
+bytes, records calibration in the checkpoint and diagnostics, and warns that
+the evidence is not a headline result. Compare refuses calibration reports.
+The default calibration=false still enforces frozen inputs. A candidate freeze
+is performed after calibration, rather than as a prerequisite to it.
 Target roughly 30–70% pass rate. This session makes no live calls. If the pilot
 misses that range, adjust difficulty at the design level (for example the number
 of interacting call sites, atomicity scope or cross-session policy dependence)

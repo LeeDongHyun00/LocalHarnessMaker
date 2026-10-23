@@ -22,7 +22,7 @@ from eval.runner.report import build, build_task, current_commit, native_version
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, interrupted_logs, digest, executor_environment
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
-from eval.runner.telemetry import collect, collect_runs, native_token_delta, native_token_totals, records, session_id
+from eval.runner.telemetry import collect, collect_runs, applied_tier_records, capture_tier, native_token_delta, native_token_totals, records, session_id
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -82,8 +82,10 @@ def load_config(path: Path) -> dict[str, Any]:
     config = json.loads(path.read_text())
     required = {"name", "model", "reasoning_effort", "harness", "control_backend", "reinstruction_limit",
                 "retry_limit", "seed", "codex_version", "tasks", "timeout_seconds", "grading_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population", "task_root", "service_tier"} != required:
+    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population", "task_root", "service_tier", "calibration"} != required:
         raise ValueError("Config must contain exactly the documented baseline fields")
+    if type(config.get("calibration", False)) is not bool:
+        raise ValueError("calibration must be boolean")
     if type(config["harness"]) is not bool:
         raise ValueError("harness must be boolean")
     if config["harness"]:
@@ -304,8 +306,10 @@ def run(
         task: json.loads((task_directory(config) / task / "meta.json").read_text())
         for task in config["tasks"]
     }
-    if any(meta.get("frozen") is not True for meta in metadata.values()):
+    if not config.get("calibration", False) and any(meta.get("frozen") is not True for meta in metadata.values()):
         raise ValueError("Evaluation requires every selected task to be frozen")
+    if config.get("calibration", False):
+        print("Calibration evidence only; this report is not a headline result.", file=sys.stderr)
     out = out.resolve()
     config_hash = _recorded_config_sha256 or digest(config_path.read_bytes())
     version_reader = version if callable(version) else (lambda: version) if version else installed_version
@@ -321,7 +325,7 @@ def run(
     for task in config.get("task_population", []):
         if task not in population:
             meta = json.loads((task_directory(config) / task / "meta.json").read_text())
-            if meta.get("frozen") is not True:
+            if not config.get("calibration", False) and meta.get("frozen") is not True:
                 raise ValueError("Population includes unfrozen task")
             population[task] = PrivateGraders.load(private_root, task, REPOSITORY, task_root=config.get("task_root"))
     task_set_hash = configured_digest(population, config) if "task_population" in config else selected_hash
@@ -337,8 +341,10 @@ def run(
     checkpoint = out / "checkpoint.json"
     if checkpoint.exists():
         state = json.loads(checkpoint.read_text())
-        if state.get("report_schema") != "evaluation-report-v1":
+        if state.get("report_schema") not in {"evaluation-report-v1", "evaluation-report-v2"}:
             raise ValueError("Historical provisional checkpoint requires offline migration; use a fresh output directory")
+        if state.get("pricing_catalog_sha256") is not None and state["pricing_catalog_sha256"] != digest((REPOSITORY / "eval/prices.yaml").read_bytes()):
+            raise ValueError("Resume pricing catalog differs from checkpoint")
         if state.get("static_templates", {}) != template_hashes:
             raise ValueError("Static templates changed since run start")
         if state["config_sha256"] != config_hash or state.get("config") != config:
@@ -350,11 +356,12 @@ def run(
     else:
         if _recorded_config_sha256 is not None:
             raise ValueError("Recorded configuration requires an existing checkpoint")
-        state = {"report_schema": "evaluation-report-v1", "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
+        state = {"report_schema": "evaluation-report-v2", "calibration": config.get("calibration", False), "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
                  "task_set_sha256": task_set_hash, "config": config, "tasks": {},
                  "static_templates": template_hashes, "selected_task_set_sha256": selected_hash,
                  "git_commit": current_commit(REPOSITORY),
-                 "pricing_snapshot_id": json.loads((REPOSITORY / "eval/prices.yaml").read_text())["snapshot_id"]}
+                 "pricing_snapshot_id": json.loads((REPOSITORY / "eval/prices.yaml").read_text())["snapshot_id"],
+                 "pricing_catalog_sha256": digest((REPOSITORY / "eval/prices.yaml").read_bytes())}
         write_json(checkpoint, state)
     order = list(config["tasks"])
     random.Random(config["seed"]).shuffle(order)
@@ -532,7 +539,7 @@ def run(
                     write_json(out / "run-diagnostics.json", {
                         "stop_reason": "Codex version changed before executor session",
                         "recorded_version": actual_version, "observed_version": observed_version,
-                        "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier")})
+                        "calibration": config.get("calibration", False), "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier")})
                     raise IncompleteRun("Codex version changed before executor session; run halted and remains resumable")
                 if config["harness"]:
                     try:
@@ -589,6 +596,7 @@ def run(
 
                 native_before = {p: digest(p.read_bytes()) for p in (codex_home / "sessions").rglob("*.jsonl")}
                 tokens_before = native_token_totals(list(native_before))
+                tiers_before = applied_tier_records(list((codex_home / "sessions").rglob("*.jsonl")))
                 start = time.monotonic()
                 try:
                     final_process = execute(
@@ -605,6 +613,7 @@ def run(
                 entry.pop("pid", None)
                 native_changed = [p for p in (codex_home / "sessions").rglob("*.jsonl")
                                   if native_before.get(p) != digest(p.read_bytes())]
+                segment["pricing_evidence"] = capture_tier(native_changed, tiers_before)
                 native_usage = native_token_delta(tokens_before, native_token_totals(native_changed))
                 if native_usage is not None:
                     segment["native_usage"] = native_usage
@@ -814,7 +823,7 @@ def run(
     attempted = sum(bool(entry.get("segments")) for entry in state["tasks"].values())
     configured = len(config["tasks"])
     write_json(out / "run-diagnostics.json", {
-        "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier"),
+        "calibration": config.get("calibration", False), "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier"),
         "stop_reason": stop_reason, "attempted_tasks": attempted, "configured_tasks": configured,
         "infrastructure_recoveries": [
             {"task_id": task_id, **segment} for task_id, entry in state["tasks"].items()

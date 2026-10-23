@@ -6,12 +6,13 @@ import re
 from typing import Any
 
 from eval.metrics import total
+from eval.runner.pricing import select
 from eval.runner.audit import digest
 from eval.runner.limits import capacity_refusal_without_items
 
 
 def control_calls(entry: dict[str, Any], task_id: str,
-                  pricing: dict[str, Any]) -> tuple[list[dict[str, Any]], float | None]:
+                  pricing: dict[str, Any], *, provenance: list[dict[str, Any]] | None = None) -> tuple[list[dict[str, Any]], float | None]:
     """Read only hash-pinned runner evidence, including archived interruptions."""
     runtime = Path(entry["runtime"])
     pinned = entry.get("control_files", {})
@@ -123,7 +124,10 @@ def control_calls(entry: dict[str, Any], task_id: str,
             i, c, o = counts.values()
             if i is not None and c is not None and c > i:
                 counts["cached_input_tokens"] = c = None
-            rate = next((r for r in pricing["rates"] if r["model"] == model), None)
+            tier = value.get("service_tier")
+            rate, pricing_ref = select(pricing, model, tier)
+            if i is not None and i > 272000:
+                rate, pricing_ref = None, None
             usd = None
             if rate and all(v is not None for v in (i, c, o)) and i <= 272000:
                 usd = ((i - c) * rate["input_per_million_usd"] +
@@ -136,7 +140,12 @@ def control_calls(entry: dict[str, Any], task_id: str,
                                     "completed" if value.get("status") == "success" else "failed",
                           "usage": {**counts, "usd": usd, "latency_seconds": value.get("latency_seconds"),
                                     "cost_basis": "api_equivalent_usd",
-                                    "pricing_ref": pricing["snapshot_id"] if rate else None}})
+                                    "pricing_ref": pricing_ref}})
+            if provenance is not None:
+                provenance.append({"call_id": calls[-1]["call_id"], "observed_service_tier": tier,
+                    "basis": "controller control_call.service_tier only", "pricing_ref": pricing_ref,
+                    "stderr_sha256": pinned[name],
+                    "record_sha256": digest(json.dumps(value, sort_keys=True).encode())})
         exit_code = process.get("exit_code")
         if (type(exit_code) is not int or exit_code < 0 or process.get("timed_out") or
                 (exit_code != 0 and len(calls) == count_before and not delegations)):

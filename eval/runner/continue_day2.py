@@ -12,6 +12,7 @@ import sys
 import tempfile
 from typing import Any, Callable
 
+from eval.runner.pricing import extends, report_pricing
 from eval.metrics import compute, total
 from eval.runner import core, harness, reaudit, regrade
 from eval.runner.audit import PrivateGraders, digest
@@ -119,7 +120,7 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         raise ValueError('Continuation refused: no audit-recoverable day-1 task')
     config = source_state['config']
     pricing = json.loads((core.REPOSITORY / 'eval/prices.yaml').read_text())
-    if pricing != original['metadata']['pricing']:
+    if not extends(pricing, original['metadata']['pricing']):
         raise ValueError('Continuation refused: recorded pricing snapshot differs')
     read_version = version if callable(version) else (lambda: version) if version else core.installed_version
     if read_version() != config['codex_version']:
@@ -174,8 +175,11 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         prior_controls = source_state['tasks'][task_id].get('control_files', {})
         added_entry = dict(entry, control_files={name: value for name, value in entry.get('control_files', {}).items()
                                                 if name not in prior_controls})
-        added_controls, added_control_usd = (control_calls(added_entry, task_id, pricing)
+        control_provenance: list[dict[str, Any]] = []
+        added_controls, added_control_usd = (control_calls(added_entry, task_id, pricing, provenance=control_provenance)
                                              if config['harness'] else ([], 0))
+        for row in control_provenance:
+            row["call_id"] = row["call_id"].replace("-control-", "-continuation-control-", 1)
         for call in added_controls:
             call['call_id'] = call['call_id'].replace('-control-', '-continuation-control-', 1)
         extra.extend(added_controls)
@@ -185,6 +189,8 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         continued['costs'] = {'executor_usd': executor_usd, 'control_usd': control_usd,
                               'total_usd': total([executor_usd, control_usd])}
         continued['done_claims'] = copy.deepcopy(old['done_claims'])
+        from eval.runner.pricing import preserve_provenance
+        preserve_provenance(continued, out / task_id, prior=old, additional=control_provenance)
         entry = state['tasks'][task_id]
         day1 = [s for s in entry['segments'] if s.get('day', 1) == 1]
         day2 = [s for s in entry['segments'] if s.get('day') == 2]
@@ -216,10 +222,14 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         'total_cost_usd': total([t['costs']['total_usd'] for t in tasks])}
     reasons = [f"{t['task_id']}: {reason}" for t in tasks for reason in t['invalid_reasons']]
     base_report['validity'] = {'status': 'invalid' if reasons else 'valid', 'reasons': reasons}
-    # Existing metadata/config/pricing/bootstrap remain the source run's pins;
+    # Config/bootstrap and historical prices remain pinned; additional tier
+    # snapshots cover only fresh calls.
     # the new run ID and timestamp came from regrade.
     models = {c['model'] for t in tasks for c in t['calls'] if c['purpose'] != 'executor'}
     base_report['metadata']['control_model'] = next(iter(models)) if len(models) == 1 and 'unknown' not in models else None
+    from eval.runner.task_completion import publish_summary
+    publish_summary(tasks, out)
+    base_report["metadata"]["pricing"] = report_pricing(pricing)
     validate(base_report, core.REPOSITORY)
     provenance['status'] = 'finished'
     diagnostics['continuation'] = provenance

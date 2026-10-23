@@ -60,18 +60,12 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
         if event.get("type") == "event_msg" and event.get("payload", {}).get("type") == "token_count"
         and event["payload"].get("rate_limits") is not None
     ]
-    if service_tier is None:
-        tiers = {p.get("service_tier", "standard") for p in contexts}
-    else:
-        values = [p["service_tier"] for p in [*contexts, *applied]
-                  if isinstance(p, dict) and "service_tier" in p]
-        tiers = {value if isinstance(value, str) else "unknown" for value in values}
-    pricing_tier = (next(iter(tiers)) if len(tiers) == 1 else "unknown" if tiers or service_tier is not None
-                    else "standard")
+    values = [p.get("service_tier") if isinstance(p, dict) else None for p in applied]
+    tiers = {value if isinstance(value, str) else "unknown" for value in values}
+    pricing_tier = next(iter(tiers)) if len(tiers) == 1 else "unknown"
     return {
         "pricing_evidence": {"tier": pricing_tier,
-                             "basis": ("native applied settings and explicit turn_context tiers" if service_tier is not None else
-                                       "native turn_context when present; otherwise Standard baseline assumption")},
+                             "basis": "native event_msg.thread_settings_applied.service_tier only"},
         "settings_evidence": {"verified": verified, "source": settings_source or "native_session_jsonl",
                               "observed": observed,
                               **({"requested_service_tier": service_tier, "service_tier_verified": tier_verified,
@@ -164,3 +158,36 @@ def native_token_delta(before: dict[str, tuple[int, dict[str, int]]],
             return None
         deltas.append(delta)
     return {k: sum(d[k] for d in deltas) for k in deltas[0]} if deltas else None
+
+
+def applied_tier_records(paths: list[Path]) -> dict[str, list[dict[str, Any]]]:
+    """Read applied records separately so later resumes cannot reprice old calls."""
+    return {str(path): [event for event in records(path) if event.get("type") == "event_msg"
+            and isinstance(event.get("payload"), dict)
+            and event["payload"].get("type") == "thread_settings_applied"] for path in paths}
+
+
+def capture_tier(paths: list[Path], before: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    """Capture only newly emitted applied settings, including repeated records."""
+    from collections import Counter
+    from hashlib import sha256
+
+    def fingerprint(event: dict[str, Any]) -> str:
+        return sha256(json.dumps(event, sort_keys=True).encode()).hexdigest()
+
+    observations = []
+    for path, events in applied_tier_records(paths).items():
+        prior = Counter(fingerprint(event) for event in before.get(path, []))
+        for event in events:
+            identity = fingerprint(event)
+            if prior[identity]:
+                prior[identity] -= 1
+                continue
+            settings = event["payload"].get("thread_settings", {})
+            value = settings.get("service_tier") if isinstance(settings, dict) else None
+            observations.append({"native_log": path, "record_sha256": identity,
+                                 "observed_service_tier": value if isinstance(value, str) else None})
+    tiers = {o["observed_service_tier"] or "unknown" for o in observations}
+    return {"tier": next(iter(tiers)) if len(tiers) == 1 else "unknown",
+            "basis": "new native thread_settings_applied records captured at process exit",
+            "records": observations}

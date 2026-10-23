@@ -10,6 +10,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from eval.metrics import compute, total
 from eval.runner.core import REPOSITORY, load_config
 from eval.runner.report import usage
+from eval.runner.pricing import report_pricing
 
 
 def test_pilot_configs_use_same_frozen_deterministic_strata() -> None:
@@ -46,7 +47,7 @@ def test_snapshot_provenance_and_schema_remain_compatible() -> None:
     prices = json.loads((REPOSITORY / 'eval/prices.yaml').read_text())
     schema = json.loads((REPOSITORY / 'schemas/evaluation-report.schema.json').read_text())
     Draft202012Validator(schema['properties']['metadata']['properties']['pricing'],
-                        format_checker=FormatChecker()).validate(prices)
+                        format_checker=FormatChecker()).validate(report_pricing(prices))
     assert prices['snapshot_id'] == 'openai-standard-short-2026-10-22-v1'
     assert prices['checked_on'] == '2026-10-22'
     assert 'https://developers.openai.com/api/docs/pricing' in prices['source']
@@ -64,7 +65,7 @@ def test_pinned_prices_feed_accounting_and_metrics(tmp_path: Path, model: str, e
     events.write_text(json.dumps({'type': 'turn.completed', 'usage': {
         'input_tokens': 58248, 'cached_input_tokens': 54656, 'output_tokens': 524,
         'reasoning_output_tokens': 400}}) + '\n')
-    result = usage(events, 1, model, prices)
+    result = usage(events, 1, model, prices, tier="standard")
     assert result['usd'] == pytest.approx(expected)
     assert result['pricing_ref'] == prices['snapshot_id']
     def cost_metric(cost: float | None) -> dict[str, object]:
@@ -73,7 +74,7 @@ def test_pinned_prices_feed_accounting_and_metrics(tmp_path: Path, model: str, e
                          'costs': {'total_usd': total([cost, 0])}, 'handoff': None}],
                        seed=0, resamples=1000)['cost_per_pass']
     assert cost_metric(result['usd'])['value'] == pytest.approx(expected)
-    for unknown in (usage(events, 1, 'unknown', prices), usage(events, 1, model, prices, tier='priority')):
+    for unknown in (usage(events, 1, 'unknown', prices), usage(events, 1, model, prices, tier='unknown')):
         assert unknown['usd'] is unknown['pricing_ref'] is None
         assert cost_metric(unknown['usd'])['value'] is None
     events.write_text(json.dumps({'type': 'turn.completed', 'service_tier': 'flex', 'usage': {

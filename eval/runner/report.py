@@ -1,13 +1,12 @@
-"""Translate retained runner evidence into the approved version-1 report."""
+"""Translate retained runner evidence into versioned evaluation reports."""
 
 from datetime import datetime
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
 from typing import Any
-
-from jsonschema import Draft202012Validator, FormatChecker
 
 from eval.runner.publication import checkout_text, evidence_path
 
@@ -15,6 +14,8 @@ from eval.metrics import METHOD, compute, metric, total
 from eval.runner.audit import digest
 from eval.runner.control_accounting import control_calls
 from eval.runner.telemetry import records, session_id
+from eval.runner.pricing import select, report_pricing
+from eval.runner.schema_compat import validate_schema
 from eval.runner.limits import capacity_message, capacity_refusal_without_items
 
 
@@ -23,7 +24,7 @@ def artifact(path: Path) -> dict[str, str]:
     return {"path": checkout_text(str(path)), "sha256": digest(path.read_bytes())}
 
 
-def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str = "standard", native_counts: dict[str, int] | None = None) -> dict[str, Any]:
+def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str | None = None, native_counts: dict[str, int] | None = None) -> dict[str, Any]:
     """Use complete per-segment counts; cache is a subset, output includes reasoning."""
     turns = [e.get("usage", {}) for e in records(events) if e.get("type") == "turn.completed"]
     counts = {key: sum(t[key] for t in turns) if turns and all(type(t.get(key)) is int and t[key] >= 0 for t in turns) else None
@@ -35,19 +36,15 @@ def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, 
     i, c, o = (counts[k] for k in counts)
     if i is not None and c is not None and c > i:
         raise ValueError("Cached tokens exceed input tokens")
-    # Standard is the baseline CLI default assumption; explicit unknown tiers
-    # and long-context requests cannot inherit the short-context price.
-    observed_tiers = [e.get("service_tier", e.get("usage", {}).get("service_tier", tier))
-                      for e in records(events) if e.get("type") == "turn.completed"]
-    covered = tier == "standard" and all(t in {"standard", "default"} for t in observed_tiers)
-    covered = covered and all(t["input_tokens"] <= 272000
-                              for t in turns if type(t.get("input_tokens")) is int)
-    rate = next((r for r in pricing["rates"] if r["model"] == model), None) if covered else None
+    covered = all(t["input_tokens"] <= 272000
+                  for t in turns if type(t.get("input_tokens")) is int)
+    covered = covered and (i is None or i <= 272000)
+    rate, pricing_ref = select(pricing, model, tier) if covered else (None, None)
     usd = None
     if rate is not None and all(v is not None for v in (i, c, o)):
         usd = ((i - c) * rate["input_per_million_usd"] + c * rate["cached_input_per_million_usd"] + o * rate["output_per_million_usd"]) / 1_000_000
     return {**counts, "usd": usd, "latency_seconds": latency, "cost_basis": "api_equivalent_usd",
-            "pricing_ref": pricing["snapshot_id"] if rate else None}
+            "pricing_ref": pricing_ref}
 
 
 def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
@@ -55,18 +52,27 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     """Preserve invalid costs and represent missing observations explicitly."""
     runtime = Path(entry["runtime"])
     segments, calls = [], []
+    provenance = []
     for segment in result["segments"]:
         path = runtime / segment["events"]
         sid = session_id([path]) or result["session_id"]
         if sid and path.is_file():
             segments.append({k: segment[k] for k in ("attempt", "started_at", "exited_at", "exit_code")}
                             | {"session_id": sid, "events": artifact(path)})
+        native = [Path(p) for p in segment.get("native_logs", [])]
+        tier_evidence = segment.get("pricing_evidence") or {
+            "tier": "unknown", "basis": "No retained per-process applied-tier capture."}
+        tier = tier_evidence["tier"]
         calls.append({"call_id": f'{result["task_id"]}-exec-{segment["attempt"]}', "purpose": "executor",
                       "backend": "codex_cli", "model": config["model"],
                       "status": "timeout" if segment.get("timed_out") else "completed" if segment["exit_code"] == 0 else "failed",
                       "usage": usage(path, segment.get("latency_seconds", 0), config["model"], pricing,
-                                     tier=result.get("pricing_evidence", {}).get("tier", "standard"),
+                                     tier=tier,
                                      native_counts=segment.get("native_usage"))})
+        provenance.append({"call_id": calls[-1]["call_id"], "observed_service_tier": tier,
+                           "basis": tier_evidence["basis"], "captured_records": tier_evidence.get("records", []),
+                           "pricing_ref": calls[-1]["usage"]["pricing_ref"],
+                           "native_sources": [artifact(p) for p in native if p.is_file()]})
     audit = result["grader_access_audit"]
     status = audit["status"]
     reason = "Observed forbidden access." if status == "access_detected" else "; ".join(audit["errors"]) if status == "inconclusive" else None
@@ -103,16 +109,36 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     else:
         grading = None
     executor_usd = total([c["usage"]["usd"] for c in calls])
-    controls, control_usd = control_calls(entry, result["task_id"], pricing) if config["harness"] else ([], 0)
+    controls, control_usd = control_calls(entry, result["task_id"], pricing, provenance=provenance) if config["harness"] else ([], 0)
     calls.extend(controls)
     history = entry.get("rerun_history")
     if history:
+        for row in provenance:
+            row["call_id"] = f'{result["task_id"]}-rerun-{history["rerun_id"]}-{row["call_id"]}'
         for call in calls:
             call["call_id"] = f'{result["task_id"]}-rerun-{history["rerun_id"]}-{call["call_id"]}'
+        provenance = [{"call_id": c["call_id"], "observed_service_tier": None,
+                       "basis": "Prior rerun accounting retained; see source artifacts in rerun provenance.",
+                       "pricing_ref": c["usage"]["pricing_ref"]} for c in history["calls"]] + provenance
         calls = history["calls"] + calls
         control_usd = (None if history["control_usd"] is None or control_usd is None else
                        total([c["usage"]["usd"] for c in calls if c["purpose"] != "executor"]))
         executor_usd = total([c["usage"]["usd"] for c in calls if c["purpose"] == "executor"])
+    (out / "pricing-provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    # Offline regrade has a fresh output directory; reuse only hash-pinned
+    # published final messages, never an unpinned workspace file.
+    for ref in meta.get("artifacts", []):
+        name = Path(ref["path"]).name
+        if not re.fullmatch(r"final-[0-9]+\.md", name) or (out / name).exists():
+            continue
+        source = evidence_path(ref["path"])
+        if digest(source.read_bytes()) != ref["sha256"]:
+            raise ValueError("Retained final-message hash mismatch")
+        (out / name).write_bytes(source.read_bytes())
+    from eval.runner.task_completion import retain
+    retain(out, dict(result, _runtime=str(runtime)), two_session=meta["two_session"])
+    (out / "calibration.json").write_text(json.dumps({"calibration": config.get("calibration", False),
+        "notice": "Calibration evidence only; not a headline result." if config.get("calibration", False) else None}) + "\n")
     # The verdict exposes negative done claims, but not the complete claim denominator.
     # Until a full claim observation is available, emit no measured claims and keep
     # false_done_rate undefined rather than treating unobserved claims as zero errors.
@@ -178,8 +204,7 @@ def validate_session_versions(task: dict[str, Any], version: str) -> None:
 
 def validate(report: dict[str, Any], repository: Path) -> None:
     """Check schema plus runtime arithmetic, IDs, chronology and log hashes."""
-    Draft202012Validator(json.loads((repository / "schemas/evaluation-report.schema.json").read_text()),
-                        format_checker=FormatChecker()).validate(report)
+    validate_schema(report, repository)
     tasks = report["tasks"]
     if len({t["task_id"] for t in tasks}) != len(tasks):
         raise ValueError("Duplicate task identifiers")
@@ -230,6 +255,10 @@ def validate(report: dict[str, Any], repository: Path) -> None:
     sizes = {"pass_rate": expected["valid_tasks"], "avg_attempts": expected["valid_tasks"],
              "cost_per_pass": len(tasks), "false_done_rate": sum(t["done_claims"]["claimed_items"] for t in tasks if t["outcome"] != "invalid"),
              "handoff_success": sum(t["two_session"] and t["outcome"] != "invalid" for t in tasks)}
+    if "task_false_done_rate" in report["metrics"]:
+        from eval.runner.task_completion import population
+        _, counts = population(tasks)
+        sizes["task_false_done_rate"] = counts["denominator"]
     if any(report["metrics"][key]["sample_size"] != size for key, size in sizes.items()):
         raise ValueError("Metric sample count mismatch")
     for m in report["metrics"].values():
@@ -273,7 +302,7 @@ def build(config: dict[str, Any], state: dict[str, Any], tasks: list[dict[str, A
         "executor_model": config["model"], "reasoning_effort": config["reasoning_effort"],
         "control_backend": config["control_backend"], "control_model": control_model,
         "seed": config["seed"], "reinstruction_limit": config["reinstruction_limit"],
-        "cost_basis": "api_equivalent_usd", "pricing": pricing,
+        "cost_basis": "api_equivalent_usd", "pricing": report_pricing(pricing),
         "confidence": {"level": .95, "method": METHOD, "resamples": 10000, "seed": config["seed"]},
         "parity_comparator": None}, "tasks": tasks, "metrics": compute(tasks, seed=config["seed"]),
         "accounting": {"attempted_tasks": len(tasks), "valid_tasks": len(tasks) - sum(t["outcome"] == "invalid" for t in tasks),
@@ -282,5 +311,10 @@ def build(config: dict[str, Any], state: dict[str, Any], tasks: list[dict[str, A
         "validity": {"status": "invalid" if invalid else "valid", "reasons": invalid}}
     report["metrics"]["false_done_rate"] = metric([], "claimed_criterion", 0, lambda _: None,
         seed=config["seed"], reason="Complete done-claim denominator is not yet observed; verdicts retain negative evidence.")
+    from eval.runner.task_completion import publish_summary
+    if tasks:
+        directory = next(evidence_path(a["path"]).parent for a in tasks[0]["artifacts"]
+                         if Path(a["path"]).name == "task-completion.json")
+        publish_summary(tasks, directory)
     validate(report, repository)
     return report

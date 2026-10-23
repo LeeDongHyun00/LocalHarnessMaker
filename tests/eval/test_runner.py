@@ -58,6 +58,15 @@ class Executor:
             json.dumps({"type": "session_meta", "payload": {"id": "unit-session",
                         "cli_version": "0.162.0-alpha.17.2"}}) + "\n" +
             json.dumps({"type": "turn_context", "payload": {"model": "gpt-6.1-sol", "effort": "medium"}}) + "\n")
+        if not any(v.startswith('service_tier=') for v in argv):
+            fixture = Path(__file__).parent / 'fixtures/native-session-0.163.jsonl'
+            applied = next(json.loads(line) for line in fixture.read_text().splitlines()
+                           if json.loads(line).get('payload', {}).get('type') == 'thread_settings_applied')
+            applied['ordinal'] = self.calls
+            applied['payload']['thread_id'] = 'unit-session'
+            applied['payload']['thread_settings']['service_tier'] = 'standard'
+            with (session / "rollout-unit.jsonl").open('a') as stream:
+                stream.write(json.dumps(applied) + '\n')
         events = [{"type": "thread.started", "thread_id": "unit-session"}]
         if self.leak:
             events.append({"type": "item.completed", "item": {"type": "command_execution", "command": "cat test_private_synthetic.py"}})
@@ -1832,7 +1841,7 @@ def test_executor_capacity_usage_and_native_counts(tmp_path: Path, items: bool) 
     item = json.dumps({'type': 'item.completed', 'item': {'type': 'reasoning', 'text': 'work'}}) + '\n'
     path.write_text((item if items else '') + CAPACITY_STREAM)
     pricing = json.loads((REPOSITORY / 'eval/prices.yaml').read_text())
-    priced = usage(path, 1, 'gpt-6.1-sol', pricing)
+    priced = usage(path, 1, 'gpt-6.1-sol', pricing, tier='standard')
     assert priced['input_tokens'] == (None if items else 0)
     assert priced['usd'] == (None if items else 0)
     native = tmp_path / 'native'

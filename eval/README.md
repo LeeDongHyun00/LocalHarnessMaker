@@ -26,7 +26,8 @@ and numbers only.
 resume/regrade and exact day-2 validation use the selected root. V1's default
 digest format is preserved; other roots are included in the digest namespace.
 The existing compare command refuses different task-set hashes, including
-cross-version comparisons. IDs are unique across sets and v2 IDs start `v2-`.
+comparisons between different task-set versions. Report-interface versions 1
+and 2 can be compared on their shared metrics. IDs are unique across sets and v2 IDs start `v2-`.
 
 `service_tier` is optional. Omit it to leave the CLI default in effect. When set,
 every executor launch, retry, resume and fresh day-2 session passes
@@ -36,17 +37,25 @@ context-only evidence does not verify the tier. Missing/different evidence adds
 `executor_service_tier_missing_or_different` and prevents grading. Checkpoint
 config, segment verification, task telemetry and run diagnostics retain the
 request and observations. The shared report schema and CLI flags are unchanged.
-The pinned Standard-only price snapshot cannot price priority: those costs stay
-null, including invalid attempts, until a verified versioned price is available.
+Executor pricing reads the native applied tier separately for every segment.
+Control pricing reads only service_tier on the controller's control_call line.
+Absent or unsupported tiers have null price and cost; config requests and CLI
+defaults never substitute for observed evidence. pricing-provenance.json pins
+per-call tier, source evidence and selected snapshot through task artifacts.
 
 [pilot-v2-a.yaml](configs/pilot-v2-a.yaml) uses full A's gpt-6.1-sol / medium,
 priority, Codex 0.163.0-alpha.11.1, zero retries and 900-second process deadlines
 (1800 seconds per process for two-session tasks).
 [STOP-3 estimate](reports/pilot-v2-a-estimate.md) bounds 24 planned executor
-launches; it separates the historical Standard workload proxy from unknown
-priority USD. No live pilot was run in this worktree. The frozen-input runner
-continues to reject frozen=false tasks and untracked task inputs. Host review,
-a reviewed candidate freeze/commit and spending approval precede calibration.
+launches and applies the sourced 2× Fast multiplier to the planning proxy.
+No live pilot was run in this worktree. calibration is a boolean config field,
+default false. With true, the runner accepts frozen=false candidates, pins their
+input bytes, records calibration=true in checkpoint and run diagnostics, and
+prints a stderr notice that the report is calibration evidence, not a headline
+result. A hash-pinned calibration.json artifact carries that status in each
+report task; compare refuses it. With false, all freeze checks remain in force.
+The pilot config enables calibration=true. Host review and spending approval
+precede the live calibration; freeze follows calibration review.
 Target baseline A at roughly 30–70%; revise design across whole families/types,
 never select or drop individual tasks by pilot outcome. Preserve all candidates.
 
@@ -256,13 +265,25 @@ Reports compute seeded task-cluster bootstrap metrics (10000 resamples;
 minimum 1000). Invalid tasks leave quality samples but retain costs. Any zero
 original/bootstrap denominator or missing accounting produces null values and
 bounds. Output tokens already include reasoning; cached input is an input
-subset. `prices.yaml` pins `openai-standard-short-2026-10-22-v1`, using the
-user-supplied Claude host fetch of OpenAI pricing (checked 2026-10-22): Standard
-tier, up to 272K input tokens. The source records the URL and absence of a
-provider version/date. Unknown models/tiers, long-context turns and incomplete
-tokens retain null costs; null propagates to accounting and cost_per_pass.
-Standard is the CLI baseline assumption when no tier evidence is present;
-observed non-Standard tiers override it. Subscription usage is not zero-dollar
+subset. `prices.yaml` preserves openai-standard-short-2026-10-22-v1 unchanged
+and adds openai-fast-short-2026-10-23-v1. The user supplied Claude's official
+OpenAI pricing-page observation dated 2026-10-23; this offline session did not
+fetch it. Fast mode (priority processing, renamed 2026-07-30) is exactly 2×
+Standard on input, cache and output: Sol 6.1 4/.20/20, Luna .20/.02/1 and Sol 6
+4/.40/20 USD per million tokens. A supplemental 2026-10-23 Standard snapshot
+pins Sol 6 at 2/.20/10 without modifying the original two-model snapshot.
+All snapshots retain source/date/rates inside metadata.pricing.source's pinned
+catalog serialization, compatible with the existing closed report schema.
+Each call's pricing_ref identifies the selected original snapshot; the per-task
+pricing artifact retains observed tiers and source hashes. Unknown models/tiers,
+long-context calls and incomplete usage remain null.
+
+The gpt-6-luna CLI default tier is priority. Retained version 1 control calls
+were priced at Standard rates although they ran at priority. The final evaluation
+must disclose this historical underpricing; no retained version 1 report is
+rewritten. New control lines without a tier stay unknown, including old
+controller versions that do not emit one. No controller change is required here.
+Subscription usage is not zero-dollar
 API usage. Historical reports are preserved. The runner prices each retained
 `control_call` stderr line (including internal retries and HTTP fallback) with
 `prices.yaml`, ignoring controller USD. Calls retain actual backend/model,
@@ -273,8 +294,20 @@ operations or successful contract/handoff commands without successful generation
 records keep control and total costs null. Mechanical verification and handoff
 validation add no model calls. Invalid tasks retain every observed call's cost.
 `metadata.control_model` contains the sole observed control model; no model or
-multiple models produces null and a stderr warning. Full done-claim extraction
-remains pending; false_done_rate stays undefined. Under decision 0007, local
+multiple models produces null and a stderr warning. Criterion-level false_done_rate remains unchanged and undefined when its
+complete denominator is unavailable. Version 2 adds task_false_done_rate from
+the retained final message of the last required session for every configuration.
+The task-scope adapter binds completion prose to a synthetic task ID and applies
+verifier.claims.claimed_criteria's vocabulary, negation, exception and quote/code
+rules; criterion-only and test-only claims do not imply task completion.
+A claimed-complete valid task is false done only when hidden grading fails.
+Invalid tasks leave both populations; missing final messages are explicitly
+excluded, and a claimed task without hidden grading makes the rate undefined.
+Task-completion artifacts pin extractor/adapter hashes, source segment/event
+hash, final-message hash, evidence and reasons. The summary artifact publishes
+numerator, denominator, excluded IDs/reasons and undefined grading outcomes.
+Seeded bootstrap resamples eligible valid task clusters including nonclaiming
+tasks; any zero replicate denominator produces null bounds/value. Under decision 0007, local
 Gemma and QLoRA are dropped and parity is reported as not measured.
 
 New checkpoints record the starting `git_commit` and `pricing_snapshot_id`.
@@ -741,7 +774,9 @@ This separate command preserves existing CLI flags. It writes comparison.json
 and comparison.md and prints exactly the supplied output directory. Input errors
 exit 1, write errors exit 2. Inputs must validate against the report schema;
 comparisons refuse differing task-set digests, seeds, executor models, Codex
-versions (using compare_versions), cost basis or pricing. Effort may differ for B.
+versions (using compare_versions), cost basis or changed historical pricing pins.
+Added tier snapshots are allowed only when existing snapshots remain identical;
+historical costs are preserved and disclosed. Effort may differ for B.
 Input report hashes, matched/excluded IDs and comparison direction are retained.
 Only tasks valid in both reports contribute to each side's pass_rate,
 cost_per_pass, avg_attempts and two-session handoff_success. Any invalid matched
@@ -755,3 +790,15 @@ A comparison with no eligible two-session tasks has undefined handoff_success.
 Use A for the handoff comparison. Local Gemma and QLoRA are dropped; parity
 remains not measured. These changes have mocked evidence only; live harness
 compatibility and all host measurements remain pending.
+
+## Report-interface compatibility
+
+New reports carry all seven version 2 metrics. Per decision 0009, the presence
+of metrics.task_false_done_rate declares interface version 2; absence declares
+version 1. Regrade, continuation, infrastructure rerun, re-audit and compare
+validate that declared shape. The compatibility loader reconstructs version 1
+by reversing exactly the two approved schema additions; it never modifies the
+shared schema or source reports. Derived reports can add version 2 evidence
+without model calls or grading invalid tasks. Compare includes task-level false
+done only when both sources carry it; otherwise it reports shared metrics only.
+Calibration status survives recovery through pinned task artifacts/diagnostics.

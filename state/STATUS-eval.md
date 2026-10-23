@@ -1,53 +1,54 @@
 ## Done
 
-- Added the narrow missing-terminal exception for explicitly interrupted segments in runner/re-audit/regrade, preserving all other inconclusive checks; covered hard and graceful interruption followed by same-session completion and regrade (`.venv/bin/python -m pytest tests/eval -q`: 1092 passed in 103.45s).
-- Reused schema-valid manifest-pinned contracts before the first executor launch and archived verified partial control preparation; changed/unowned files still fail safely (`.venv/bin/python -m pytest tests/eval -q`: 1092 passed in 103.45s).
-- Added infrastructure-only fresh reruns with retained-evidence regrading for other tasks, access-match refusal, source/config/input/version/pricing checks, source immutability, per-task/run provenance and prior/new accounting preserved across resume/regrade (`.venv/bin/python -m pytest tests/eval -q`: 1092 passed in 103.45s).
-- Added SIGINT/SIGTERM stop diagnostics and exit 130 without tracebacks for run, rerun, continuation and regrade; covered signals before executor launch and during checkpoint cleanup (`.venv/bin/python -m pytest tests/eval -q`: 1092 passed in 103.45s).
-- Fixed newline-only JSONL framing in audit, telemetry, limit detection, control accounting and redaction; masked heredoc bodies before shell tokenization while retaining unquoted-expansion uncertainty and protected-path checks (`.venv/bin/python -m pytest tests/eval -q`: 1092 passed in 103.45s).
-- Updated README/CHANGES and retained the committed v2 pilot, frozen v1 inputs and historical reports without edits (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports`: exit 0).
-- Verified the requested separate command surface and worktree without model calls (`.venv/bin/python -m eval.runner.rerun_invalid --help`: exit 0, --private-root/--from/--out/--reasons listed; `git symbolic-ref --short HEAD`: r5/v2).
+- Enabled boolean calibration (default false) before freeze, with checkpoint/diagnostic/report-artifact labeling, stderr notice and compare refusal; enabled the v2 A pilot and revised its Fast planning estimate (`.venv/bin/python -m pytest tests/eval -q`: 1126 passed in 113.59s)
+- Preserved the original Standard snapshot, pinned user-supplied Fast rates plus the Standard Sol 6 supplement, captured newly observed executor tiers per process, required control-call tier evidence and retained per-call pricing provenance across recovery; unknown tiers remain null (`.venv/bin/python -m pytest tests/eval -q`: 1126 passed in 113.59s)
+- Implemented task_false_done_rate using retained last-session final messages and the verifier extractor's clause semantics, valid-task numerator/denominator, explicit missing-message exclusions, source hashes and seeded task-cluster bootstrap; retained criterion-level false_done_rate and added v1/v2 report-reader compatibility (`.venv/bin/python -m pytest tests/eval -q`: 1126 passed in 113.59s)
+- Revised all four multiple_requirements target specifications, independent private graders/references and coverage manifests; archived the previous candidate privately and updated DESIGN plus the counts-only validation report (`.venv/bin/python "$LHM_PRIVATE_GRADERS/validate_distinct_pilot.py"`: 20 valid starter/reference pairs, 249 reference checks, 136 starter failures, 252/252 requirements covered, 1121 killed mutants, 18 reviewed equivalents, 0 unreviewed survivors, 20 public starter suites and 20 reference verification runs passing; prior bug-fix references fail 22 checks across the four changed task IDs)
+- Preserved v1 public tasks, schemas and retained reports, and confirmed no private-root literal entered modified repository files (`git diff --exit-code -- eval/tasks schemas`: exit 0; offline snapshot/report/path checks: Standard snapshot unchanged, only the two authorized v2 planning/validation reports changed, 9 retained shared-schema reports valid, 1 provisional report unchanged, private-path scan clean)
 
 ## Remaining
 
-- Host: transfer these changes only at a safe boundary for the other checkouts. Regrade full B to recover partition-sign's interrupted terminal and line-endings' Unicode JSONL framing, and full harness to recover round-robin's quoted heredoc. These actual source artifacts/private graders were unavailable here; no host outcome recovery is claimed.
-- Host: use `python -m eval.runner.rerun_invalid --private-root P --from SOURCE --out NEW --reasons control_cli_error,runner_control_file_preexisting` for the completed harness source's pre-launch stable-unique invalidity. Inspect retained source/selection provenance. For checkpoint-only interrupted/capacity-limited runs, resume the original command/config/output first.
-- Host: review the previously committed aa41a35 v2 candidate and priority pricing, apply an explicitly reviewed candidate freeze and obtain spending approval before its 24-session baseline-A calibration. Preserve all candidates; revise difficulty by whole families/types, never by individual pilot outcome.
-- After v2 calibration: build the remaining sixteen planned families, validate the population and publish its separate freeze through Role 1. This session did not touch eval/tasks-v2/.
-- Preserve main-checkout measurements and earlier follow-ups: C authored once by the user, reduced B/full harness workflow, paired comparisons, five pilot-A reviews and twenty-sample reporting. Do not reinterpret v1 results as matched v2 evidence.
-- Run the full repository suite once before merge on the host. Only tests/eval ran here. Review the final Commit plan; no staging or commits were performed.
+- Review and transfer repository changes and the matching private v2 candidate artifacts at a safe boundary for other checkouts. Do not stage or commit here; use the final Commit plan on the host.
+- Host: obtain spending approval for the 24-session baseline-A calibration using calibration=true. Run with the approved Codex version and observed priority tiers; retain candidate hashes and all outcomes. Calibration precedes freeze and is never headline evidence.
+- After calibration: revise only at whole-family/type level if needed, build the remaining sixteen planned families, validate the whole population and publish its separate freeze through Role 1.
+- Host recovery remains pending: regrade full B's interrupted terminal/Unicode framing and full harness's quoted heredoc. Use retained evidence first; source artifacts from other checkouts were not recovered in this session.
+- Host: use the existing infrastructure-only rerun flow for eligible completed harness invalidities; checkpoint-only interrupted/capacity-limited runs resume their original command first. Never rerun a quality failure to improve the score.
+- Preserve C skeletons for the user's authorship, paired comparison scope, five pilot-A reviews and twenty-sample reporting. Disclose historical v1 Luna control underpricing in the final evaluation; do not rewrite retained v1 reports or treat absent task-level metrics as zero.
+- Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
 
-- Exempt only missing_terminal_event for exit_code=-2/interrupted=true captures: all bytes/access matches and other audit errors remain evidence; completed resume evidence is retained separately.
-- Archive pinned partial pre-launch outputs and reuse validated pinned contracts: resume must not adopt executor-authored or changed control files, and no source evidence is deleted.
-- Select fresh reruns using invalid reasons plus causal infrastructure evidence: ordinary outcomes, precision-only audit errors and unexplained invalidity use retained-evidence regrading; any candidate access match refuses before calls.
-- Start rerun tasks from public starters in new runtimes: source/grading workspaces never reach the executor. Fresh attempts/segments describe new execution; provenance retains original segments/log references, and all calls/costs remain counted once, with unknown costs null.
-- Preserve the original SIGINT/SIGTERM diagnostic across checkpoint cleanup and return 130: both control preparation and executor interruption must exit without a traceback.
-- Parse heredoc boundaries before shell tokenization and frame JSONL on newline only: quoted body syntax and Unicode line separators inside string values are data, while unquoted expansions and protected-path checks remain conservative.
-- Preserve optional v2 task-root/service-tier behavior and the approved report schema/CLI flags: this change adds only the explicitly requested separate rerun operation.
+- Permit an explicit calibration procedure before freeze: the default freeze rule remains, candidate bytes remain hash-pinned, and calibration status is persisted through recovery and refused by compare.
+- Keep the original Standard snapshot intact and add dated tier snapshots: schema-compatible metadata serializes their complete pins in the existing source field; per-call artifacts retain tier/source/pricing_ref evidence.
+- Capture newly emitted native applied settings at process exit: later resumes cannot reprice earlier calls. Control calls without an observed tier remain unknown, including existing controller versions without that field.
+- Preserve original costs during retained-evidence recovery: catalog extensions must preserve every historical pin; fresh calls use new observations and historical calls remain explicitly identified.
+- Give multiple_requirements distinct domain specifications within every pilot family: revised behavior interacts with canonicalization, ordering, aggregation/conflicts, rendering and batches, and the bug-fix references do not satisfy it.
+- Apply verifier.claims.claimed_criteria through an eval-owned task-scope adapter: no verifier code or criterion-level metric changes. Retain final-message/segment and extractor/adapter hashes for reproducibility.
+- Exclude invalid tasks and missing final messages from both task-claim populations: a claimed valid task lacking hidden grading remains in the denominator but makes the rate undefined, rather than establishing failure or silently shrinking the denominator.
+- Infer report-interface version from presence of task_false_done_rate as approved in decision 0009: reverse exactly the two v2 schema additions for v1 validation, without editing schemas or migrating source reports.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
+- .venv/bin/python "$LHM_PRIVATE_GRADERS/validate_distinct_pilot.py"
 - git diff --check -- eval tests/eval state/STATUS-eval.md
-- git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports
-- .venv/bin/python -m eval.runner.rerun_invalid --help
-- Host/offline: python -m eval.runner.regrade --private-root P --from SOURCE --out NEW
-- Host/approved spending only: python -m eval.runner.rerun_invalid --private-root P --from SOURCE --out NEW --reasons control_cli_error,runner_control_file_preexisting
+- git diff --exit-code -- eval/tasks schemas
+- Host/retained evidence only: python -m eval.runner.regrade --private-root P --from SOURCE --out NEW
+- Host/approved spending only: python -m eval run --config eval/configs/pilot-v2-a.yaml --out eval/reports/pilot-v2-a/
 
 ## Do not touch
 
-- Work only in r5/v2 with this worktree's .venv; edit only eval/, tests/eval/ and this status file. Preserve all other checkouts and roles' paths.
-- Frozen eval/tasks/, eval/tasks-v2/, retained reports, private production graders, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
+- Work only in r5/v2 with this worktree's .venv; edit only eval/, tests/eval/, this status file and the authorized private v2 candidate artifacts. Preserve other checkouts and roles' paths.
+- Frozen v1 public tasks/graders, retained v1 reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or project-file deletion.
-- No live executor/controller/judge calls, network, nested Codex, macOS sandbox-exec or real private-root lookup in this environment. Use synthetic private fixtures and mock model/executor calls.
-- Never execute/resume Codex in a grading copy, expose private content, fabricate accounting or waive malformed/unsupported/unresolved/unfinished audit evidence through later success. The interrupted missing-terminal exception is the only new audit exemption.
-- Keep C skeletons unfilled until the user authors them, and keep the v2 candidate unfrozen until the reviewed host freeze step. Priority pricing remains unverified by this session.
+- No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Model and executor integration checks must use mocks.
+- Never publish private-root paths, grader/reference contents or mutation sources. Validation publication contains task IDs and numbers only.
+- Never execute/resume Codex in a grading copy, grade invalid tasks, fabricate unknown accounting or waive malformed/unsupported/unresolved audit evidence through a later success.
+- Keep C skeletons unfilled until the user authors them and the v2 candidate unfrozen until calibration review and the approved freeze procedure.
 
 ## Assumptions
 
-- The four host failures and absence of access attempts are user-supplied context; actual host evidence was unavailable. Regression tests use synthetic retained runs and a representative heredoc with the specified mixed raw-regex quotes/backslashes.
-- SOURCE for rerun_invalid is a completed schema-valid report/checkpoint. Checkpoint-only interrupted/capacity-limited runs resume normally first; no historical exit hash is invented for fresh-selected pre-launch failures.
-- --reasons selects any matching recorded invalid reason, followed by the infrastructure eligibility checks. Other tasks are regraded from retained evidence; a reason string alone never authorizes rerunning a quality outcome.
-- Earlier v2 pilot difficulty, priority rates and host measurement quality remain unmeasured/unverified here. Existing deadline and freeze decisions are unchanged.
+- The Fast prices, 2026-07-30 naming change and Luna CLI priority default are user-supplied official-page/host observations; network verification is unavailable. No live cost or quality measurement is claimed.
+- The existing verifier exposes criterion extraction only. Binding task-scoped prose to one synthetic task ID applies its completion vocabulary, negation, exceptions and quote/code rules without treating criterion counts or test-only statements as whole-task completion.
+- Only the retained final output of the final process in the last required session supplies completion evidence; absent evidence is explicitly undefined, with no earlier-session or intermediate-message substitution.
+- Prior host recovery outcomes are still unknown. Private v2 artifacts are local companion changes and must remain paired with the revised public candidate; no v1 private grader was edited.

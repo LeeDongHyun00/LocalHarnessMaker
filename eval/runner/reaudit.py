@@ -23,8 +23,14 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
     """Return labels only; never rewrite a checkpoint, report or audit artifact."""
     state = json.loads((out / "checkpoint.json").read_text())
     report = json.loads((out / "report.json").read_text())
+    from eval.runner.schema_compat import validate_schema
+    from jsonschema import ValidationError
+    try:
+        validate_schema(report, core.REPOSITORY)
+    except ValidationError as exc:
+        raise ValueError("Report schema validation failed") from exc
     tasks = state.get("tasks")
-    if (state.get("report_schema") != "evaluation-report-v1" or not isinstance(tasks, dict) or
+    if (state.get("report_schema") not in {"evaluation-report-v1", "evaluation-report-v2"} or not isinstance(tasks, dict) or
             not tasks or any(not re.fullmatch(r"[a-z0-9][a-z0-9-]*", task) for task in tasks) or
             {task["task_id"] for task in report["tasks"]} != set(tasks)):
         raise ValueError("A complete version-1 run is required")

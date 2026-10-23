@@ -112,8 +112,8 @@ def test_launch_tier_and_invalidation_and_checkpoint(setup: tuple[Path, Path, Pa
         assert task['grading'] is None
     else:
         assert task['outcome'] == 'pass'
-        # Priority rates are absent from the pinned Standard-only price snapshot.
-        assert task['costs']['total_usd'] is None
+        # Native priority evidence selects the Fast snapshot.
+        assert task['costs']['total_usd'] == pytest.approx(.000221)
     checkpoint = json.loads((out / 'checkpoint.json').read_text())
     assert checkpoint['config']['service_tier'] == 'priority'
     assert json.loads((out / 'run-diagnostics.json').read_text())['service_tier'] == 'priority'

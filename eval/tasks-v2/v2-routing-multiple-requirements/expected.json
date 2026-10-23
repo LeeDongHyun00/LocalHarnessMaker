@@ -12,6 +12,6 @@
     "-v"
   ],
   "expected_exit_code": 0,
-  "expected_test_count": 12,
+  "expected_test_count": 13,
   "pass_condition": "All deterministic private unittest cases pass in a separate trusted grading copy."
 }

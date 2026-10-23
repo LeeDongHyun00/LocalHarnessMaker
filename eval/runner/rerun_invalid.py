@@ -9,6 +9,7 @@ import sys
 from typing import Any, Callable
 import uuid
 
+from eval.runner.pricing import extends, report_pricing
 from eval.metrics import compute, total
 from eval.runner import core, harness, regrade
 from eval.runner.audit import PrivateGraders, audit_retained_logs, digest, interrupted_logs
@@ -111,7 +112,7 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
     if not selected:
         raise ValueError('No eligible infrastructure-invalid tasks match the requested reasons')
     pricing = json.loads((core.REPOSITORY / 'eval/prices.yaml').read_text())
-    if pricing != original['metadata']['pricing']:
+    if not extends(pricing, original['metadata']['pricing']):
         raise ValueError('Pinned pricing snapshot differs')
     read_version = version if callable(version) else (lambda: version) if version else core.installed_version
     if read_version() != config['codex_version']:
@@ -185,6 +186,9 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
     base['validity'] = {'status': 'invalid' if invalid else 'valid', 'reasons': invalid}
     models = {c['model'] for t in tasks for c in t['calls'] if c['purpose'] != 'executor'}
     base['metadata']['control_model'] = next(iter(models)) if len(models) == 1 and 'unknown' not in models else None
+    from eval.runner.task_completion import publish_summary
+    publish_summary(tasks, out)
+    base["metadata"]["pricing"] = report_pricing(pricing)
     validate(base, core.REPOSITORY)
     provenance['status'] = 'finished'
     core.write_json(out / 'rerun-invalid.json', provenance)

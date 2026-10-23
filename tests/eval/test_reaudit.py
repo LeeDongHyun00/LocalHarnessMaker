@@ -8,12 +8,26 @@ from typing import Any
 import pytest
 
 from eval.runner import core, reaudit
+
+SOURCE_REPOSITORY = core.REPOSITORY
+
+
+def schema_report(task_ids: list[str]) -> dict[str, Any]:
+    """Use a real v1 report shape while audit tests vary retained raw evidence."""
+    from copy import deepcopy
+    value = json.loads((SOURCE_REPOSITORY / "schemas/examples/evaluation_report.json").read_text())
+    value["metrics"].pop("task_false_done_rate")
+    template = value["tasks"][0]
+    value["tasks"] = [dict(deepcopy(template), task_id=task_id) for task_id in task_ids]
+    return value
+
 from eval.runner.audit import PrivateGraders, audit_logs
 
 
 @pytest.fixture
 def finished(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Path, Path]:
     repository = tmp_path / "repository"
+    shutil.copytree(SOURCE_REPOSITORY / "schemas", repository / "schemas")
     public = repository / "eval/tasks/unit-task"
     public.mkdir(parents=True)
     (public / "prompt.md").write_text('Example: "shared-example"\n')
@@ -39,7 +53,7 @@ def finished(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Pat
     (out / "checkpoint.json").write_text(json.dumps({"report_schema": "evaluation-report-v1", "tasks": {
         "unit-task": {"phase": "finished", "runtime": str(runtime), "segments": [{"events": events.name}],
                       "result": {"grader_access_audit": audit}}}}))
-    (out / "report.json").write_text(json.dumps({"tasks": [{"task_id": "unit-task"}]}))
+    (out / "report.json").write_text(json.dumps(schema_report(["unit-task"])))
 
     def forbidden(*args: Any, **kwargs: Any) -> None:
         raise AssertionError("Re-audit must never execute subprocesses")
@@ -141,7 +155,7 @@ def test_reaudit_keeps_all_tasks_and_errors_without_paths(finished: tuple[Path, 
                                       "segments": [{"events": "exec-1.jsonl"}],
                                       "result": {"grader_access_audit": second_audit}}
     checkpoint.write_text(json.dumps(state))
-    (out / "report.json").write_text(json.dumps({"tasks": [{"task_id": task} for task in state["tasks"]]}))
+    (out / "report.json").write_text(json.dumps(schema_report(list(state["tasks"]))))
     log = runtime / "exec-1.jsonl"
     log.write_text('{"type":"unknown-one"}\n{"type":"unknown-two"}\n{"type":"turn.completed"}\n')
     before = snapshot(out.parent)

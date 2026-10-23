@@ -158,7 +158,7 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
 
 
 def validation_digest(private_by_task: dict[str, PrivateGraders], config: dict[str, Any]) -> str:
-    """Hash unfrozen v2 candidate bytes offline; runner still requires tracked frozen inputs."""
+    """Hash unfrozen v2 candidates offline; execution still requires tracked inputs."""
     if config.get('task_root') != 'eval/tasks-v2':
         return core.configured_digest(private_by_task, config)
     hashes = {}

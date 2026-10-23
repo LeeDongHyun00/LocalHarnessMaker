@@ -39,5 +39,6 @@
     "v2-reservations-two-session": 1800,
     "v2-routing-two-session": 1800,
     "v2-inventory-two-session": 1800
-  }
+  },
+  "calibration": true
 }

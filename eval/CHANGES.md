@@ -1128,3 +1128,52 @@ was modified. Verification and remaining host work are recorded in STATUS-eval.
 Verification: `.venv/bin/python -m pytest tests/eval -q` — 649 passed in
 60.49s. Frozen task and pilot-report diffs are empty; no full repository suite
 was run in this session.
+
+# Calibration, observed-tier pricing and interface v2 metrics — 2026-10-23
+
+Add boolean calibration (default false) for the decision 0008 pre-freeze pilot.
+Calibration checkpoints, run diagnostics and pinned report artifacts identify
+nonheadline evidence, stderr explains that status, and compare refuses it.
+The baseline-A pilot and estimate enable calibration before its later freeze.
+
+Preserve the original Standard snapshot, add the user-supplied 2026-10-23 Fast
+snapshot at 2× Standard and a separate Standard Sol 6 supplement. Capture newly
+emitted native applied tiers at each process exit; control calls require a tier
+on their control_call line. Unknown tiers remain null. Per-call artifacts and
+schema-compatible metadata pin tier/rate/source provenance. Recovery preserves
+historical accounting. README records Luna's priority CLI default and the
+retained v1 control-cost underpricing for disclosure in the final evaluation.
+
+Give all four multiple_requirements variants materially different family
+specifications and independent private graders/references/coverage. Archive the
+previous candidate privately. Revalidate all twenty starter/reference pairs and
+the changed references' complete mutation populations. The counts-only report
+records 249 reference checks, 136 starter failures, 252/252 covered requirements,
+1121 killed mutants, 18 reviewed equivalents and zero unreviewed survivors;
+20 starter public suites and 20 reference verification commands pass.
+
+Implement task_false_done_rate using the retained final message of the last
+required session, a task-scope adapter applying verifier.claims.claimed_criteria,
+valid-task populations and seeded task-cluster bootstrap. Pin final/segment and
+extractor hashes, evidence, numerator/denominator and exclusions through existing
+artifacts. Preserve criterion-level false_done_rate. Missing final messages are
+excluded with reasons; missing hidden grading never establishes false done.
+Version-aware schema validation supports retained v1 reports in regrade,
+continuation, rerun, re-audit and compare; task-level comparison requires v2 on
+both sides. No retained v1 report, schema or existing CLI flag is changed.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1126 passed in
+113.59s. All nine retained shared-schema reports validate by declared version;
+the provisional report remains unchanged. `git diff --check -- eval tests/eval
+state/STATUS-eval.md` and `git diff --exit-code -- eval/tasks schemas` pass.
+The four prior bug-fix references fail 22 checks against the revised variants.
+
+## Assumptions
+
+- Pricing is the user's supplied official-page observation; network verification
+  and live executor/controller/judge calls are unavailable in this session.
+- The existing verifier exposes criterion extraction only. The eval-owned adapter
+  binds task-scoped completion prose to one synthetic ID, uses the same clause
+  rules and excludes criterion-only/test-only statements; no verifier edit occurs.
+- The new candidate remains unfrozen. Paid calibration, later freeze and the
+  full repository check before merge remain host work.

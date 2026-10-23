@@ -38,7 +38,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     state = json.loads((source / 'checkpoint.json').read_text())
     entries = state.get('tasks')
     config = state.get('config')
-    if (state.get('report_schema') != 'evaluation-report-v1' or not isinstance(entries, dict) or
+    if (state.get('report_schema') not in {'evaluation-report-v1', 'evaluation-report-v2'} or not isinstance(entries, dict) or
             not entries or set(entries) != {task['task_id'] for task in original['tasks']} or
             any(not re.fullmatch(r'[a-z0-9][a-z0-9-]*', task) for task in entries) or
             any(e.get('phase') != 'finished' or e.get('pid') for e in entries.values())):
@@ -160,6 +160,8 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         # Regrading does not change executor/control accounting or observations.
         for key in ('calls', 'costs', 'done_claims'):
             shared[key] = copy.deepcopy(old_task[key])
+        from eval.runner.pricing import preserve_provenance
+        preserve_provenance(shared, task_out, prior=old_task)
         tasks.append(shared)
     report['tasks'] = tasks
     report['metrics'] = compute(tasks, seed=original['metadata']['confidence']['seed'],
@@ -172,10 +174,12 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                             'total_cost_usd': total([t['costs']['total_usd'] for t in tasks])}
     reasons = [f"{t['task_id']}: {reason}" for t in tasks for reason in t['invalid_reasons']]
     report['validity'] = {'status': 'invalid' if reasons else 'valid', 'reasons': reasons}
+    from eval.runner.task_completion import publish_summary
+    publish_summary(tasks, out)
     validate(report, core.REPOSITORY)
     core.write_json(out / 'checkpoint.json', new_state)
     core.write_json(out / 'run-diagnostics.json', {
-        'task_root': config.get('task_root', 'eval/tasks'), 'service_tier': config.get('service_tier'),
+        'calibration': config.get('calibration', False), 'task_root': config.get('task_root', 'eval/tasks'), 'service_tier': config.get('service_tier'),
         'source': str(source), 'source_report_sha256': digest(source_bytes),
         'audit_code_version': audit_code_version(), 'workspace_hash_checks': checks})
     text = json.dumps(report, indent=2) + '\n'
