@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-round-robin-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-wtxs9cf_/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-48-59-01a166e0-4be8-7661-b6e9-6c1bbee818a1.jsonl",
+        "sha256": "bb6b0c5aaa83eff311fa56312edd5d219d056bf436327e0f700ab8e7462afc97"
+      }
+    ]
+  }
+]

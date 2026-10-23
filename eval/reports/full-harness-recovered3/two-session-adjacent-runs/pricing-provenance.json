@@ -1,0 +1,68 @@
+[
+  {
+    "call_id": "two-session-adjacent-runs-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nlls5elz/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-29-46-01a167e1-5ee8-7862-8782-af27f04a7fdb.jsonl",
+        "sha256": "f74c3c8dde6011a604999dfe4e9b757ca2e9deaa9a3ceac6a7745631ff20fb9e"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-adjacent-runs-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nlls5elz/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-30-57-01a167e2-78d1-7491-83cc-e3ee164bd28f.jsonl",
+        "sha256": "64ac8d3d6d425b26beba53ef38aa3d5034a6387384d6a125e1557218e13b0420"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-adjacent-runs-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "16219f7d42e0fcb9818fa34aeea0bd3d5537300248fe105bb6525fe558f19192",
+    "record_sha256": "882c8804b64d4c22d1f72b7fe894ee341bb2743316780c462283fb19603191ad"
+  },
+  {
+    "call_id": "two-session-adjacent-runs-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "16219f7d42e0fcb9818fa34aeea0bd3d5537300248fe105bb6525fe558f19192",
+    "record_sha256": "9a0b695946798944d8ee63937991a671aeef014e57ffd90031b09f4287671fd8"
+  },
+  {
+    "call_id": "two-session-adjacent-runs-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "fa66724006a1e2ea72cf11436a35a85a881476e98ef1e3b3dfff42160790b857",
+    "record_sha256": "e7bebdf297920a038764c2689fbec9ef44b4c1145be103f605a448a0bf1a16f3"
+  },
+  {
+    "call_id": "two-session-adjacent-runs-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e094f294f18720e9154cb3696870efb7413a35d1dec3c8e49c9ccf9b2cdfe110",
+    "record_sha256": "429cdb646924b7ad90fa64901aafb23fbfbf4de8dc1348a5cef1962bab4c6dc1"
+  },
+  {
+    "call_id": "two-session-adjacent-runs-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "71e727e6546fc555016312e27dcea16b8dff1444599b616051e821acf191cce4",
+    "record_sha256": "13a81ae6907afcd7b85f4161d0f76691e8c88ea4f7932e68195d11a652571749"
+  }
+]

@@ -1,0 +1,76 @@
+[
+  {
+    "call_id": "two-session-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-82dwtt7w/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-31-57-01a16775-7fcb-7483-baac-6f7d702f5f0a.jsonl",
+        "sha256": "06f49148b85ae4eeba938563317f135cc5053382a613fd70b7c16aa74de139d3"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-flatten-once-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-82dwtt7w/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-33-30-01a16776-f0af-7110-89e2-3f63ffd67715.jsonl",
+        "sha256": "9d6a45835597e3e2c08e5aeabe8197cd8545e671a52e0d8e757d4bc83c3ae907"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-flatten-once-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "7bfaabf4acb118e5fcbd66defe73a71d9ea265673e5d080e141d93642b7c3709",
+    "record_sha256": "52d33d3c653b1e1bc0ea3b8f4297fc32512c65db9600fa6c89f809168e1777ce"
+  },
+  {
+    "call_id": "two-session-flatten-once-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "41cb13dce4617fa69217473ba469e0b56ce25b0526d8eb9b6b1f6eea55eea780",
+    "record_sha256": "2f5595c0c97133d07c34b3aad4c4acba5fc1ff844b1f786e61eb2a77be53d585"
+  },
+  {
+    "call_id": "two-session-flatten-once-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f68c1423e575718c91dde92d8def43b153ca2d9a18379a11bec91a9190aec029",
+    "record_sha256": "b718b0b8fcc03fa2cf8998a6d2e7d21853c4d667512ab60265a352ba10e85410"
+  },
+  {
+    "call_id": "two-session-flatten-once-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f68c1423e575718c91dde92d8def43b153ca2d9a18379a11bec91a9190aec029",
+    "record_sha256": "dca0eb51d8ba48c30f123e2249cd8be3ac34d6c2c9d95c03d0148376f1aa3ef7"
+  },
+  {
+    "call_id": "two-session-flatten-once-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "9a8bdecc8ab1ac7327927400a49303a04357b0ebae7fc3d8bdf1dae396060693",
+    "record_sha256": "e545442209734307e717c1c8ca73e71c83fc53fdaccdb31d5ba14f27a6c45fe9"
+  },
+  {
+    "call_id": "two-session-flatten-once-control-6",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "65d56a42398e98ce7abe4563f7e1aab91c75fd8455c1dd297d891903183a9cfe",
+    "record_sha256": "59c29728eaa4c91b782109949b1bf7f9ecb171b6063e9267eedcf18eba175947"
+  }
+]

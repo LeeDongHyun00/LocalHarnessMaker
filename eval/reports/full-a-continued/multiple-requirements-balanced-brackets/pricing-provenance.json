@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-balanced-brackets-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4ylu2p9j/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-45-54-01a166dd-798a-71e0-be19-6240832e2828.jsonl",
+        "sha256": "0e31cdf6e3b1848ebe9089149c706fc96581427cc53ecfab5a021b21eb9f9662"
+      }
+    ]
+  }
+]

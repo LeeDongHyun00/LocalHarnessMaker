@@ -1,0 +1,11 @@
+{
+  "numerator": 1,
+  "denominator": 22,
+  "excluded_task_ids": [
+    "two-session-balanced-brackets"
+  ],
+  "exclusions": {
+    "two-session-balanced-brackets": "Invalid task: excluded from numerator and denominator."
+  },
+  "undefined_outcomes": {}
+}

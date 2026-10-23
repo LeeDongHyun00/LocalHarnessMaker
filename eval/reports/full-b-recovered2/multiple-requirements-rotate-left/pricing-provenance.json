@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-rotate-left-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-6gj7gpy9/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-11-11-01a16762-7b7b-7973-b4be-334a64b76dd1.jsonl",
+        "sha256": "f904e485326dd221d4baeea057d33b3911136d52e13a6386fade24c7a10cce58"
+      }
+    ]
+  }
+]

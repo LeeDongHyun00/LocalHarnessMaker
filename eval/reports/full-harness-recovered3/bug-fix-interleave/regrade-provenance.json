@@ -1,0 +1,10 @@
+{
+  "task_id": "bug-fix-interleave",
+  "source_report_sha256": "68428d4727f4d142d422c1ac0b13a2027fd1e401acd6c4f7fd3b1b38205bd4f2",
+  "workspace_verification": "published_workspace_copy",
+  "published_file_count": 2,
+  "workspace_file_count": 2,
+  "hashes_compared": 2,
+  "mtimes_checked": 2,
+  "last_exit_time_ns": 1792740912968063000
+}

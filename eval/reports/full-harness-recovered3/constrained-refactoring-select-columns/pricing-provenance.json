@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "constrained-refactoring-select-columns-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-02etxaso/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-19-45-01a1676a-5583-7370-85e0-0b174aa830aa.jsonl",
+        "sha256": "1b56421ba4d0acb493f94dfd77ece2b73e1d935597216d9f7e47fee6f3062000"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-select-columns-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "6cb63c6827fe94ea6e7aee793ba2c77bb613df3534b12904a406a8d42de11779",
+    "record_sha256": "89d4e82462aa84151fb19e0dc799d1c3f269292410708a0de38b30f4f7713173"
+  },
+  {
+    "call_id": "constrained-refactoring-select-columns-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f03b28c82c4db57f4f00b2c96c5d4b969949b3814708a95558e8f4126ba55208",
+    "record_sha256": "46f8bd9457c00a46838ce1ea28e143d1026c57c1a6e87ff1c79654c5a92e1572"
+  }
+]

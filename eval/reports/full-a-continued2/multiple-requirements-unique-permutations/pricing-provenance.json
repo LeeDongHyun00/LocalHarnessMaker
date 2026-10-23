@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-unique-permutations-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-2xwphuau/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-56-18-01a1671d-e9b9-7973-bcab-c7138b150d6d.jsonl",
+        "sha256": "1ecf2ca1c788f5046124ceb87a823a8b74296451f677f8ddef321a90f3c91f5c"
+      }
+    ]
+  }
+]

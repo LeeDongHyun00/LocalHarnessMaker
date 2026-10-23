@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "d5b6e94e714549fb8fb0139783de9f4311b0438c954c07448d2306a33063e8cb",
+  "final_message": {
+    "path": "eval/reports/full-a-regrade/feature-plus-test-partition-sign/final-1.md",
+    "sha256": "ab31efbc2ace43f719e17c7efa78e6ab8313a9106cb123ff89406acb23e45e4a"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `partition` with type hints, preserving order and duplicates without mutating the input"
+  ],
+  "undefined_reason": null
+}

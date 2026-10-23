@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fc0609ip/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-12-00-01a166f5-5e03-72c3-bdae-fc044799016f.jsonl",
+        "sha256": "99df8858b9e00ebb387ddf8dd8848c3c49ff38c7a8f40366907a286a310efaeb"
+      }
+    ]
+  }
+]

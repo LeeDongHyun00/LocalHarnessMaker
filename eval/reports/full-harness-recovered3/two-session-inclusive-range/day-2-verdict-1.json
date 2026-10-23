@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+inclusive_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:\n10: def inclusive_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\")]; assert len(methods) >= 3 and any(\"many\" in n.name.lower() or \"batch\" in n.name.lower() for n in methods)'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_many_empty (test_solution.InclusiveManyTests.test_many_empty) ... ok\ntest_many_forwards_arguments_without_mutation (test_solution.InclusiveManyTests.test_many_forwards_arguments_without_mutation) ... ok\ntest_many_preserves_case_order_and_inputs (test_solution.InclusiveManyTests.test_many_preserves_case_order_and_inputs) ... ok\ntest_many_propagates_first_exception_unchanged_and_stops (test_solution.InclusiveManyTests.test_many_propagates_first_exception_unchanged_and_stops) ... ok\ntest_ascending_endpoints_are_included (test_solution.InclusiveTests.test_ascending_endpoints_are_included) ... ok\ntest_descending_endpoints_are_included (test_solution.InclusiveTests.test_descending_endpoints_are_included) ... ok\ntest_equal_endpoints_give_singleton (test_solution.InclusiveTests.test_equal_endpoints_give_singleton) ... ok\ntest_negative_endpoints_and_zero_crossing (test_solution.InclusiveTests.test_negative_endpoints_and_zero_crossing) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.002s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(?=.*python -m unittest discover -v)(?=.*(?:passed|pass(?:ed)? all|result:))\n1: # Day 2 handoff\n2: \n3: ## Design decisions\n4: \n5: - Preserve the typed public API `inclusive(start: int, stop: int) -> list[int]`.\n6: - Select a step of +1 for ascending or equal endpoints and -1 for descending endpoints.\n7: - Use `range(start, stop + step, step)` to include the final endpoint, then return a fresh list. Equal endpoints yield a singleton.\n8: - Inputs are integers; no input collections are mutated. Validation of other input types is unspecified.\n9: - Use Python 3.11+ and only the standard library.\n10: - Add `inclusive_many(cases: list[tuple]) -> list`, calling `inclusive(*case)` in input order and returning a fresh result list. Empty input returns `[]`.",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

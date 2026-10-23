@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-routing-bug-fix-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vecmf8jj/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-13-43-01a167d2-ae95-7842-827d-7397dd1abb57.jsonl",
+        "record_sha256": "693e69ac90a0ed43d2a686f240777307d91c245e978253c897f5a43ad0df33e9",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vecmf8jj/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-13-43-01a167d2-ae95-7842-827d-7397dd1abb57.jsonl",
+        "sha256": "1356be34871c9b41d232a467584993976bd3121463a6a106476c8376c3ea5f33"
+      }
+    ]
+  }
+]

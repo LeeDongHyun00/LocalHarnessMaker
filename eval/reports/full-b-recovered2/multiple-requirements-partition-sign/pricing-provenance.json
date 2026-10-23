@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-partition-sign-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gce4kybh/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-15-57-01a16766-d89b-73e3-970f-1f519185106a.jsonl",
+        "sha256": "d246f10918420ff3095ae7911eedc06fb979e633e8ed45e288ba3087d6e2c20f"
+      }
+    ]
+  }
+]

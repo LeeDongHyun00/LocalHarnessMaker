@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3jtus6ty/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-36-10-01a16742-6d34-7b92-a470-f90549573006.jsonl",
+        "sha256": "591c04125a6c9a32eaed677802484fce06215e90af233360be52e68b4fafc565"
+      }
+    ]
+  }
+]

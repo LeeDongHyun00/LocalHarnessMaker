@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-wq71mt41/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-44-24-01a16749-f336-7ee1-9f84-afb2038ba218.jsonl",
+        "sha256": "37547168a615723fae01897d7dda39146272cd8990ebc1a001dd4309ff111043"
+      }
+    ]
+  }
+]

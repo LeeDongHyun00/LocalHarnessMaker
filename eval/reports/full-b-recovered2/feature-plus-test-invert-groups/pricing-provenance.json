@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-invert-groups-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-00wqaowt/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-10-26-01a16761-cfaf-7c12-95ca-d4f9074f32cb.jsonl",
+        "sha256": "2b112b3e02e67e2481de18ea20e0b1abaa66aecb5c782dba4d7c4e9d7b570a63"
+      }
+    ]
+  }
+]

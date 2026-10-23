@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-routing-multiple-requirements-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3l7dvb81/codex-home/sessions/2026/10/23/rollout-2026-10-23T22-31-41-01a168f5-cb57-7991-b55d-a8b269bf6fad.jsonl",
+        "record_sha256": "c01ab0d3b49f162a947b332f98eb0f5fe979234aec423b68dedd6961d83be756",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3l7dvb81/codex-home/sessions/2026/10/23/rollout-2026-10-23T22-31-41-01a168f5-cb57-7991-b55d-a8b269bf6fad.jsonl",
+        "sha256": "6d17454d0c6f5c0992965387b223de0ea673149cc38c773dca6a6dadca68d9e8"
+      }
+    ]
+  }
+]

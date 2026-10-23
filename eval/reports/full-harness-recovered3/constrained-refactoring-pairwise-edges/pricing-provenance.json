@@ -1,0 +1,76 @@
+[
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-di65ctmh/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-23-43-01a167db-cf54-7790-ae3d-a6dd812a1c02.jsonl",
+        "sha256": "a6e522b00885efc68ae296238f1462be5fc27dbdf91eeb93d19d784b49547dc3"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-di65ctmh/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-23-43-01a167db-cf54-7790-ae3d-a6dd812a1c02.jsonl",
+        "sha256": "a6e522b00885efc68ae296238f1462be5fc27dbdf91eeb93d19d784b49547dc3"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f075e6b6ac6aba00bc11fbfaf5134325058d8ef9479a2572608ca7609d8b9b79",
+    "record_sha256": "0ee911170fbf9324a2c560c4bc4a532db21a51bffa29846a0c478c0ceb3be42f"
+  },
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f075e6b6ac6aba00bc11fbfaf5134325058d8ef9479a2572608ca7609d8b9b79",
+    "record_sha256": "caf8a6e10e54b925db90a6b6e6e480f52ca345978fb3a73fcf90a9f6918f7552"
+  },
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4a544603a0794edb4077325ab9849d42c64f36188cf552d9bf8716d39e3776ac",
+    "record_sha256": "89f19e8ed439b7256e9d17da9185a4bfd8b92b01331c996254af7e0bc093fd5e"
+  },
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4a544603a0794edb4077325ab9849d42c64f36188cf552d9bf8716d39e3776ac",
+    "record_sha256": "ca2da436e33f4792709b072e4d4133f6bd41a911df7ca2787e9a05fe70a4d0dd"
+  },
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "fffb87c390440770417ab92d8341a39964c8e4ededc66a24df2122b2d8fa8e60",
+    "record_sha256": "844bdc6b33eb5da1e673379b243dd2b1ed7362b6c8f986ac5a6ac375f270bcd9"
+  },
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-control-6",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "fffb87c390440770417ab92d8341a39964c8e4ededc66a24df2122b2d8fa8e60",
+    "record_sha256": "a29a9b15e3da0cf69e9f5d8fcde07c5ac585ba67712f5ad4a760afc03a204e60"
+  }
+]

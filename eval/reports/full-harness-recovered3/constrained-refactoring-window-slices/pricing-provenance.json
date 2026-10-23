@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "constrained-refactoring-window-slices-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-jpd__zww/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-29-58-01a16773-b086-7e11-831c-49cd9ce4c413.jsonl",
+        "sha256": "a7cfa1c59fda95a715ab711fb67fbf16e217305bab2fabfc7d3c83e5b1f42586"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-window-slices-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f0ba1ac01f1d196c9ef051d85abed6e7510ce2a5168c967a3f690b47951efea5",
+    "record_sha256": "18daf52f69a84e58ceff84ceefc08ab0320302c9e763a4e4be6f69d3c426621a"
+  },
+  {
+    "call_id": "constrained-refactoring-window-slices-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f0ba1ac01f1d196c9ef051d85abed6e7510ce2a5168c967a3f690b47951efea5",
+    "record_sha256": "5dbc6f5f733ea2f8b0d23e3a778092990ee60163c158e520a7484f73058b3579"
+  }
+]

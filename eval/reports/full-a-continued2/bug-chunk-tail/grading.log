@@ -1,0 +1,5 @@
+test_partial_tail_and_input_preservation (test_private_52cd3099d9414735bd7d03910ee989ce.ChunkingTests.test_partial_tail_and_input_preservation) ... ok
+test_single_item (test_private_52cd3099d9414735bd7d03910ee989ce.ChunkingTests.test_single_item) ... ok
+test_unit_chunks_and_empty_input (test_private_52cd3099d9414735bd7d03910ee989ce.ChunkingTests.test_unit_chunks_and_empty_input) ... ok
+Ran 3 tests in 0.001s
+OK

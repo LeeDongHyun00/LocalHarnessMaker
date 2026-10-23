@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-rotate-left-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-6_zpud1_/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-44-44-01a16713-584f-72f2-825d-58518e84b632.jsonl",
+        "sha256": "468c3505641d31e2ef15d0923567827c02c89c3790022c262a83df30210e2903"
+      }
+    ]
+  }
+]

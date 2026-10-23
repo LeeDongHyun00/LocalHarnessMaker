@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "multiple-requirements-common-prefix-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-dttsuio3/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-46-29-01a167b9-adef-7ff3-bdf4-f8d50755ae79.jsonl",
+        "sha256": "5dc814ebcc265f5295529e766752ca7e842e797999031bec77444325b70e103e"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-common-prefix-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d313c8866f9a982fa9a75cf9bd2741cb33050c809c728619ce763b6ff1b15b6f",
+    "record_sha256": "c35d27b1169dbfd159811aa4b31fcbc64d9dc4b57464c076e4ce4374c3aa1530"
+  },
+  {
+    "call_id": "multiple-requirements-common-prefix-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d313c8866f9a982fa9a75cf9bd2741cb33050c809c728619ce763b6ff1b15b6f",
+    "record_sha256": "0d152589207a483a0f10ab557fd19471f641111775d079df2f9df596199849b8"
+  },
+  {
+    "call_id": "multiple-requirements-common-prefix-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "005223cbc8d957b7f6e8715ea9c1825c219038319bc812d71b5f2fd0076e2d09",
+    "record_sha256": "e1932e83262b703a069a3576fa6f76064f3eb543935b33453a8d0ae9fee35c6f"
+  }
+]

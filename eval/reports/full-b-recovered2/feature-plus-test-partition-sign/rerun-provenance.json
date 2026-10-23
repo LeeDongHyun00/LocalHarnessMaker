@@ -1,0 +1,227 @@
+{
+  "operation": "rerun-unaccounted",
+  "source": "eval/reports/full-b-regrade",
+  "source_run_id": "acee11e1bd5b47f1a9d56dbd1372d8c2",
+  "source_report_sha256": "a8e3609b323356db826518adbf922c23e3edd8613eaaaab3b14d60ac09594958",
+  "source_checkpoint_sha256": "4676063b9b95fb78d2da636b0de56255e886cf0399420162bb5422d8475e42b2",
+  "requested_reasons": [],
+  "selected_tasks": [
+    "feature-plus-test-partition-sign"
+  ],
+  "status": "finished",
+  "audit_code_version": {
+    "audit.py": "404f743d725e8e52645429179f8c9c1300a65aee88e336e43efed4f1432ac9d7",
+    "javascript.py": "e2e854a124443f25c7ec1fb515d0fe0dc1a444877d48b040b65cd0a4ed36a34f",
+    "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+    "regrade.py": "bdbcfff0573841832a35b145c1812243ba9bb680c7222fe5acca781dd9ece88c",
+    "telemetry.py": "e2c887e38c76829c481d61f8ffd3cd7130b98aa434a04f1189d1dd11bdcc01b2",
+    "core.py": "fa5e72337dcd556be0e1c485d418e78325b9f85be0553bae9fb2dc973ffd0f00",
+    "workspace_verification.py": "00ff2a966dd89555430cb7ea48712240e065955784344e0289f731d9569d1b4f",
+    "harness.py": "c7770545ef303949870015cd67f22472f70505bf93c83f72fd95934a1f019e77",
+    "rerun_invalid.py": "2df7fded322b07eb5579bf2764f1308b00a86c106df0dd5e9d47c702f7856c4e",
+    "rerun_unaccounted.py": "350417a55aa41636d721db247b746b1f7f824d6308b5741ce18e250e13b732e7"
+  },
+  "task_id": "feature-plus-test-partition-sign",
+  "invalid_reasons": [],
+  "source_outcome": "pass",
+  "reason": "executor_usage_missing_after_infrastructure_interruption",
+  "accounting_policy": "replace_with_fresh_session",
+  "infrastructure_causes": [
+    {
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "markers": [
+        "interrupted",
+        "exit_code=-2"
+      ],
+      "missing_usage_fields": [
+        "input_tokens",
+        "cached_input_tokens",
+        "output_tokens"
+      ],
+      "pricing_ref": null,
+      "pricing_evidence": null
+    }
+  ],
+  "source_segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T06:53:52.004282+00:00",
+      "events": "exec-1.jsonl",
+      "stderr": "exec-1.stderr",
+      "day": 1,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exit_code": -2,
+      "exited_at": "2026-10-23T06:55:45.325316+00:00",
+      "interrupted": true,
+      "partial_usage": {
+        "source": "native event_msg.token_count.info.total_token_usage",
+        "lower_bound": true,
+        "note": "Lower bound of cumulative session usage at interruption; may include earlier processes. Evidence only, never used for costs.",
+        "rollouts": [
+          {
+            "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmq3zwke/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-53-53-01a16789-9525-72a3-a199-2ce6041f2e31.jsonl",
+            "timestamp": "2026-10-23T06:54:08.613Z",
+            "tokens": {
+              "input_tokens": 28778,
+              "cached_input_tokens": 24064,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 320,
+              "reasoning_output_tokens": 82,
+              "total_tokens": 29098
+            }
+          }
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "started_at": "2026-10-23T06:55:49.843810+00:00",
+      "events": "exec-2.jsonl",
+      "stderr": "exec-2.stderr",
+      "day": 1,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T06:56:42.190837+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 52.33077624900034,
+      "native_usage": {
+        "input_tokens": 48724,
+        "cached_input_tokens": 43136,
+        "output_tokens": 1474
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmq3zwke/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-53-53-01a16789-9525-72a3-a199-2ce6041f2e31.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "07eff730e5f92f856f9d7351630474a4c529380a98a9fcef33ecd00176c3d4f5"
+    }
+  ],
+  "source_executor_segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T06:53:52.004282+00:00",
+      "exited_at": "2026-10-23T06:55:45.325316+00:00",
+      "exit_code": -2,
+      "session_id": "01a16789-9525-72a3-a199-2ce6041f2e31",
+      "events": {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmq3zwke/exec-1.jsonl",
+        "sha256": "d41adb4290677031a9ced57eef4850580d7cf0d0038c9110e03a05af8acfa25b"
+      }
+    },
+    {
+      "attempt": 2,
+      "started_at": "2026-10-23T06:55:49.843810+00:00",
+      "exited_at": "2026-10-23T06:56:42.190837+00:00",
+      "exit_code": 0,
+      "session_id": "01a16789-9525-72a3-a199-2ce6041f2e31",
+      "events": {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmq3zwke/exec-2.jsonl",
+        "sha256": "c991f1426b33c22dba37989fe8aa6b17edc7626e487d5df7edee96ffceda2067"
+      }
+    }
+  ],
+  "source_artifacts": [
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/access-audit.json",
+      "sha256": "82ef3859f542bad31a29b7fb71990908f9c8556d0d352fc98bfa6e1ab3503104"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/calibration.json",
+      "sha256": "66a4de1b40fe711c16108c735e08955c3fe152c1bf8d760a5945ad8485ed2fd0"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/exec-1.jsonl",
+      "sha256": "d41adb4290677031a9ced57eef4850580d7cf0d0038c9110e03a05af8acfa25b"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/exec-1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/exec-2.jsonl",
+      "sha256": "c991f1426b33c22dba37989fe8aa6b17edc7626e487d5df7edee96ffceda2067"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/exec-2.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/final-2.md",
+      "sha256": "06900a895b8bdc4f85b35f8ead22fa59ee41ca066e0a88460c870d1bbb008bba"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/grading.log",
+      "sha256": "3eab35289405c2418063b86d798f53d844e45a515589c3b25584f7e0c001f96d"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/result.json",
+      "sha256": "f93e0eeeaba9c62c01245674fbf99c44fb7fd01a06ddc05a86816b08f1d8f12b"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/session-evidence.jsonl",
+      "sha256": "ccb2f5212988cb5c57afc3175e89d551bc821dfe1e0db66f12baef0ee014f09e"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/task-completion.json",
+      "sha256": "a5c8f2878bfefaf62b94b956999cda756d6592102e5ed3898cf16d883cec2a41"
+    },
+    {
+      "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmq3zwke/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-53-53-01a16789-9525-72a3-a199-2ce6041f2e31.jsonl",
+      "sha256": "9e3010a2ac440e9589404d6ef5a7e3d9b3024b55f552803171de903121b2a086"
+    },
+    {
+      "path": "eval/reports/full-b-regrade/feature-plus-test-partition-sign/pricing-provenance.json",
+      "sha256": "755364e24aab902e1f08757b79f346663cf4257194e5d5d4ceebb04e69665d6b"
+    }
+  ],
+  "source_calls": [
+    {
+      "call_id": "feature-plus-test-partition-sign-exec-1",
+      "purpose": "executor",
+      "backend": "codex_cli",
+      "model": "gpt-6.1-sol",
+      "status": "failed",
+      "usage": {
+        "input_tokens": null,
+        "cached_input_tokens": null,
+        "output_tokens": null,
+        "usd": null,
+        "latency_seconds": 0,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": "openai-standard-short-2026-10-22-v1"
+      }
+    },
+    {
+      "call_id": "feature-plus-test-partition-sign-exec-2",
+      "purpose": "executor",
+      "backend": "codex_cli",
+      "model": "gpt-6.1-sol",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 48724,
+        "cached_input_tokens": 43136,
+        "output_tokens": 1474,
+        "usd": 0.0302296,
+        "latency_seconds": 52.33077624900034,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": "openai-standard-short-2026-10-22-v1"
+      }
+    }
+  ],
+  "source_costs": {
+    "executor_usd": null,
+    "control_usd": 0,
+    "total_usd": null
+  },
+  "rerun_id": "cfd8f353779249d4b56d301effdd35d4",
+  "workspace_verification": "workspace_digest",
+  "workspace_digest_version": 1,
+  "outcome": "pass",
+  "fresh_runtime": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ddjkjqwj",
+  "added_call_ids": [
+    "feature-plus-test-partition-sign-rerun-cfd8f353779249d4b56d301effdd35d4-feature-plus-test-partition-sign-exec-1"
+  ],
+  "added_cost_usd": 0.036921199999999994
+}

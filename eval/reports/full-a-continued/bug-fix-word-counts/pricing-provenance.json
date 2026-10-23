@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-word-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hls6x9wb/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-55-39-01a166e6-6551-7742-a1a2-8091771f2287.jsonl",
+        "sha256": "7455e46f63d633d5ebe683dfc43bb1d8c451fd8c0956bf11adb06f6064dc1294"
+      }
+    ]
+  }
+]

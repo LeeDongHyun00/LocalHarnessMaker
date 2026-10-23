@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "4156218a4eeb0c77e179a3dd0edb5619cafdb430d67ccc949f5db04a6e5027df",
+  "final_message": {
+    "path": "eval/reports/full-a-continued2/feature-plus-test-clamp-values/final-1.md",
+    "sha256": "bdebc9d63e1628b9e82fa60b338faeeefc5d86aaf37ca872bd892228ecfc712e"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `clamp` with inclusive bounds, valid equal bounds, and `ValueError` for reversed bounds"
+  ],
+  "undefined_reason": null
+}

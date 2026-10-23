@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "feature-plus-test-partition-sign-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-y9qa_eow/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-34-58-01a167e6-2038-7350-8036-fd9fbaf2b88d.jsonl",
+        "sha256": "6119aa122b7f1493367d90a3e87d1a9bd185db7d5f7db74ce74b3a2ff5788d3c"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-partition-sign-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4a03c24a8aa9ea6d598d937cb62baa8e4acb9e8f700ad175f3ca71835a977329",
+    "record_sha256": "21efe425ace3def4f7c473ee77ffaef70bc9411bc5b08875e154255d4c30b2ec"
+  },
+  {
+    "call_id": "feature-plus-test-partition-sign-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4a03c24a8aa9ea6d598d937cb62baa8e4acb9e8f700ad175f3ca71835a977329",
+    "record_sha256": "0ec549f2e00958e29d7b45b3b065f9b7582fd5b53095df00818db76248d676fa"
+  }
+]

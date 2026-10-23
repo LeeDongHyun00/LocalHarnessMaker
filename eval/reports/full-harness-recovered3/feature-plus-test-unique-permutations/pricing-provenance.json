@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "feature-plus-test-unique-permutations-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-e5zfwu4h/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-44-05-01a16780-9d7b-7b20-b2a8-028a14ad6714.jsonl",
+        "sha256": "ef5b181fe362d724ff69bee62eb6cba2338310a6c1005bdbd8f5cbec15396c43"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-unique-permutations-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "927f6d83a8a58a3e737cc067f3271c694a1cd64018a0dee23f157604fcb3371c",
+    "record_sha256": "6b6b7d44121de9ae779dad3075d0cb151a8762e9a1904d65f41707496e1fcbd6"
+  },
+  {
+    "call_id": "feature-plus-test-unique-permutations-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "7e765b43c94d253d455672da0dd07b22e82844cb5788c39c02268683a56eb177",
+    "record_sha256": "2266d397629e8a1b6e847821273d52df655f4bd7ce5c978c8699f448e3aa68e9"
+  },
+  {
+    "call_id": "feature-plus-test-unique-permutations-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "7e765b43c94d253d455672da0dd07b22e82844cb5788c39c02268683a56eb177",
+    "record_sha256": "0f77b9a9101fb01d973800a029f430d739e92fa777d5d528ac1e286470b12500"
+  }
+]

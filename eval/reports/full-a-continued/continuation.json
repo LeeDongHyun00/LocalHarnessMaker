@@ -1,0 +1,48 @@
+{
+  "source": "eval/reports/full-a",
+  "source_report_sha256": "de239596565450ee72eb03a5a4fce903627987f47e5a072bec6b760603ace833",
+  "source_run_id": "81548890119742798a252770aed81ccb",
+  "audit_code_version": {
+    "audit.py": "8146d104b27b179b800d8fd5c2de2c4d19b49afac9a6a6be376bd38145dd9021",
+    "javascript.py": "e2e854a124443f25c7ec1fb515d0fe0dc1a444877d48b040b65cd0a4ed36a34f",
+    "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+    "regrade.py": "c2ed750234ae5fd2146374f0e732d78d6e64fee73aa1930ae285ce8764a87034",
+    "core.py": "5380779a966b433d55b04c85a1bd01abce24dc85b0bced331f8261d0a8b7a214",
+    "harness.py": "c7770545ef303949870015cd67f22472f70505bf93c83f72fd95934a1f019e77",
+    "continue_day2.py": "66a9c4db24e9765f3badbc7d85b4ea532c65e3e33d1ac354f0e870fc8b25ab84"
+  },
+  "recorded_config_sha256": "94b06e9f54c5fbf3a1edcb58bd8ee0615aaf8269eff6bf4a1830b51eecb820ae",
+  "materialized_config_sha256": "94b06e9f54c5fbf3a1edcb58bd8ee0615aaf8269eff6bf4a1830b51eecb820ae",
+  "selected_tasks": [
+    "two-session-balanced-brackets"
+  ],
+  "status": "finished",
+  "tasks": [
+    {
+      "task_id": "two-session-balanced-brackets",
+      "source_run_id": "81548890119742798a252770aed81ccb",
+      "source": "eval/reports/full-a",
+      "audit_code_version": {
+        "audit.py": "8146d104b27b179b800d8fd5c2de2c4d19b49afac9a6a6be376bd38145dd9021",
+        "javascript.py": "e2e854a124443f25c7ec1fb515d0fe0dc1a444877d48b040b65cd0a4ed36a34f",
+        "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+        "regrade.py": "c2ed750234ae5fd2146374f0e732d78d6e64fee73aa1930ae285ce8764a87034",
+        "core.py": "5380779a966b433d55b04c85a1bd01abce24dc85b0bced331f8261d0a8b7a214",
+        "harness.py": "c7770545ef303949870015cd67f22472f70505bf93c83f72fd95934a1f019e77",
+        "continue_day2.py": "66a9c4db24e9765f3badbc7d85b4ea532c65e3e33d1ac354f0e870fc8b25ab84"
+      },
+      "day1_started_at": "2026-10-23T04:43:24.022737+00:00",
+      "day1_exited_at": "2026-10-23T04:44:02.015419+00:00",
+      "day2_started_at": "2026-10-23T13:55:56.909244+00:00",
+      "day2_exited_at": "2026-10-23T13:56:55.442850+00:00",
+      "gap_seconds": 33114.893825,
+      "day1_workspace_exit_sha256": "2b5662a7c736338dc648721cc41dd7d7c4a5b011989dfdebe775bb6d024fec96",
+      "copied_workspace_sha256": "2b5662a7c736338dc648721cc41dd7d7c4a5b011989dfdebe775bb6d024fec96",
+      "copy_hash_matched": true,
+      "added_call_ids": [
+        "two-session-balanced-brackets-exec-2"
+      ],
+      "added_cost_usd": null
+    }
+  ]
+}

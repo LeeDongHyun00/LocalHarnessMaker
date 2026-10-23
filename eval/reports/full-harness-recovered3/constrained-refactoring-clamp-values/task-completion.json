@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "d02268fd9d5a443f67eafabfd53423e88f2730a46aa94ed6c400d99a047cf022",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/constrained-refactoring-clamp-values/final-1.md",
+    "sha256": "76bc9249c9b8a6eccfb1993593605cf1363b9b1fb7dccadb4f8bd792c91558ca"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

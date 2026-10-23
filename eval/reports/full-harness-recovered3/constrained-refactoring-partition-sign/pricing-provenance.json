@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "constrained-refactoring-partition-sign-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4oc0k5sg/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-47-35-01a167ba-bedd-7023-bd62-9fcf6f436ce7.jsonl",
+        "sha256": "9d3fa1c2fa3aadfa3ff66e94fd179f66ff9dbbb06ab63bdeb8ee9b78e5484769"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-partition-sign-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "bce60a6ff90aadc734a54073d91b577f2c0882ca7e23b6af5a2de550f0d34efd",
+    "record_sha256": "1d413eb9ac7c62b4cd7afe56471696838f7fccfdebf1fe9110015a1d2e7413a9"
+  },
+  {
+    "call_id": "constrained-refactoring-partition-sign-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "31892420f0c1bc4098b5132c781ba33c81b6aba61d00c388ff39548046db6d2a",
+    "record_sha256": "52e338730c28bfe521696d113697da2847ca67f2840534cc31ae9db26c409b86"
+  }
+]

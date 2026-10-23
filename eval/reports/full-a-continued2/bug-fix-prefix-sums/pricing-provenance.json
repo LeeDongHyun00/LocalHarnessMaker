@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-prefix-sums-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-l6a1cb19/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-43-23-01a166db-2c86-7580-bf9e-63cb90b43843.jsonl",
+        "sha256": "0b84d5e94d3f8ce81001b7483b0d45e95d5e65699267fc070aaa8ae794c3d9d1"
+      }
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "multiple-requirements-rotate-left-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0vvsdlw_/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-33-36-01a167ad-f2ad-7573-94b6-b40178ff5238.jsonl",
+        "sha256": "7b6b3904f829a11005a419d4e7780b20f886497b4959ae79d5f48a4cf9d60615"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-rotate-left-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "1c30968a9bd672ebf58a3d1abffdac699152b01b38e25b49c789eda27969d0e3",
+    "record_sha256": "0d9009b3b77d3ad43e8c7d73061b0d23df10bbad2c8550853be9d6bfb69031aa"
+  },
+  {
+    "call_id": "multiple-requirements-rotate-left-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "28b6c41eefb1b2880424667de7fda05beb23a0f43eb4ea4157a1bcad195357d2",
+    "record_sha256": "e0f83e83a4cfc3be54d839ed558d46851545088d1ffbcdcb4f3030668b45ea96"
+  }
+]

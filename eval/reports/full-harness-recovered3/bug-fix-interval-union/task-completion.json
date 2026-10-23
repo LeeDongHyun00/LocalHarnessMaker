@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "a4533c9fb903df7d7f5a156cb236cf1519fed9953d0880306ea2f3ee3a52b2df",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/bug-fix-interval-union/final-1.md",
+    "sha256": "31231b563fd58b4153989d2f9969ed3d436fff2b14e9300f23c4c6b1fc7c0f37"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

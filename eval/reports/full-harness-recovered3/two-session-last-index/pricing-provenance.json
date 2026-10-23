@@ -1,0 +1,73 @@
+[
+  {
+    "call_id": "two-session-last-index-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-n06r68xi/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-12-12-01a1679a-55a3-7a93-a1f6-524a70208ce0.jsonl",
+        "sha256": "88655a14a321932bce3dc07e4e5912e4e76b332be40fc54d82dc2be126e8b66c"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-last-index-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-n06r68xi/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-12-12-01a1679a-55a3-7a93-a1f6-524a70208ce0.jsonl",
+        "sha256": "88655a14a321932bce3dc07e4e5912e4e76b332be40fc54d82dc2be126e8b66c"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-last-index-exec-3",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-n06r68xi/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-14-42-01a1679c-a83d-7b53-95b8-266ff79b4be1.jsonl",
+        "sha256": "170b14fa9d353141d19e13c47585961d0696500eeade9ea3146bec689251d5c7"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-last-index-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "6a033b13966df547c0a3ae0ad6dc09c48d958ddbb19f1bea92a5eb540489c0bc",
+    "record_sha256": "becf1656a2ea427072c39e174aa39cbc74e4e83052c6e38029974f9dec42fdc5"
+  },
+  {
+    "call_id": "two-session-last-index-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "469442eec28f74c5de3f1882c5f04b7c7de41f80978cc635037cb9303991e69e",
+    "record_sha256": "9061aae1e1cf30c7c6af349b983b324df71e0ce140f4ed8a081356523ae8ebdd"
+  },
+  {
+    "call_id": "two-session-last-index-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "469442eec28f74c5de3f1882c5f04b7c7de41f80978cc635037cb9303991e69e",
+    "record_sha256": "91cb4e516b180915e1dc1347cf1d32d88775e8d41ec6f88ffed18c0d5977e302"
+  },
+  {
+    "call_id": "two-session-last-index-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d21e1c8919923beacd66e52e491fa2121e5b30a7fcb0fb29b053bdaf7e171692",
+    "record_sha256": "902d7a9176e63be5cefeb5ac7691ac891b846ec5ea3e520dd5c08f65bbaa5b73"
+  }
+]

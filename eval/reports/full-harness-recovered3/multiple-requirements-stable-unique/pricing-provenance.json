@@ -1,0 +1,45 @@
+[
+  {
+    "call_id": "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-exec-1",
+    "observed_service_tier": "standard",
+    "basis": "Tier inferred from the model default; new native applied service_tier omitted/null at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-oque8vlh/codex-home/sessions/2026/10/24/rollout-2026-10-24T00-54-27-01a16978-7fb9-7b03-9042-23018b01a754.jsonl",
+        "record_sha256": "db9515b4bdae51e33453e8b996ba8f47e838c0eced928eac69d67cc27d3154cb",
+        "observed_service_tier": null
+      }
+    ],
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-oque8vlh/codex-home/sessions/2026/10/24/rollout-2026-10-24T00-54-27-01a16978-7fb9-7b03-9042-23018b01a754.jsonl",
+        "sha256": "7c3bf7aeb7d828de5fc54f192cd2892c7b0aad3bfbad297ef8b60b9ea4f2d62c"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2c910a9543608954afcb7869ccd4548e96243121734b804242e2105174f4ef8b",
+    "record_sha256": "5984b3421fa49ccb863bff3f559cdcb8e327c1ae63013dec99e3540e14ddfee7"
+  },
+  {
+    "call_id": "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2c910a9543608954afcb7869ccd4548e96243121734b804242e2105174f4ef8b",
+    "record_sha256": "db4afad51b6d8db0a531a3b97dd7121b3c75711cbedf77122b1c6bcb3652816f"
+  },
+  {
+    "call_id": "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "74a0056de33c7e72d29470b4985d97fcfc5643d75c365f48241047571165c43e",
+    "record_sha256": "3e75fa37191dab4e199e2293f0ec9029221d94750b063c5e3d438d6840f0cefe"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "constrained-refactoring-merge-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-dmqa9p49/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-16-02-01a167d4-cdf1-7092-ab0f-275c7424000f.jsonl",
+        "sha256": "264c7a1a9bc6366547a7811c5c0a4c2c72ed8dbcaf96496552376b976c164eb2"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-merge-counts-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "3c616f395aed9b708180a50ed3f04e306b89790b82bac08623c9f4e6001091a9",
+    "record_sha256": "1f84d4d6e4873d0b8244f66c3efd014eeba4ebc4f3f99404c68a168773a5b8cd"
+  }
+]

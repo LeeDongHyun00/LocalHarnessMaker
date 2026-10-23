@@ -1,0 +1,37 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "solution.py implements typed `windows(items, size)`: rejects nonpositive sizes with ValueError, returns successive contiguous slices, handles oversized windows with an empty list, and does not mutate the input."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "test_solution.py contains seven unittest methods covering window behavior and edge cases; the verdict confirms the required pattern matched."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "HANDOFF.md records design decisions and the verification command `python -m unittest discover -v`."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`python -m unittest discover -v` completed successfully with exit code 0; all seven tests passed."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Preserved the existing `windows(items: list[int], size: int) -> list[list[int]]` API and used successive list slices to build windows.",
+      "why": "This returns overlapping windows while leaving the input unchanged; each result is a fresh list."
+    },
+    {
+      "what": "Validate nonpositive sizes before processing inputs.",
+      "why": "The specification requires ValueError for size <= 0, including when the input is empty."
+    }
+  ],
+  "verify_commands": [
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services."
+  ]
+}

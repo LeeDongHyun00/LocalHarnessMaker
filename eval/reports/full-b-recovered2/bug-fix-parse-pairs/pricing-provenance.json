@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-parse-pairs-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-i4ox_1e6/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-46-46-01a1674c-2343-7221-a1e6-8f8d939a3a5b.jsonl",
+        "sha256": "45d511d1a4fa6db36004bd999e0a6a6dfc632941b61d64a94825a98ec4c0078b"
+      }
+    ]
+  }
+]

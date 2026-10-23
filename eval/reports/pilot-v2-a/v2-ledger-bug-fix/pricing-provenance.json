@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-ledger-bug-fix-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-r6r3q0c8/codex-home/sessions/2026/10/23/rollout-2026-10-23T19-08-50-01a1683c-14ca-7992-bffa-6093a206869c.jsonl",
+        "record_sha256": "d856c8cc8ad8ee2d0eb0354527a9cef758c4644b74672f33a0214b1d34c7cc8a",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-r6r3q0c8/codex-home/sessions/2026/10/23/rollout-2026-10-23T19-08-50-01a1683c-14ca-7992-bffa-6093a206869c.jsonl",
+        "sha256": "d3e7a17a133d031742bdff3b70208b110ac4fc857fe70e32e7b737c1223653f1"
+      }
+    ]
+  }
+]

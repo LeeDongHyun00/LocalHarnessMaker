@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "feature-plus-test-ordinal-labels-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-wkiwgrcp/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-33-34-01a167e4-d7f0-7ea3-94dc-0e3acb63e30d.jsonl",
+        "sha256": "89f463480626e3873d5d362ddf321be528fb54a7d8c432bfba6bb87f8d3417f9"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-ordinal-labels-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "c8bbd987f8dd603c11bef62c57d9411944607d2759b3df6e52c92c08b3875aeb",
+    "record_sha256": "43e9341c4f096f6c9c1a1364adee707c05f8b85b2cd53a9ed6da91935c906a05"
+  },
+  {
+    "call_id": "feature-plus-test-ordinal-labels-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e34d6a6b291d206e742db5153c68c6d9b1a996ebe51743e1ebbb699f7ececca0",
+    "record_sha256": "5098d575afc055bd17ec6831768e46bffe281936343bc4386bab678930f27f62"
+  },
+  {
+    "call_id": "feature-plus-test-ordinal-labels-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e34d6a6b291d206e742db5153c68c6d9b1a996ebe51743e1ebbb699f7ececca0",
+    "record_sha256": "1ec5f955936c53636d50233283312e2b465183072ca2ef098f142f281fcc2410"
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "feature-plus-test-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-s5ee8idk/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-39-33-01a167b3-649c-77e1-bcae-c5a64c856a26.jsonl",
+        "sha256": "eb8a728eda3f247480c5cc361de9f4ed117cd4fb05b84e7afb71784cf9c12ac1"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-interleave-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e5f3fbc25049c08932ad1687c06294b235eb527cd50c3750537f6ec5afb0cb80",
+    "record_sha256": "a299be5332720b6ca7f3f821cdfa6ff9bddc831c2a68613a805ceac03e81b2bd"
+  },
+  {
+    "call_id": "feature-plus-test-interleave-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e5f3fbc25049c08932ad1687c06294b235eb527cd50c3750537f6ec5afb0cb80",
+    "record_sha256": "62a8bd521a17d8bca614f9b225a09105c530f246597d0b379e6ec9366951ff78"
+  }
+]

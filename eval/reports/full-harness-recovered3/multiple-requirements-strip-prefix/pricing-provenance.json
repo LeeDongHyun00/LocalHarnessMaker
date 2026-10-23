@@ -1,0 +1,44 @@
+[
+  {
+    "call_id": "multiple-requirements-strip-prefix-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-g06slyxa/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-11-40-01a167d0-cbcf-7660-8d3e-d21ad0617274.jsonl",
+        "sha256": "9dc4b3bcb8f3d3ca6c99cb4e062158077ff55d9c79e6739cc6e0c86b041df89e"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-strip-prefix-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-g06slyxa/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-11-40-01a167d0-cbcf-7660-8d3e-d21ad0617274.jsonl",
+        "sha256": "9dc4b3bcb8f3d3ca6c99cb4e062158077ff55d9c79e6739cc6e0c86b041df89e"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-strip-prefix-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e18cb7b5168e3a54f727a5327f4a1d126f150ab10fd82f407ab837ee12870d18",
+    "record_sha256": "218ae1f903004b5e62af603182c5d6b542b9634a425695905068c7b2e6a01a06"
+  },
+  {
+    "call_id": "multiple-requirements-strip-prefix-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e18cb7b5168e3a54f727a5327f4a1d126f150ab10fd82f407ab837ee12870d18",
+    "record_sha256": "6e768fdd302cb1f9fe0f1330856130706e45b82bc1f69e987ed8c116196f8763"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "a95307ee24294060738a2ae9f064d00c556fa6d0223ec7cf677ec2c5bc2ff4ed",
+  "final_message": {
+    "path": "eval/reports/full-a-continued/bug-fix-merge-counts/final-1.md",
+    "sha256": "82a90e3ec7f1e54e89c4ba568a7a3722721251cb034ecb40d70631c965c86404"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

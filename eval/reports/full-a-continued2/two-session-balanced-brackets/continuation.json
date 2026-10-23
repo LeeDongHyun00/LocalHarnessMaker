@@ -1,0 +1,28 @@
+{
+  "task_id": "two-session-balanced-brackets",
+  "source_run_id": "81548890119742798a252770aed81ccb",
+  "source": "eval/reports/full-a",
+  "audit_code_version": {
+    "audit.py": "a1def643fa2c1cbeb88d044042b7b534caf7bb35ce5e6bb8c44fd2b8d8e6ebad",
+    "javascript.py": "e2e854a124443f25c7ec1fb515d0fe0dc1a444877d48b040b65cd0a4ed36a34f",
+    "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+    "regrade.py": "671455b3647f47f00ba891925c390e5eb06a3f29de81a11ca21fe8181df9f3f3",
+    "telemetry.py": "be0001cde384b179bf886e8fe2a630f7ee922bcc366083d68fbb26ba399681a2",
+    "core.py": "66b3512f0963f9b5b5d26208c613896cd0aa8b8295ab680a05b9b460723823ba",
+    "workspace_verification.py": "bc6bfd0a340bc74bb8e4cef6a16deee46fc9123d2ad0e64c242f3a76891c40d1",
+    "harness.py": "c7770545ef303949870015cd67f22472f70505bf93c83f72fd95934a1f019e77",
+    "continue_day2.py": "4fc0acf4c4c3f47620b7654117254dde6baade2adf8267a9db38e4bb8669da73"
+  },
+  "day1_started_at": "2026-10-23T04:43:24.022737+00:00",
+  "day1_exited_at": "2026-10-23T04:44:02.015419+00:00",
+  "day2_started_at": "2026-10-23T15:02:01.196293+00:00",
+  "day2_exited_at": "2026-10-23T15:02:47.103675+00:00",
+  "gap_seconds": 37079.180874,
+  "day1_workspace_exit_sha256": "2b5662a7c736338dc648721cc41dd7d7c4a5b011989dfdebe775bb6d024fec96",
+  "copied_workspace_sha256": "2b5662a7c736338dc648721cc41dd7d7c4a5b011989dfdebe775bb6d024fec96",
+  "copy_hash_matched": true,
+  "added_call_ids": [
+    "two-session-balanced-brackets-exec-2"
+  ],
+  "added_cost_usd": null
+}

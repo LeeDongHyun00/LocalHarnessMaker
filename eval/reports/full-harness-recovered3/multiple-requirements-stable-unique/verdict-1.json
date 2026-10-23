@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+unique\\s*\\(\n2: \n3: \n4: def unique(items: list[str]) -> list[str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: R1 supported solution.py:4-5 (each string once, first-occurrence order); R2 supported solution.py:7 (empty input returns an empty list); R3 supported solution.py:6 (equality is case-sensitive).",
+      "reason": "All specified docstring details are present in solution.py."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_duplicates_preserve_first_occurrence_order (test_solution.UniqueTests.test_duplicates_preserve_first_occurrence_order) ... ok\ntest_empty_input (test_solution.UniqueTests.test_empty_input) ... ok\ntest_equality_is_case_sensitive (test_solution.UniqueTests.test_equality_is_case_sensitive) ... ok\ntest_preserves_values_and_does_not_mutate_input (test_solution.UniqueTests.test_preserves_values_and_does_not_mutate_input) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: test_solution.py",
+      "reason": "required file exists"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

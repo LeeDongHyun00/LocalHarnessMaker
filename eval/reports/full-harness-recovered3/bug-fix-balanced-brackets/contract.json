@@ -1,0 +1,83 @@
+{
+  "task_summary": "Fix balanced in solution.py without changing its signature, and add a regression test in test_solution.py for the specified bracket nesting behavior.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve balanced's existing signature and maintain type hints.",
+    "Do not mutate input collections.",
+    "Ignore non-bracket characters; check nesting of (), [] and {}; unmatched opening or closing brackets return false; empty text returns true.",
+    "Add at least one passing unittest test method in test_solution.py that exercises the public API.",
+    "Verify using python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module and regression test module compile.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The regression test file includes at least one unittest test method.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The solution preserves a definition named balanced.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "\\bdef\\s+balanced\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The requested unittest discovery command succeeds.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named relative paths solution.py and test_solution.py are within the supplied task workspace; either file may not exist yet and may be created.",
+    "The existing balanced signature and exact implementation details are not supplied; preserve the signature found in the workspace.",
+    "The requested unittest discovery command is expected to discover test_solution.py from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=776; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17388,
+    "output_tokens": 449,
+    "usd": 0.0019633
+  }
+}

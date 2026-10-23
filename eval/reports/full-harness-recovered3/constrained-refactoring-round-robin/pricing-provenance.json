@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "constrained-refactoring-round-robin-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ow6c6hc2/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-16-41-01a16767-85eb-72c3-be7f-3f54ca1d01ec.jsonl",
+        "sha256": "8a932de08815d4ad8a20262ad63ecaeae8f210cb6f360f3654770dd48c960810"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-round-robin-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d0a40836f0c74f355b1a900f3f24a2ad0e509cde378ade373fbc4f3c07346692",
+    "record_sha256": "cc609b04a92ce7a9fe9f29035d3a5f59a834c9e2ddeacfd1393fac97fbf8bba2"
+  },
+  {
+    "call_id": "constrained-refactoring-round-robin-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f4a5af7ac258f398b0cdf5d636727bea06dae34abcdbd552fcf3f49214d22ba8",
+    "record_sha256": "8fc868eaccb1987ff01f34f7931a958616180390a6bbfd7b0a537f7937d640ae"
+  }
+]

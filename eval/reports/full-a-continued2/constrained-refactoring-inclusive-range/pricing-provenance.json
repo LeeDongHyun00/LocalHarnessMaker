@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-inclusive-range-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-r2az52z3/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-38-51-01a166d7-03ba-7773-b94e-5a5d8e27a2d8.jsonl",
+        "sha256": "1470ad1bb2f8b57fce957cbe535c45b5c3083160b3e74a7dcc5a8ad1e3c26724"
+      }
+    ]
+  }
+]

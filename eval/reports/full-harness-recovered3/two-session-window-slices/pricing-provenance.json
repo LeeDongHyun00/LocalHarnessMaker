@@ -1,0 +1,60 @@
+[
+  {
+    "call_id": "two-session-window-slices-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-34fbomkq/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-57-12-01a1678c-a053-7253-83ed-5989c6df7f51.jsonl",
+        "sha256": "537b4c43993e806a87875760d95d69583c7a770c0e5bb4f03982e2378421ce9c"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-window-slices-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-34fbomkq/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-58-47-01a1678e-17dc-7671-8950-7d1c4d8698ce.jsonl",
+        "sha256": "de7bc21710daa8217731902602807f4f8d1c2e19758d374c77fa0bcbc5d0412d"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-window-slices-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "9ff0fef6998b82a988ec5c8fc5475e6c26ff2322ae5078bde6d9026fa1230bc3",
+    "record_sha256": "06a32e09bf64b32f0007156ae229eea83cecea9bc1b069700f618934f3eebfe4"
+  },
+  {
+    "call_id": "two-session-window-slices-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "407e3ddca62f6e20ad33336b82769308bcd2a3df1a932113c77dac1ca4a6d852",
+    "record_sha256": "08e81bb72620f3e59b2381ec54f0fbfd776b5b2717227c8603a0ed92983c8aa7"
+  },
+  {
+    "call_id": "two-session-window-slices-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "dae98850c40d58b6f0baeaf8f44eb45543e37fdfd87694c1320b4d32c421daa4",
+    "record_sha256": "3617e10275e857be4aab3b07ed6e3ae00a5ce19b053ae56b81770f8f82e28043"
+  },
+  {
+    "call_id": "two-session-window-slices-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "b3c23fd30356bc6cd7ad119d6a657886d78f0e1563c8cbd0b03d5123b9fa82a5",
+    "record_sha256": "7b3348cdde735248a3042a7d2ed8ab7673529a1b20c400891d179b085b6e0481"
+  }
+]

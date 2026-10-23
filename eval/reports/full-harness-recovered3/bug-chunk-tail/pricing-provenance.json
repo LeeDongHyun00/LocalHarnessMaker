@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "bug-chunk-tail-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3m_lhldn/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-27-53-01a167a8-b4a4-7e33-af38-bd51774cead6.jsonl",
+        "sha256": "56f8a4be9c1f2b543dad52d844e72307571c72c72338ee1efb445fbe088e0b26"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-chunk-tail-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2c86a63b66c421b50ac6f601bf492b47bf8605f6c261cb5eb783eab9a265fea2",
+    "record_sha256": "13497f57863d239182d3109b4d76bd42a245fa5ff701e8cde88fb20489abd9c5"
+  },
+  {
+    "call_id": "bug-chunk-tail-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2c86a63b66c421b50ac6f601bf492b47bf8605f6c261cb5eb783eab9a265fea2",
+    "record_sha256": "c7ad9509ce46dbe620caf8e157babcac89e9b6e1396c3ab454a04f3ea54d4bd5"
+  },
+  {
+    "call_id": "bug-chunk-tail-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2c606dfa483589124a763e87959e1fc4890472c4718d1373c61eb6a6a4c83a32",
+    "record_sha256": "2806df393b8729c2ebec1dfdd13328caf08b2bd70860353257bf70e842c61967"
+  }
+]

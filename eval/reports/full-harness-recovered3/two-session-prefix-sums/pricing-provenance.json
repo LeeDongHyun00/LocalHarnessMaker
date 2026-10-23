@@ -1,0 +1,65 @@
+[
+  {
+    "call_id": "two-session-prefix-sums-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-v8aldhd9/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-00-02-01a1678f-2692-7261-ba42-f2be4e00a430.jsonl",
+        "sha256": "20172b9b0583f5a8484bdda6d0351af1e61e4c629453147c44e76baf501f139c"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-prefix-sums-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-v8aldhd9/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-01-15-01a16790-57d8-7e03-8819-3c07b62a69a0.jsonl",
+        "sha256": "3fbc3f801c797c92d92ae7d3e3d02a1b912316cfbd81b02fcdefb35aa7f9f497"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-prefix-sums-exec-3",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-v8aldhd9/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-01-15-01a16790-57d8-7e03-8819-3c07b62a69a0.jsonl",
+        "sha256": "3fbc3f801c797c92d92ae7d3e3d02a1b912316cfbd81b02fcdefb35aa7f9f497"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-prefix-sums-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8d28222557ca758232cc9121a28f24dbb9aaedf52fda370e6a2e40c01c27ef3e",
+    "record_sha256": "4818bf03cf84c8dfc34e0d550eaeb7587476c00361bfcbf649c2cc4ee207f915"
+  },
+  {
+    "call_id": "two-session-prefix-sums-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "75e5538c6015261a60105adece7963e49d90bc23def81f3280212ed3a05b5a1f",
+    "record_sha256": "6944b06b27db9610b2bb378040e031b4a989e33baf0870439e2840e9931b7650"
+  },
+  {
+    "call_id": "two-session-prefix-sums-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4be59572bc53a9fb2eeaa39f423d5379f7b85c1c40a60f8c7f1b5e43f95f556d",
+    "record_sha256": "660bc5e0df569330122781979336caec605b0a4cd2b74baf71c5c139a18b4194"
+  }
+]

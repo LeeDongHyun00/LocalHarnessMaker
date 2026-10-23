@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "7322f4f78715054905dfd7091b9471c7d9a27994c576276879ea1cb94cd56e95",
+  "final_message": {
+    "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/final-1.md",
+    "sha256": "2c1e2728e7a9945072829d32aacd51e9a03fad147e3d1e4ae634de31e9ce321c"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs and added `test_regression"
+  ],
+  "undefined_reason": null
+}

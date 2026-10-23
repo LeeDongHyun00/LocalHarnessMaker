@@ -1,0 +1,11 @@
+{
+  "numerator": 4,
+  "denominator": 13,
+  "excluded_task_ids": [
+    "v2-reservations-bug-fix"
+  ],
+  "exclusions": {
+    "v2-reservations-bug-fix": "Invalid task: excluded from numerator and denominator."
+  },
+  "undefined_outcomes": {}
+}

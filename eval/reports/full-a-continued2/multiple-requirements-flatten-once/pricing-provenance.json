@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-igewplzx/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-41-52-01a16710-b522-7c01-acb8-69bfba6d0135.jsonl",
+        "sha256": "04824143f2453df416db502307308abc844a6e677eacd8177af22977b99c0e51"
+      }
+    ]
+  }
+]

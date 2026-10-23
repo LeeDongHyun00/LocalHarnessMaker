@@ -1,0 +1,101 @@
+{
+  "task_summary": "Extend the existing public API with rotate_many, add unittest coverage, and update HANDOFF.md with observed verification evidence.",
+  "constraints": [
+    "Preserve the day-1 API compatibility.",
+    "rotate_many(cases: list[tuple]) -> list accepts positional-argument tuples for rotate, returns results in case order, returns [] for no cases, and propagates the first exception unchanged.",
+    "Do not mutate cases or their arguments.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines the type-hinted rotate_many function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+rotate_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "Unittest coverage in test_solution.py exercises batch behavior and includes at least three test methods.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The named implementation and test modules compile successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "HANDOFF.md records the verification command and its observed result.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?s)(python -m unittest discover -v).*?(pass|passed|success|successful)"
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The existing day-1 rotate API remains present and type hinted.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+rotate\\s*\\(\\s*items\\s*:\\s*list\\s*\\[\\s*int\\s*\\]\\s*,\\s*steps\\s*:\\s*int\\s*\\)\\s*->\\s*list\\s*\\[\\s*int\\s*\\]"
+      }
+    },
+    {
+      "id": "SC-7",
+      "description": "At least three unittest test methods are defined in test_solution.py.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:(?:async\\s+)?def\\s+test\\w*\\s*\\([^)]*\\)\\s*:.*?){3}"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The supplied handoff identifies solution.py as the existing implementation, test_solution.py as the unittest file, and HANDOFF.md as the evidence file; those relative paths are interpreted within the runner workspace.",
+    "The requested files may not exist yet and may be created or updated.",
+    "The unittest suite is discoverable with python -m unittest discover -v.",
+    "No additional rotate_many behavior beyond the stated contract is assumed.",
+    "Removed invalid criterion SC-5: llm_judge must be decidable from workspace files alone; use a command criterion for execution evidence. Its requirement remains unverified and needs user review."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=604; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 39506,
+    "output_tokens": 1761,
+    "usd": 0.00231974
+  }
+}

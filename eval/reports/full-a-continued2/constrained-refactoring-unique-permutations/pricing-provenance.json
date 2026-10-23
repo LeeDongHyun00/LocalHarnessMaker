@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-unique-permutations-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hoq_anlm/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-40-08-01a166d8-345d-7232-ad65-e3c2bd89d97d.jsonl",
+        "sha256": "1d4782950f66e044c524fc5108205d329a7232241b2fb8c2c3509e8c09ab7606"
+      }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "2c56c4ce6c51209a7017151e1a08bc715697295779014f6fb74454e33c4ab6ee",
+  "final_message": {
+    "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/final-2.md",
+    "sha256": "f62effad4d0793349aefab2d95bbdd1e1ff07dad29442061ff7d8165134f83ba"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `run_many` and `render_many`, preserving day-1 policy, exact errors, signatures and dependencies"
+  ],
+  "undefined_reason": null
+}

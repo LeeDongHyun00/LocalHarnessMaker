@@ -1,0 +1,98 @@
+{
+  "task_summary": "Implement an ordinal formatter in solution.py and add standard-library unittest coverage in test_solution.py for ordinary, boundary, and empty inputs, or invalid numeric inputs if the API accepts no collection.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Format nonnegative integers with English ordinal suffixes: 1st, 2nd, 3rd, 4th; numbers ending in 11, 12, or 13 use th, including 111, 112, and 113.",
+    "Raise ValueError for negative inputs; format zero as 0th.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least two passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py exists in the workspace.",
+      "check": {
+        "type": "file_exists",
+        "path": "solution.py"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py exists in the workspace.",
+      "check": {
+        "type": "file_exists",
+        "path": "test_solution.py"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The named Python files compile successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The standard-library unittest suite completes successfully and includes at least two test methods exercising the public API.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The implementation provides a public ordinal formatting API with type hints.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether it defines a public ordinal-formatting API with type hints that formats nonnegative integers as English ordinals, handles 11, 12, and 13 exceptions for any magnitude, returns 0th for zero, and raises ValueError for negative values. Do not infer behavior not visible in the file."
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The tests cover ordinary and boundary ordinal inputs, plus empty or invalid numeric inputs as applicable, and include at least two unittest test methods exercising the public API.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read test_solution.py and assess whether it uses standard-library unittest with at least two test methods that exercise the public API, cover ordinary and boundary ordinal inputs, and cover invalid numeric inputs if the API accepts no collection (otherwise cover empty inputs). Assess only test content visible in the file."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "Interpret paths as relative to the supplied task workspace; the named files may not exist yet and may be created.",
+    "The request does not specify the public function name or exact API signature; implementation and tests must choose a reasonable public API consistently.",
+    "The unittest discovery command is assumed to discover test_solution.py from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=875; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17424,
+    "output_tokens": 666,
+    "usd": 0.00072756
+  }
+}

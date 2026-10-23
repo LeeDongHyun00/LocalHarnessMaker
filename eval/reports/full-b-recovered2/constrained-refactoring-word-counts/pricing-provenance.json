@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-word-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4zhi708r/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-02-45-01a16791-b0d4-7e62-905e-1b27fc3ed14f.jsonl",
+        "sha256": "afb10775d01cd7928fa1a7c617023f8396a7d260e8524f1ebb01750a3164bf38"
+      }
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "6be6228114e78236ac4a8858a3ebba49b979f58453000ab13eb872940a4bb47b",
+  "final_message": {
+    "path": "eval/reports/full-b-recovered2/constrained-refactoring-pairwise-edges/final-1.md",
+    "sha256": "101319b34b9e3cdce39dfa85bf280f03e87e06ce0c69ae4b22c4ded4b6b7a34c"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

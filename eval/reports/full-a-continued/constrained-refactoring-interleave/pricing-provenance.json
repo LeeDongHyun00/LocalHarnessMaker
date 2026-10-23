@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-m4tx0vh2/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-19-22-01a166fc-1bfd-7ce3-9e16-3c6dad13b6d8.jsonl",
+        "sha256": "62a3b7fe20123e08c4ae948f66f1f30d8cb7a95815c01c55c0e2d4c053583973"
+      }
+    ]
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "[solution.py](solution.py): defines the public clamp function."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "[solution.py](solution.py): clamp has parameter and return type annotations."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "[test_solution.py](test_solution.py): contains six unittest methods; the required test count check passed."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`python -m unittest discover -v` passed; all six tests succeeded."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "[HANDOFF.md](HANDOFF.md): records design decisions and the verification command."
+    },
+    {
+      "criterion_id": "SC-6",
+      "artifact": "[solution.py](solution.py) and [test_solution.py](test_solution.py): implement and cover inclusive clamping, reversed-bound `ValueError`, equal bounds, type hints, and input-list preservation."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Validate bounds before clamping, then return the lower bound, upper bound, or original value as appropriate.",
+      "why": "This implements inclusive bounds and ensures reversed bounds raise `ValueError`; equal bounds remain valid."
+    },
+    {
+      "what": "Preserve the existing typed `clamp(value: int, low: int, high: int) -> int` signature and avoid mutation.",
+      "why": "This maintains the public API and requested type and collection behavior."
+    }
+  ],
+  "verify_commands": [
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services."
+  ]
+}

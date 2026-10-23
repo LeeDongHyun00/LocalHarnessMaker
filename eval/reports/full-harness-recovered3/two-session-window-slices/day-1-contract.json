@@ -1,0 +1,73 @@
+{
+  "task_summary": "Implement contiguous fixed-size windows in solution.py, add unittest regression coverage in the public tests, and document design decisions and a verification command in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "Do not impose an algorithmic complexity requirement.",
+    "HANDOFF.md is an allowed output; include design decisions and the verification command."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py implements the specified public behavior: return all contiguous windows of exactly the requested size, advance by one, raise ValueError when size is at most zero, and return an empty list when size exceeds the input length.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether its public API implements all specified window behaviors, maintains type hints, and avoids mutating input collections. Do not infer requirements beyond the request."
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py contains at least three unittest test methods exercising the public API, including the specified edge cases and window behavior.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def test_\\w+\\s*\\(self[^)]*\\):.*?){3}"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "HANDOFF.md records design decisions and the verification command `python -m unittest discover -v`.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?s)(?=.*design decisions)(?=.*python -m unittest discover -v)"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files may not exist yet and may be created in the supplied workspace.",
+    "The public API name and exact function signature are unspecified; implementation and tests will follow the interface supported by the task workspace, without assuming an unmentioned name.",
+    "“public tests” refers to test_solution.py as the required public test file.",
+    "The requested unittest discovery command is runnable from the workspace root and discovers test_solution.py; that discovery arrangement is not confirmed."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=840; distinct_files=3; tests_requested=true; requirement_segments=16; score=7"
+  },
+  "cost_estimate": {
+    "input_tokens": 21169,
+    "output_tokens": 511,
+    "usd": 0.0023724
+  }
+}

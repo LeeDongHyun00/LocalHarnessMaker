@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; solution = ast.parse(Path(\"solution.py\").read_text()); tests = ast.parse(Path(\"test_solution.py\").read_text()); assert ast.get_docstring(solution) or any(ast.get_docstring(node) for node in solution.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))); methods = [node for node in ast.walk(tests) if isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\")]; assert len(methods) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_adjacent_equal_values (test_solution.RunsTests.test_adjacent_equal_values) ... ok\ntest_empty_input (test_solution.RunsTests.test_empty_input) ... ok\ntest_nonadjacent_equal_values_remain_separate (test_solution.RunsTests.test_nonadjacent_equal_values_remain_separate) ... ok\ntest_single_value (test_solution.RunsTests.test_single_value) ... ok\ntest_values_and_input_order_are_preserved (test_solution.RunsTests.test_values_and_input_order_are_preserved) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

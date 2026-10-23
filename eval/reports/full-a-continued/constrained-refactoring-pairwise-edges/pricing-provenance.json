@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-n4pimngp/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-48-06-01a16716-6d9a-7542-a735-173ab1bb30fa.jsonl",
+        "sha256": "b9864390716b463f4af734e5782375b4629c7c6dfb532df23dbf4c0fa25e1feb"
+      }
+    ]
+  }
+]

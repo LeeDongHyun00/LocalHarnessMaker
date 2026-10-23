@@ -1,0 +1,28 @@
+[
+  {
+    "call_id": "two-session-stable-unique-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-38ejtmx6/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-25-04-01a16701-5377-7ac2-aa3a-53a0cb6d1e9e.jsonl",
+        "sha256": "1fcbb24f52ef28a3e85a1be0eca69dff565062dbcbacb036e86e809e7330198f"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-stable-unique-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-38ejtmx6/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-25-43-01a16701-f3a2-7e32-b275-d47047bae0c0.jsonl",
+        "sha256": "d17c9d8fa9103d2bcc3f534c408833faaf9b1fdc4605b5a07e93bcd7cfa3dd9d"
+      }
+    ]
+  }
+]

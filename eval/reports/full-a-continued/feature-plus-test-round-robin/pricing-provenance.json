@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-round-robin-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-tht4relo/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-40-36-01a1670f-8b0a-7d63-8271-ed5ef138b0d9.jsonl",
+        "sha256": "287283123d5671301361e04b2715f4521b6db78ab72133659d5a33248f437c66"
+      }
+    ]
+  }
+]

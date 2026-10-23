@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "constrained-refactoring-balanced-brackets-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vxjc3_rp/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-45-01-01a167b8-63eb-7152-ab49-3c0b13b4cbd4.jsonl",
+        "sha256": "2afcfad4cbf664e96a69f09118941943ae9fa4895c0cf1c1bdfe4b7d18c9721b"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-balanced-brackets-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "b296f9bf81abfce0bf90cdf474b105acf0ac9bc68589d5ddd41e9d306701d3e4",
+    "record_sha256": "3e6d33ff4d376d001f2a46e3099826dd7f28359455a2f25335d392323e47a705"
+  }
+]

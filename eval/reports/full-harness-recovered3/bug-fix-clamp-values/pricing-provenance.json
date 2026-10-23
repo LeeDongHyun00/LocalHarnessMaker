@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "bug-fix-clamp-values-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-e_g7eyt8/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-52-52-01a16751-b19d-7af2-bb95-f8095368616e.jsonl",
+        "sha256": "628954421279f5be626ef252217efb8ad2ffe05c2ed5b0d690e7b61e672b191a"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-fix-clamp-values-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "bf550955c1dc7e8adb2c16a614bb6248b2fe501a7f0af4555f087b00af2d9f15",
+    "record_sha256": "a1b1b17523d1052fcdf226736cc5caea0a0c6d9686fb064d22f876df145d64ac"
+  },
+  {
+    "call_id": "bug-fix-clamp-values-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "bf550955c1dc7e8adb2c16a614bb6248b2fe501a7f0af4555f087b00af2d9f15",
+    "record_sha256": "ddb6ffcd849e6f001cd73d386e485020ac35ad81c535ccdf9e1fc72318ae2d12"
+  },
+  {
+    "call_id": "bug-fix-clamp-values-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "3018e7787b59130197fdc7e042bebe03c1c3c7d587884b6134cf6a6c993481f7",
+    "record_sha256": "a4037cefe30036794ccc8e023331ed583f6f34f79313c24ce61f4eff18d5f151"
+  }
+]

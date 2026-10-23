@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "bug-fix-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-p4f3jq07/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-34-40-01a167ae-ed2f-76d0-987c-1caf8cda4d2d.jsonl",
+        "sha256": "38ab684fd3c5ab6f683a68f81806ad1d69d8d7208bb499b7e5dc14465c1b7a54"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-fix-interleave-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f153c82cb98a90ae544973cb984e1a73d1fd2cfebd8ea112320912d44d1efe1f",
+    "record_sha256": "e9bf0857ca4f7030493308aa42547311ed7ca6d51cdc6da9d2d5a82a6ea35e5d"
+  },
+  {
+    "call_id": "bug-fix-interleave-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "39d35bd636c6a34e0d2983c919c58ea5843ba1c5010ce896ced359b1cc53ec5f",
+    "record_sha256": "bba567655916b63984bf6c53292dff4d5758d38571054f861f3231c0af362bb1"
+  }
+]

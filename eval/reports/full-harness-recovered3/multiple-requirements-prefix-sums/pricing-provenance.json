@@ -1,0 +1,49 @@
+[
+  {
+    "call_id": "multiple-requirements-prefix-sums-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmpghp_6/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-45-17-01a16781-b550-7532-9175-5de873675dd5.jsonl",
+        "sha256": "1d54554da60f5262aee81bd75068462a7940d2ac5986c23ef69682dfdeebc93b"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-prefix-sums-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmpghp_6/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-45-17-01a16781-b550-7532-9175-5de873675dd5.jsonl",
+        "sha256": "1d54554da60f5262aee81bd75068462a7940d2ac5986c23ef69682dfdeebc93b"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-prefix-sums-exec-3",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-kmpghp_6/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-45-17-01a16781-b550-7532-9175-5de873675dd5.jsonl",
+        "sha256": "1d54554da60f5262aee81bd75068462a7940d2ac5986c23ef69682dfdeebc93b"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-prefix-sums-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "b33a425f8da9b3d5069e13e02d2c41567704de3a3139c07573ba90033ce6fde1",
+    "record_sha256": "4448d92dee2c2b004ba2b5b6946a68b342a45a9ca467f2bef00c0e34249cee46"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "fc85a424ba9015cb0f9c33f0f65cf8e2303ae78e368870e8455f3e5dae593d95",
+  "final_message": {
+    "path": "eval/reports/full-b-recovered2/feature-plus-test-interval-union/final-1.md",
+    "sha256": "6801a014f02bb79b116d7cedec86d00acffe40c88a41c73bf6bc8329f0fdbea7"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `union` with sorted interval merging, touching-endpoint support, `ValueError` validation, and input preservation"
+  ],
+  "undefined_reason": null
+}

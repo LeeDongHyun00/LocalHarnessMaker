@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+invert\\s*\\(\n2: \n3: \n4: def invert(items: dict[str, str]) -> dict[str, list[str]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, invert’s docstring says “Group input keys by their values,” that “Each resulting list of keys follows dictionary insertion order,” and “Empty input returns {}.”",
+      "reason": "The public invert function’s docstring specifies grouping keys by their values, preserving dictionary insertion order within each resulting key list, and returning {} for empty input."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:^|\\n)\\s*def\\s+test\\w*\\s*\\([^)]*\\)\\s*:[\\s\\S]*?(?:\\n\\s*def\\s+test\\w*\\s*\\(|\\Z)[\\s\\S]*?(?:\\n\\s*def\\s+test\\w*\\s*\\(|\\Z)\n6: class InvertTests(unittest.TestCase):\n7:     def test_groups_repeated_values_in_insertion_order(self):\n8:         items = {\"z\": \"blue\", \"a\": \"red\", \"m\": \"blue\", \"b\": \"red\"}\n9: \n10:         result = invert(items)\n11: \n12:         self.assertEqual(result, {\"blue\": [\"z\", \"m\"], \"red\": [\"a\", \"b\"]})\n13:         self.assertEqual(list(result), [\"blue\", \"red\"])\n14: \n15:     def test_empty_input(self):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.InvertTests.test_empty_input) ... ok\ntest_groups_repeated_values_in_insertion_order (test_solution.InvertTests.test_groups_repeated_values_in_insertion_order) ... ok\ntest_preserves_exact_values_and_input_order (test_solution.InvertTests.test_preserves_exact_values_and_input_order) ... ok\ntest_result_mutation_does_not_change_input_or_later_results (test_solution.InvertTests.test_result_mutation_does_not_change_input_or_later_results) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: solution.py shows `groups = {}`, then `for key, value in items.items(): groups.setdefault(value, []).append(key)`, and returns groups. This supports that the input collection is read-only during inversion and exact values are used for grouping.",
+      "reason": "The visible implementation iterates over items.items() and only writes to a newly created groups dictionary and its lists. It uses each value unchanged as the grouping key and appends the corresponding input key; there is no mutation of the input dictionary or normalization of values."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "constrained-refactoring-ordinal-labels-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-v1lentlh/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-26-24-01a16770-6cef-7fa2-868c-a096dd839db5.jsonl",
+        "sha256": "c5d7e1861c01e448feee1e5db31a0dc3edb0ab5d7091ba3c2d677b72114daddb"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-ordinal-labels-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "0d15bcb7af1987e595cdc08603f84b495c4b5d869ad6b1a2b14a4303950a4e26",
+    "record_sha256": "def0fedaaebfb84810df25c1c866674d45d97afbc7a0d9b4a6d9ded12453ee39"
+  },
+  {
+    "call_id": "constrained-refactoring-ordinal-labels-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "0d15bcb7af1987e595cdc08603f84b495c4b5d869ad6b1a2b14a4303950a4e26",
+    "record_sha256": "0073890f093e1f546359c20469cb7e03bde6d2b31f8edcf432606a1e37c4b10d"
+  }
+]

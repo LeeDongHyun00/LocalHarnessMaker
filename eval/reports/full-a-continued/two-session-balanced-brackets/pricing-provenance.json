@@ -1,0 +1,27 @@
+[
+  {
+    "call_id": "two-session-balanced-brackets-exec-1",
+    "observed_service_tier": null,
+    "basis": "Retained original accounting; no per-call tier observation available.",
+    "pricing_ref": "openai-standard-short-2026-10-22-v1"
+  },
+  {
+    "call_id": "two-session-balanced-brackets-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-_avuj__7/codex-home/sessions/2026/10/23/rollout-2026-10-23T22-55-59-01a1690c-0220-72a1-a850-52bcf618d75c.jsonl",
+        "record_sha256": "67fb21ff3df496031462c82338b4b7fa064b30afd13ec2357ef8ff96239d830f",
+        "observed_service_tier": null
+      }
+    ],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-_avuj__7/codex-home/sessions/2026/10/23/rollout-2026-10-23T22-55-59-01a1690c-0220-72a1-a850-52bcf618d75c.jsonl",
+        "sha256": "8fefa82f4dc83d998eb6bf308456be43d81e371feaa14e222eda8408aa576e60"
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-inclusive-range-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3vi9v799/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-20-08-01a1676a-b154-7d71-9b4e-a2ec0de6685d.jsonl",
+        "sha256": "b59606b6f0300ef3376612ef975b0dc3ff6392a345aa831deb8648e30ba571b4"
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-word-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-u55cutdw/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-45-47-01a16782-2cb6-7c40-b38a-4a66c20db3db.jsonl",
+        "sha256": "f999dfeff31712ebe1603d7db6867a68f15ffd2facdf323d57b19163f7c7bc77"
+      }
+    ]
+  }
+]

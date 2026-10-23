@@ -1,0 +1,68 @@
+[
+  {
+    "call_id": "two-session-invert-groups-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c9o9n970/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-44-49-01a167ef-244c-7851-bb44-4883c8097797.jsonl",
+        "sha256": "80ca3d9ed97e0e46d7e744c39e89d6aac8df3460c8ffde49e43fab0f3679910e"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-invert-groups-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c9o9n970/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-46-26-01a167f0-a341-7093-9763-c14f11a6f58b.jsonl",
+        "sha256": "f83f8d3570f509834056e67c5771e45d68a29029f62f5f1102fc77b7c57ec29b"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-invert-groups-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "5a050bbec7987e739218e4a41108087e8d1058c421719a50436e2c68d01088d1",
+    "record_sha256": "adbdcb1343059728f89221975aca1f0d2f64009bc59d801439dfd144a475c0d8"
+  },
+  {
+    "call_id": "two-session-invert-groups-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "faf46d68d8df4483df76995b23ca0b96c1791b0baae4c230b5aa2a6ce3795140",
+    "record_sha256": "e6e6c3cd514127f5c022680473d309db7dd1b0979d745102e683459bbd50d100"
+  },
+  {
+    "call_id": "two-session-invert-groups-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "aa219e30122a3a42c4541d935483d36ece2b9eb7b96aa3603a447050c43aeffe",
+    "record_sha256": "2f8a1b043a5e8ac49453ee0324c57b3ec8a15844c3e465a32738cf7a201bfa3b"
+  },
+  {
+    "call_id": "two-session-invert-groups-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "9e8cd7c242d64f5c2841d121c89db13ae277ac2bb89b94f7dd005ce8c0a605d2",
+    "record_sha256": "0d291057029a9d3f7e88bd96cab2e2aa895ee16c12be6457152522120b11cbd1"
+  },
+  {
+    "call_id": "two-session-invert-groups-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4a0ec512233aed5412bdc802284c21d58bae49b2ec560e6fae182fba492bf410",
+    "record_sha256": "55308595fe29758355d2d0ff8befb07bc2180d9f2581f5c8a29f16e76d8e82e1"
+  }
+]

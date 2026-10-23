@@ -1,0 +1,50 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` compiled successfully with `python -m py_compile solution.py` (exit 0)."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`solution.py` exposes the typed `pairs(items: list[int]) -> list[tuple[int, int]]` function."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`pairs` returns an empty list for fewer than two items and overlapping, ordered pairs for `[1, 2, 3]`; verdict confirms this behavior."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`pairs` uses type hints and constructs a new list without mutating the input."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "`test_solution.py` contains six unittest methods exercising the public API."
+    },
+    {
+      "criterion_id": "SC-6",
+      "artifact": "`python -m unittest discover -v` passed; all six tests succeeded."
+    },
+    {
+      "criterion_id": "SC-7",
+      "artifact": "`HANDOFF.md` documents design decisions and includes `python -m unittest discover -v`."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Kept the existing `pairs` API and used indexed adjacent-element access to create ordered overlapping tuples in a new list.",
+      "why": "This handles short inputs naturally and preserves the input collection."
+    },
+    {
+      "what": "Used only the Python standard library and added regression cases for short inputs, overlap/order, duplicates, negative values, and input preservation.",
+      "why": "This meets the stated runtime constraints and covers the requested public behavior."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py",
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Do not access parent repositories or external services; work only in the supplied task workspace."
+  ]
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "call_id": "two-session-word-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sd3g6zf5/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-40-27-01a167b4-32c4-75c2-b42a-02948e509331.jsonl",
+        "sha256": "48c8d30aabf86befc691f9941e4e59384d6b54c500b01f9b62bc67b35c98a9ae"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-word-counts-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sd3g6zf5/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-42-17-01a167b5-e817-7263-95d4-81cbc8e4119b.jsonl",
+        "sha256": "989c5d44aae03a25a5dbf2ec933e93c67076fdcbd0d6ec313b3c5f08b3174348"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-word-counts-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "095a4dbec826c0811af002e8b1ff819679af21cf6f0e6f70373c5741c3d34549",
+    "record_sha256": "412c6d59369472d7969d96cb9f3ff6659bf6a0148c4fa14637dad8fb70375ec4"
+  },
+  {
+    "call_id": "two-session-word-counts-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "05cc7cd675237468590cea39a8f0e2cefb9b7bc231bd932ec4a76f2715fd6f3a",
+    "record_sha256": "f98b0670b237eaeef98e71612094dbf08324fb4696d02feea6477186b9cbed3e"
+  },
+  {
+    "call_id": "two-session-word-counts-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "05cc7cd675237468590cea39a8f0e2cefb9b7bc231bd932ec4a76f2715fd6f3a",
+    "record_sha256": "b35907bf8c761133013d427d24060895197a4bd3cd9febe84a611a1efa19c4e7"
+  },
+  {
+    "call_id": "two-session-word-counts-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e2d9735d27606d23016e63738218e9b602cd33cb7a06e60e6d41dd8fd0c9ad51",
+    "record_sha256": "d5e76403dc7518bf93737c9b244b061fbe5113f839241b59bf551d59b38035a1"
+  },
+  {
+    "call_id": "two-session-word-counts-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "05bd8dba8d9a5fb327ea1dac09405ff86256523a296fcd14f04690ef3e5afdab",
+    "record_sha256": "607f1b7c6ef127e5e6678320cb63164e9d4d034e5d0a69103d5ae83cfa9d64ae"
+  }
+]

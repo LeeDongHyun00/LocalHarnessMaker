@@ -1,0 +1,52 @@
+[
+  {
+    "call_id": "two-session-stable-unique-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-8d6k28h5/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-35-43-01a167af-e200-7f23-aa58-c83ee598e00f.jsonl",
+        "sha256": "24c228fb3ed5fa4dfd1311ec843bac1350a172bcf2b95f8fbba3f8a95cb86faf"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-stable-unique-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-8d6k28h5/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-37-05-01a167b1-25f4-7bd0-96f7-47b09e197236.jsonl",
+        "sha256": "1607470190c43aadb87795887eb35191f088ab4685ec2063e2349a1505c2b1b8"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-stable-unique-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "f80d8eba72d6dd6dfb7363fa6e0cd5585656b18e61b93d3e506ff8bba5f95616",
+    "record_sha256": "157fcf7b870d0bd407cdee1c1c6fb42562293fee553e11b4ca09e1e9f0fe92ed"
+  },
+  {
+    "call_id": "two-session-stable-unique-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "47f70c3bb2db7938e3606b6bfdb5ef315166d533c50f7291a0600b0f037f9015",
+    "record_sha256": "f0afa8f73bdf3f2f54d6f1620e66a0b3593d24e1998036f407152a5f270317a0"
+  },
+  {
+    "call_id": "two-session-stable-unique-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "7e70ceb75b8fe89ee38d51b6e2261bb9766279c1b4f1ff9a308508b986616018",
+    "record_sha256": "c6ea37017fa2b20da8989ff7c40fc0ae3ffe9b9e83d450277dd099ac12266a42"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "constrained-refactoring-invert-groups-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-m0st60x9/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-36-03-01a167e7-1e93-7432-b90c-c851e6bd0744.jsonl",
+        "sha256": "9a3eb9b69712a8e1ea1e81cc461a0485ea2ab48580cabc9643e9c106cb270eed"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-invert-groups-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e0ae0a73c22dab0b3be4c04504b8e8dc31193ba2d06f35bb5aea3c4ad78e1275",
+    "record_sha256": "3606792984c9170d2870f77881405eac02fc54d0a04b794c1d9737dc3e0a66ec"
+  }
+]

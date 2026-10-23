@@ -1,0 +1,11 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "dfb3091ecca9fbbcf69a1ec9cb56646da20603c225d1343ff28bef3f099bdc09",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "af279114df1e755b88047f401f8c7c3b6a1eab0686383dfe990d927fbbfd649a",
+  "final_message": null,
+  "claimed_complete": null,
+  "claim_evidence": [],
+  "undefined_reason": "No retained final message of the last session."
+}

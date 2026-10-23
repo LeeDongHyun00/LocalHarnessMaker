@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "d3c23937d13d7a590d5ed30cd6f7b7beb7e231f023b5a1c7d1c0e3ad2a82c7a7",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/bug-fix-unique-permutations/final-1.md",
+    "sha256": "d09e1624001764b86303a038e8a238553b45fee6c3fd8445aa500543ccf3f09e"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-merge-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-cvivniy1/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-44-05-01a16712-bf9a-7bf2-ac98-17538587fd38.jsonl",
+        "sha256": "5c6806ef1ea1146b2f5380b1cfa0e1162600b95e8c3289aeafa2a18ce831da64"
+      }
+    ]
+  }
+]

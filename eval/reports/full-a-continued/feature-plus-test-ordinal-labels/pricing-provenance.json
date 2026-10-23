@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-ordinal-labels-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-dimi9g68/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-52-03-01a1671a-07f5-7212-8828-a040bc210137.jsonl",
+        "sha256": "6a58bcc4c3e525e0930627d4454e1eed693fab9039491013ffd35340e6116189"
+      }
+    ]
+  }
+]

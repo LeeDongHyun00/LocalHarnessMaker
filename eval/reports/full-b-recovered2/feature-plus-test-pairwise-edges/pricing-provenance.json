@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-g5pn734y/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-15-16-01a1672f-4f93-7c82-9bc7-0a77f256c7c0.jsonl",
+        "sha256": "54a5db83f3d6e66ff6b6b9d9546264973feadc6ea6690902d116f631f619e931"
+      }
+    ]
+  }
+]

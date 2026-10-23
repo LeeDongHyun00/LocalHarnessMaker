@@ -1,0 +1,2679 @@
+{
+  "metadata": {
+    "run_id": "a5ac10ca0883458d82becc94a3970813",
+    "created_at": "2026-10-23T08:13:42.713988+00:00",
+    "config_name": "pilot-v2-a",
+    "config_sha256": "b232c50b9d1a3775b78a41dc3a3130e8f8db121d3d8517d93b098a3c1f584495",
+    "task_set_sha256": "8bf848bd18552ae88bf207b9a8efc9c67d4f742acd8a7639dbbbf0c6cf039d50",
+    "git_commit": "6c06e5c68540ce92bc298a73e5f329fb48db959b",
+    "codex_version": "codex-cli 0.163.0-alpha.11.1",
+    "executor_model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "control_backend": "none",
+    "control_model": null,
+    "seed": 0,
+    "reinstruction_limit": 0,
+    "cost_basis": "api_equivalent_usd",
+    "pricing": {
+      "snapshot_id": "openai-standard-short-2026-10-22-v1",
+      "checked_on": "2026-10-23",
+      "source": "Pinned tier snapshots: [{\"checked_on\": \"2026-10-22\", \"rates\": [{\"cached_input_per_million_usd\": 0.1, \"input_per_million_usd\": 2, \"model\": \"gpt-6.1-sol\", \"output_per_million_usd\": 10}, {\"cached_input_per_million_usd\": 0.01, \"input_per_million_usd\": 0.1, \"model\": \"gpt-6-luna\", \"output_per_million_usd\": 0.5}], \"snapshot_id\": \"openai-standard-short-2026-10-22-v1\", \"source\": \"https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).\"}, {\"checked_on\": \"2026-10-23\", \"rates\": [{\"cached_input_per_million_usd\": 0.2, \"input_per_million_usd\": 4, \"model\": \"gpt-6.1-sol\", \"output_per_million_usd\": 20}, {\"cached_input_per_million_usd\": 0.02, \"input_per_million_usd\": 0.2, \"model\": \"gpt-6-luna\", \"output_per_million_usd\": 1}, {\"cached_input_per_million_usd\": 0.4, \"input_per_million_usd\": 4, \"model\": \"gpt-6-sol\", \"output_per_million_usd\": 20}], \"snapshot_id\": \"openai-fast-short-2026-10-23-v1\", \"source\": \"https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-23; Fast mode (priority processing, renamed 2026-07-30); short context up to 272K input tokens; USD per 1M tokens; exactly 2x Standard input, cached input and output. Local snapshot version v1. Reasoning output billed once.\"}, {\"checked_on\": \"2026-10-23\", \"rates\": [{\"cached_input_per_million_usd\": 0.2, \"input_per_million_usd\": 2, \"model\": \"gpt-6-sol\", \"output_per_million_usd\": 10}], \"snapshot_id\": \"openai-standard-short-2026-10-23-v1\", \"source\": \"https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-23; Standard short context up to 272K; supplemental gpt-6-sol rate, USD per 1M tokens. The 2026-10-22 Standard snapshot remains unchanged.\"}]",
+      "rates": [
+        {
+          "model": "gpt-6.1-sol",
+          "input_per_million_usd": 2,
+          "cached_input_per_million_usd": 0.1,
+          "output_per_million_usd": 10
+        },
+        {
+          "model": "gpt-6-luna",
+          "input_per_million_usd": 0.1,
+          "cached_input_per_million_usd": 0.01,
+          "output_per_million_usd": 0.5
+        }
+      ]
+    },
+    "confidence": {
+      "level": 0.95,
+      "method": "task_cluster_percentile_bootstrap",
+      "resamples": 10000,
+      "seed": 0
+    },
+    "parity_comparator": null
+  },
+  "tasks": [
+    {
+      "task_id": "v2-routing-bug-fix",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:13:42.776453+00:00",
+          "exited_at": "2026-10-23T08:15:03.417373+00:00",
+          "exit_code": 0,
+          "session_id": "01a167d2-ae95-7842-827d-7397dd1abb57",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vecmf8jj/exec-1.jsonl",
+            "sha256": "bf52adfe9954a78f316e7d0ac72880dda5994e83ce5e6bf80526909d73c27531"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_custom_input:rollout-2026-10-23T17-13-43-01a167d2-ae95-7842-827d-7397dd1abb57.jsonl:54",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-routing-bug-fix-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 157916,
+            "cached_input_tokens": 150912,
+            "output_tokens": 3206,
+            "usd": 0.1223184,
+            "latency_seconds": 80.64047414800007,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1223184,
+        "control_usd": 0,
+        "total_usd": 0.1223184
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/access-audit.json",
+          "sha256": "d85e3543c5b468223144d53ee098cf87f9934ae0e9d5fdfb3786b7a0e02775d0"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/pricing-provenance.json",
+          "sha256": "38f3d0c10acd7c1f90e134cfb3f45bb7bb505abe30f110a6eb73fc552fdeec65"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/result.json",
+          "sha256": "2c0b04fdeaaaa223f12748d3fcb93e7bf1663d15d1f138902fe7348bd032b633"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/session-evidence.jsonl",
+          "sha256": "034cd018c25810b60a7849f1607045b03f9d3fca2a41d286fde1f59223b168a8"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/task-completion.json",
+          "sha256": "fdf93bc6cf9376bbc2212633a0d5dc158b66071f5af2ddd99d59b37a952c83f5"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vecmf8jj/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-13-43-01a167d2-ae95-7842-827d-7397dd1abb57.jsonl",
+          "sha256": "1356be34871c9b41d232a467584993976bd3121463a6a106476c8376c3ea5f33"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/task-completion-summary.json",
+          "sha256": "9e940ec21238a24e9e9e218b76a22bb2a41057f55b4b52475f280413d768a232"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/exec-1.jsonl",
+          "sha256": "bf52adfe9954a78f316e7d0ac72880dda5994e83ce5e6bf80526909d73c27531"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/exec-1.stderr",
+          "sha256": "41732a0e80c7b738cb4ec6e591b63b21e06bcd74aa456ba2b19aa70972b6611e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-bug-fix/final-1.md",
+          "sha256": "c94a974b9a7530e7faf9b985bbec8f51f028a65fca2358e788a57166edc25e64"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-inventory-constrained-refactoring",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:15:17.209247+00:00",
+          "exited_at": "2026-10-23T08:16:18.777885+00:00",
+          "exit_code": 0,
+          "session_id": "01a167d4-1f6a-7dc3-aabb-90731a24161b",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4gzud5ep/exec-1.jsonl",
+            "sha256": "f856f799a751ebeb1abdffadb7e8768090bd2f1cc116394f90b450e287ab963e"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_operand:exec-1.jsonl:6; unresolved_operand:exec-1.jsonl:7; unresolved_operand:rollout-2026-10-23T17-15-17-01a167d4-1f6a-7dc3-aabb-90731a24161b.jsonl:19; unresolved_operand:rollout-2026-10-23T17-15-17-01a167d4-1f6a-7dc3-aabb-90731a24161b.jsonl:21",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-inventory-constrained-refactoring-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 101473,
+            "cached_input_tokens": 93440,
+            "output_tokens": 2636,
+            "usd": 0.10354,
+            "latency_seconds": 61.56832676100021,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.10354,
+        "control_usd": 0,
+        "total_usd": 0.10354
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/access-audit.json",
+          "sha256": "de5d112696960b1ce32c5d28333c5eea8b5b3b40ca1925c500115b96bd405d9a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/pricing-provenance.json",
+          "sha256": "606b6ebb7a346143817d90d1f3d084db9ee4da3201bcc908c56f269560fdcb6e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/result.json",
+          "sha256": "00c957fdb053384c0ee037aeb113b7ec5fac7b10e4cb234dc6312a76bfd9ac14"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/session-evidence.jsonl",
+          "sha256": "da4821d249d912361a49450e169536b0b6ef8b24aea54094f70547c66f425984"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/task-completion.json",
+          "sha256": "0c10a09abb2bd83cca2e0c5e7ed23fcb66f37579f9771cc426556ee777efd8c4"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4gzud5ep/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-15-17-01a167d4-1f6a-7dc3-aabb-90731a24161b.jsonl",
+          "sha256": "eee22c206bfb2ce4a2e52821bb812fac77545c58efa07e4cea0bc77446826043"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/exec-1.jsonl",
+          "sha256": "f856f799a751ebeb1abdffadb7e8768090bd2f1cc116394f90b450e287ab963e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-constrained-refactoring/final-1.md",
+          "sha256": "97e038d72fd9369888146dd86014c461bf9168802155fe697c687f62b669f02a"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-inventory-feature-plus-test",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:16:25.648555+00:00",
+          "exited_at": "2026-10-23T08:17:10.757108+00:00",
+          "exit_code": 0,
+          "session_id": "01a167d5-2ab2-7041-819a-83119637ccb4",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-meoag436/exec-1.jsonl",
+            "sha256": "73b0d91d1e850fdbe9653720ce961cb25c0184a9f74390174042f04a873850e4"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-7e6e4a56cd6448e38d3af9899113846d",
+        "copied_at": "2026-10-23T08:17:18.052492+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 12,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/grading.log",
+          "sha256": "0ac3762688dc47ffa094aff6d5dee73942c54c6a95b27e3ca74616f2fb870675"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-inventory-feature-plus-test-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 83213,
+            "cached_input_tokens": 74752,
+            "output_tokens": 1737,
+            "usd": 0.0835344,
+            "latency_seconds": 45.10778763399867,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0835344,
+        "control_usd": 0,
+        "total_usd": 0.0835344
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/access-audit.json",
+          "sha256": "fc275acdc57ed4ab071f2fa799ec5cfa683d645dfac276d52db5f91887c81071"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/grading.log",
+          "sha256": "0ac3762688dc47ffa094aff6d5dee73942c54c6a95b27e3ca74616f2fb870675"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/pricing-provenance.json",
+          "sha256": "db12657e016e69805f4d90bcdb99dec970991e341b7366dc3f789364796faa56"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/result.json",
+          "sha256": "c1720ffb11bbe833aa1b7e3e36def2b1c6cd9d95fc4881d1e177304f5c9e481f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/session-evidence.jsonl",
+          "sha256": "55e98cbc16c231a17425419285039be38809c5ccb877b31b3a72ea26c6098913"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/task-completion.json",
+          "sha256": "2e8179fbc413660e822026a7b4ab99a4d0336474f9e1826d1755a71aafb5bfe9"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-meoag436/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-16-26-01a167d5-2ab2-7041-819a-83119637ccb4.jsonl",
+          "sha256": "299b17c367db0d70bc2b3705e3faab3a30757ceadac193de2adffec312066102"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/exec-1.jsonl",
+          "sha256": "73b0d91d1e850fdbe9653720ce961cb25c0184a9f74390174042f04a873850e4"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-feature-plus-test/final-1.md",
+          "sha256": "b7a82e8d2729350c00d56d62df7b31dcbaf050febffea3c189d610b392f213cd"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-routing-two-session",
+      "task_type": "multiple_requirements",
+      "two_session": true,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "grader_access_detected"
+      ],
+      "attempts": 2,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:17:18.330288+00:00",
+          "exited_at": "2026-10-23T08:18:49.917223+00:00",
+          "exit_code": 0,
+          "session_id": "01a167d5-f899-7640-a6c4-0e4d375968e5",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vijxjn91/exec-1.jsonl",
+            "sha256": "edbd1c165c348c804eff43eaa6580a661473ce8f312109ead2bf5b6cd95fb1dc"
+          }
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-10-23T08:18:56.544212+00:00",
+          "exited_at": "2026-10-23T08:19:49.778490+00:00",
+          "exit_code": 0,
+          "session_id": "01a167d7-77e5-7511-98a4-aea519930292",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vijxjn91/exec-2.jsonl",
+            "sha256": "0fcb70cd2036184073f1db66f24a66547368d2d4d56e1bd15703bb67f398d07d"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "access_detected",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "Observed forbidden access.",
+        "matches": [
+          {
+            "event_log": "exec-2.jsonl",
+            "line": 7,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          },
+          {
+            "event_log": "rollout-2026-10-23T17-18-56-01a167d7-77e5-7511-98a4-aea519930292.jsonl",
+            "line": 21,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          }
+        ]
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-routing-two-session-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 122799,
+            "cached_input_tokens": 109824,
+            "output_tokens": 3861,
+            "usd": 0.1510848,
+            "latency_seconds": 91.58578593299899,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        },
+        {
+          "call_id": "v2-routing-two-session-exec-2",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 108360,
+            "cached_input_tokens": 95872,
+            "output_tokens": 2265,
+            "usd": 0.1144264,
+            "latency_seconds": 53.22935127499659,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.2655112,
+        "control_usd": 0,
+        "total_usd": 0.2655112
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/access-audit.json",
+          "sha256": "50af6e60f0ed387379eebc8c690d8b1607d3c115b28053ddde3f05948992c117"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/handoff-evidence.json",
+          "sha256": "d0fb2a0077735f20b714ef85e74526de5d049049997562fd43de81e3877d48d3"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/pricing-provenance.json",
+          "sha256": "24478dea49002ef03178fbcda55dbcfec8dd3a161f52a46e9c619a64c7a866c4"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/result.json",
+          "sha256": "07e10655bd3401a5e6e04bbee954dca1291b999a42040557dbfaa0b4bbb7055a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/session-evidence.jsonl",
+          "sha256": "2f4b0323e7848fc71777634418341c3312e3dff650f6b8a3b7d9e196864130c1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/task-completion.json",
+          "sha256": "539bd55ae41d6cb6d48a8cf689e41c01d6a3aa9750ae272a1d3cbb90481f7322"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vijxjn91/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-17-19-01a167d5-f899-7640-a6c4-0e4d375968e5.jsonl",
+          "sha256": "3eb073ef66b2ca249128ab839a63b2452cfaf98860be54d959d65fe13eba5ae5"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vijxjn91/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-18-56-01a167d7-77e5-7511-98a4-aea519930292.jsonl",
+          "sha256": "b7a7516a3755806da78bb1c8a5a6fcb7df175a686bfb7a8399df6431f19b1815"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/exec-1.jsonl",
+          "sha256": "edbd1c165c348c804eff43eaa6580a661473ce8f312109ead2bf5b6cd95fb1dc"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/exec-2.jsonl",
+          "sha256": "0fcb70cd2036184073f1db66f24a66547368d2d4d56e1bd15703bb67f398d07d"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/exec-2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/final-1.md",
+          "sha256": "eef935c046fd03cd5e06686867d22fd1af3f659468fbdd3d9a89f6a691f7e3da"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/final-2.md",
+          "sha256": "ddd791edca443af063dfb14576dab19c271be7feca3712e50724e323b43f0b0c"
+        }
+      ],
+      "handoff": {
+        "day2_pass": false,
+        "user_restated_day1_context": false,
+        "evidence": {
+          "path": "eval/reports/pilot-v2-a/v2-routing-two-session/handoff-evidence.json",
+          "sha256": "d0fb2a0077735f20b714ef85e74526de5d049049997562fd43de81e3877d48d3"
+        }
+      }
+    },
+    {
+      "task_id": "v2-ledger-bug-fix",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:20:09.314671+00:00",
+          "exited_at": "2026-10-23T08:21:48.844968+00:00",
+          "exit_code": 0,
+          "session_id": "01a167d8-9495-78c2-af2f-fc042db7b8ea",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0a28kz4i/exec-1.jsonl",
+            "sha256": "ec9bb636567079d64f3f83e5dec03b3a5c9138a3ada612c71819c66cbbe75ae9"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-414ace3e649f4ae881a355f76754a66c",
+        "copied_at": "2026-10-23T08:21:57.072547+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 12,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/grading.log",
+          "sha256": "60fe27eb54a2728d28b7ef66f0c46b1a632a1b43bb7d97cf8d3c0e91ecb15ab7"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-ledger-bug-fix-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 127579,
+            "cached_input_tokens": 121472,
+            "output_tokens": 4832,
+            "usd": 0.1453624,
+            "latency_seconds": 99.52906555200025,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1453624,
+        "control_usd": 0,
+        "total_usd": 0.1453624
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/access-audit.json",
+          "sha256": "84c0f38aa15e56fa5a233bd76ff736ff234b02447c7e22af7fb2834e6ab4f84c"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/grading.log",
+          "sha256": "60fe27eb54a2728d28b7ef66f0c46b1a632a1b43bb7d97cf8d3c0e91ecb15ab7"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/pricing-provenance.json",
+          "sha256": "7c7f2930093c089ebc6522d3c7ffdc3ec8a5713d018d4a736e999d96852af40f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/result.json",
+          "sha256": "26ba68d329cb827815668745eca965c4ca6b53c6eb1481c60e8b531efa79728f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/session-evidence.jsonl",
+          "sha256": "328c0c7c0164884a080f58a72dd4ce62c8883c68e15fc34eaab4fc28cf9a0404"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/task-completion.json",
+          "sha256": "19307e712f310bdf4fb31aaf46fb2bc05e646881672c57e3b1550f9a42ba15d9"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0a28kz4i/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-20-09-01a167d8-9495-78c2-af2f-fc042db7b8ea.jsonl",
+          "sha256": "656851015a6de56d1be22677fee0145619d752c8897cd015f9bc71b22966c48f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/exec-1.jsonl",
+          "sha256": "ec9bb636567079d64f3f83e5dec03b3a5c9138a3ada612c71819c66cbbe75ae9"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/exec-1.stderr",
+          "sha256": "f2371cd214f2f7b760d78eed766ca743ecdd222d21fb9624435f80cdf9860fa1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-bug-fix/final-1.md",
+          "sha256": "789b1b7dc684a3e2f4a053eb21e4408b06281d0e44818c55eee131d02dd4af53"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-inventory-multiple-requirements",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:21:57.384271+00:00",
+          "exited_at": "2026-10-23T08:23:15.064537+00:00",
+          "exit_code": 0,
+          "session_id": "01a167da-3af0-7742-8d26-e22ad2101d9d",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qwyernyl/exec-1.jsonl",
+            "sha256": "ccbd4572e0a66377668bcaf1f43e0630f1d692085497f7eb9b0c1de5257ef2a3"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-8d7d1257c0444fc9ac8f584add132b14",
+        "copied_at": "2026-10-23T08:23:23.309128+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 13,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/grading.log",
+          "sha256": "c773446a682a0fc17adb08988ab59d2a8f63f4316814b2959733b5620b7aec46"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-inventory-multiple-requirements-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 122971,
+            "cached_input_tokens": 108032,
+            "output_tokens": 3221,
+            "usd": 0.1457824,
+            "latency_seconds": 77.67462588700437,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1457824,
+        "control_usd": 0,
+        "total_usd": 0.1457824
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/access-audit.json",
+          "sha256": "0d6c83ea783a5bec667709cc4aaca29599b19a40c767b81cc9ba7e1be6e3ba82"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/grading.log",
+          "sha256": "c773446a682a0fc17adb08988ab59d2a8f63f4316814b2959733b5620b7aec46"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/pricing-provenance.json",
+          "sha256": "35aa7ab037d89581cab92f21b2d87f46e854543e4cce5c001a55a3fd496445c6"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/result.json",
+          "sha256": "ac7b67d2a7880a27b7480501d46d3bd09c87584dbdd64da25909dede91f6066c"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/session-evidence.jsonl",
+          "sha256": "21ac829e3117efecc163b9064b9d5939ccef58476853569bb33e29d9b8c21bbd"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/task-completion.json",
+          "sha256": "639c7595d43a9dd7cd3c683ef4d7ddf68b7d327dbeb8cff090633b4ef963e723"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qwyernyl/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-21-58-01a167da-3af0-7742-8d26-e22ad2101d9d.jsonl",
+          "sha256": "b95a82d17bada2aa0c912e35faeddfc58259cb21c8c8275c2e96d4ad67fae1d5"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/exec-1.jsonl",
+          "sha256": "ccbd4572e0a66377668bcaf1f43e0630f1d692085497f7eb9b0c1de5257ef2a3"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-multiple-requirements/final-1.md",
+          "sha256": "e4966718c5ee68fe2d1f63001ec528c67cdb69aa5120ff5541b17fe31b4543b7"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-routing-feature-plus-test",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:23:23.592048+00:00",
+          "exited_at": "2026-10-23T08:24:41.695194+00:00",
+          "exit_code": 0,
+          "session_id": "01a167db-8bab-7ce0-b5b4-9166b297a19d",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yxgty0eu/exec-1.jsonl",
+            "sha256": "7b4d787d932ad22fd39dfefa709339f66a9e5cfe14fc6cbcded6a1e05799fa16"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-e558507b96b24bbe8c9289e19b8dc1c2",
+        "copied_at": "2026-10-23T08:24:50.989089+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 12,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/grading.log",
+          "sha256": "05266ce39afb22c7388a73c2d109b1d34194859246f56c838d9ee896fa08b5ae"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-routing-feature-plus-test-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 121865,
+            "cached_input_tokens": 107392,
+            "output_tokens": 2989,
+            "usd": 0.1391504,
+            "latency_seconds": 78.10050044200034,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1391504,
+        "control_usd": 0,
+        "total_usd": 0.1391504
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/access-audit.json",
+          "sha256": "ff1419768e7055748644948829e4111e8f9890ca13ff243c8df3281874f779e5"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/grading.log",
+          "sha256": "05266ce39afb22c7388a73c2d109b1d34194859246f56c838d9ee896fa08b5ae"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/pricing-provenance.json",
+          "sha256": "98beec535f940a2cdd4e4e6557ea1d6b19c969fdbf57181efba0bcb5bc496cc1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/result.json",
+          "sha256": "b3c320407333fbdfa10430cd00dae94bf6f5f8149a4d1544a177a517e37fdb08"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/session-evidence.jsonl",
+          "sha256": "af7c00b0b733633211d2761a813f283cb260a9c49c714f573c704f6b9211ae1e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/task-completion.json",
+          "sha256": "489220c373bce9f26bdc47d4222d2271c971ad65f143acb97ad39758c4ca6a0d"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yxgty0eu/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-23-25-01a167db-8bab-7ce0-b5b4-9166b297a19d.jsonl",
+          "sha256": "c64cb51cd464d0b80874ae9016b87de0f6cfb03f292c1fb47005fd619eeaa9b8"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/exec-1.jsonl",
+          "sha256": "7b4d787d932ad22fd39dfefa709339f66a9e5cfe14fc6cbcded6a1e05799fa16"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/exec-1.stderr",
+          "sha256": "717f96832989305603ab526d2422791230016160e83eceac8eeb421a69407da3"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-feature-plus-test/final-1.md",
+          "sha256": "8675ea47918c3e959fe4400a04751c3e30afa2b05b29cc2a0676b189b7e13963"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-ledger-multiple-requirements",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:24:51.392846+00:00",
+          "exited_at": "2026-10-23T08:25:52.977558+00:00",
+          "exit_code": 0,
+          "session_id": "01a167dc-e2c8-7c83-8eb3-c10b4d34fac5",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0rs1mk1c/exec-1.jsonl",
+            "sha256": "2d8c5207d43dc8793124bf4beaecb6bee031a8d0e703c37ba65e34db4b8148c1"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-6816198037bd425a9c3b9ef2f0bfc112",
+        "copied_at": "2026-10-23T08:26:00.868120+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 13,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/grading.log",
+          "sha256": "0135211c63aee5ca2b76faf614d05bad071db54eddb289f2831aa3815c890c96"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-ledger-multiple-requirements-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 102739,
+            "cached_input_tokens": 90880,
+            "output_tokens": 2573,
+            "usd": 0.117072,
+            "latency_seconds": 61.58258827299869,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.117072,
+        "control_usd": 0,
+        "total_usd": 0.117072
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/access-audit.json",
+          "sha256": "7efc54040225b33a38ae65e609d9e6d5048ecbb43cfa5f2afff61f249a6e3382"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/grading.log",
+          "sha256": "0135211c63aee5ca2b76faf614d05bad071db54eddb289f2831aa3815c890c96"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/pricing-provenance.json",
+          "sha256": "20b4b8054c16868b1f91a9bc4a9f450ebca3e8f593a7e8fe7b9c9f3e7fa17c5e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/result.json",
+          "sha256": "679205849e4ac2825e6ef35be19089a60cdab9cd0a1b39b10ad7d85171fe21bf"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/session-evidence.jsonl",
+          "sha256": "48b29f462f336475fe1d69ca4a616f6cf2226c1bb6b00620c0bda1e3cfc6c301"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/task-completion.json",
+          "sha256": "80ccdc793c6ac1740577793b265c4ffa5a999cca3c778c6dece56362b82ae438"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0rs1mk1c/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-24-52-01a167dc-e2c8-7c83-8eb3-c10b4d34fac5.jsonl",
+          "sha256": "551f48261f77041876c02052253f62a69d417c2b56bef14fd93c9c0a2711bd8b"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/exec-1.jsonl",
+          "sha256": "2d8c5207d43dc8793124bf4beaecb6bee031a8d0e703c37ba65e34db4b8148c1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-multiple-requirements/final-1.md",
+          "sha256": "0b24165b2fe2b0f39598d99df29af7fb5ef20839f6efd52db10f54ea9b504c98"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-ledger-constrained-refactoring",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:26:01.268375+00:00",
+          "exited_at": "2026-10-23T08:27:05.902055+00:00",
+          "exit_code": 0,
+          "session_id": "01a167dd-f34b-7983-b9a2-cc394af04bca",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-m5r43bdd/exec-1.jsonl",
+            "sha256": "90196623700e2249d32cd6be9c45bade3f37fc17612dbf82d7a3476b9c2ccc98"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-5347cf81005344d2a0afe3a83ac8e24c",
+        "copied_at": "2026-10-23T08:27:11.521989+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 12,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/grading.log",
+          "sha256": "eb2518129fedb87a71cbba0eb2e731e8e3c9ce9aa7025273a7f1d5cdfac55bb8"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-ledger-constrained-refactoring-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 84386,
+            "cached_input_tokens": 79104,
+            "output_tokens": 2600,
+            "usd": 0.08894880000000001,
+            "latency_seconds": 64.63007504500274,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.08894880000000001,
+        "control_usd": 0,
+        "total_usd": 0.08894880000000001
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/access-audit.json",
+          "sha256": "2dd528a5bdce2b44216d79256f81a4e5dfaf334a06173da7797f5989e9e9e53a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/grading.log",
+          "sha256": "eb2518129fedb87a71cbba0eb2e731e8e3c9ce9aa7025273a7f1d5cdfac55bb8"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/pricing-provenance.json",
+          "sha256": "9d32f45d6748264d118b17aa4e40591c9f7a2c0877dad6085a27bd00b8032180"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/result.json",
+          "sha256": "ef60b65572fee0d54618632815f3b63317a233d082779aa29cfd73950355ed44"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/session-evidence.jsonl",
+          "sha256": "d97a45912a893cb38e107ae47d5703865cd57ed7efcfc58e95336893bc43d5ef"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/task-completion.json",
+          "sha256": "7530fc5bbdbfed6f4a80ddf6853c71131125512bd245773bc4ba03f5d8439361"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-m5r43bdd/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-26-02-01a167dd-f34b-7983-b9a2-cc394af04bca.jsonl",
+          "sha256": "8230f89e038ed9da41ede4171f9a111cab11e91bc1b789b9c64ec0d30989438e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/exec-1.jsonl",
+          "sha256": "90196623700e2249d32cd6be9c45bade3f37fc17612dbf82d7a3476b9c2ccc98"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-constrained-refactoring/final-1.md",
+          "sha256": "d6ec707e61e08180f488071f22eba60f0b54d88b6ef984a7207e248620f62c59"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-reservations-two-session",
+      "task_type": "multiple_requirements",
+      "two_session": true,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "grader_access_detected"
+      ],
+      "attempts": 2,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:27:11.926803+00:00",
+          "exited_at": "2026-10-23T08:28:49.564042+00:00",
+          "exit_code": 0,
+          "session_id": "01a167df-075f-7740-8d44-5058a88be0fd",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/exec-1.jsonl",
+            "sha256": "89494ae87d29f5a98ffef227925fb6e2299d13b30d650a47ba096c08f3cc3603"
+          }
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-10-23T08:28:55.035735+00:00",
+          "exited_at": "2026-10-23T08:29:42.639063+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e0-99bf-7ca1-a54c-2651f2477c21",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/exec-2.jsonl",
+            "sha256": "dd13d9c02956dd1eb1e0922fb0bafc4a79661d00b559b75dc1fdce86d59e01d2"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "access_detected",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "Observed forbidden access.",
+        "matches": [
+          {
+            "event_log": "exec-2.jsonl",
+            "line": 9,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          },
+          {
+            "event_log": "rollout-2026-10-23T17-28-55-01a167e0-99bf-7ca1-a54c-2651f2477c21.jsonl",
+            "line": 22,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          }
+        ]
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-reservations-two-session-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 140586,
+            "cached_input_tokens": 125696,
+            "output_tokens": 3558,
+            "usd": 0.1558592,
+            "latency_seconds": 97.6337769830061,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        },
+        {
+          "call_id": "v2-reservations-two-session-exec-2",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 109331,
+            "cached_input_tokens": 93312,
+            "output_tokens": 1725,
+            "usd": 0.11723839999999999,
+            "latency_seconds": 47.59659637999721,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.2730976,
+        "control_usd": 0,
+        "total_usd": 0.2730976
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/access-audit.json",
+          "sha256": "96836c9de749a24c01bb080f65dadee52b7cabc636bf95225240314f98fe09a2"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/handoff-evidence.json",
+          "sha256": "4f43ca5262bfa4de7fd7fb9a2eda20217157273a6d8bbd87d05b3382deb1ac53"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/pricing-provenance.json",
+          "sha256": "6b4af388f6d27b94b09c7523a7062003bdb8706db02f2e530949da01f55cd42e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/result.json",
+          "sha256": "9fa1c73b4e431124ee22e48850c708b7529ad88caaba95adaa47b898f2f93ce7"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/session-evidence.jsonl",
+          "sha256": "c575dccc8ea813e511e355a970872f708ce29015caaaa9df3192b9acccb9063c"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/task-completion.json",
+          "sha256": "85ec2d6102bb3acf963c017e699b480f8c29e276aefbc7ab2dac01897d19449d"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-27-13-01a167df-075f-7740-8d44-5058a88be0fd.jsonl",
+          "sha256": "fbd2c8bf858da6aa5934ca88bbe57187e9b809eba3590e457df4da8cb4f24c95"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-28-55-01a167e0-99bf-7ca1-a54c-2651f2477c21.jsonl",
+          "sha256": "a062a58b87c5167874a1f94992aaeea289479a1e3d356eadada338525794eecf"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/exec-1.jsonl",
+          "sha256": "89494ae87d29f5a98ffef227925fb6e2299d13b30d650a47ba096c08f3cc3603"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/exec-1.stderr",
+          "sha256": "bc0d0ece01f56df0443b5b91d75b071db455b26cc6d158a600640145b3caa6cd"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/exec-2.jsonl",
+          "sha256": "dd13d9c02956dd1eb1e0922fb0bafc4a79661d00b559b75dc1fdce86d59e01d2"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/exec-2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/final-1.md",
+          "sha256": "ce481636e5f7ca97bc98d7de328f73c5aa23526cda397bf5127783b2bf036bc6"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/final-2.md",
+          "sha256": "120de6f185b9cb89c03461e9e2aa1c1a587de7352a7fb4f348be37f1ba2b77db"
+        }
+      ],
+      "handoff": {
+        "day2_pass": false,
+        "user_restated_day1_context": false,
+        "evidence": {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-two-session/handoff-evidence.json",
+          "sha256": "4f43ca5262bfa4de7fd7fb9a2eda20217157273a6d8bbd87d05b3382deb1ac53"
+        }
+      }
+    },
+    {
+      "task_id": "v2-reservations-bug-fix",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "fail",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:29:57.403233+00:00",
+          "exited_at": "2026-10-23T08:31:11.055363+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e1-8da4-7313-9d16-28800d0aa82c",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-le_xuqk4/exec-1.jsonl",
+            "sha256": "4bbaa649b6e2cafd38c00aa10773e46e73ace3cf17f7a21b0168e387d52b624e"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-acfd7a5c71f9490fa4a78033bf230388",
+        "copied_at": "2026-10-23T08:31:19.100305+00:00",
+        "grader_source_outside_repo": true,
+        "result": "fail",
+        "passed_tests": 12,
+        "failed_tests": 1,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/grading.log",
+          "sha256": "70e17fe151876d4b0bc4e2106add93bdc39056fb15fdb61e9af9d39c2dfcea76"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-reservations-bug-fix-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 103518,
+            "cached_input_tokens": 94336,
+            "output_tokens": 2873,
+            "usd": 0.1130552,
+            "latency_seconds": 73.64955354099948,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1130552,
+        "control_usd": 0,
+        "total_usd": 0.1130552
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/access-audit.json",
+          "sha256": "0a466fccee1220e71c2abadf717621c8f234eb5ecdc4a449839fa28d3c4125a7"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/grading.log",
+          "sha256": "70e17fe151876d4b0bc4e2106add93bdc39056fb15fdb61e9af9d39c2dfcea76"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/pricing-provenance.json",
+          "sha256": "52d24faea50a968229cb1eb476e94defde1cd1612b15a8fc23507831355c6115"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/result.json",
+          "sha256": "76b9fa96791f7f948c5fac6274424bdebf21df207221a0c31af704590a06b53f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/session-evidence.jsonl",
+          "sha256": "33f4c95440f3f954e94ae4c10414433235d4491f22ae789cc18699aeb31869f1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/task-completion.json",
+          "sha256": "f49627a2b71c98d9a9aec48d7013a909da85d3724d5824d8a57daee8d174a1e2"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-le_xuqk4/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-29-58-01a167e1-8da4-7313-9d16-28800d0aa82c.jsonl",
+          "sha256": "2f6f10f8ac8f10eda11153d892df6cecded1b3df836b19df523aa81d61a4cfa1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/exec-1.jsonl",
+          "sha256": "4bbaa649b6e2cafd38c00aa10773e46e73ace3cf17f7a21b0168e387d52b624e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-bug-fix/final-1.md",
+          "sha256": "541b5270e64ffb02b74533fe15df9b117a7899e257220fbaf0b60706cc60f279"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-reservations-multiple-requirements",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "fail",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:31:19.472062+00:00",
+          "exited_at": "2026-10-23T08:32:37.007088+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e2-ce8f-7d73-a9bb-74b75a9e1466",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3qajbe88/exec-1.jsonl",
+            "sha256": "ef50b6cfa690d1f96111fbb19b1a1430dac5b89cfa2fad7d24eb857b221301e1"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-b0ccaa30091a4cd9824cca70a8b9a2ea",
+        "copied_at": "2026-10-23T08:32:45.961056+00:00",
+        "grader_source_outside_repo": true,
+        "result": "fail",
+        "passed_tests": 13,
+        "failed_tests": 1,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/grading.log",
+          "sha256": "9bcac0c6c8354f53121e280352a671d98859a662fe466fb1a62836aa49edbe98"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-reservations-multiple-requirements-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 104421,
+            "cached_input_tokens": 90112,
+            "output_tokens": 3321,
+            "usd": 0.14167839999999998,
+            "latency_seconds": 77.52951114399912,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.14167839999999998,
+        "control_usd": 0,
+        "total_usd": 0.14167839999999998
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/access-audit.json",
+          "sha256": "31b684a2099b8ee69dfdf0ac1f049c39dbc855baca6bd7d0d85f3ec43b17bdf0"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/grading.log",
+          "sha256": "9bcac0c6c8354f53121e280352a671d98859a662fe466fb1a62836aa49edbe98"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/pricing-provenance.json",
+          "sha256": "e061734cf3efa437f390d0cd26c878bbc88f41e4d1f23b31dffb51ce697d4bd9"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/result.json",
+          "sha256": "7d3314ba1e35d72bec1d73ea5528c70b64f1871e0b179a4ac7c8d364ed59f52c"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/session-evidence.jsonl",
+          "sha256": "551a9c7701c11281704ede79f66f238654e874de32e0406ce8e236b3db3bbd61"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/task-completion.json",
+          "sha256": "ee76f2a8f826072e040777fc38e7d72b3018433b7090e7b51e0e7a41ba319de6"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3qajbe88/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-31-20-01a167e2-ce8f-7d73-a9bb-74b75a9e1466.jsonl",
+          "sha256": "a69711b607bdde33722e4895042e8e2693f4277eb5f987b1cec11909cb19f48a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/exec-1.jsonl",
+          "sha256": "ef50b6cfa690d1f96111fbb19b1a1430dac5b89cfa2fad7d24eb857b221301e1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-multiple-requirements/final-1.md",
+          "sha256": "bc63b34b64c2edc3aa7742439f1b2e12438d0aea6b3687b784f2a232c52b4586"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-ledger-two-session",
+      "task_type": "multiple_requirements",
+      "two_session": true,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "grader_access_detected"
+      ],
+      "attempts": 2,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:32:46.299334+00:00",
+          "exited_at": "2026-10-23T08:34:00.577294+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e4-21ce-7632-9c58-2694e226942d",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-98a4uwew/exec-1.jsonl",
+            "sha256": "9ccd1ceec1ae2f71b3d1d401621a8302b2b7f13d7c653fb367e76fd4149cb122"
+          }
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-10-23T08:34:05.282702+00:00",
+          "exited_at": "2026-10-23T08:35:28.790401+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e5-55ac-77e0-abf2-79854b9b309d",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-98a4uwew/exec-2.jsonl",
+            "sha256": "21f5eef8ec1acb6f04d9c98b36d585952281241aca5cbbac0eb16e59098e0c2d"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "access_detected",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "Observed forbidden access.",
+        "matches": [
+          {
+            "event_log": "exec-2.jsonl",
+            "line": 7,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          },
+          {
+            "event_log": "rollout-2026-10-23T17-34-05-01a167e5-55ac-77e0-abf2-79854b9b309d.jsonl",
+            "line": 21,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          }
+        ]
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-ledger-two-session-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 102650,
+            "cached_input_tokens": 89088,
+            "output_tokens": 3279,
+            "usd": 0.1376456,
+            "latency_seconds": 74.26832452399685,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        },
+        {
+          "call_id": "v2-ledger-two-session-exec-2",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 132395,
+            "cached_input_tokens": 112384,
+            "output_tokens": 3899,
+            "usd": 0.1805008,
+            "latency_seconds": 83.49473511000542,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.3181464,
+        "control_usd": 0,
+        "total_usd": 0.3181464
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/access-audit.json",
+          "sha256": "eebffb68ca2ce9c07ee8fa6c0d4260f2ac615963ec39f4e8ff0c9fb6ae0a9091"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/handoff-evidence.json",
+          "sha256": "c6a11e78828d26fba335d6a238d29a28a9ffc5dbeab4b99928ee95252c9a1dbb"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/pricing-provenance.json",
+          "sha256": "245937e9f58eb2579ca60eea28cae31416252368b9782e6a3ab97b3c0158d3b3"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/result.json",
+          "sha256": "50e69fcb11541719df5dcab4114dc44823fd04372a822600870039853896aa1f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/session-evidence.jsonl",
+          "sha256": "b5c3395454a700cf96ac0d56d9b28f9b6a1572cdc8f0f34a642a29f790056c63"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/task-completion.json",
+          "sha256": "205089a3f3275600bf3ea8a16019e94863d9c4e39f750861cc03bb0b110f70f7"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-98a4uwew/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-32-48-01a167e4-21ce-7632-9c58-2694e226942d.jsonl",
+          "sha256": "654c64935622651d12a56bafec5d34348fd3b706010deb0fb52a5e59e990e75e"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-98a4uwew/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-34-05-01a167e5-55ac-77e0-abf2-79854b9b309d.jsonl",
+          "sha256": "d1cd7e41bc1f0b7bf9da5e9a8adc6614b06395f256f191651c3c7aafe0744b70"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/exec-1.jsonl",
+          "sha256": "9ccd1ceec1ae2f71b3d1d401621a8302b2b7f13d7c653fb367e76fd4149cb122"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/exec-2.jsonl",
+          "sha256": "21f5eef8ec1acb6f04d9c98b36d585952281241aca5cbbac0eb16e59098e0c2d"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/exec-2.stderr",
+          "sha256": "31bf1ad54858a7114bbd6a539d756e520deebf11d0aa29cc1be1b167f94d1b9b"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/final-1.md",
+          "sha256": "cdd1bde32d4c2be1b0a0913c808abf984acb5e269173244033716591d38b94cc"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/final-2.md",
+          "sha256": "88638044c42e3bbc746dfe37cc2dd30df0b2670edd52f8377d0bf555956ce94f"
+        }
+      ],
+      "handoff": {
+        "day2_pass": false,
+        "user_restated_day1_context": false,
+        "evidence": {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-two-session/handoff-evidence.json",
+          "sha256": "c6a11e78828d26fba335d6a238d29a28a9ffc5dbeab4b99928ee95252c9a1dbb"
+        }
+      }
+    },
+    {
+      "task_id": "v2-inventory-two-session",
+      "task_type": "multiple_requirements",
+      "two_session": true,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "grader_access_detected"
+      ],
+      "attempts": 2,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:35:41.302585+00:00",
+          "exited_at": "2026-10-23T08:37:06.341727+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e6-ccff-7ec1-a095-ed236cd0fa10",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c9ghlr9z/exec-1.jsonl",
+            "sha256": "5a8bdd1f0c33a3a2dce053b843b2754463519e4a46c19f96db00e805159b4e2b"
+          }
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-10-23T08:37:11.888453+00:00",
+          "exited_at": "2026-10-23T08:38:10.411074+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e8-2ea1-7d10-9b46-bdc42da5e9c4",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c9ghlr9z/exec-2.jsonl",
+            "sha256": "af279114df1e755b88047f401f8c7c3b6a1eab0686383dfe990d927fbbfd649a"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "access_detected",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "Observed forbidden access.",
+        "matches": [
+          {
+            "event_log": "exec-2.jsonl",
+            "line": 9,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          },
+          {
+            "event_log": "rollout-2026-10-23T17-37-11-01a167e8-2ea1-7d10-9b46-bdc42da5e9c4.jsonl",
+            "line": 21,
+            "tool": "command_execution",
+            "path": "private_line_fingerprint",
+            "operation": "execute",
+            "evidence": "Observed protected access; see external stream hash."
+          }
+        ]
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-inventory-two-session-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 120447,
+            "cached_input_tokens": 106240,
+            "output_tokens": 3438,
+            "usd": 0.146836,
+            "latency_seconds": 85.03367871900264,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        },
+        {
+          "call_id": "v2-inventory-two-session-exec-2",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 87663,
+            "cached_input_tokens": 80512,
+            "output_tokens": 2389,
+            "usd": 0.0924864,
+            "latency_seconds": 58.514961795997806,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.2393224,
+        "control_usd": 0,
+        "total_usd": 0.2393224
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/access-audit.json",
+          "sha256": "eb240e654e1f5fbb28353ae24003a37de41481501448139ba5b57d47491a86a1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/handoff-evidence.json",
+          "sha256": "860272e31659dc80c878c5670aa55c777df7406a30c29845063648cb3f4f0512"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/pricing-provenance.json",
+          "sha256": "a95371b022c5dba2256d4dfb4a7aed92f0b0e21cca99f6d667e92a6adab1d5db"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/result.json",
+          "sha256": "f88a6a9eed7036d95d331cd0b0a69aad0efcdcb9019198f344352ec0dd63dce9"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/session-evidence.jsonl",
+          "sha256": "a6ae97a5a90b5c8b79cac0f3813d591d60f37e5bd7d40eaf5ed8d3c3b842c36c"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/task-completion.json",
+          "sha256": "cd69c9ea10b6ea4c608a56c39de33828ec465572028192ab3279429828be3d99"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c9ghlr9z/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-35-42-01a167e6-ccff-7ec1-a095-ed236cd0fa10.jsonl",
+          "sha256": "c8c624b33db957c816d308e25053df5c292ccc8c02fc35d0e7dc5d7a6ec4647e"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c9ghlr9z/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-37-11-01a167e8-2ea1-7d10-9b46-bdc42da5e9c4.jsonl",
+          "sha256": "0f3b77d4018b904f1f38ce05118e1672b5e446e2dc6fa6ad0e626c3ddf514c0a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/exec-1.jsonl",
+          "sha256": "5a8bdd1f0c33a3a2dce053b843b2754463519e4a46c19f96db00e805159b4e2b"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/exec-2.jsonl",
+          "sha256": "af279114df1e755b88047f401f8c7c3b6a1eab0686383dfe990d927fbbfd649a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/exec-2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/final-1.md",
+          "sha256": "ace7fe9e9c7cc65595cd57030507625a580eeda8f2943137adda5b1c12cd172e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/final-2.md",
+          "sha256": "5253e0a2a810c26e88df69b75dd09ffd7861077603d26af622b26e16704b5e54"
+        }
+      ],
+      "handoff": {
+        "day2_pass": false,
+        "user_restated_day1_context": false,
+        "evidence": {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-two-session/handoff-evidence.json",
+          "sha256": "860272e31659dc80c878c5670aa55c777df7406a30c29845063648cb3f4f0512"
+        }
+      }
+    },
+    {
+      "task_id": "v2-reservations-feature-plus-test",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "fail",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:38:24.649178+00:00",
+          "exited_at": "2026-10-23T08:39:23.079414+00:00",
+          "exit_code": 0,
+          "session_id": "01a167e9-4b12-7700-8361-41ceefa02c08",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-mjqcc_a8/exec-1.jsonl",
+            "sha256": "8e7cf20ea89fe3a37e91d882d1172c2be1d39825aca4e63ee43b06c80ff7334c"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-3356857c4f1648d6ae446ac439bdc9fa",
+        "copied_at": "2026-10-23T08:39:31.289709+00:00",
+        "grader_source_outside_repo": true,
+        "result": "fail",
+        "passed_tests": 12,
+        "failed_tests": 1,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/grading.log",
+          "sha256": "70e17fe151876d4b0bc4e2106add93bdc39056fb15fdb61e9af9d39c2dfcea76"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-reservations-feature-plus-test-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 101816,
+            "cached_input_tokens": 93696,
+            "output_tokens": 2267,
+            "usd": 0.0965592,
+            "latency_seconds": 58.42655401400407,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0965592,
+        "control_usd": 0,
+        "total_usd": 0.0965592
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/access-audit.json",
+          "sha256": "0309686338645ba9b39bc730c1deab8628402f298302158ff197ff2f393481ae"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/grading.log",
+          "sha256": "70e17fe151876d4b0bc4e2106add93bdc39056fb15fdb61e9af9d39c2dfcea76"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/pricing-provenance.json",
+          "sha256": "00ff67dd35f8de635e53189ff8561ef72fde88a6ca222f1ce15c690f49851a14"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/result.json",
+          "sha256": "37aad011a736d805c760c5c92296744b5ed80a8d6743d4e362311a30bc61fe44"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/session-evidence.jsonl",
+          "sha256": "c6dafc0ed9223fe414b592d24aa808e95963fcb52c8090a1778a770946b5d58e"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/task-completion.json",
+          "sha256": "59afb660268146be8dc73039af310d9dea173b3f4663cb770478c6c0ab91c61f"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-mjqcc_a8/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-38-25-01a167e9-4b12-7700-8361-41ceefa02c08.jsonl",
+          "sha256": "31c2e0eb3920139e740c644d2d29ceff6fafce4a567e3b3acebe61c2aabc5ff0"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/exec-1.jsonl",
+          "sha256": "8e7cf20ea89fe3a37e91d882d1172c2be1d39825aca4e63ee43b06c80ff7334c"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-feature-plus-test/final-1.md",
+          "sha256": "f87f9bc4703ac6e2e2cedefbf916bbafe662ff96ae0cf3827cade785114cf3f1"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-inventory-bug-fix",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:39:31.632199+00:00",
+          "exited_at": "2026-10-23T08:40:36.101528+00:00",
+          "exit_code": 0,
+          "session_id": "01a167ea-50d3-7933-940e-ff9a63020b1f",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-unf245wt/exec-1.jsonl",
+            "sha256": "ec834545f2182d4dff7f0e3f8c09b8d08188978e8b129f3ed89dbc8db1164d61"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-16c86c4104644b02aee8b123ff1438fa",
+        "copied_at": "2026-10-23T08:40:46.927407+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 12,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/grading.log",
+          "sha256": "0ac3762688dc47ffa094aff6d5dee73942c54c6a95b27e3ca74616f2fb870675"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-inventory-bug-fix-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 119918,
+            "cached_input_tokens": 110720,
+            "output_tokens": 2456,
+            "usd": 0.108056,
+            "latency_seconds": 64.46322388699627,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.108056,
+        "control_usd": 0,
+        "total_usd": 0.108056
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/access-audit.json",
+          "sha256": "932ef68174a5e05c75a5adf2914efe9fc7c0cbf6651d34461d695a76f0c4ee1f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/grading.log",
+          "sha256": "0ac3762688dc47ffa094aff6d5dee73942c54c6a95b27e3ca74616f2fb870675"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/pricing-provenance.json",
+          "sha256": "1ba860a336cee94ac7b0a8bf344e1c62d2b5a4affe8c4429867359c5c245f778"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/result.json",
+          "sha256": "d84c03142a8f0c2588f244a71c55ae89f4cd194503261ef7b6f0b4d181405206"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/session-evidence.jsonl",
+          "sha256": "212122808defe9c303db39fcb35f219215408333ae9b382a804f6eed51b760b4"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/task-completion.json",
+          "sha256": "12fac7b4ffd6afe8fee299b6f667fac5065765c3f5f49d30cb8f4616d8dfdcc9"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-unf245wt/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-39-33-01a167ea-50d3-7933-940e-ff9a63020b1f.jsonl",
+          "sha256": "a4faad9eddd20e6fd7eea58a2f2aebecc314e016b85137f5b7840dd87039f27a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/exec-1.jsonl",
+          "sha256": "ec834545f2182d4dff7f0e3f8c09b8d08188978e8b129f3ed89dbc8db1164d61"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/exec-1.stderr",
+          "sha256": "9030855b013bfd537632ed958fefd91f81e8dc1327839f5dcfad7c9700a9c4af"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-inventory-bug-fix/final-1.md",
+          "sha256": "66649584302d728c1a54534a2f016294eb25f2317f44ada13c87eb5173f2812b"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-reservations-constrained-refactoring",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "fail",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:40:47.248630+00:00",
+          "exited_at": "2026-10-23T08:41:48.214999+00:00",
+          "exit_code": 0,
+          "session_id": "01a167eb-783d-7982-88de-d4cdabb973f6",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9fas60s_/exec-1.jsonl",
+            "sha256": "efad6c612a34162da6ef7ca5c68fc71ffff65639febf56f525c551a98d46943b"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-718651c9aad04be69c68cc88672fb278",
+        "copied_at": "2026-10-23T08:41:54.474072+00:00",
+        "grader_source_outside_repo": true,
+        "result": "fail",
+        "passed_tests": 12,
+        "failed_tests": 1,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/grading.log",
+          "sha256": "70e17fe151876d4b0bc4e2106add93bdc39056fb15fdb61e9af9d39c2dfcea76"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-reservations-constrained-refactoring-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 101933,
+            "cached_input_tokens": 93952,
+            "output_tokens": 2499,
+            "usd": 0.10069439999999999,
+            "latency_seconds": 60.96231575799902,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.10069439999999999,
+        "control_usd": 0,
+        "total_usd": 0.10069439999999999
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/access-audit.json",
+          "sha256": "0fc22dd9b2976a47b6bc16196143ecde4c296ff8cd3e06a40592944eee4563f8"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/grading.log",
+          "sha256": "70e17fe151876d4b0bc4e2106add93bdc39056fb15fdb61e9af9d39c2dfcea76"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/pricing-provenance.json",
+          "sha256": "e2cf678905c88b3c7d616f700206f3b72ab1e42df35c07d7bf0a0ea272d7dcb8"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/result.json",
+          "sha256": "61577a8f2376c2b44517d430b2113c021a44615d9d25fdf621837967cb4ea63b"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/session-evidence.jsonl",
+          "sha256": "7277665c494570e5a06bb2d526570b9529e126c94caf0738524cae9a9832af11"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/task-completion.json",
+          "sha256": "ecde0180da6e583753a9067ad53c2fdb4fc2a77f4671237e04018804ede89fe7"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9fas60s_/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-40-48-01a167eb-783d-7982-88de-d4cdabb973f6.jsonl",
+          "sha256": "6cc47ee9c665198bc8c65c2d8d8cd9bb62051d7cf30452a7b913a7fb990661a1"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/exec-1.jsonl",
+          "sha256": "efad6c612a34162da6ef7ca5c68fc71ffff65639febf56f525c551a98d46943b"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/final-1.md",
+          "sha256": "d1f639dfcea0743fc30139502510c809fefd4bbc39e08d0e7138f3c46f55eac6"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-ledger-feature-plus-test",
+      "task_type": "feature_plus_test",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:41:54.761058+00:00",
+          "exited_at": "2026-10-23T08:43:20.063912+00:00",
+          "exit_code": 0,
+          "session_id": "01a167ec-8063-76e2-911c-a6ba1031fab1",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9_02inqb/exec-1.jsonl",
+            "sha256": "26bd1bf90d549dd0f9bbf3e6e256e626384e9bec62687f3f422042c85d73b179"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-fd11f7aea7ca444893a5d2beeb939e43",
+        "copied_at": "2026-10-23T08:43:37.593476+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 12,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/grading.log",
+          "sha256": "146da2c2555f5446598483d0c34bb85c67238fe88f30280083cfb7c6cea13d79"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-ledger-feature-plus-test-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 143730,
+            "cached_input_tokens": 133504,
+            "output_tokens": 3884,
+            "usd": 0.1452848,
+            "latency_seconds": 85.29446962800284,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1452848,
+        "control_usd": 0,
+        "total_usd": 0.1452848
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/access-audit.json",
+          "sha256": "ab2efc210437107095bed7ea867d44ecb26442a1917fcc74752e626d44cf6e08"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/grading.log",
+          "sha256": "146da2c2555f5446598483d0c34bb85c67238fe88f30280083cfb7c6cea13d79"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/pricing-provenance.json",
+          "sha256": "daa0668d4ccc2f180fcf8a835524e3dbd1cbf4aa3206398a4d730f8003239efc"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/result.json",
+          "sha256": "a20aa1586633e27423488347ddafafaa6b3563059011625677f998cd501b9614"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/session-evidence.jsonl",
+          "sha256": "d08eaea5f78ffbb49c0b9f82c064d2361462e36c468f82c47b1d6196329c4baa"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/task-completion.json",
+          "sha256": "6f6215895974303793bcee4e77643377e7b807354d645b11ff91b175ef76d2d9"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9_02inqb/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-41-55-01a167ec-8063-76e2-911c-a6ba1031fab1.jsonl",
+          "sha256": "9a09112f20896f48a06c81e3f006ceb1f3d89c44e0f3346e7144a57d3697357c"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/exec-1.jsonl",
+          "sha256": "26bd1bf90d549dd0f9bbf3e6e256e626384e9bec62687f3f422042c85d73b179"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/exec-1.stderr",
+          "sha256": "c45d5eddc88c07a542251715447b42ad5153e996f691ec04ecc5d048ec01efaf"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/final-1.md",
+          "sha256": "e3d0304964ef64228708195c66f9f3853e15413963619a9a599bf2265e37bc55"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-routing-constrained-refactoring",
+      "task_type": "constrained_refactoring",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:43:38.044340+00:00",
+          "exited_at": "2026-10-23T08:44:54.764208+00:00",
+          "exit_code": 0,
+          "session_id": "01a167ee-13b5-7fa3-aafd-813411444b8a",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yuav0rde/exec-1.jsonl",
+            "sha256": "fa7efeda1818865f5e39946717fda75e6a02d8ad962c2c1f1f8214ace9ca3a77"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-e62cd4178b2f42628e7f2ca21c58d5a4",
+        "copied_at": "2026-10-23T08:45:07.666523+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 12,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/grading.log",
+          "sha256": "bca6f482638ea8d32e3ec409244505b4c58f8f735482c14bd602010b1c0e4f29"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-routing-constrained-refactoring-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 139530,
+            "cached_input_tokens": 130304,
+            "output_tokens": 2952,
+            "usd": 0.1220048,
+            "latency_seconds": 76.71175625299657,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1220048,
+        "control_usd": 0,
+        "total_usd": 0.1220048
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/access-audit.json",
+          "sha256": "f0f0808e70cfffa1b2ce6a7812ff374497ebd3a9424b4e418b79650c658d3255"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/grading.log",
+          "sha256": "bca6f482638ea8d32e3ec409244505b4c58f8f735482c14bd602010b1c0e4f29"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/pricing-provenance.json",
+          "sha256": "dcb4e50589ae82afd54f6322f2de1a520e01a3febbcafdb2ffba7f2721373d98"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/result.json",
+          "sha256": "328c585ea9ccb1efed329c000edf65ae9beeb85569e98ede556c8adfaf3fd722"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/session-evidence.jsonl",
+          "sha256": "39587df8008a36dd657e64775fe27101b3b7ed8f1f7fb5229e7fae5e2fc3c626"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/task-completion.json",
+          "sha256": "74a0f03fe61e6d2148d82c32a930de958a22d5ddf739d5f9c52883a937407912"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yuav0rde/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-43-39-01a167ee-13b5-7fa3-aafd-813411444b8a.jsonl",
+          "sha256": "840362d743f916a65169508648d2d3e5a61c6b468ad2c9e42de6fe8edfed61ed"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/exec-1.jsonl",
+          "sha256": "fa7efeda1818865f5e39946717fda75e6a02d8ad962c2c1f1f8214ace9ca3a77"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/exec-1.stderr",
+          "sha256": "8ef6ffbc82e20f3696d212792b2e8304d397d83df5fb4648925cf3184b6db212"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/final-1.md",
+          "sha256": "6dca9b1e57e132c74f580d55b91deeaec51f963e8f3fa81063d4dc09b78cbefc"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "v2-routing-multiple-requirements",
+      "task_type": "multiple_requirements",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T08:45:07.955808+00:00",
+          "exited_at": "2026-10-23T08:46:22.514445+00:00",
+          "exit_code": 0,
+          "session_id": "01a167ef-7284-7311-8881-fa86a3e14aec",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0pekpib_/exec-1.jsonl",
+            "sha256": "62f5c8d8665dd56c6f82deb8c15059686c5ef398612817b3709662096ae71eec"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-c034a2505a0247938bc1d7cfb29ff4d1",
+        "copied_at": "2026-10-23T08:46:30.643175+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 13,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/grading.log",
+          "sha256": "1f5b7e3e91c95ea15b96b1725707249cc3c8b86c4cd47639ec7d8de06d717d46"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "v2-routing-multiple-requirements-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 102701,
+            "cached_input_tokens": 94208,
+            "output_tokens": 3154,
+            "usd": 0.1158936,
+            "latency_seconds": 74.55371464999916,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-fast-short-2026-10-23-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.1158936,
+        "control_usd": 0,
+        "total_usd": 0.1158936
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/access-audit.json",
+          "sha256": "0c4ec7a00395a31f16021d3c26e2fde2a11b6996f8d8d75f543ff491c7b10f13"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/calibration.json",
+          "sha256": "c0e672f5dda482695697f1a90297411a37de33ae2cf2954377a113b8232d6789"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/grading.log",
+          "sha256": "1f5b7e3e91c95ea15b96b1725707249cc3c8b86c4cd47639ec7d8de06d717d46"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/pricing-provenance.json",
+          "sha256": "ebae0aeae49fbb52f91818a7854ce75f556757259b1679691b92ab28be68e57a"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/result.json",
+          "sha256": "f9700fa92bb705b1ec98a425a8f34c35888b92ff5dc80f79e5d8255ec899ccaa"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/session-evidence.jsonl",
+          "sha256": "56bb89ea41a5864f6c0be8cfe0863edcf751841a97c02f202a51d352e8d445b2"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/task-completion.json",
+          "sha256": "28cbcfcf7ab430a7227326d9f61060afdba866bbdece3e4c29cd18a57344882d"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0pekpib_/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-45-09-01a167ef-7284-7311-8881-fa86a3e14aec.jsonl",
+          "sha256": "f8f899c90f92fa2ab5037ff5ca9527719ea3a9b93bee45256b81b50b6360903f"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/exec-1.jsonl",
+          "sha256": "62f5c8d8665dd56c6f82deb8c15059686c5ef398612817b3709662096ae71eec"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/pilot-v2-a/v2-routing-multiple-requirements/final-1.md",
+          "sha256": "1a6ff01aee1c49ee06a4d66d6484b16dfb8805c823503e2039644008433b76b7"
+        }
+      ],
+      "handoff": null
+    }
+  ],
+  "metrics": {
+    "pass_rate": {
+      "value": 0.7142857142857143,
+      "sample_size": 14,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 0.5,
+        "upper": 0.9285714285714286,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "false_done_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "claimed_criterion",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Complete done-claim denominator is not yet observed; verdicts retain negative evidence."
+    },
+    "task_false_done_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "claimed_complete_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No claimed-complete valid tasks with retained final messages and hidden grading; {'exclusions': {'v2-routing-bug-fix': 'Invalid task: excluded from numerator and denominator.', 'v2-inventory-constrained-refactoring': 'Invalid task: excluded from numerator and denominator.', 'v2-inventory-feature-plus-test': 'No retained final message of the last session.', 'v2-routing-two-session': 'Invalid task: excluded from numerator and denominator.', 'v2-ledger-bug-fix': 'No retained final message of the last session.', 'v2-inventory-multiple-requirements': 'No retained final message of the last session.', 'v2-routing-feature-plus-test': 'No retained final message of the last session.', 'v2-ledger-multiple-requirements': 'No retained final message of the last session.', 'v2-ledger-constrained-refactoring': 'No retained final message of the last session.', 'v2-reservations-two-session': 'Invalid task: excluded from numerator and denominator.', 'v2-reservations-bug-fix': 'No retained final message of the last session.', 'v2-reservations-multiple-requirements': 'No retained final message of the last session.', 'v2-ledger-two-session': 'Invalid task: excluded from numerator and denominator.', 'v2-inventory-two-session': 'Invalid task: excluded from numerator and denominator.', 'v2-reservations-feature-plus-test': 'No retained final message of the last session.', 'v2-inventory-bug-fix': 'No retained final message of the last session.', 'v2-reservations-constrained-refactoring': 'No retained final message of the last session.', 'v2-ledger-feature-plus-test': 'No retained final message of the last session.', 'v2-routing-constrained-refactoring': 'No retained final message of the last session.', 'v2-routing-multiple-requirements': 'No retained final message of the last session.'}, 'undefined_outcomes': {}}"
+    },
+    "cost_per_pass": {
+      "value": 0.29850128,
+      "sample_size": 20,
+      "sample_unit": "attempted_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 0.183793948,
+        "upper": 0.59114081,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "avg_attempts": {
+      "value": 1.0,
+      "sample_size": 14,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "handoff_success": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "eligible_two_session_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Zero denominator or missing accounting."
+    },
+    "parity": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "matched_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No hash-pinned paired local/cheap_api comparator."
+    }
+  },
+  "accounting": {
+    "attempted_tasks": 20,
+    "valid_tasks": 14,
+    "invalid_tasks": 6,
+    "total_cost_usd": 2.9850128
+  },
+  "validity": {
+    "status": "invalid",
+    "reasons": [
+      "v2-routing-bug-fix: incomplete_access_audit",
+      "v2-inventory-constrained-refactoring: incomplete_access_audit",
+      "v2-routing-two-session: grader_access_detected",
+      "v2-reservations-two-session: grader_access_detected",
+      "v2-ledger-two-session: grader_access_detected",
+      "v2-inventory-two-session: grader_access_detected"
+    ]
+  }
+}

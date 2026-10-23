@@ -1,0 +1,47 @@
+[
+  {
+    "call_id": "feature-plus-test-stable-unique-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-s_xxji22/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-43-40-01a167b7-27c8-7c42-99c9-97f9eb37e3f4.jsonl",
+        "sha256": "cbd8b343b840bf1f8ea1d74a5823b0fd960b482e42f244ea54e6131a88904e30"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-stable-unique-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "45261db9862cff76577a4f989ea0a6848ee8567b7fdef79e08157a93354697cd",
+    "record_sha256": "f5bf0e97dd0950951152cb2fd5eb52ca61fbf73e76bad8fb228bae89474d6f70"
+  },
+  {
+    "call_id": "feature-plus-test-stable-unique-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8e2d9e44e3ed989d046b661d3cfaafa9a9f072a6ffba7c40aeccb8c63431e224",
+    "record_sha256": "b5bdd2a9dce08f1bd05deee3b0866e64b2f425431bef92c47c5494684b7df0ba"
+  },
+  {
+    "call_id": "feature-plus-test-stable-unique-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8e2d9e44e3ed989d046b661d3cfaafa9a9f072a6ffba7c40aeccb8c63431e224",
+    "record_sha256": "fd45d75023d791fecc2b98bfee46fb68f304a1582920f151de591154e5531a24"
+  },
+  {
+    "call_id": "feature-plus-test-stable-unique-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8e2d9e44e3ed989d046b661d3cfaafa9a9f072a6ffba7c40aeccb8c63431e224",
+    "record_sha256": "b531922b92d6e53b3aead6f357a736931558be8383bf9cd1186805dc412f512b"
+  }
+]

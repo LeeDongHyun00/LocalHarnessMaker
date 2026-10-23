@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-interval-union-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sytsj7kk/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-34-52-01a16778-2b96-7741-97af-2ce5634b0fa2.jsonl",
+        "sha256": "e04383d5dfbb4354bc84777f7f324f5c9accf76125bb3c279cb276ecccfa7e28"
+      }
+    ]
+  }
+]

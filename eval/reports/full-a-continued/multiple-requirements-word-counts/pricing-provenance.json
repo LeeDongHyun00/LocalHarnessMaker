@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-word-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4b4wida5/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-34-02-01a166d2-9cbd-7b70-b514-5271dc5283e9.jsonl",
+        "sha256": "0050014694c8603c3786d89c21badbf39f6551dc4825297cd7f8158b9eea3845"
+      }
+    ]
+  }
+]

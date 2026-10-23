@@ -1,0 +1,7 @@
+test_boundaries_and_errors (test_private_60dd21a9503c4bfda944ca9577e6d467.PublicContract.test_boundaries_and_errors) ... ok
+test_input_preservation (test_private_60dd21a9503c4bfda944ca9577e6d467.PublicContract.test_input_preservation) ... ok
+test_ordinary (test_private_60dd21a9503c4bfda944ca9577e6d467.PublicContract.test_ordinary) ... ok
+test_public_regressions (test_private_60dd21a9503c4bfda944ca9577e6d467.PublicContract.test_public_regressions) ... ok
+test_variant_contract (test_private_60dd21a9503c4bfda944ca9577e6d467.PublicContract.test_variant_contract) ... FAIL
+Ran 5 tests in 0.042s
+FAILED (failures=1)

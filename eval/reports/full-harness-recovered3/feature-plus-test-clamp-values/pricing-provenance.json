@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "feature-plus-test-clamp-values-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yy2tpgcu/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-38-43-01a1677b-b07a-79d0-9222-52d38ffa5000.jsonl",
+        "sha256": "21392ac5176bd08e0995595b795209072a26d4d168ac3fda6242ba9c26df9daf"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-clamp-values-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "9ed939ecf258ea100dd3b0a7498e8b48333683de5fcd4b278dfc6696712db839",
+    "record_sha256": "7690b6b85da6bd831fa04cbce7a9a1a0c9fc3c15923fb4c79d315c337c0d3e24"
+  }
+]

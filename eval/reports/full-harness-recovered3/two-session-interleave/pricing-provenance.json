@@ -1,0 +1,52 @@
+[
+  {
+    "call_id": "two-session-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ai4pc2fz/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-26-40-01a167de-89c9-7703-8f67-61bc1b94b0af.jsonl",
+        "sha256": "c6e98114e5f6d958244e3e60852231c56852ba63b272cb3d0b9577945269e26f"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-interleave-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ai4pc2fz/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-28-08-01a167df-e4bf-7bf3-bd4c-c64904889d68.jsonl",
+        "sha256": "7398ee3993b0f3068e797359d83932917db5b0b3c005d8cf51476c54a01f682a"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-interleave-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "37e4963c57b7c967dbe218333d68e935894d43dc84cee31a1ca6b713c47aebb6",
+    "record_sha256": "bee626d833bf12bbfa406e84d1903ade7b1cc46e666536889f335fbfb0983f22"
+  },
+  {
+    "call_id": "two-session-interleave-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "db12119f54fdd2f3b95dbafb36cc39f0f52e9abe21df67cab06c3bd15fbe3fab",
+    "record_sha256": "7eeb694f9aaf1e47e6e6877b590132274717a44aa11f8892420cdc792ed3f284"
+  },
+  {
+    "call_id": "two-session-interleave-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "cb52ed894d6642aedf399aec7007ef70de274198faa4f05af3d7e74a2c885233",
+    "record_sha256": "50661b8f03ad3d4e1fee3a4b0c707f2c81a63608411a456fa470ed18565bc581"
+  }
+]

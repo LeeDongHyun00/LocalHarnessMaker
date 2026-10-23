@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-ordinal-labels-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9zyio3mc/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-54-28-01a166e5-4eb6-7e22-9044-a3756ca96d75.jsonl",
+        "sha256": "ec53a823ae78c5fddda915157d4e9c70a8a48958c96b643ea5b9763e56844041"
+      }
+    ]
+  }
+]

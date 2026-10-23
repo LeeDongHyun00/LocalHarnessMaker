@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "constrained-refactoring-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yo8a7muh/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-09-38-01a16761-1271-7cf2-a9ad-a654df9bc364.jsonl",
+        "sha256": "431f63405e2b882d3918b02c5aa5a9693f6fc606d74aac41ab7731fdfe872873"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-flatten-once-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "742a76eaf9b3e9117c78e2ae8b82c4f97b1d996a2a02b83e99cc5c4ef25d28ea",
+    "record_sha256": "ed9e6183c18d15aa40a49b4ff0d8fca96be82352c3ddae007b2f8685859caef5"
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-clamp-values-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-jx5qccf7/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-34-44-01a166d3-3eb1-77a3-b390-e264a77247fd.jsonl",
+        "sha256": "499b2e91813ebe58a4fb0cc677f2f9b0614b6986e12c62bdd1ac5b5db9d78d8b"
+      }
+    ]
+  }
+]

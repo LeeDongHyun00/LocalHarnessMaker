@@ -1,0 +1,44 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` compiled successfully: `python -m py_compile solution.py` exited 0."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`solution.py` defines typed public function `inclusive(start: int, stop: int) -> list[int]`."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`test_solution.py` contains four unittest methods exercising the public API; the AST check passed."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`python -m unittest discover -v` passed all four tests."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "`HANDOFF.md` records design decisions and the requested verification command."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Choose a +1 step for ascending or equal endpoints and a -1 step for descending endpoints; use `range(start, stop + step, step)` and return a list.",
+      "why": "This includes both endpoints and makes equal endpoints return a singleton."
+    },
+    {
+      "what": "Assume integer arguments; validation for other input types is unspecified.",
+      "why": "The public behavior specifies integer start and stop values but does not define validation behavior."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py",
+    "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 3'",
+    "python -m unittest discover -v",
+    "python -c 'from pathlib import Path; text = Path(\"HANDOFF.md\").read_text(); assert \"design\" in text.lower() and \"python -m unittest discover -v\" in text'"
+  ],
+  "do_not_touch": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services."
+  ]
+}

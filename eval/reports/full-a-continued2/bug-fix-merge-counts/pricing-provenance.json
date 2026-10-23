@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-merge-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hvmr2kfs/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-42-25-01a16711-38b3-78e3-902e-1dfbbfd03b1d.jsonl",
+        "sha256": "e38b7e0fb46afc81295411f087f6e1da7e655a682857082269641578252b6256"
+      }
+    ]
+  }
+]

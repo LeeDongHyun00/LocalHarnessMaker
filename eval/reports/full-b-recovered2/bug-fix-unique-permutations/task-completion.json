@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "c41725c176c8b50a596479298338e4cefc5f3b285ef94f592a87f9c46a2e047c",
+  "final_message": {
+    "path": "eval/reports/full-b-recovered2/bug-fix-unique-permutations/final-1.md",
+    "sha256": "d4f2d535d9b68b8f6a1125e6dd16d1b94b079ed9e97cb18ff0942b79fab14654"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

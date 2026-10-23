@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "e24a91dbed1cf1418295aa0b24a0795b1f66678ebf73a551123ffa885e3e7686",
+  "final_message": {
+    "path": "eval/reports/full-a-regrade/bug-fix-interleave/final-1.md",
+    "sha256": "9bc0aebbf839947abf8b331cca10a23bbcc63d011d0da3cfecb27b96cc5afa6a"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

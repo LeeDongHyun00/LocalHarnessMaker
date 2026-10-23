@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "feature-plus-test-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hi4gv4_v/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-05-58-01a16794-a36f-7d02-9c30-651accc76412.jsonl",
+        "sha256": "93d46d98595abbc9b3d31784ae12278ed51ed81e8a167e92012fc1af5c95aaf5"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-flatten-once-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "15dc9e77936ab60bbb55beb5a0f7ffb7bf654ac3b4c54e17aae9861070fa703e",
+    "record_sha256": "eb5415a0c6505b9056ae8f60416e919747c755218dc0c0313632f247bf9840d5"
+  },
+  {
+    "call_id": "feature-plus-test-flatten-once-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "15dc9e77936ab60bbb55beb5a0f7ffb7bf654ac3b4c54e17aae9861070fa703e",
+    "record_sha256": "4fa7d8205f29f27661fa58bd18fea02bad3523828a24a3349ae8014614ded26e"
+  },
+  {
+    "call_id": "feature-plus-test-flatten-once-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "252a50ddd5778a2875d870ec3228d82c0ebae324d2cdbe2bb0ded1d4e2e97867",
+    "record_sha256": "5c6ddcb6575d4d0eff78a818d9ec987dca77e7d0e0933862d4acdb4b13e17075"
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-parse-pairs-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-51f4sxqn/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-45-10-01a16713-bccf-7143-a7e8-17303ab3d04f.jsonl",
+        "sha256": "811b0a077d71b368533c81f1f86de8e750c57dd284bc2e1fe9e742b11a1c9a73"
+      }
+    ]
+  }
+]

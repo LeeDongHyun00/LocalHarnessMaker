@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "8c5be3bca20031b9592a0ca03abfa426c6bd8a7fc90acc3fc5c406d14dba4153",
+  "final_message": {
+    "path": "eval/reports/full-a-continued/bug-chunk-tail/final-1.md",
+    "sha256": "ae607201b4f6745f1f295f3252686fd9cc36f02078a85d9e1f0df052b06a393d"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

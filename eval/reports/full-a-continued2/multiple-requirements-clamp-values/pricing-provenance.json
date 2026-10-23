@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-clamp-values-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fbtvfdtq/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-39-23-01a1670e-704f-7f71-a9ce-1f21e659f411.jsonl",
+        "sha256": "8fe8094772c4e5b62e295c8dc9f1de9b4815e8086e9e6a50532b4ed54d7a0266"
+      }
+    ]
+  }
+]

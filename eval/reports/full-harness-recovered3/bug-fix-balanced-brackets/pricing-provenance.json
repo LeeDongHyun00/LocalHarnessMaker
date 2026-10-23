@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "bug-fix-balanced-brackets-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9oyos05r/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-10-30-01a16761-df3d-7d41-ad4f-729b6b42d4d8.jsonl",
+        "sha256": "effa79057480dafa9d52e872e5e979133d9d09197f1f2dc6e6328f7f4aa64b78"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-fix-balanced-brackets-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "7b98b4974c89ab798f3455694f5a011f8f2e896821a1f113a3134f412c8f879b",
+    "record_sha256": "7ae2d14f5b21568399e7b4fa870e0a5a5ae32434e8ba75cdadf14d611467741b"
+  }
+]

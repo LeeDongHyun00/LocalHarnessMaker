@@ -1,0 +1,70 @@
+{
+  "task_summary": "Fix rotate in solution.py without changing its signature, and add regression coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "Preserve all behavior and compatibility requirements."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The rotate implementation retains its existing signature and type hints while implementing the specified public behavior: rotate left by steps modulo length, rotate right for negative steps, return [] for empty input, and map [1, 2, 3] with 4 steps to [2, 3, 1] without mutating the input.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py. Confirm rotate retains its preexisting signature and type hints, implements left rotation modulo input length (including right rotation for negative steps), returns [] for empty input, satisfies the specified example, and does not mutate the input collection. Do not infer or require behavior beyond the request."
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py contains at least one passing unittest test method that exercises the public rotate API.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The named Python files compile successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The preexisting rotate signature and precise input type are discoverable from solution.py; no signature details are supplied in the request.",
+    "The requested unittest discovery command can discover and run the regression test using the standard library."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=767; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17399,
+    "output_tokens": 448,
+    "usd": 0.00061606
+  }
+}

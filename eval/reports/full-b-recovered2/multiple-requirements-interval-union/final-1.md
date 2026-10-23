@@ -1,0 +1,3 @@
+Repaired `union` in [solution.py](/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nx1j1k7e/workspace/solution.py) and added its public specification docstring. It merges overlapping or touching intervals, sorts by start, rejects reversed bounds, and preserves input values and order.
+
+Added 9 regression tests in `test_solution.py`. All pass with `python -m unittest discover -v` on Python 3.13.5.

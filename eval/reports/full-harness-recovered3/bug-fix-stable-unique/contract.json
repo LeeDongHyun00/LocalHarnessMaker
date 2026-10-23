@@ -1,0 +1,117 @@
+{
+  "task_summary": "Fix the behavior of unique in solution.py without changing its signature, and add a regression test in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Return each string once, preserving first-occurrence order; empty input returns []; equality is case-sensitive.",
+    "Maintain type hints and do not mutate input collections.",
+    "Add at least one passing unittest test method in test_solution.py that exercises the public API.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The unique implementation retains its existing signature and includes type hints.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def unique\\s*\\([^\\n]*\\)\\s*->\\s*[^:\\n]+\\s*:"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The implementation returns each string once in first-occurrence order, returns an empty list for empty input, and preserves case-sensitive equality.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from solution import unique; assert unique([\"a\", \"b\", \"a\", \"A\"]) == [\"a\", \"b\", \"A\"]; assert unique([]) == []'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The implementation does not mutate its input collection.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from solution import unique; values = [\"a\", \"b\", \"a\"]; original = values.copy(); unique(values); assert values == original'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least one unittest test method exercising the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:.*?def\\s+test\\w*\\s*\\("
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The named Python implementation and regression test files compile.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c 'from solution import unique; assert unique([\"a\", \"b\", \"a\", \"A\"]) == [\"a\", \"b\", \"A\"]; assert unique([]) == []'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'from solution import unique; values = [\"a\", \"b\", \"a\"]; original = values.copy(); unique(values); assert values == original'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are interpreted as relative to the supplied task workspace; they may not exist yet and may be created.",
+    "The behavior examples in the assertions interpret the requested public contract using representative duplicate, case-variant, and empty inputs.",
+    "The existing public API accepts a collection of strings and returns a list of strings; its exact current signature is unknown and must be preserved.",
+    "unittest discovery from the workspace root finds test_solution.py, as implied by the requested command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=747; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 38642,
+    "output_tokens": 1422,
+    "usd": 0.00322736
+  }
+}

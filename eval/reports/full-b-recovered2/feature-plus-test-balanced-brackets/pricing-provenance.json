@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-balanced-brackets-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-8mf5rr7k/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-51-49-01a16787-adaa-7d91-8c5d-d5366d959e32.jsonl",
+        "sha256": "b0959b307362a56440bef7d2edba3e1a091a7314c33db12806d5406cab2c4bd0"
+      }
+    ]
+  }
+]

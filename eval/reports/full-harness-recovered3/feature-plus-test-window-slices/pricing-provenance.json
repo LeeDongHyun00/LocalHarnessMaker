@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "feature-plus-test-window-slices-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hski2i0o/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-57-27-01a16755-e114-7a60-a9b4-4233b20d8271.jsonl",
+        "sha256": "690d6c6e1dbfbbbd1c8bac3aee84f37059b1851db0f136a21c2b574ff3dd8f9f"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-window-slices-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e9f35aa25aa3c5db14d79c2670a988351d522cf6df98eae49d8d0e90762d1e99",
+    "record_sha256": "a0f6e17c423c5e54969f54b672c00f5db532c394f7f0c05e117858d6b0f035d8"
+  },
+  {
+    "call_id": "feature-plus-test-window-slices-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e9f35aa25aa3c5db14d79c2670a988351d522cf6df98eae49d8d0e90762d1e99",
+    "record_sha256": "a00d690cd6c5d7c329c391aae1b69312063e1b9fd9dca1e8594b0457f77b016c"
+  }
+]

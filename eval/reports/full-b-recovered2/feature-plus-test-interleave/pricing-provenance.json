@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c_o4kw25/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-14-43-01a16765-b7d2-7fe0-9f5d-193eef66675e.jsonl",
+        "sha256": "cac3e954517c05c8ec14921b8ad157b1258584833213b0107893fe5dc5e7fc49"
+      }
+    ]
+  }
+]

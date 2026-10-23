@@ -1,0 +1,52 @@
+[
+  {
+    "call_id": "two-session-line-endings-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hln46bmw/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-28-59-01a167a9-b54b-7462-a6b4-6501b115e2c1.jsonl",
+        "sha256": "bb4f41f76729d3150521671c90c6e30de52d35f74910d75c84a7ab8e6d51a628"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-line-endings-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hln46bmw/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-30-16-01a167aa-e9a4-7461-80a7-492a197c3710.jsonl",
+        "sha256": "8a2a658dcb4b671d9ea1b0bb0214f8d94f3156cb5b9de11f819e8f7a5f0fbfa4"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-line-endings-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2510722fc264890de7a7f8b20563a1bce3b92ef6febae737855c606f99cacdc2",
+    "record_sha256": "5f825a7454c6be24d52de6ca6b0e9c2f8acbab5780dbd971bd92e70417133dd8"
+  },
+  {
+    "call_id": "two-session-line-endings-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "ee8071b2c11db6bd1614487a6577ad9fac2e212056d84fee43008442722251e6",
+    "record_sha256": "e17449ee214fb81b507b11f9622c325c06e82a562075b7072c114bb87c760531"
+  },
+  {
+    "call_id": "two-session-line-endings-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "b27f20d543f8e09dfb90216a30dbae9a13517e7c3100f4c51425e50f1a69ff23",
+    "record_sha256": "97070bbbf0b0ff008797cdd70cdd2fe750aaa956f1d80bdfb0a470be2b02e280"
+  }
+]

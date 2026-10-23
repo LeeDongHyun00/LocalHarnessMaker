@@ -1,0 +1,84 @@
+[
+  {
+    "call_id": "two-session-interval-union-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-l5d_9rcp/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-13-13-01a16764-5820-7722-a2d5-e8392289b153.jsonl",
+        "sha256": "2f671ba4bbbafd8a0fad5852c74007e54d376d55394fb0ba004264eb6450a70a"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-interval-union-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-l5d_9rcp/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-14-38-01a16765-ac1e-7432-980f-344dcbb64d64.jsonl",
+        "sha256": "50096aff97e545cbae0b7662ebd947bfac7a4b001b326d72dbcb201517511f58"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-interval-union-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "18944e5801ce22ac1004fb2b91e9ca66266eda1e99622abd8a9560c147716722",
+    "record_sha256": "5a623a2e23dc07bdd456ddbb77ad63db0121146ad6e18d90e04840a987eb3a1e"
+  },
+  {
+    "call_id": "two-session-interval-union-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "b11d501f3b1630da1f8f500c36fe4d821a2adf63ba0bf54c9200b97815d016e9",
+    "record_sha256": "9b0c8c29fc5173b5b26f43d42f8985cc0cd0867a95b48e19e6ebb6db47008c53"
+  },
+  {
+    "call_id": "two-session-interval-union-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "5c31af7abcf009c19cd0e87b7d1b7d39a154eedc398286e38f45b80aeb87e942",
+    "record_sha256": "e23b7198e6e62230fe79e30efd5c7e7bc1b1dc9041c5714406215122f6d7e5c5"
+  },
+  {
+    "call_id": "two-session-interval-union-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "cf1e4f5818fa02d9e8574a5e5d058e8060fc9d043844459160937a75157fe308",
+    "record_sha256": "bab373795f789cecdca65082cdd97ad4e5c52c8a88c588cabb3c3073e1f41ed6"
+  },
+  {
+    "call_id": "two-session-interval-union-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "cf1e4f5818fa02d9e8574a5e5d058e8060fc9d043844459160937a75157fe308",
+    "record_sha256": "7c4d7cfdb23ce5687df2e093e7c5f6faca85287183914bc6da5e660f817d1018"
+  },
+  {
+    "call_id": "two-session-interval-union-control-6",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "cf1e4f5818fa02d9e8574a5e5d058e8060fc9d043844459160937a75157fe308",
+    "record_sha256": "881a1636b024d95495b1a69cc38074da51f37675b9b352c8f2ae7942cbaf75ba"
+  },
+  {
+    "call_id": "two-session-interval-union-control-7",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "463871a8f5ce1058b04aa7d43532c5d1917aefcf5776bd8677c18606406073da",
+    "record_sha256": "a6e1ed8ca90e42231b04a6fe0abba3c07e2a492f81e4b9e1dd6c8749f2058758"
+  }
+]

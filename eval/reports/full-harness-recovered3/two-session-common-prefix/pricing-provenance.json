@@ -1,0 +1,60 @@
+[
+  {
+    "call_id": "two-session-common-prefix-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-bdguwh3s/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-49-17-01a1674e-6c51-7442-9493-b05b7abcb21a.jsonl",
+        "sha256": "a1f6bb394ed6ecdcd5e062788edc01ffbb5a553f64e992f461cae83268517c06"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-common-prefix-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-bdguwh3s/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-50-32-01a1674f-9975-7592-be9f-e6f05d17452e.jsonl",
+        "sha256": "bb05429dde8256adc348d1a7a6e0651f21944ed91e99aadd88407425234a3aa0"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-common-prefix-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "80738c4ca8d32f294ed4062fb41d4f57e238ef535115e4954711b97f35afb3ad",
+    "record_sha256": "56ea5feb4f70bb5533e33095de6b27f2a7aec1db16ec4882fcdfc31f86d0ec89"
+  },
+  {
+    "call_id": "two-session-common-prefix-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "028aaaed574c361f86f37b8c11426539eb66b9c5f267100ba054bf3f90a72601",
+    "record_sha256": "7a18299da35b9c9f082fc127beea35d20f3e6340f9cbd7b2b3ef871902081b89"
+  },
+  {
+    "call_id": "two-session-common-prefix-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "6bc59bd8aa145df440786334ce590663edb685e461ddfb85fb0dad9189452574",
+    "record_sha256": "a27106238d30815dc6417e819b5c6e640a544cf215fd22086d13c1ef7b7b2fc4"
+  },
+  {
+    "call_id": "two-session-common-prefix-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "0d4ed3592f9f9463f32cb11ebb6205451f9a7ac0adcd801fde3157d17096ae9a",
+    "record_sha256": "7728393696ab536fae516d8a67474ed73afdd7f913070aca324217bde329ac40"
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-merge-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9tkurfgv/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-48-13-01a16784-6554-71e0-8337-15c372d3e0c4.jsonl",
+        "sha256": "dfe1ba3e2a554cdf3a0075e59422828314553a497d07450d1fa6cccf467a2eb3"
+      }
+    ]
+  }
+]

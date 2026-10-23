@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-window-slices-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-e9rcfnik/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-37-42-01a166d5-f318-77a1-9ad0-92144592e53a.jsonl",
+        "sha256": "ba31188ced0e0ba1ed5ed2e5857333f62f6c41fc5ee3f3497bb6dc9d140dd125"
+      }
+    ]
+  }
+]

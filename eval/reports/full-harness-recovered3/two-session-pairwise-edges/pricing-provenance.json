@@ -1,0 +1,92 @@
+[
+  {
+    "call_id": "two-session-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3xxh14k3/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-40-55-01a1677d-b76d-7590-b60c-3dffb856933e.jsonl",
+        "sha256": "fbef9892d3a9cc47da9c709cfaed0f2484ebc6e798ae198e316dbab6d2d87c3f"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-pairwise-edges-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3xxh14k3/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-42-41-01a1677f-58dd-7893-98f3-51371dd8cce8.jsonl",
+        "sha256": "35e1868e2c7597357fcfbe13b6786c22ad64a079c8542ebd99ed379522eeca28"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "59a0631423d39c9986c0109a7201285f924bab1e7352722e1ecc7c4711892ec6",
+    "record_sha256": "959ff4f788aa8a4e3acde4defa9f2e6c0bf523f5d9c96feebd45f0d8c2f0560e"
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "dc16aa0574a7ef5d1068ea28b0546031148bc270c4fda7f221db5ceda0786080",
+    "record_sha256": "1246068a1c0f0ab6e9da3ed87d349d5096741995da9e01a6aa16e91a248221d5"
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "dc16aa0574a7ef5d1068ea28b0546031148bc270c4fda7f221db5ceda0786080",
+    "record_sha256": "accb429ce944ff635e1e24dd4de7cc9e7161a24867a7192278746d67e65117c3"
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "dc16aa0574a7ef5d1068ea28b0546031148bc270c4fda7f221db5ceda0786080",
+    "record_sha256": "5ba4807fc9e5ee851d7bf45c15024d7e3eefd563db03ec1872dcc9aefa527525"
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "6daf92d018863a64f18945498f6b984ee94b7e1f69006c4c09fea8c64f2b1595",
+    "record_sha256": "fdc5de991580d663645a536649987ee661162850ed43783ed944de710b3cfbfd"
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-6",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "c680fe5cda93ff68ae4e106d96088314b536faa6dcb557179576df6362fd6854",
+    "record_sha256": "e400f8fb79dd231a3caeb5e0f841645bb8875fda22f15598f9cebb0de3cbabd8"
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-7",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "c680fe5cda93ff68ae4e106d96088314b536faa6dcb557179576df6362fd6854",
+    "record_sha256": "e389fcdc8bc076dcd33b859a3982c2224e90bd24e6b8db38cf91737014fb747e"
+  },
+  {
+    "call_id": "two-session-pairwise-edges-control-8",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "0e31b43930e73b21f52ea2095871747a59e787713d668ece2dfeed236855f6c0",
+    "record_sha256": "ed153697d88e06db84b1d0f7928e54c63ed8abd05a363ef8f969256a33de87e7"
+  }
+]

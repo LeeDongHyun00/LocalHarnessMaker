@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def ordinal\\s*\\(|def ordinal_legacy\\s*\\(|def _[A-Za-z_]\\w*\\s*\\(\n4: def _format_ordinal(value: int) -> str:\n11: def ordinal(value: int) -> str:\n15: def ordinal_legacy(value: int) -> str:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def test_[A-Za-z_]\\w*\\s*\\([^)]*\\)\\s*:.*?){2}\n7:     def test_nonnegative_ordinals(self):\n8:         cases = {\n9:             0: '0th', 1: '1st', 2: '2nd', 3: '3rd', 4: '4th',\n10:             10: '10th', 11: '11th', 12: '12th', 13: '13th',\n11:             20: '20th', 21: '21st', 22: '22nd', 23: '23rd',\n12:             101: '101st', 111: '111th', 112: '112th', 113: '113th',\n13:             121: '121st', 122: '122nd', 123: '123rd',\n14:         }\n15:         original = cases.copy()\n16:         for function in (ordinal, ordinal_legacy):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_negative_values_raise (test_solution.OrdinalTests.test_negative_values_raise) ... ok\ntest_nonnegative_ordinals (test_solution.OrdinalTests.test_nonnegative_ordinals) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

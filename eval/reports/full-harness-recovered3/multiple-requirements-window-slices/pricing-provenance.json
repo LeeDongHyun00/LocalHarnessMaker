@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "multiple-requirements-window-slices-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-zra6qa6h/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-18-49-01a16769-7685-7e93-935f-7f7695d3fec4.jsonl",
+        "sha256": "8ff3e3716e683245da85c3a85395349c4869bbf600a5186010a79933aa4d875f"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-window-slices-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "0bcdbf0e1cded84d4412701b3a7a219dcf5652dea8d6bb456e9d2ea583ebfaee",
+    "record_sha256": "82c6fd17c3782a7b4acf0359f909ae520066463ff34fd831f9c2a93763d8680c"
+  }
+]

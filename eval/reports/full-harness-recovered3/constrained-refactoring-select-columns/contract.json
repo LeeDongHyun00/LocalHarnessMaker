@@ -1,0 +1,81 @@
+{
+  "task_summary": "Refactor select and select_legacy in solution.py to share their algorithm through one private helper, preserving the stated public behavior and compatibility requirements, and add public unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve both function signatures, return types, error behavior, input immutability, imports, public names, and type hints.",
+    "Return new dictionaries with requested columns in column order for each row; omit missing keys; preserve row order and values; include repeated requested columns once.",
+    "Do not mutate input collections. No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least two passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py contains select and select_legacy definitions and compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py defines a private helper used by both select and select_legacy to implement their shared algorithm, while retaining the stated compatibility and behavior requirements.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py. Determine whether select and select_legacy delegate their shared row-selection algorithm to one private helper, preserve their existing signatures, return types, error behavior, imports, public names, and type hints, and implement the requested public behavior: new dictionaries per row, requested column order, omitted missing keys, preserved row order and values, repeated columns included once, and no input mutation. Judge only what is supported by the visible file content."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least two unittest test methods exercising the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?){2}"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The supplied task workspace is the relative-path workspace, and solution.py and test_solution.py may not exist yet and may be created.",
+    "The initial public signatures, return types, error behavior, imports, and public names needed to verify compatibility are discoverable in supplied workspace files or context; unspecified details cannot be inferred from the request.",
+    "python -m unittest discover -v is the requested test runner and the tests will be discoverable with that command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=939; distinct_files=2; tests_requested=true; requirement_segments=18; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 21175,
+    "output_tokens": 613,
+    "usd": 0.00077664
+  }
+}

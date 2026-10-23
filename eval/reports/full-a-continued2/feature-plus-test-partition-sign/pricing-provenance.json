@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-partition-sign-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-zgmaxti2/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-52-37-01a1671a-8efb-7273-9447-b4dbbdd05f04.jsonl",
+        "sha256": "fc87608f7ca6087306144c6d89b4f28bec9861606b1df1456b3ad08cb1388262"
+      }
+    ]
+  }
+]

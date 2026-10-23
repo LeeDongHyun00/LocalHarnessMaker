@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "bug-fix-prefix-sums-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-xslb5dv5/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-07-18-01a1675e-f16b-7091-b65e-f7aa5564667b.jsonl",
+        "sha256": "b5b11b16bc4ba348b71f1a2500761497eedd852f88abdbc8f15ded7067d64edc"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-fix-prefix-sums-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4f373e6f66087711e2a9ec4b962c7f168c2cbee1d7e1a604892468bfba85a8b6",
+    "record_sha256": "c72b132535aedfa39ec75c9eff529bdb5cf22b57dbb3426990bf8a980330867d"
+  },
+  {
+    "call_id": "bug-fix-prefix-sums-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "08de7a525d29c8aa7175c8d85d09d93ccdc025e59466409c446e844bc73401a6",
+    "record_sha256": "f5dc8ccfb4c8ba49ba018601c0ad6daab66b83104ddc9cc8e599ad0d6f7b4229"
+  },
+  {
+    "call_id": "bug-fix-prefix-sums-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "08de7a525d29c8aa7175c8d85d09d93ccdc025e59466409c446e844bc73401a6",
+    "record_sha256": "ead506f78e4435deb5b9f3b0b42e0ec5ee3faa54a006ab2542668a295d328501"
+  }
+]

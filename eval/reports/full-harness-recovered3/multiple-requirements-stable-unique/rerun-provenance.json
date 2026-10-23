@@ -1,0 +1,76 @@
+{
+  "operation": "rerun-invalid",
+  "source": "eval/reports/full-harness",
+  "source_run_id": "2ca02d52e85242999263d6ecd95bc898",
+  "source_report_sha256": "68428d4727f4d142d422c1ac0b13a2027fd1e401acd6c4f7fd3b1b38205bd4f2",
+  "source_checkpoint_sha256": "9b4550de1c6ffd8cd2e3b27ba54bd4e9609457904c66cd449ca555eb43e23a52",
+  "requested_reasons": [
+    "control_cli_error",
+    "executor_settings_unverified",
+    "incomplete_access_audit",
+    "runner_control_file_preexisting"
+  ],
+  "selected_tasks": [
+    "multiple-requirements-stable-unique"
+  ],
+  "status": "finished",
+  "audit_code_version": {
+    "audit.py": "404f743d725e8e52645429179f8c9c1300a65aee88e336e43efed4f1432ac9d7",
+    "javascript.py": "e2e854a124443f25c7ec1fb515d0fe0dc1a444877d48b040b65cd0a4ed36a34f",
+    "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+    "regrade.py": "bdbcfff0573841832a35b145c1812243ba9bb680c7222fe5acca781dd9ece88c",
+    "telemetry.py": "e2c887e38c76829c481d61f8ffd3cd7130b98aa434a04f1189d1dd11bdcc01b2",
+    "core.py": "fa5e72337dcd556be0e1c485d418e78325b9f85be0553bae9fb2dc973ffd0f00",
+    "workspace_verification.py": "00ff2a966dd89555430cb7ea48712240e065955784344e0289f731d9569d1b4f",
+    "harness.py": "c7770545ef303949870015cd67f22472f70505bf93c83f72fd95934a1f019e77",
+    "rerun_invalid.py": "2df7fded322b07eb5579bf2764f1308b00a86c106df0dd5e9d47c702f7856c4e",
+    "rerun_unaccounted.py": "350417a55aa41636d721db247b746b1f7f824d6308b5741ce18e250e13b732e7"
+  },
+  "task_id": "multiple-requirements-stable-unique",
+  "invalid_reasons": [
+    "control_cli_error",
+    "runner_control_file_preexisting",
+    "incomplete_access_audit",
+    "executor_settings_unverified"
+  ],
+  "source_outcome": "invalid",
+  "reason": "infrastructure_invalidity",
+  "accounting_policy": "retain_prior_spending",
+  "infrastructure_causes": [],
+  "source_segments": [],
+  "source_executor_segments": [],
+  "source_artifacts": [
+    {
+      "path": "eval/reports/full-harness/multiple-requirements-stable-unique/access-audit.json",
+      "sha256": "8d1af1750b3ad446f8177a9fe4ec247814270c0e324a931284d23565d0548a54"
+    },
+    {
+      "path": "eval/reports/full-harness/multiple-requirements-stable-unique/result.json",
+      "sha256": "cd5529a4fe31d4fb251e4c1c168f2334cd887cee42c5e59b30c9a9e8c1dca6ed"
+    },
+    {
+      "path": "eval/reports/full-harness/multiple-requirements-stable-unique/session-evidence.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "eval/reports/full-harness/multiple-requirements-stable-unique/contract.control.json",
+      "sha256": "95c32fd9ea49caa2d36f9998a71aafa00e811ee116aa46bf7948cb237c0ecd68"
+    }
+  ],
+  "source_calls": [],
+  "source_costs": {
+    "executor_usd": 0,
+    "control_usd": null,
+    "total_usd": null
+  },
+  "rerun_id": "6d883314a2a34ceabd538d13ed412fce",
+  "outcome": "pass",
+  "fresh_runtime": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-oque8vlh",
+  "added_call_ids": [
+    "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-exec-1",
+    "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-control-1",
+    "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-control-2",
+    "multiple-requirements-stable-unique-rerun-6d883314a2a34ceabd538d13ed412fce-multiple-requirements-stable-unique-control-3"
+  ],
+  "added_cost_usd": null
+}

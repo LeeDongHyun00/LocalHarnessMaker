@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "3c110bac1ae56bbec5ec3b41700cfb837733e750f968e5e9b6e3ef48a90995f7",
+  "final_message": {
+    "path": "eval/reports/full-a-continued2/constrained-refactoring-last-index/final-1.md",
+    "sha256": "85f5970494b2da6af3f12df39c1842ef029fe0064e1912ea79bc76aba8699d24"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

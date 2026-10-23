@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "feature-plus-test-invert-groups-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-rzhajwoh/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-16-10-01a1679d-fbba-7301-b2c3-81173f220ce3.jsonl",
+        "sha256": "aaa0aff7e157c236fd210855a0ec76db88009e6bda72473c5b003f53d1e4065b"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-invert-groups-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "27f4fcd241af1ca16484e83de31062c3e4aaa1b3c143a99bd811853641374334",
+    "record_sha256": "cf66d6897ceefb757bce5dbd034ba0dfb6757871af6fff48cd1db3f54b927a2d"
+  },
+  {
+    "call_id": "feature-plus-test-invert-groups-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8c44cddc5ecc833b393514a235fcd842f334b1dd0d8baff9a9a80d0afc37d0a9",
+    "record_sha256": "bee6ce09089ced8beb373fda28d2143e5349440399e1c278454db7b577f0acb6"
+  },
+  {
+    "call_id": "feature-plus-test-invert-groups-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8c44cddc5ecc833b393514a235fcd842f334b1dd0d8baff9a9a80d0afc37d0a9",
+    "record_sha256": "7446eafac751f1d80b3cb4f4ca390a3ad361fdf6a5391e2cd58417d97971b514"
+  }
+]

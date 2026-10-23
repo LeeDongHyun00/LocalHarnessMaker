@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-invert-groups-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c3rhdj10/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-27-03-01a16771-0495-7412-a247-f344701461f0.jsonl",
+        "sha256": "a403820ba371c5a889fc0144fde0f97fd7cf4195d4386bde0d034a996095b775"
+      }
+    ]
+  }
+]

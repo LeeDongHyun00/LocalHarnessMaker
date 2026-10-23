@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "d5ed91ebab5603a3455a4a22992146309602da6c09851f19d21f9aac4b33482e",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/bug-fix-window-slices/final-1.md",
+    "sha256": "8ea52e2fc668b6f252f31424ce15a6f3a3224a95de3d4ef96aee9fcf62e48a6d"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

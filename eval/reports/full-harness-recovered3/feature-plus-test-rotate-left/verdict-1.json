@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_boundary_rotations_return_new_lists (test_solution.RotateTests.test_boundary_rotations_return_new_lists) ... ok\ntest_empty_input (test_solution.RotateTests.test_empty_input) ... ok\ntest_ordinary_rotations (test_solution.RotateTests.test_ordinary_rotations) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+rotate\\s*\\(\n2: \n3: \n4: def rotate(items: list[int], steps: int) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\(\n9:     def test_ordinary_rotations(self) -> None:\n21: \n22:     def test_boundary_rotations_return_new_lists(self) -> None:\n36: \n37:     def test_empty_input(self) -> None:",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

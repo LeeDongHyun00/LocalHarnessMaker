@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "bb88b03e6889de23492fc985462637cdd5961604533e2a2edc1daa9f18df3f39",
+  "final_message": {
+    "path": "eval/reports/full-a-continued2/feature-plus-test-strip-prefix/final-1.md",
+    "sha256": "4dbf8edbc6b1e07ab7914080f9ab9c3b4c76e38b62508b95726a5fb81f58e86d"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `strip_prefix` using `str"
+  ],
+  "undefined_reason": null
+}

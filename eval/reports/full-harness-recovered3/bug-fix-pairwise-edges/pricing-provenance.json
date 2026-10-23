@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "bug-fix-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vlo7_yx5/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-37-38-01a1677a-b5a1-77b3-9ad0-7b2f87740cb1.jsonl",
+        "sha256": "44baa42c77ca47a03e3596e0f9c1f3baac8859a1355aa157795082619e6df02b"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-fix-pairwise-edges-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "1c6b1252469720ce26859d2545234e40a241d7caac76167bee106dacc57ce40c",
+    "record_sha256": "1a3a7081d6f10974611eae03ae0479b0ab7f1dac6921967b1aae4dd7045d5623"
+  },
+  {
+    "call_id": "bug-fix-pairwise-edges-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "cc587e4b6652cb413e178c1d58c0fc8ffda64e4e6cfeff5769af92bfc680268c",
+    "record_sha256": "233dc175d213ef6061c98470488641e7a08346b671d589a6e2f7e5ce4628a49e"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "ab476ba2e994be8e9596b37eaad188bfac90d9bc53636617219ffb208ad0c391",
+  "final_message": {
+    "path": "eval/reports/full-b-regrade/multiple-requirements-invert-groups/final-1.md",
+    "sha256": "f7224f48903ae4685e0f002ef1746c25029e7a9e7a99daee9e721471269351b3"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

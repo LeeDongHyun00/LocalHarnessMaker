@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-routing-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yuav0rde/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-43-39-01a167ee-13b5-7fa3-aafd-813411444b8a.jsonl",
+        "record_sha256": "127277521bac3945af226ef93c62ab1b6258cc46690f00d5f4e201aefce3861a",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-yuav0rde/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-43-39-01a167ee-13b5-7fa3-aafd-813411444b8a.jsonl",
+        "sha256": "840362d743f916a65169508648d2d3e5a61c6b468ad2c9e42de6fe8edfed61ed"
+      }
+    ]
+  }
+]

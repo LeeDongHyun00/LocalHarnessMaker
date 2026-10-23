@@ -1,0 +1,90 @@
+{
+  "task_summary": "Repair solution.py to split text on arbitrary whitespace, casefold tokens, count them while retaining punctuation, and return {} for empty or whitespace-only text. Add a public API docstring and regression tests in test_solution.py, preserving input values and collection order as specified.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least 3 passing unittest test methods exercising the public API.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The public API specification is present as a docstring in solution.py.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)(?:def\\s+\\w+\\s*\\([^)]*\\)\\s*(?:->[^:]+)?\\s*:\\s*\\n\\s*(?:[rubfRUBF]*\\\"\\\"\\\"|[rubfRUBF]*''' )|(?:\\\"\\\"\\\"|'''))"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py compiles under Python.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s*def\\s+test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The discovered unittest suite exits successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The implementation and public specification follow the requested behavior, retain type hints, avoid mutating inputs, and preserve collection order requirements where applicable.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether the public API specification is documented in a docstring; implementation splits on arbitrary whitespace, casefolds each token, counts tokens without stripping punctuation, and returns an empty mapping for empty or whitespace-only text; type hints are maintained; inputs are not mutated; and regression tests exercise the public API with at least three unittest test methods. Base the assessment only on file content."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The requested files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The exact public API name, signature, and any additional collection order behavior are unspecified; identify these from the supplied files or preserve existing compatibility without inventing new API behavior.",
+    "The requested unittest discovery command is supported and the suite is discoverable from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=839; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17401,
+    "output_tokens": 655,
+    "usd": 0.00071976
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "ddb670ca4250ba50b7bf70a07daed1797dfc10aef29723686c536908f6691372",
+  "final_message": {
+    "path": "eval/reports/full-a-continued2/two-session-interleave/final-2.md",
+    "sha256": "98aaffd88c50a3a1a4f15b925eb248838c402166dd8d1e51d6cfe2ed4e5f60a5"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

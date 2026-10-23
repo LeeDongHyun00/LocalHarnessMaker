@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "144b31092f55823f7dadf2cfce7af2127db11e0bc61fcdee65999fd747301882",
+  "final_message": {
+    "path": "eval/reports/full-b-regrade/feature-plus-test-flatten-once/final-1.md",
+    "sha256": "f5efd8611aec620e39eacaea4e92c6e170d9d89f5135f67f643802cf56486ce1"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `flatten` to flatten exactly one level, preserve order, ignore empty lists, and return a new list without mutating inputs"
+  ],
+  "undefined_reason": null
+}

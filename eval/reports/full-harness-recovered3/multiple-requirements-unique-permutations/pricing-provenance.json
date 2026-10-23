@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "multiple-requirements-unique-permutations-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-6h3t4y1a/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-42-11-01a167ec-ba40-7102-a436-3b9defd017c7.jsonl",
+        "sha256": "7287632a2bef5fa047e7287a79231073ea447cf921914905696cc89575e40966"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-unique-permutations-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "5d34871e6d725120fdf8fd0840c5bf9eb8665d358d2456f99a9d0873e2328dd1",
+    "record_sha256": "26d30aa390d5718c37c87ff20bff61374918c523575bdc22a9070ae5363240d2"
+  },
+  {
+    "call_id": "multiple-requirements-unique-permutations-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "fe1369710899c3f98ad7a82cd7a7c4fd3ae5020c8a9bf32604e5d56bfb6ba82c",
+    "record_sha256": "1e5c4a625040666bc869bd69a46a42045d3d2349136954bdd0ac21d6fe13bdfd"
+  }
+]

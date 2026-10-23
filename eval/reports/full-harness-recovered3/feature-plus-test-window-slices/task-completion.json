@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "b7a327984fa6d973548218c68add979635d3789518ce537fa337f98b3dc71d6d",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/feature-plus-test-window-slices/final-1.md",
+    "sha256": "a4e9b07e4331d780da6548f3098a67e2a38a78f985cc9bf5d835b38c1556ec2d"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `windows` in `solution"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ie17mvz0/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-09-03-01a16729-9c79-7c52-a2ce-93bd4b965c4a.jsonl",
+        "sha256": "10f9b1a2aa4890e1085e6d57380712fddcb9636d9d06c2698f1fb6dd0a928f9d"
+      }
+    ]
+  }
+]

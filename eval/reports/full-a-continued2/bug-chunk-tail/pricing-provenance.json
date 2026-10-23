@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-chunk-tail-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-v4oclcr_/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-21-14-01a166fd-d4d3-7a20-a1e3-575086ddfe7c.jsonl",
+        "sha256": "3d6aa36ee685b4f0ade88b6ca4c6cadc2cd26ebdb8f493c861ae2c67d5ccbd5a"
+      }
+    ]
+  }
+]

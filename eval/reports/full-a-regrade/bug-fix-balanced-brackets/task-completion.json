@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "fa7ea07d7fa8ba7d7c5f6bafcf2aee079890cb89338d48fc2aa2c82b293e5fe3",
+  "final_message": {
+    "path": "eval/reports/full-a-regrade/bug-fix-balanced-brackets/final-1.md",
+    "sha256": "3c2b61c3cdf62c47825d08dcc2f526a8a4f8c32a3ee82f38b3889a425e21ad92"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

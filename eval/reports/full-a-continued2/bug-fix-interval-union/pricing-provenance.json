@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-interval-union-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sza4fdsd/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-46-35-01a166de-13fe-7ef1-b5b6-f29de133883e.jsonl",
+        "sha256": "062e7062e3aa42414f0e7056ab1fc677acbb439cb8e3a121b92774bdafbeea4c"
+      }
+    ]
+  }
+]

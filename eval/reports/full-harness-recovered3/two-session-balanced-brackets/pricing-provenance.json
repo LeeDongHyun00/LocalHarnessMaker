@@ -1,0 +1,68 @@
+[
+  {
+    "call_id": "two-session-balanced-brackets-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nyxpfnpx/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-13-30-01a167d2-7b05-73d2-9009-1a0b266d2b1f.jsonl",
+        "sha256": "626dd5cec0eda51ac896525f50c43cc8af7f3d124763cd3f7e71acf9a7927386"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-balanced-brackets-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nyxpfnpx/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-14-41-01a167d3-9413-7952-a9cb-05d75868e376.jsonl",
+        "sha256": "141b2634b11d12f389042c5e1e79196fc8f610fb3ca80119ed91438fcd63204a"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-balanced-brackets-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "6e64027ed64018d382aed424097539b2d22b78c71578783478f18b62751bbc3a",
+    "record_sha256": "27e5dcdf0e710fa28fab45e586885b1db81b031e318eaecf5f1e6f8a995f0833"
+  },
+  {
+    "call_id": "two-session-balanced-brackets-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "6e64027ed64018d382aed424097539b2d22b78c71578783478f18b62751bbc3a",
+    "record_sha256": "a2c76a54e18578c577a1877b844b749494337b88b0172fb965a2d57d02392a33"
+  },
+  {
+    "call_id": "two-session-balanced-brackets-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "957dc1e85ff6740c86718d6c5ebd2247bf22cab68413fbcccd60ce1fc2f141b9",
+    "record_sha256": "433f0859a94da8de447653903856f1def373adf9b835c67d22168e2e11dae3a2"
+  },
+  {
+    "call_id": "two-session-balanced-brackets-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "4cc2c71dbb26c0c4618ead4de51d713127a4f91eb5a4d11fbc91d4c7d0f4dd92",
+    "record_sha256": "8d65331f06eedddb24c98e4edc3fb6122b816495123e657059ff6507f2658b5d"
+  },
+  {
+    "call_id": "two-session-balanced-brackets-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "94004c7a47c124fade1db7ad4edaea13c0e97cfd52f4a91e149fb502455507b6",
+    "record_sha256": "deab3f621f51ca1adc6916373633f59ea300ff408c3ff09a4496dac57ead0a5c"
+  }
+]

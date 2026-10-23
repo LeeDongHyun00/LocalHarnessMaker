@@ -1,0 +1,60 @@
+[
+  {
+    "call_id": "two-session-merge-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4caj7r88/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-53-44-01a16752-870c-7f41-ac4f-38554cdcb3ea.jsonl",
+        "sha256": "0cc2be72ef4fb63c500b6edcf18dc74d3f8e3df51c8f094347a15012b0b0ff5b"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-merge-counts-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4caj7r88/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-55-05-01a16753-c2d3-7f02-99e3-86c179fd6336.jsonl",
+        "sha256": "7e205227708bb245c6c39041fb43ddd8e53e84644a380d3d1b62a9a24699f7d5"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-merge-counts-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "146c02969ca0ba42c46e4d0ebbf9167fb9cbe137f700c1b1e8c08c17b7581ac3",
+    "record_sha256": "a866ccfe663c0e8aa3e5d9124484b9d6b3f104f9308697b24e690c5031865484"
+  },
+  {
+    "call_id": "two-session-merge-counts-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "3b7a0d79630739e802e273e3bdff8357f97a0c7e5f4afef36670e9e28f02eedc",
+    "record_sha256": "e0f41322e95c6a77c71df8585e024a5befaf7d8da11648cda2f08257680f6c7b"
+  },
+  {
+    "call_id": "two-session-merge-counts-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "3c4c96158f198a946059fa5c9df39a36458a975e7ad751e39161fee2b0f4ca6b",
+    "record_sha256": "21963b97b55dca2a4a0d1d9c3bf99799a85da88b44f0f0db6520b48047a8be14"
+  },
+  {
+    "call_id": "two-session-merge-counts-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "9e7a8eb7d38d3f64de4d8cdc9ee2f3189550367dfcf9da8dad07811f1b5dfe76",
+    "record_sha256": "8d4c024c99a01d315c5f345a1b24d016e595215d7848bcb466187d48c0c69fa6"
+  }
+]

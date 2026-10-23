@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "a3b51f879c469eb7ed03e24f85bc57a6779884d2bbad856b72e3579c784cd6b2",
+  "final_message": {
+    "path": "eval/reports/pilot-v2-a/v2-reservations-constrained-refactoring/final-1.md",
+    "sha256": "5f649aa0e70819c7832dd1ce1992bcb0c7db2dd49cb6ed9dbe87a0fbf54c0852"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented runtime normalization through `project"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); count = sum(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith(\"test\") for cls in ast.walk(tree) if isinstance(cls, ast.ClassDef) and any((isinstance(base, ast.Name) and base.id == \"TestCase\") or (isinstance(base, ast.Attribute) and base.attr == \"TestCase\") for base in cls.bases) for node in cls.body); assert count >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_converts_crlf_as_one_line_break (test_solution.NormalizeTests.test_converts_crlf_as_one_line_break) ... ok\ntest_converts_lone_cr (test_solution.NormalizeTests.test_converts_lone_cr) ... ok\ntest_does_not_change_input (test_solution.NormalizeTests.test_does_not_change_input) ... ok\ntest_empty_and_line_break_only_inputs (test_solution.NormalizeTests.test_empty_and_line_break_only_inputs) ... ok\ntest_preserves_lf_and_other_characters (test_solution.NormalizeTests.test_preserves_lf_and_other_characters) ... ok\ntest_preserves_mixed_and_adjacent_line_breaks (test_solution.NormalizeTests.test_preserves_mixed_and_adjacent_line_breaks) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(design decision|design choice).*(python -m unittest discover -v)|(python -m unittest discover -v).*(design decision|design choice)\n3: Design decisions:\n4: \n5: - Keep the public signature `normalize(text: str) -> str`.\n6: - Replace CRLF with LF before replacing remaining CR with LF, so each CRLF\n7:   contributes exactly one line break.\n8: - Use string replacements without stripping or splitting. Existing LF, trailing\n9:   newlines, whitespace, Unicode, and all other characters remain intact.\n10: - Strings are immutable; the function does not mutate its input or collections.\n11: - Use only the Python standard library. Public unittest coverage includes CRLF,\n12:   lone CR, mixed and adjacent endings, trailing breaks, empty input, character",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

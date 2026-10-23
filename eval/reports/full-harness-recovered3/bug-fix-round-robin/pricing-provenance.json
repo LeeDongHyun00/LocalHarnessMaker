@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "bug-fix-round-robin-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ekshf1iv/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-03-53-01a167c9-aeb0-7ee0-a139-a18663d6da1d.jsonl",
+        "sha256": "1aa3f2da6b266a419008c005e3f3cd945d543d7c6b834ff95e2658b393eabc7b"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-fix-round-robin-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "917c3692bda299dbe347a1828a5ff49fc6751a4d9237cb4a1f42138e9e83ddc3",
+    "record_sha256": "e6d87da1200ad28dd4bc144630bbd3ce34cc9cb9cbf59eda764558dd74ed3e49"
+  },
+  {
+    "call_id": "bug-fix-round-robin-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "3e32d34d8c87c3d3263767dc41a0cf9354f1152fa5fee46b3a1951920e01bea3",
+    "record_sha256": "41ae384fb939db658b55f12881d43e05cc55f3c376604a36dee639a7d8304a7c"
+  }
+]

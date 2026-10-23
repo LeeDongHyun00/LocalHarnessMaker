@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "multiple-requirements-interval-union-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sc4wwpgs/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-20-57-01a167a2-5d77-7692-ad70-65c1acef013b.jsonl",
+        "sha256": "254924af6c63aa7dd479c37db2ac0d998d2a2cdb20e0bad7a3c755387ead3276"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-interval-union-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2e26d29265ab815b7cab44d34db5d26f9005bb72a4c06bd6eb648d059a5738c1",
+    "record_sha256": "70a2604aa5a5a1139e3fa333316ff966b1ae04321a595776cb00c1d57ece5bb9"
+  },
+  {
+    "call_id": "multiple-requirements-interval-union-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "57e39e1c11c6bca5ecc495b2a1387aa885b585ca0f4039ad8c39cd2fd53c0cea",
+    "record_sha256": "98574079cb8ebee53af76ddfa0cdc5afced91fb3b006b749280e5e9b53dc5219"
+  },
+  {
+    "call_id": "multiple-requirements-interval-union-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "57e39e1c11c6bca5ecc495b2a1387aa885b585ca0f4039ad8c39cd2fd53c0cea",
+    "record_sha256": "1e07fdb61b20a86ba15f79676eb1f6339af3f6411269e62c0f9d9a6d68ebf783"
+  }
+]

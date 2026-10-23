@@ -1,0 +1,43 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "solution.py implements words(text: str) -> dict[str, int] using whitespace splitting, casefolding, punctuation preservation, and a fresh result mapping."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "python -m py_compile solution.py exited 0."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "test_solution.py has six unittest methods exercising the public API."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "python -m unittest discover -v exited 0; six tests passed."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "HANDOFF.md records design decisions and includes the verification command."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Split with str.split(), casefold tokens before counting, and preserve punctuation.",
+      "why": "These choices implement the requested tokenization and counting behavior."
+    },
+    {
+      "what": "Build a fresh dictionary for each call.",
+      "why": "This returns {} for empty input and avoids mutating input."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py",
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Parent repositories",
+    "External services"
+  ]
+}

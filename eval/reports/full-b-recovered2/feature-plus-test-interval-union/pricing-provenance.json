@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-interval-union-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sxz3zrjh/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-56-10-01a16754-c147-7422-a66f-3e340943b242.jsonl",
+        "sha256": "1a09811b37f5686e4b8dd7e11e262e5d494423369f6d20c61068abacb3ff412c"
+      }
+    ]
+  }
+]

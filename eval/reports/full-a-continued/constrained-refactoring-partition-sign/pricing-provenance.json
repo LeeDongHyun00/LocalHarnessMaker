@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-partition-sign-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nu_xs7jg/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-30-40-01a16706-778d-7712-bc5a-455a497d3190.jsonl",
+        "sha256": "b0045662195d1ea5871a52ea8be71c84728b8b97335bc51652572af2182b9ffc"
+      }
+    ]
+  }
+]

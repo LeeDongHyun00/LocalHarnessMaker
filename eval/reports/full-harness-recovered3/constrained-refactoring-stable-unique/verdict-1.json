@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def unique\\b.*?def unique_legacy\\b.*?def _[A-Za-z0-9_]+\\b\n4: def unique(items: list[str]) -> list[str]:\n5:     return _unique(items)\n6: \n7: \n8: def unique_legacy(items: list[str]) -> list[str]:\n9:     return _unique(items)\n10: \n11: \n12: def _unique(items: list[str]) -> list[str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def test_[A-Za-z0-9_]+\\s*\\(.*?\\):.*?){2}\n7:     def test_first_occurrence_order_and_case_sensitivity(self):\n8:         for function in (unique, unique_legacy):\n9:             with self.subTest(function=function.__name__):\n10:                 items = [\"b\", \"a\", \"b\", \"A\", \"a\", \"\", \"\"]\n11:                 original = items.copy()\n12:                 result = function(items)\n13:                 self.assertIsInstance(result, list)\n14:                 self.assertEqual(result, [\"b\", \"a\", \"A\", \"\"])\n15:                 self.assertEqual(items, original)\n16:                 self.assertIsNot(result, items)",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input_returns_new_empty_list (test_solution.UniqueTests.test_empty_input_returns_new_empty_list) ... ok\ntest_first_occurrence_order_and_case_sensitivity (test_solution.UniqueTests.test_first_occurrence_order_and_case_sensitivity) ... ok\ntest_invalid_inputs_preserve_type_errors (test_solution.UniqueTests.test_invalid_inputs_preserve_type_errors) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "llm_judge SC-4: `solution.py` defines `unique(items: list[str]) -> list[str]` and `unique_legacy(items: list[str]) -> list[str]`, each returning `_unique(items)`; `_unique` returns `list(dict.fromkeys(items))`. In `test_solution.py`, tests exercise both functions and check expected order `['b', 'a', 'A', '']`, unchanged input and distinct result list, empty input, and equivalent TypeErrors for `None` and nested unhashable lists.",
+      "reason": "The implementation routes both public functions through the shared private helper, preserves their list[str] -> list[str] signatures, and uses insertion-ordered deduplication. The supplied tests cover first-occurrence order, case sensitivity, empty input, new-list/input immutability, and matching TypeError behavior. No contrary evidence appears in the supplied files."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

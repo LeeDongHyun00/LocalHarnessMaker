@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "constrained-refactoring-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-r45_lb_k/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-24-00-01a167a5-28c5-7bf3-a883-18e7d32b3273.jsonl",
+        "sha256": "82a7fb8fd89b070acd3b9a537e354f70136878b29e2efca4c5099029d980b1bb"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-interleave-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2a8926fd8e063e050ed21a625456f63b3ebd640bbe65551dccd2d70ebdeeda8e",
+    "record_sha256": "00a35a700d4ef5525210011e399da14fe08b43dad39a27f1a1106bc11fe6f650"
+  },
+  {
+    "call_id": "constrained-refactoring-interleave-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2a8926fd8e063e050ed21a625456f63b3ebd640bbe65551dccd2d70ebdeeda8e",
+    "record_sha256": "14dcdf52c29dc90b05b9d8dd09807c17c6eb4be2170ec658da64f6bf756a1e80"
+  },
+  {
+    "call_id": "constrained-refactoring-interleave-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "79ba8bc2a225ebb6e3fae2577dba13bb7aa6c50702e0ef0587d2e33bfd63c5b2",
+    "record_sha256": "7321de7e21f91466f1c85edb280ab172da9c539639606a16fcdf32b30fe1e986"
+  }
+]

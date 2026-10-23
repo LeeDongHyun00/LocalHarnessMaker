@@ -1,0 +1,615 @@
+{
+  "calibration": false,
+  "task_root": "eval/tasks",
+  "service_tier": null,
+  "source": "eval/reports/full-b",
+  "source_report_sha256": "3435911add115eaea591c409487d56ff045e67027e3d147cee6a6a86e12cbb93",
+  "audit_code_version": {
+    "audit.py": "2012556b8fbb655a19ecc66af5955bd9af1def38ddf3e56dbb86c67f7fd345fd",
+    "javascript.py": "e2e854a124443f25c7ec1fb515d0fe0dc1a444877d48b040b65cd0a4ed36a34f",
+    "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+    "regrade.py": "3daedca5b5137578949319e2d9f9f384832305eeebfd0853816e1fae9acdb494"
+  },
+  "workspace_hash_checks": [
+    {
+      "task_id": "bug-fix-window-slices",
+      "expected_sha256": "5d5a1e5d6907cbdf1bd5678714e0548c81b6c7efdf1f37f067321f14d6f1d806",
+      "observed_sha256": "5d5a1e5d6907cbdf1bd5678714e0548c81b6c7efdf1f37f067321f14d6f1d806",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-interval-union",
+      "expected_sha256": "92b92ec7e7711885b051c1803b6e374818f8173857fea599210197d65af122d3",
+      "observed_sha256": "92b92ec7e7711885b051c1803b6e374818f8173857fea599210197d65af122d3",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-line-endings",
+      "expected_sha256": "770d10cd816d2aef72429b5b2fb6ef547ec7dcb2994d600494f16ee4bbedf749",
+      "observed_sha256": "770d10cd816d2aef72429b5b2fb6ef547ec7dcb2994d600494f16ee4bbedf749",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-interleave",
+      "expected_sha256": "94a12f270244670811083575de36255b524378f24ded6c133e1dda1bf9c5a95c",
+      "observed_sha256": "94a12f270244670811083575de36255b524378f24ded6c133e1dda1bf9c5a95c",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-window-slices",
+      "expected_sha256": "84eb52959611d463ffd44dea040f51b54988b1134c856444066a2e27967f53a5",
+      "observed_sha256": "84eb52959611d463ffd44dea040f51b54988b1134c856444066a2e27967f53a5",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-pairwise-edges",
+      "expected_sha256": "17fba2a4a89e16c5bfe5b0a598430d7c06ead5c1e2a94f2fcbd68204d1488188",
+      "observed_sha256": "17fba2a4a89e16c5bfe5b0a598430d7c06ead5c1e2a94f2fcbd68204d1488188",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-adjacent-runs",
+      "expected_sha256": "1c005ea9d3b85f9923136e6fa27da0d0b80a2764ccc952c5cd547dd1f56c99db",
+      "observed_sha256": "1c005ea9d3b85f9923136e6fa27da0d0b80a2764ccc952c5cd547dd1f56c99db",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-prefix-sums",
+      "expected_sha256": "7ed8e434925c0073b13ca86a968b97c51e4d6534ddf73a205bfaa1cd33138703",
+      "observed_sha256": "7ed8e434925c0073b13ca86a968b97c51e4d6534ddf73a205bfaa1cd33138703",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-select-columns",
+      "expected_sha256": "21ad920b4297c4e2c2f818ee1185cecfb5268e23f9ccab85a49beb9693c4989d",
+      "observed_sha256": "21ad920b4297c4e2c2f818ee1185cecfb5268e23f9ccab85a49beb9693c4989d",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-flatten-once",
+      "expected_sha256": "7752080c4d0ff1dfd332c4ad80fbeb452271b26e66f2f002712c6e9a70ba8c4b",
+      "observed_sha256": "7752080c4d0ff1dfd332c4ad80fbeb452271b26e66f2f002712c6e9a70ba8c4b",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-prefix-sums",
+      "expected_sha256": "cae988389b29ab4d61b8c2d50c26e5fa7e20eb09e06614584cc3880e72e17f69",
+      "observed_sha256": "cae988389b29ab4d61b8c2d50c26e5fa7e20eb09e06614584cc3880e72e17f69",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-pairwise-edges",
+      "expected_sha256": "5cd04b0a03bf18e3a34a5237349245da39d2855f59af9ec56efbc2f2da057c05",
+      "observed_sha256": "5cd04b0a03bf18e3a34a5237349245da39d2855f59af9ec56efbc2f2da057c05",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-clamp-values",
+      "expected_sha256": "338afb37982aeb87aed01436d04a6cc725b89f35714de5433bda21b7bc624d8d",
+      "observed_sha256": "338afb37982aeb87aed01436d04a6cc725b89f35714de5433bda21b7bc624d8d",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-prefix-sums",
+      "expected_sha256": "c8ffb77e894c833938f917c35eb9b5a99a4cf391212c95da5b7eeecdfd92c84d",
+      "observed_sha256": "c8ffb77e894c833938f917c35eb9b5a99a4cf391212c95da5b7eeecdfd92c84d",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-inclusive-range",
+      "expected_sha256": "ab652dc5cf1b28e0382450c0950b59b00266bc3f16d696ea975bd9cde683c9f3",
+      "observed_sha256": "ab652dc5cf1b28e0382450c0950b59b00266bc3f16d696ea975bd9cde683c9f3",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-balanced-brackets",
+      "expected_sha256": "4d5be120664172e0b8de2631f1633b4412dcba7408669c7be92dd52f25c746e9",
+      "observed_sha256": "4d5be120664172e0b8de2631f1633b4412dcba7408669c7be92dd52f25c746e9",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-unique-permutations",
+      "expected_sha256": "6892eee1d7c202ed2dc74e36eef8a96f010a69e9eac2ce6e6ac52ab996ea416f",
+      "observed_sha256": "6892eee1d7c202ed2dc74e36eef8a96f010a69e9eac2ce6e6ac52ab996ea416f",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-ordinal-labels",
+      "expected_sha256": "1a4d673d03ff04903f4857256d2a4777dabb9cdb8ec4bd8bf048b9d6d64a79b0",
+      "observed_sha256": "1a4d673d03ff04903f4857256d2a4777dabb9cdb8ec4bd8bf048b9d6d64a79b0",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-common-prefix",
+      "expected_sha256": "dd29e58ea8bb45298783556b8434474554c5c9de1e8d23552e4e2e4d83651c43",
+      "observed_sha256": "dd29e58ea8bb45298783556b8434474554c5c9de1e8d23552e4e2e4d83651c43",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-prefix-sums",
+      "expected_sha256": "1a600e22007b38883e3ce733f2644162b98af6e0b5352bae66fd6dadbb1db6a3",
+      "observed_sha256": "1a600e22007b38883e3ce733f2644162b98af6e0b5352bae66fd6dadbb1db6a3",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-select-columns",
+      "expected_sha256": "b0ee3a89b6b72207d0efe709d2524539a730b1c690cc636d748879b7f72eb936",
+      "observed_sha256": "b0ee3a89b6b72207d0efe709d2524539a730b1c690cc636d748879b7f72eb936",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-inclusive-range",
+      "expected_sha256": "aea16bfd14e577024faf7d49ffec4955719fb9229ddbd7a3fde1bf5b3096fee9",
+      "observed_sha256": "aea16bfd14e577024faf7d49ffec4955719fb9229ddbd7a3fde1bf5b3096fee9",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-word-counts",
+      "expected_sha256": "08b591c79cdf8175b9147ba7c50a7e18d3b10db022f5bd73af7337d160cf96d3",
+      "observed_sha256": "08b591c79cdf8175b9147ba7c50a7e18d3b10db022f5bd73af7337d160cf96d3",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-last-index",
+      "expected_sha256": "a095e6a938cb6ec49936ba1afa4e5dd01d55b634597b81f2d2a337667b0750cc",
+      "observed_sha256": "a095e6a938cb6ec49936ba1afa4e5dd01d55b634597b81f2d2a337667b0750cc",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-last-index",
+      "expected_sha256": "841d60f0b10ea6d9fc0614af2f75c0f51a8bd0a4e07fddc82b30627032a6441e",
+      "observed_sha256": "841d60f0b10ea6d9fc0614af2f75c0f51a8bd0a4e07fddc82b30627032a6441e",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-inclusive-range",
+      "expected_sha256": "dfd297360e4a363a99de42a1ca6acad64ecd2eac7a480f29358506fbead66a4a",
+      "observed_sha256": "dfd297360e4a363a99de42a1ca6acad64ecd2eac7a480f29358506fbead66a4a",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-unique-permutations",
+      "expected_sha256": "85a65a96f9dafdaa60a93fdbbb94c8848c6df36b23564c3888724a3a3d2c5e78",
+      "observed_sha256": "85a65a96f9dafdaa60a93fdbbb94c8848c6df36b23564c3888724a3a3d2c5e78",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-flatten-once",
+      "expected_sha256": "0350756eb0dfc40d223dcf165e169d9d8bc041865bf5b18f06ad3efde0657122",
+      "observed_sha256": "0350756eb0dfc40d223dcf165e169d9d8bc041865bf5b18f06ad3efde0657122",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-invert-groups",
+      "expected_sha256": "2cb893511db7ee7a04c16abbb9e6fa0ec4c527357c8d756dce8b37f35a0771b2",
+      "observed_sha256": "2cb893511db7ee7a04c16abbb9e6fa0ec4c527357c8d756dce8b37f35a0771b2",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-ordinal-labels",
+      "expected_sha256": "c0969095b74201c9b36e57ac677cbab206287aea4380226fda00368006f1887b",
+      "observed_sha256": "c0969095b74201c9b36e57ac677cbab206287aea4380226fda00368006f1887b",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-round-robin",
+      "expected_sha256": "433bfb987681d4f8c00dec05b8751ce180044ab1bee38f8fbcada2a9dd60fb84",
+      "observed_sha256": "433bfb987681d4f8c00dec05b8751ce180044ab1bee38f8fbcada2a9dd60fb84",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-interleave",
+      "expected_sha256": "a33c338bdf1d6b3b063770915f4d69b235212691dc77ac5cff328b37458cf08e",
+      "observed_sha256": "a33c338bdf1d6b3b063770915f4d69b235212691dc77ac5cff328b37458cf08e",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-round-robin",
+      "expected_sha256": "39624e1c0e40c159fb3e9b800cd57fcc7ae6bbd1a7a8d4e3586df4dedd64a268",
+      "observed_sha256": "39624e1c0e40c159fb3e9b800cd57fcc7ae6bbd1a7a8d4e3586df4dedd64a268",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-word-counts",
+      "expected_sha256": "3b8d3f5c49fcb31b4c2bc19e52188689bc238895c2a219a9307fca476dd44964",
+      "observed_sha256": "3b8d3f5c49fcb31b4c2bc19e52188689bc238895c2a219a9307fca476dd44964",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-merge-counts",
+      "expected_sha256": "a81257e7e11eccda9725a7822051bf94ae5c509d66af0643eb591169b3619da8",
+      "observed_sha256": "a81257e7e11eccda9725a7822051bf94ae5c509d66af0643eb591169b3619da8",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-common-prefix",
+      "expected_sha256": "0f0cf2c5ad428aa90572711af99e4b2f9659aa0e5ed5f5505071f38a72f4267f",
+      "observed_sha256": "0f0cf2c5ad428aa90572711af99e4b2f9659aa0e5ed5f5505071f38a72f4267f",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-last-index",
+      "expected_sha256": "778bdc37fd08b50aecf9d503f9746a0636952a612b56991f670074be5aab23e0",
+      "observed_sha256": "778bdc37fd08b50aecf9d503f9746a0636952a612b56991f670074be5aab23e0",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-pairwise-edges",
+      "expected_sha256": "effd46ccf382fd5d97c6d4fd2879a8057651b314a2ef0970e93a47e81501740f",
+      "observed_sha256": "effd46ccf382fd5d97c6d4fd2879a8057651b314a2ef0970e93a47e81501740f",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-select-columns",
+      "expected_sha256": "b6d85b505577fa36bac49c03b8602745fd485fb03c0840a294c2e555316a45e4",
+      "observed_sha256": "b6d85b505577fa36bac49c03b8602745fd485fb03c0840a294c2e555316a45e4",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-parse-pairs",
+      "expected_sha256": "607d1a82c899ddca234412c12d5c14bcaa78aaf4ec2346d1cbc1031889d9cad8",
+      "observed_sha256": "607d1a82c899ddca234412c12d5c14bcaa78aaf4ec2346d1cbc1031889d9cad8",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-last-index",
+      "expected_sha256": "0e5d08632ccd18fc1f2563673b1cf48079fb1c5092ebba29409c699b09751141",
+      "observed_sha256": "0e5d08632ccd18fc1f2563673b1cf48079fb1c5092ebba29409c699b09751141",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-stable-unique",
+      "expected_sha256": "87fa7f2162c3ca03b4ab5fe1dc8949c3f4ff04de8114c2b3e65f54882f7d74e7",
+      "observed_sha256": "87fa7f2162c3ca03b4ab5fe1dc8949c3f4ff04de8114c2b3e65f54882f7d74e7",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-common-prefix",
+      "expected_sha256": "030afbb0df2451a1f20a22cfd55e5272b6fa880242e5224ebdb0b5e4fe00958e",
+      "observed_sha256": "030afbb0df2451a1f20a22cfd55e5272b6fa880242e5224ebdb0b5e4fe00958e",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-stable-unique",
+      "expected_sha256": "497804c052bef2eae13179ceeb3a4f7eee98bcc4e6b522f59af6bd0764a797d7",
+      "observed_sha256": "497804c052bef2eae13179ceeb3a4f7eee98bcc4e6b522f59af6bd0764a797d7",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-partition-sign",
+      "expected_sha256": "d325eddd92b2fcf038ba4557f1ee98942637e342ed79bd4628504920f1529e83",
+      "observed_sha256": "d325eddd92b2fcf038ba4557f1ee98942637e342ed79bd4628504920f1529e83",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-strip-prefix",
+      "expected_sha256": "94dfd4f7da08e6dcff46cefe2adf4ee342cba8718a0f59ada0e0f81d55e27887",
+      "observed_sha256": "94dfd4f7da08e6dcff46cefe2adf4ee342cba8718a0f59ada0e0f81d55e27887",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-interleave",
+      "expected_sha256": "4e334ddbd45978eade01bc6f7d791ae3838f9246d25067df24028c7ebf33ea59",
+      "observed_sha256": "4e334ddbd45978eade01bc6f7d791ae3838f9246d25067df24028c7ebf33ea59",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-balanced-brackets",
+      "expected_sha256": "f1267b9e6a9749a7c1de30ec379cfb3d0cdea37cd91fc152849d1a6dcdda4ffd",
+      "observed_sha256": "f1267b9e6a9749a7c1de30ec379cfb3d0cdea37cd91fc152849d1a6dcdda4ffd",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-interval-union",
+      "expected_sha256": "a249b63ab71cf8500405e3e373a92e38152ae83384b3976d90ab572fce1da24a",
+      "observed_sha256": "a249b63ab71cf8500405e3e373a92e38152ae83384b3976d90ab572fce1da24a",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-rotate-left",
+      "expected_sha256": "d2d916397ea219457ba310b15798df67a01783e288d5c25ef3fcd8bca21d5dae",
+      "observed_sha256": "d2d916397ea219457ba310b15798df67a01783e288d5c25ef3fcd8bca21d5dae",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-window-slices",
+      "expected_sha256": "b7f5220679c378c197c7f49d3e601719e3fe93effa3c8d48cc086ef151314529",
+      "observed_sha256": "b7f5220679c378c197c7f49d3e601719e3fe93effa3c8d48cc086ef151314529",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-adjacent-runs",
+      "expected_sha256": "7a17273e9dd7422395903712f5d4ca299799c68d61cecca122d2959cfbb1655c",
+      "observed_sha256": "7a17273e9dd7422395903712f5d4ca299799c68d61cecca122d2959cfbb1655c",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-select-columns",
+      "expected_sha256": "8a17b81fad3ef173376afa81f698c63d3a1b625e670d8a944f189265aac20345",
+      "observed_sha256": "8a17b81fad3ef173376afa81f698c63d3a1b625e670d8a944f189265aac20345",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-adjacent-runs",
+      "expected_sha256": "8cedfcc71c40c3ff1d59f02bb0b88da2a74aa80b3de62b65ede7f50c4fe92dca",
+      "observed_sha256": "8cedfcc71c40c3ff1d59f02bb0b88da2a74aa80b3de62b65ede7f50c4fe92dca",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-window-slices",
+      "expected_sha256": "336d7f9f3a14bc381cb8a0162ea3197d5cdae755e80b4c163bfd06096af61e11",
+      "observed_sha256": "336d7f9f3a14bc381cb8a0162ea3197d5cdae755e80b4c163bfd06096af61e11",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-strip-prefix",
+      "expected_sha256": "06ac2516f41edefb5a939d89bef379e7db9f91448780f592c8c373fe2ea3bf5c",
+      "observed_sha256": "06ac2516f41edefb5a939d89bef379e7db9f91448780f592c8c373fe2ea3bf5c",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-strip-prefix",
+      "expected_sha256": "05378959d9755d6951f5cbee1ca560aa206d217d644db0b51169859806ee151d",
+      "observed_sha256": "05378959d9755d6951f5cbee1ca560aa206d217d644db0b51169859806ee151d",
+      "matched": true
+    },
+    {
+      "task_id": "bug-chunk-tail",
+      "expected_sha256": "315dbcd8d0f1e75bda91fbaebc99f0dacd2e18b162924ec720a2eab58f0d8290",
+      "observed_sha256": "315dbcd8d0f1e75bda91fbaebc99f0dacd2e18b162924ec720a2eab58f0d8290",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-unique-permutations",
+      "expected_sha256": "6b5a7a016dc40bd8132ca84a4b2fa2856cb39afec7efa36b54ac52cd2a9e2dcb",
+      "observed_sha256": "6b5a7a016dc40bd8132ca84a4b2fa2856cb39afec7efa36b54ac52cd2a9e2dcb",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-line-endings",
+      "expected_sha256": "2573a7b558fa86ca308216e7dbc849f6cfbc7ffa21dadb290e8f241664337c44",
+      "observed_sha256": "2573a7b558fa86ca308216e7dbc849f6cfbc7ffa21dadb290e8f241664337c44",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-invert-groups",
+      "expected_sha256": "3c6ce9728bf9d4745ec7a13518e34d7374caa6cc63816511d98d44e08dc76619",
+      "observed_sha256": "3c6ce9728bf9d4745ec7a13518e34d7374caa6cc63816511d98d44e08dc76619",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-rotate-left",
+      "expected_sha256": "4550f0903f5e4e70d3024c199fb689211fc9a6d865be1423b5d9d964436dc3d0",
+      "observed_sha256": "4550f0903f5e4e70d3024c199fb689211fc9a6d865be1423b5d9d964436dc3d0",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-clamp-values",
+      "expected_sha256": "e0c61e08ef27deba60de2322fb43144ff00677c02a397f0305ff4a8d45e8f691",
+      "observed_sha256": "e0c61e08ef27deba60de2322fb43144ff00677c02a397f0305ff4a8d45e8f691",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-stable-unique",
+      "expected_sha256": "14a0eb4c267dc1f09480d07b22cb991f8eba2ec859203aeaa2bac948648d4761",
+      "observed_sha256": "14a0eb4c267dc1f09480d07b22cb991f8eba2ec859203aeaa2bac948648d4761",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-interleave",
+      "expected_sha256": "b16b850fea6664d97e0953ae8fd357b4c1b9f5308ff8ffcfcbdd73c295dd5928",
+      "observed_sha256": "b16b850fea6664d97e0953ae8fd357b4c1b9f5308ff8ffcfcbdd73c295dd5928",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-partition-sign",
+      "expected_sha256": "83b56c8028d7a474a43e63de91c55dc1687126099d21cef2cc6f2ca628063c4c",
+      "observed_sha256": "83b56c8028d7a474a43e63de91c55dc1687126099d21cef2cc6f2ca628063c4c",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-balanced-brackets",
+      "expected_sha256": "08f71f8ea7096d1357ec0ce541937531ae601a125994705da2e980b8b51baeec",
+      "observed_sha256": "08f71f8ea7096d1357ec0ce541937531ae601a125994705da2e980b8b51baeec",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-partition-sign",
+      "expected_sha256": "bba1092d8c0416e1bc2f2cb0ae6b127bf416a8de951a960f50704308507a6224",
+      "observed_sha256": "bba1092d8c0416e1bc2f2cb0ae6b127bf416a8de951a960f50704308507a6224",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-inclusive-range",
+      "expected_sha256": "cfc30159a663046d3f593b1d59612c5fb730ba614c3a4b148ba3f2b5deb78d1f",
+      "observed_sha256": "cfc30159a663046d3f593b1d59612c5fb730ba614c3a4b148ba3f2b5deb78d1f",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-parse-pairs",
+      "expected_sha256": "5076ff2bdc95226c2cc5acb94cc72278aa6e20ddc41c9b3ef611195491e6e259",
+      "observed_sha256": "5076ff2bdc95226c2cc5acb94cc72278aa6e20ddc41c9b3ef611195491e6e259",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-adjacent-runs",
+      "expected_sha256": "041a73e51a62ba097afd040084bb2b7beeee8556255da06f557b79e7546c2ec3",
+      "observed_sha256": "041a73e51a62ba097afd040084bb2b7beeee8556255da06f557b79e7546c2ec3",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-strip-prefix",
+      "expected_sha256": "f197cb683636ead741abc31d5039a94e29e236dd7099ec9c77f9b70679075e77",
+      "observed_sha256": "f197cb683636ead741abc31d5039a94e29e236dd7099ec9c77f9b70679075e77",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-line-endings",
+      "expected_sha256": "66c0668457e2185bf998340207a371f1b9c5ea47924668b7c3375dd8e2508f43",
+      "observed_sha256": "66c0668457e2185bf998340207a371f1b9c5ea47924668b7c3375dd8e2508f43",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-rotate-left",
+      "expected_sha256": "c5fbb1fba9c8867728531073b5aa5a2d56012506047f21742d2d98db9f42e152",
+      "observed_sha256": "c5fbb1fba9c8867728531073b5aa5a2d56012506047f21742d2d98db9f42e152",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-invert-groups",
+      "expected_sha256": "745c8ad007c3fc3ae2de0af6179cf1806702545b56eed0e4864a3a8edb11bf6f",
+      "observed_sha256": "745c8ad007c3fc3ae2de0af6179cf1806702545b56eed0e4864a3a8edb11bf6f",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-interval-union",
+      "expected_sha256": "ac6b8f07960f6f573e3c84632cfdbab006fd9fcff637c3f0c9e88d3324b0cbb2",
+      "observed_sha256": "ac6b8f07960f6f573e3c84632cfdbab006fd9fcff637c3f0c9e88d3324b0cbb2",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-parse-pairs",
+      "expected_sha256": "6e913469eb9a27e2b551b1e35e5d3f98b36cb9859e7788deaf86654e4dc5a134",
+      "observed_sha256": "6e913469eb9a27e2b551b1e35e5d3f98b36cb9859e7788deaf86654e4dc5a134",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-round-robin",
+      "expected_sha256": "9a6e2c3c3d963a1c88b3d85bbf3b3f82cb597251b658394983a6d1acd9f4bd6f",
+      "observed_sha256": "9a6e2c3c3d963a1c88b3d85bbf3b3f82cb597251b658394983a6d1acd9f4bd6f",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-clamp-values",
+      "expected_sha256": "4718965b351e099da1007b09ab975ae0a7b3afe0e4bf72be49510093335215f7",
+      "observed_sha256": "4718965b351e099da1007b09ab975ae0a7b3afe0e4bf72be49510093335215f7",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-round-robin",
+      "expected_sha256": "b5f18db17385e57af191ea0febb9e0c8c996da6b18f199bf3834e96977b478c2",
+      "observed_sha256": "b5f18db17385e57af191ea0febb9e0c8c996da6b18f199bf3834e96977b478c2",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-interval-union",
+      "expected_sha256": "dac2869d52be9ea837c8e1b241c903eed71aabfe8976369e947807b78e290475",
+      "observed_sha256": "dac2869d52be9ea837c8e1b241c903eed71aabfe8976369e947807b78e290475",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-flatten-once",
+      "expected_sha256": "d1932ac9aa5cfc111c23e55cfa38b71ab9ce2c8930a489f49d1c7c91c4a57030",
+      "observed_sha256": "d1932ac9aa5cfc111c23e55cfa38b71ab9ce2c8930a489f49d1c7c91c4a57030",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-merge-counts",
+      "expected_sha256": "eb3541fe9f57f683e451025f405e4057ed42d29f2ecbebd8e76c8ba1aa289e98",
+      "observed_sha256": "eb3541fe9f57f683e451025f405e4057ed42d29f2ecbebd8e76c8ba1aa289e98",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-line-endings",
+      "expected_sha256": "8f2917692918b348f24f32890ca3269a0477c56c123852701b293343ebb7df8c",
+      "observed_sha256": "8f2917692918b348f24f32890ca3269a0477c56c123852701b293343ebb7df8c",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-merge-counts",
+      "expected_sha256": "5fa61c29fb4662dc69b278a8e3efabdd172902dc539afa5e214c2fada047dbc1",
+      "observed_sha256": "5fa61c29fb4662dc69b278a8e3efabdd172902dc539afa5e214c2fada047dbc1",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-rotate-left",
+      "expected_sha256": "4816406f4cc0d519b907e730354cf01f80db5d39394a6e22f9cec1c4eec11b38",
+      "observed_sha256": "4816406f4cc0d519b907e730354cf01f80db5d39394a6e22f9cec1c4eec11b38",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-parse-pairs",
+      "expected_sha256": "5fbbf2c5b85acd3dc41c5958802dbe1bc897fb54fccc012d922b11f170435974",
+      "observed_sha256": "5fbbf2c5b85acd3dc41c5958802dbe1bc897fb54fccc012d922b11f170435974",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-clamp-values",
+      "expected_sha256": "df46093d05d165f19e1d0620f82de8cbbc3d3e56e8c1ae8cc3152681865fe302",
+      "observed_sha256": "df46093d05d165f19e1d0620f82de8cbbc3d3e56e8c1ae8cc3152681865fe302",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-word-counts",
+      "expected_sha256": "de6c71d5c3bd960ee115692f9a5008a6e5fde85063b5cd67acf28c339d4b62ce",
+      "observed_sha256": "de6c71d5c3bd960ee115692f9a5008a6e5fde85063b5cd67acf28c339d4b62ce",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-stable-unique",
+      "expected_sha256": "5873dc03464d251aa39e5b5c3c339ea3239250ab7a3d1e9460aa694e0fad6d34",
+      "observed_sha256": "5873dc03464d251aa39e5b5c3c339ea3239250ab7a3d1e9460aa694e0fad6d34",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-merge-counts",
+      "expected_sha256": "9b252d74acdec31569dd8170a02da9ed98ee9c140ec0fc86a2751b90f3fcc3f5",
+      "observed_sha256": "9b252d74acdec31569dd8170a02da9ed98ee9c140ec0fc86a2751b90f3fcc3f5",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-pairwise-edges",
+      "expected_sha256": "3eeee81bced2a7254fdf0820253150b72eb4128f530ff84e451c7a798a330e72",
+      "observed_sha256": "3eeee81bced2a7254fdf0820253150b72eb4128f530ff84e451c7a798a330e72",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-balanced-brackets",
+      "expected_sha256": "4bcec9736c5d5640f0a1224e81f6279000a147753e3c003a34276adf66c5e325",
+      "observed_sha256": "4bcec9736c5d5640f0a1224e81f6279000a147753e3c003a34276adf66c5e325",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-ordinal-labels",
+      "expected_sha256": "5f97e37d5873a7743bb8b0d6331948cf91250cced1e65dbd182ce636a8fc3bdd",
+      "observed_sha256": "5f97e37d5873a7743bb8b0d6331948cf91250cced1e65dbd182ce636a8fc3bdd",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-partition-sign",
+      "expected_sha256": "07eff730e5f92f856f9d7351630474a4c529380a98a9fcef33ecd00176c3d4f5",
+      "observed_sha256": "07eff730e5f92f856f9d7351630474a4c529380a98a9fcef33ecd00176c3d4f5",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-invert-groups",
+      "expected_sha256": "d6cf19756617effce26c5bac5db9407636a0fddda3ec634f021b62bc6a6f4eaf",
+      "observed_sha256": "d6cf19756617effce26c5bac5db9407636a0fddda3ec634f021b62bc6a6f4eaf",
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-flatten-once",
+      "expected_sha256": "934a4e37fe7475147343af6d87872600a381bdabdec24341c8027f427113e855",
+      "observed_sha256": "934a4e37fe7475147343af6d87872600a381bdabdec24341c8027f427113e855",
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-common-prefix",
+      "expected_sha256": "49d97b39381be545524f755157b9397f07c17625c995c5d00fbc6eab241262e5",
+      "observed_sha256": "49d97b39381be545524f755157b9397f07c17625c995c5d00fbc6eab241262e5",
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-unique-permutations",
+      "expected_sha256": "dfcc132cb40215cdf1c5cca1e9bf349df5b80db2d0181dc19d1259bfadcc0a2a",
+      "observed_sha256": "dfcc132cb40215cdf1c5cca1e9bf349df5b80db2d0181dc19d1259bfadcc0a2a",
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-word-counts",
+      "expected_sha256": "577e41ee85a68a592c286bf4b063c1ce38db0548eb32eb4556e3ba78e0eaa507",
+      "observed_sha256": "577e41ee85a68a592c286bf4b063c1ce38db0548eb32eb4556e3ba78e0eaa507",
+      "matched": true
+    }
+  ]
+}

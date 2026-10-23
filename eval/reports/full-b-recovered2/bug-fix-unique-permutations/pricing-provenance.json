@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-unique-permutations-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-2rcp7d8w/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-30-05-01a1673c-dc76-7ac0-8a42-caed32835a79.jsonl",
+        "sha256": "4b40ea60ca6f003ba2abe45898d9e5622e0377a33e4332063042379e27fca90a"
+      }
+    ]
+  }
+]

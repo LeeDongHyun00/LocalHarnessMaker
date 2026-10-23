@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "ae8d09a7a7df40fd7b29b57003c2044074b20878e37d8249008574a9c60ded36",
+  "final_message": {
+    "path": "eval/reports/pilot-v2-a/v2-routing-constrained-refactoring/final-1.md",
+    "sha256": "96eedf335e39c0272080af21139f32b1d12c5ab9fcc74e3b459046f6cbe3ac8b"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

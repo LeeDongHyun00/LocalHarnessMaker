@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "feature-plus-test-partition-sign-rerun-cfd8f353779249d4b56d301effdd35d4-feature-plus-test-partition-sign-exec-1",
+    "observed_service_tier": "standard",
+    "basis": "Tier inferred from the model default; new native applied service_tier omitted/null at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ddjkjqwj/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-07-48-01a16984-b744-7a70-91da-c6cab1f5dcb2.jsonl",
+        "record_sha256": "5539572b1d533411b6801b16a2ca9da8ed337512adc5763ed7765eadb5c45f2a",
+        "observed_service_tier": null
+      }
+    ],
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ddjkjqwj/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-07-48-01a16984-b744-7a70-91da-c6cab1f5dcb2.jsonl",
+        "sha256": "d238d7e9ed950b7663b9907bd5a1be64565d58292ae9c27d1b99dd4aec421999"
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-merge-counts-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-bh7ukx_e/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-20-08-01a166fc-cef4-74c0-a923-d19ff59021c2.jsonl",
+        "sha256": "547467c969263b73d5773e748b676da11ddb335a62b4f2ac59c8f817cfc5f47b"
+      }
+    ]
+  }
+]

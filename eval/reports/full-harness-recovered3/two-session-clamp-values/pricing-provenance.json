@@ -1,0 +1,68 @@
+[
+  {
+    "call_id": "two-session-clamp-values-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-zh2piidu/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-51-16-01a16787-2d16-7770-a991-0981b9ad5c1c.jsonl",
+        "sha256": "3aa7d3af3a5e9baac950652b576f2b4553696b8ba793dbd2da90669b1f1fd7e9"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-clamp-values-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-zh2piidu/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-52-40-01a16788-7d10-75f0-8e3c-e3fb206f6342.jsonl",
+        "sha256": "a80afbe4689263dfe233069fd3aac8da436028436d9783151c4c9c605dfb12f1"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-clamp-values-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "328bdc7a6249891d5448d12783d1505a410fbc53928095576c1665a294755f9d",
+    "record_sha256": "4972f3b5359abdaea2921e46d2c606281de12a49b2ed17e07005126bfabe0f55"
+  },
+  {
+    "call_id": "two-session-clamp-values-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "43ec684b0bd847ff7d752de58f6795b5b8ba5dbd30c73c6b3146ace161cc829c",
+    "record_sha256": "b37f6a87307287399fda7c41cc7a1feed597fa3a05c8202ca56d4960c5de2522"
+  },
+  {
+    "call_id": "two-session-clamp-values-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "741f5ea6956d65c69a9a2bba6747e6ed3bce79578656f7ec12e5d03bc73148fe",
+    "record_sha256": "18d807c57444826ee014d3b8d96835441151bd3fd1dcd3b480c2933e5b4778c9"
+  },
+  {
+    "call_id": "two-session-clamp-values-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "cc9c4630dabc57555aab082d41a07f52528ca04b86ace91e8dd17638391a3707",
+    "record_sha256": "e02a7aae614af0912b7187314c9dd3b147832d397e0d793a3cde0bc29d671bbb"
+  },
+  {
+    "call_id": "two-session-clamp-values-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "3ba241a7057add10bbcb04383ba6ca86913250d0aa7f868021ae8ecc8bd0fb9d",
+    "record_sha256": "54a196a43a9cc42d6ec561dd4313cffc5afc561db7dc5135097983ddbc2cfa75"
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "call_id": "two-session-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fa972les/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-57-25-01a166e8-0820-7d22-81ef-de87105a9767.jsonl",
+        "sha256": "a7de2b011769e96c4ecf1266538c1185b85797459dd9bd04e38f6bf2860953f4"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-flatten-once-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fa972les/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-58-16-01a166e8-d063-7372-a8cb-1a4512b0d3d6.jsonl",
+        "sha256": "67bdb7b5f899b99a80d81442bb6c1930c5b252621508b7b6c52ed78a8d81ba1d"
+      }
+    ]
+  }
+]

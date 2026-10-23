@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-round-robin-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-jo4o7xh7/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-34-51-01a16741-36bc-75a3-b5b5-2c02ee241626.jsonl",
+        "sha256": "2e1c158bc4a06031edcc85aead74e75946fe551480c2d70cab655515b3118282"
+      }
+    ]
+  }
+]

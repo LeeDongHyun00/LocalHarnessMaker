@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "e4e241fcb40679054285ad88bb0f3b963705b61cf84470d39f8f85652eefcf11",
+  "final_message": {
+    "path": "eval/reports/full-a-continued/two-session-merge-counts/final-2.md",
+    "sha256": "e7c5d9981c69a97d96f6e1766ced39a18177e4e504cc8b4c8f4becab5b6ac672"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `merge_many` with ordered results, empty-batch support, unchanged inputs, and first-exception propagation"
+  ],
+  "undefined_reason": null
+}

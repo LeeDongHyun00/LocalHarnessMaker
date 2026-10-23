@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "b9533755dfc1a3b6a067f732ec90a97e5ac3752fa0a1dabef3231902be7c89c3",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/feature-plus-test-round-robin/final-1.md",
+    "sha256": "c1cf956aa184bd540db01fb64fcde7906a41a4edf6ac50f4bbf67654656933fc"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `round_robin` with type hints, preserving group order without mutating inputs"
+  ],
+  "undefined_reason": null
+}

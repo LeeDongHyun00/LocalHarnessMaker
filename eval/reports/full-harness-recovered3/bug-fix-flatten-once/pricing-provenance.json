@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "bug-fix-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-luyghz5i/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-37-12-01a167e8-2f29-7700-8f81-b355e7f367e1.jsonl",
+        "sha256": "2d68ec77ad57a0338eeddc6bb09c07880b5c5f207dbeacd35b0322d70f434991"
+      }
+    ]
+  },
+  {
+    "call_id": "bug-fix-flatten-once-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "51aa20fd3d55a04ca60a9896c2dffb75819c77911a88e13d5c5e05a3b55b7650",
+    "record_sha256": "2acf4b4066a6bb4112aedaa9b46731ab4ab4d47b2898b63542bfd9b32f70e727"
+  }
+]

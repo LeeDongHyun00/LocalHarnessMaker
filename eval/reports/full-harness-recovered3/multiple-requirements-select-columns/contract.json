@@ -1,0 +1,98 @@
+{
+  "task_summary": "Repair `select` in `solution.py`, document its public specification in a docstring, and add at least three passing `unittest` methods in `test_solution.py` for the specified public behavior.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve type hints, do not mutate input collections, and retain the stated behavior and compatibility requirements.",
+    "Return new dictionaries with requested columns in column order for each row; omit missing keys, preserve row order and values, and include repeated column names only once.",
+    "No algorithmic complexity constraint is imposed."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The implementation module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "`solution.py` contains a `select` function definition.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+select\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public specification is documented in a docstring associated with `select`.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read `solution.py` and assess whether the `select` function has a docstring that specifies the requested public behavior: new dictionaries per row, requested columns in column order, omitted missing keys, preserved row order and values, and repeated column names appearing once. Judge only the visible file contents."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "`test_solution.py` contains at least three `unittest.TestCase` test methods exercising the public API.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(1 for node in ast.walk(tree) if isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\") and any(isinstance(parent, ast.ClassDef) and any(isinstance(base, ast.Name) and base.id == \"TestCase\" for base in parent.bases) for parent in ast.walk(tree) if node in ast.walk(parent))) >= 3'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The requested unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(1 for node in ast.walk(tree) if isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\") and any(isinstance(parent, ast.ClassDef) and any(isinstance(base, ast.Name) and base.id == \"TestCase\" for base in parent.bases) for parent in ast.walk(tree) if node in ast.walk(parent))) >= 3'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "Interpret all named paths as relative to the supplied task workspace.",
+    "`solution.py` and `test_solution.py` may not exist yet and may be created or edited as needed.",
+    "Assume unittest discovery from the workspace root finds `test_solution.py` and that its tests can exercise the public API without additional dependencies.",
+    "The request does not specify a function signature or input container types; preserve the existing API and type hints if present, otherwise determine a compatible signature from the supplied task workspace."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=894; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34922,
+    "output_tokens": 1540,
+    "usd": 0.00291436
+  }
+}

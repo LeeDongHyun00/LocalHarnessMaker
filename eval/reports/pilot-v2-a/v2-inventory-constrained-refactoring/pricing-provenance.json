@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-inventory-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hpdyjisf/codex-home/sessions/2026/10/23/rollout-2026-10-23T19-03-41-01a16837-5b0b-7d51-8d63-d832fda1e4fa.jsonl",
+        "record_sha256": "4b84157a1554569dbe93e427f6ce7ac033c2b51fab6817fb973e420d05cfeb1d",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-hpdyjisf/codex-home/sessions/2026/10/23/rollout-2026-10-23T19-03-41-01a16837-5b0b-7d51-8d63-d832fda1e4fa.jsonl",
+        "sha256": "3320d5310e727705895a4aeb5e1acf85c8a55283b44ba235dc28be2fcdb8bad4"
+      }
+    ]
+  }
+]

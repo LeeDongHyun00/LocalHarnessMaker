@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-ledger-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ut2u37gm/codex-home/sessions/2026/10/23/rollout-2026-10-23T19-14-26-01a16841-3263-7ba0-930f-7f721b4bdc8b.jsonl",
+        "record_sha256": "8b9cc0ce9ad474897dc836a602e2274b69af5b95e511ebb8feedc2ce433b5ddb",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ut2u37gm/codex-home/sessions/2026/10/23/rollout-2026-10-23T19-14-26-01a16841-3263-7ba0-930f-7f721b4bdc8b.jsonl",
+        "sha256": "1892737f9428b872cacf684810d6ccacab5e0261ec81261f4d37b53802bebd27"
+      }
+    ]
+  }
+]

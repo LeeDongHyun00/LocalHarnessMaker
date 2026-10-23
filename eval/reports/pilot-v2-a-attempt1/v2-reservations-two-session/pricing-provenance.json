@@ -1,0 +1,40 @@
+[
+  {
+    "call_id": "v2-reservations-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-27-13-01a167df-075f-7740-8d44-5058a88be0fd.jsonl",
+        "record_sha256": "f27f8d6617861db25c929993f23fac9667924c59f4055c126eedc5a1d93d29b6",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-27-13-01a167df-075f-7740-8d44-5058a88be0fd.jsonl",
+        "sha256": "fbd2c8bf858da6aa5934ca88bbe57187e9b809eba3590e457df4da8cb4f24c95"
+      }
+    ]
+  },
+  {
+    "call_id": "v2-reservations-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-28-55-01a167e0-99bf-7ca1-a54c-2651f2477c21.jsonl",
+        "record_sha256": "6a16de1aa6e343f8f0e3ea5a8c78b59ba93202ff0c7768c20a6592de7ec4523a",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-gdw9zxn4/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-28-55-01a167e0-99bf-7ca1-a54c-2651f2477c21.jsonl",
+        "sha256": "a062a58b87c5167874a1f94992aaeea289479a1e3d356eadada338525794eecf"
+      }
+    ]
+  }
+]

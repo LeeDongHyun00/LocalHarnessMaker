@@ -1,0 +1,47 @@
+[
+  {
+    "call_id": "constrained-refactoring-adjacent-runs-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-y6mi1jz7/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-00-36-01a16758-cb2a-7a13-a8c9-74716e582383.jsonl",
+        "sha256": "2d76518ef2f8e7abb99089bd705fc7c341b458afa4730e904b04990bc1488bff"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-adjacent-runs-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "ce379ee67c33b08e078840813f0ab4486066fed52d544c186674c88859294a29",
+    "record_sha256": "bd4afbad5c920d289b74ce3450b557d5e443a84b321e3fe419cbbdadf623656a"
+  },
+  {
+    "call_id": "constrained-refactoring-adjacent-runs-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "ce379ee67c33b08e078840813f0ab4486066fed52d544c186674c88859294a29",
+    "record_sha256": "eadc198c2203f07ceebb6d9449cb93bb00af4047da1be91bcaf8823c897ac057"
+  },
+  {
+    "call_id": "constrained-refactoring-adjacent-runs-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "31ae86cdfe744e23aca0166e82f90a001da54f5be7230c25904926d39d089063",
+    "record_sha256": "3de099805132dffd5b01540de77dd45702e2ec4249490c09aeb17f1762bba774"
+  },
+  {
+    "call_id": "constrained-refactoring-adjacent-runs-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "31ae86cdfe744e23aca0166e82f90a001da54f5be7230c25904926d39d089063",
+    "record_sha256": "7496ba8367c2e5a69ecb16b53de2ba0e652de80247647171d8e61edb3bdd3afa"
+  }
+]

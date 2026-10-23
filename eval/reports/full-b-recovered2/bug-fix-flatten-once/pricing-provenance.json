@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c3zdputh/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-58-17-01a1678d-9d8a-7742-9dbb-546572e7374e.jsonl",
+        "sha256": "2994582eb03111f3b9a202a4394b8aac6a9783b30c293339504766e930a045b1"
+      }
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "05b6bfecc0e16d52ab8d0c0606eca70b4ab711605e4861fc80aa6b03710b88cb",
+  "final_message": {
+    "path": "eval/reports/full-b-recovered2/constrained-refactoring-ordinal-labels/final-1.md",
+    "sha256": "985b225ce1bafe86efce901b62f13c4374d3fcc6b50bd54d049202cabe603e7e"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

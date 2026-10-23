@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "constrained-refactoring-clamp-values-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ams6f468/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-18-51-01a167d7-6296-7c60-aeb9-34341fffcbee.jsonl",
+        "sha256": "a5dfcba15713354c82c64738a7fc9cd5bd6379b9e9a5d807a11d6fd7431a3c35"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-clamp-values-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e22804814a0704a5860c13b4c34f43f624690caa31e24dde8f6c226aba0634ea",
+    "record_sha256": "af6e542c32c0635d031fa17ccec2c6a118647cb1c0669357a3a6ebfe9bb6bded"
+  },
+  {
+    "call_id": "constrained-refactoring-clamp-values-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "73a5d144b36f98676ce7107b1f35d729cf6501c50a0ab401f12f94288fc9124a",
+    "record_sha256": "551fc322bceb1e44bb5658998ba026b33988af3437b7620ed5f919d56f33b64e"
+  },
+  {
+    "call_id": "constrained-refactoring-clamp-values-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "73a5d144b36f98676ce7107b1f35d729cf6501c50a0ab401f12f94288fc9124a",
+    "record_sha256": "5aea36af9cbf1ffb41ba63cd30a9d406229643d62e58423f6f493069d32ccd71"
+  }
+]

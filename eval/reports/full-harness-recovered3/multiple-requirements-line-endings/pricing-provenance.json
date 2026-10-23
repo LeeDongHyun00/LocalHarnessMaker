@@ -1,0 +1,47 @@
+[
+  {
+    "call_id": "multiple-requirements-line-endings-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-81ir_jgu/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-08-30-01a16760-0852-7520-bcb5-e9eafcfd58cb.jsonl",
+        "sha256": "19fab9aad3cc253f2e356e68af9472d10965851ce5fbc51401fb0d83d4964484"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-line-endings-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "7de262e79733d75a335e9e100078b645e73cbc388351dcd73b786f8741a14e92",
+    "record_sha256": "9592b48c81a2954b770a1e6c5b0e3f15297f589f49f5321470c5c981d7874f15"
+  },
+  {
+    "call_id": "multiple-requirements-line-endings-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "7de262e79733d75a335e9e100078b645e73cbc388351dcd73b786f8741a14e92",
+    "record_sha256": "1e080e8c313851738aa1f6a21744ced2c047462b1f5f0f0f2de31a5d72d87794"
+  },
+  {
+    "call_id": "multiple-requirements-line-endings-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "517ec0d23292c256a31ab053fb4846a459509e3fc529a02237a2b5ccf456bbf7",
+    "record_sha256": "7335da4148e9c47a49d4c85ae6b039742512a4bc1d3b1b9280d572c0ae1939d4"
+  },
+  {
+    "call_id": "multiple-requirements-line-endings-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "517ec0d23292c256a31ab053fb4846a459509e3fc529a02237a2b5ccf456bbf7",
+    "record_sha256": "40dbea2279798744ec00c94ecb6caa14f5f6d55df0d8577308c65ccf264fc08a"
+  }
+]

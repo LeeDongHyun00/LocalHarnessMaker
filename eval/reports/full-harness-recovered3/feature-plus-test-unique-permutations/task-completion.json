@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "ef47ae69ec37ae620844ed7faa5561c62ff675ca97d71770f9035993b78f92c9",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/feature-plus-test-unique-permutations/final-1.md",
+    "sha256": "3de41dd3bdcfa5a47080319edc5e9a743137ae119968cd0997d5979b34f2aa79"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `permutations(text: str) -> list[str]`, returning distinct permutations in lexicographic order, including `[\"\"]` for empty input"
+  ],
+  "undefined_reason": null
+}

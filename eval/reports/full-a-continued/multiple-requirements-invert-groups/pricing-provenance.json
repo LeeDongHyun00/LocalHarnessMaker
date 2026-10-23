@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "multiple-requirements-invert-groups-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-wmy9960n/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-16-31-01a166f9-801d-7320-bbd9-d30876049a76.jsonl",
+        "sha256": "87ede77e6114ad383607d740c7c3ef24d94850cc2f6b5cb70bfe4319667bc2c0"
+      }
+    ]
+  }
+]

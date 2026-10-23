@@ -1,0 +1,76 @@
+[
+  {
+    "call_id": "two-session-strip-prefix-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-x27yzzwm/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-59-33-01a167c5-b2e6-7652-8996-857b50f8ab9b.jsonl",
+        "sha256": "9dfed769d3704eaf2f9f38320eadf4c2a817d5c0f5858656fc6a2a5033213867"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-strip-prefix-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-x27yzzwm/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-00-49-01a167c6-df69-70e2-bf07-1d094889533b.jsonl",
+        "sha256": "7d54a517d3680891b917e8fc1c56cbac07ba5eff55e214bdc91859b8115ac914"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-strip-prefix-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d4f225b0c13b6fee27d607b324c725bbda3330868882be73badfc471959d9e7f",
+    "record_sha256": "58f7546c1deef9e00fc4c1029f3c6fec2a90bf2cfd7c9e50df32c3faa379c668"
+  },
+  {
+    "call_id": "two-session-strip-prefix-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d4f225b0c13b6fee27d607b324c725bbda3330868882be73badfc471959d9e7f",
+    "record_sha256": "025cc3f7290709fbb78aa3233b18780b92477cfcc955e39cc01b1e4250588051"
+  },
+  {
+    "call_id": "two-session-strip-prefix-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "5677b9e7e7b5a358e61fcfa96f278cb65933c9ccab52896bc1995ee4175ba66a",
+    "record_sha256": "ef164ea89dafcbcef0ada3c73fc1a06f66c4f741b9c15755c14f5267bbbb6ebd"
+  },
+  {
+    "call_id": "two-session-strip-prefix-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "a615772e05dbf789e767f22940ea0f1ee2dc0ec6ad2aa5c434d44703038f9d2c",
+    "record_sha256": "47a62cdf2eecc46cc12af45221d27329aba06f9032761e860a4688ee8caef9c4"
+  },
+  {
+    "call_id": "two-session-strip-prefix-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "a615772e05dbf789e767f22940ea0f1ee2dc0ec6ad2aa5c434d44703038f9d2c",
+    "record_sha256": "daaaafd3009bf0ffe01d8836af18e04abf07960db3eb1e5a621102ab28c78245"
+  },
+  {
+    "call_id": "two-session-strip-prefix-control-6",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "1c87c3bfe646eefb33fe0f00da28ca250ecd275dab3fbec5feb1e3f1b4063e93",
+    "record_sha256": "eeafddace2f4279ffe17bb12dea714df25263b85726cd93b6f2986f634879c61"
+  }
+]

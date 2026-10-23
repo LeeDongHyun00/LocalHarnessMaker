@@ -1,0 +1,14 @@
+[
+  {
+    "call_id": "two-session-interleave-exec-1",
+    "observed_service_tier": null,
+    "basis": "Retained original accounting; no per-call tier observation available.",
+    "pricing_ref": "openai-standard-short-2026-10-22-v1"
+  },
+  {
+    "call_id": "two-session-interleave-exec-2",
+    "observed_service_tier": null,
+    "basis": "Retained original accounting; no per-call tier observation available.",
+    "pricing_ref": "openai-standard-short-2026-10-22-v1"
+  }
+]

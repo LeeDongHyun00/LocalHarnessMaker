@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-window-slices-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-e6tha8bq/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-08-00-01a16728-a60c-7bf1-8ba4-78278d21ef24.jsonl",
+        "sha256": "6d1818f96ca485b1c154161cb27ce7e19af9ec6a8d1cbd25e0a80ce425aa897b"
+      }
+    ]
+  }
+]

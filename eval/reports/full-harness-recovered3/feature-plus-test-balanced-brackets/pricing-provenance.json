@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "feature-plus-test-balanced-brackets-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ooclllnb/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-32-25-01a167e3-ca8d-71f2-ae47-bf3b460ee091.jsonl",
+        "sha256": "9f376a97af7fb2f25f1e1218ed2fa24ca16a037b5682f58053f094d68ae90b89"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-balanced-brackets-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d327d8db0512dbfc4b954869ba613f0227343482aa16d55760ab18230e38866e",
+    "record_sha256": "1636f5ce3d734ea2b75df0926162b041b4ca01c22084742d6f7b018aee485dad"
+  },
+  {
+    "call_id": "feature-plus-test-balanced-brackets-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "c4241129d97c3f92ec60eaa6cfa72aba7ee0e30bb461f6c1544ea4dcc32250c1",
+    "record_sha256": "a5dd19c36fe5795c3b5bb49b8c712f12599962b0ba6651ff159ba0f906106f72"
+  }
+]

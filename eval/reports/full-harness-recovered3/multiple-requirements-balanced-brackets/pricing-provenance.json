@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "multiple-requirements-balanced-brackets-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-81vh3qbd/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-11-16-01a16762-8dd2-7952-8874-663822fb2e2d.jsonl",
+        "sha256": "b4ba9a55d5469758a28c84ec5b7ebd49e430f718022ade4b7f77c7b6cc306f92"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-balanced-brackets-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "21339f5ef0f67256ede2811ee48dceb365c8abc77dc90bd4bfdb890d123f1cb1",
+    "record_sha256": "cb4e984273b4f8048082bec95f780e9467339efc9d2b4157d5546ef12d8fc47f"
+  },
+  {
+    "call_id": "multiple-requirements-balanced-brackets-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8488837c95f39c8a7b7e5797b50cc702f2a3ee10f5a18fa7adfddde23d6009be",
+    "record_sha256": "456b3fc503431d9c764030172256ccf1d7d1f8a848d8c47954ca1e2244790a35"
+  },
+  {
+    "call_id": "multiple-requirements-balanced-brackets-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "8488837c95f39c8a7b7e5797b50cc702f2a3ee10f5a18fa7adfddde23d6009be",
+    "record_sha256": "17eb68908ea35e588fdf65f85df4bbe22adedd18070a1fbb6f1376ff8716639c"
+  }
+]

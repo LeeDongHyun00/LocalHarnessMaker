@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "multiple-requirements-select-columns-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-uaju27mv/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-09-06-01a16797-8738-76d0-918d-4b9c105f7850.jsonl",
+        "sha256": "7c7d369cc0294be97e77cf63695abb9ccfe79c2df2666af9e5ea29c06f60cfe3"
+      }
+    ]
+  },
+  {
+    "call_id": "multiple-requirements-select-columns-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "abab296824dd06707998e3161e8c60b4785f6fc7a346c905ca493ce204227c11",
+    "record_sha256": "d45e1e39e05ad94acffcec0e6596b5990bb0a6151eeb8922d2861043ce284607"
+  },
+  {
+    "call_id": "multiple-requirements-select-columns-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "abab296824dd06707998e3161e8c60b4785f6fc7a346c905ca493ce204227c11",
+    "record_sha256": "ea4ecefd8edb332f94ecab6d6ad1f7e398dcaef079f58b8edf80c51ebaac96c0"
+  },
+  {
+    "call_id": "multiple-requirements-select-columns-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d1ea6c6173906c54f323d33432cfdb9a2b93418026aa4030a9540e9389593d1b",
+    "record_sha256": "874ffabe72aa9d6b25a308b4e32122aa53f0c654b6d2db23246b4a93b2f18897"
+  }
+]

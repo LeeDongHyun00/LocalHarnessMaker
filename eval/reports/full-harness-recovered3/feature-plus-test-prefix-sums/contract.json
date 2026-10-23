@@ -1,0 +1,82 @@
+{
+  "task_summary": "Implement inclusive prefix sums in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve input length, return [] for empty input, and support negative numbers.",
+    "Maintain type hints and do not mutate input collections.",
+    "Add at least two passing unittest methods exercising the public API, covering ordinary, boundary, and empty inputs (or invalid numeric inputs if no collection is accepted).",
+    "No algorithmic complexity constraint is imposed."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The prefix-sum implementation and test module compile.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The test module contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)\\bdef\\s+test_\\w+\\s*\\([^)]*\\)\\s*:"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The unittest suite passes using the requested discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The public API returns inclusive prefix sums, preserves input length, handles empty input and negative numbers, keeps type hints, and does not mutate inputs.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files and assess whether solution.py implements the requested public behavior: inclusive prefix sums with preserved input length, [] for empty input, and support for negative numbers; maintains type hints; and does not mutate input collections. Assess whether test_solution.py exercises the public API with ordinary, boundary, and empty inputs (or invalid numeric inputs if no collection is accepted), and includes at least two unittest test methods. Judge only content visible in the files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are interpreted as relative paths in the supplied task workspace; they may not exist yet and may be created.",
+    "The public API name and signature are not specified. The implementation and tests will use or establish a suitable API in solution.py, subject to review.",
+    "The phrase \"prefix\" is interpreted as the inclusive prefix sums explicitly specified in the public behavior.",
+    "Unittest discovery is assumed to find test_solution.py from the workspace root using the requested command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=818; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17388,
+    "output_tokens": 568,
+    "usd": 0.00067496
+  }
+}

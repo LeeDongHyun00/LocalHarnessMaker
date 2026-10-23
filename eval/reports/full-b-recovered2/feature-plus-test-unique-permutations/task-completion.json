@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "fb2fce2b437a4ffe5486993fbc17af8d415230bc2b2af6f4e7ea55870d435195",
+  "final_message": {
+    "path": "eval/reports/full-b-recovered2/feature-plus-test-unique-permutations/final-1.md",
+    "sha256": "123a571514c38089300363ce31e5e0fe2e4fce510db474eafac01dfebde5aa25"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented distinct, lexicographically sorted permutations, including `[\"\"]` for empty input"
+  ],
+  "undefined_reason": null
+}

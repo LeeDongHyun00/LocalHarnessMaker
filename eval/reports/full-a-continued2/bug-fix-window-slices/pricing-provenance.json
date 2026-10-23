@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-window-slices-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-byi_34hy/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-41-32-01a166d9-7a64-7760-8100-98795e71955d.jsonl",
+        "sha256": "2b6a7df8610d73f469dc4ab25136188d5813fd0e734ac9cda0ea7d5a4f25f990"
+      }
+    ]
+  }
+]

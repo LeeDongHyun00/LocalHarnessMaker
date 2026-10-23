@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "feature-plus-test-unique-permutations-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-t0vitc_v/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-08-02-01a1675f-9ad7-70e0-a008-2301a9b3f48b.jsonl",
+        "sha256": "87800087ec527a4c82334d4c1c91a5d5cfd0c3f617d3c6c2db384f1d53013f12"
+      }
+    ]
+  }
+]

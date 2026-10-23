@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "constrained-refactoring-inclusive-range-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sw3gyd0q/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-59-01-01a16757-5661-7953-b343-30c8baeea8b0.jsonl",
+        "sha256": "69d1e165b8f1d320f9cc7bbb32bdcec0c8ec821e2732260ce671d1e1c2f48bf5"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-inclusive-range-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "a1a071fe9414a7ce57a88420f40838cc8a9ddb2c2ba8fac67805f5aa7339ee9c",
+    "record_sha256": "6cce0f0ff664b4f9332608edf8d6b595164eea57aef0cf1f90e19a55426647e0"
+  },
+  {
+    "call_id": "constrained-refactoring-inclusive-range-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "fb86da430809210d0be9377630b100bf9aea985a1165d942eaa7b0ddfb62e278",
+    "record_sha256": "042a5cf09da10f8efeb93c0b23c0403f39a5bce9de30c677ac871eb1f16b696c"
+  },
+  {
+    "call_id": "constrained-refactoring-inclusive-range-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "fb86da430809210d0be9377630b100bf9aea985a1165d942eaa7b0ddfb62e278",
+    "record_sha256": "56c9454a93501e4a1adf3c75c9e8e23f8425402477709fd532df313cae541c33"
+  }
+]

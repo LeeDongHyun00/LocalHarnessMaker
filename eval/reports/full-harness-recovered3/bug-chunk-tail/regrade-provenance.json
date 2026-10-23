@@ -1,0 +1,10 @@
+{
+  "task_id": "bug-chunk-tail",
+  "source_report_sha256": "68428d4727f4d142d422c1ac0b13a2027fd1e401acd6c4f7fd3b1b38205bd4f2",
+  "workspace_verification": "published_workspace_copy",
+  "published_file_count": 1,
+  "workspace_file_count": 1,
+  "hashes_compared": 1,
+  "mtimes_checked": 1,
+  "last_exit_time_ns": 1792740498567910000
+}

@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-partition-sign-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-7zfd67r_/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-13-39-01a166f6-e361-7870-bd8c-e2c0dee8393d.jsonl",
+        "sha256": "8451960b38f22c8c405440b37fa5ab2125a67462785a248e2f70b6ffe6966f67"
+      }
+    ]
+  }
+]

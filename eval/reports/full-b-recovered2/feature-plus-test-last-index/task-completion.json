@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "627f8ab370f6771a73fc603ce3154e748435bf367c0aabc32fa9c9ee9c9f2c59",
+  "final_message": {
+    "path": "eval/reports/full-b-recovered2/feature-plus-test-last-index/final-1.md",
+    "sha256": "9239eeb4ae2320c2ef69d3cdb71c8af0e7e67ea5832f9afdf2cadcb47c8d0422"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `last_index`, preserving type hints and leaving inputs unchanged"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,96 @@
+{
+  "task_summary": "Extend the existing public API with words_many(cases: list[tuple]) -> list, add unittest coverage, preserve the Day 1 API, and update HANDOFF.md with verification evidence.",
+  "constraints": [
+    "Preserve the Day 1 public API.",
+    "Return batch results in case order and [] when cases is empty.",
+    "Propagate the first exception unchanged.",
+    "Do not mutate cases or their arguments.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result.",
+    "Use the workspace and handoff provided by the runner."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The existing solution module defines words_many with the requested signature.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+words_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods and includes batch coverage.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?=(?:.*?\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\(\\s*self\\s*\\)\\s*:){3})(?=.*\\bdef\\s+test_[A-Za-z0-9_]*batch[A-Za-z0-9_]*\\s*\\(\\s*self\\s*\\)\\s*:).*"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The discovered unittest suite passes.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "HANDOFF.md records the verification command and observed result.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?is)(python\\s+-m\\s+py_compile\\s+solution\\.py|python\\s+-m\\s+unittest\\s+discover\\s+-v)(?=.*\\b(?:exited|exit(?:\\s+code)?|result|passed)\\b).*"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The provided handoff identifies solution.py, test_solution.py, and HANDOFF.md as the relevant workspace paths; they are interpreted as relative workspace paths.",
+    "solution.py may not exist yet and may be created or updated.",
+    "The supplied handoff reports prior Day 1 implementation and verification, but those reports are context rather than current verification evidence.",
+    "The requested behavior can be tested by adding unittest cases in test_solution.py; the exact case data and expected words() results are not supplied, so tests should derive expected batch results from the existing words API where appropriate.",
+    "The signature annotation list[tuple] is interpreted literally; the contract does not specify tuple element types or a more specific result element type.",
+    "The unittest suite is assumed discoverable with python -m unittest discover -v.",
+    "HANDOFF.md should record the actual observed result of the verification command after execution; the contract does not assert that verification has already occurred."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=602; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17623,
+    "output_tokens": 753,
+    "usd": 0.00079096
+  }
+}

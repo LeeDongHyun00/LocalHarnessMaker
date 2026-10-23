@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-parse-pairs-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-53hw51hz/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-38-20-01a1670d-7881-77f1-884c-7d08b1715b41.jsonl",
+        "sha256": "d9a18aa50402ccae5e6684373f649d8e34eb65d6e1da97b94a9776d18699cf8f"
+      }
+    ]
+  }
+]

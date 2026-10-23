@@ -1,0 +1,47 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "solution.py defines partition(items: list[int])."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "solution.py returns negative, zero, and positive values in three fresh lists, preserving order and duplicates without mutating the input."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "python -m py_compile solution.py test_solution.py exited 0."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "test_solution.py contains four unittest test methods."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "python -m unittest discover -v exited 0; four tests passed."
+    },
+    {
+      "criterion_id": "SC-6",
+      "artifact": "HANDOFF.md records design decisions and the verification command."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Kept the typed public API as partition(items: list[int]) -> tuple[list[int], list[int], list[int]].",
+      "why": "The existing stub declared this signature; it supplies three fresh result lists in negative, zero, positive order."
+    },
+    {
+      "what": "Used one pass over the input to append each integer to its matching result list.",
+      "why": "This preserves relative order and duplicates while leaving the input unchanged."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py test_solution.py",
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Work only in the supplied task workspace.",
+    "Do not access parent repositories or external services."
+  ]
+}

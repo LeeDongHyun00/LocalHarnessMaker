@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "eb67235ad8b2029c1f744636f5f16983ab62e55b5ec12c668b43037fe3287471",
+  "final_message": {
+    "path": "eval/reports/full-a-continued/multiple-requirements-pairwise-edges/final-1.md",
+    "sha256": "cf4f18f20bffd81cfa8d3f1f395a8f36fcdf3249ff4884a899d2fa2c8a610a4b"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

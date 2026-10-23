@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-round-robin-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-mylwvqce/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-31-07-01a16774-bdd3-7482-815a-08ac60b5ffb9.jsonl",
+        "sha256": "ca0606f190b444f83d63fabe0445bde64e1b5a821032d34e8da9ec958d2dd2aa"
+      }
+    ]
+  }
+]

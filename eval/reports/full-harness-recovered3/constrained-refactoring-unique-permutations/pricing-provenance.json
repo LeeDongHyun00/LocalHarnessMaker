@@ -1,0 +1,39 @@
+[
+  {
+    "call_id": "constrained-refactoring-unique-permutations-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-isu6kn99/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-01-57-01a1675a-0726-7f31-8ef6-4ccca5479554.jsonl",
+        "sha256": "a572c86ee11545ba208b3f7e7c8a952b1d06a0fd7dd32d1ed92e2144fed3bbe9"
+      }
+    ]
+  },
+  {
+    "call_id": "constrained-refactoring-unique-permutations-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2af8cd45dd381dc53dae08c950eb84e2969fbb889c3c09ca7cb4d079ba205546",
+    "record_sha256": "b6f0f1790df98c9f4a0724ff98fb7e12e6f783a0fa7bb4b961bffffa47d1f342"
+  },
+  {
+    "call_id": "constrained-refactoring-unique-permutations-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "2af8cd45dd381dc53dae08c950eb84e2969fbb889c3c09ca7cb4d079ba205546",
+    "record_sha256": "bc46d8ff08346b59a65dd55a68a0a4394f2db19ef2669ce5de1b9e0fa2be4f03"
+  },
+  {
+    "call_id": "constrained-refactoring-unique-permutations-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "d1f8250bd84a06ce123d02bce85f60472261c8d9d03b80b9e81661d79ad69c59",
+    "record_sha256": "e5ef89e3dfc75049e8bcc3a070a8ae7ae3688c459371248b5777ac5a358e71f2"
+  }
+]

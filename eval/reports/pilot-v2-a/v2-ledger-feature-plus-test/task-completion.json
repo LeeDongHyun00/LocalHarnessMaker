@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "f223059496216013a4f49db7ee79699629ffe5202aaf051db31ff3aa33b307c3",
+  "final_message": {
+    "path": "eval/reports/pilot-v2-a/v2-ledger-feature-plus-test/final-1.md",
+    "sha256": "8b575528f1f47a28a39dde436debd773d49f1b922acb2a05527b78fbec4bbff1"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs and added regression coverage, including `test_batch_edge`"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+flatten\\s*\\([^\\n]*\\)\\s*->\\s*[^:\\n]+\\s*:\n7: \n8: \n9: def flatten(items: list[list[T]]) -> list[T]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\") for c in ast.walk(t) if isinstance(c, ast.ClassDef) and any((isinstance(b, ast.Name) and b.id == \"TestCase\") or (isinstance(b, ast.Attribute) and b.attr == \"TestCase\") for b in c.bases) for n in c.body) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input_returns_new_list (test_solution.FlattenTests.test_empty_input_returns_new_list) ... ok\ntest_flattens_exactly_one_level (test_solution.FlattenTests.test_flattens_exactly_one_level) ... ok\ntest_ignores_empty_inner_lists (test_solution.FlattenTests.test_ignores_empty_inner_lists) ... ok\ntest_preserves_order_and_duplicates (test_solution.FlattenTests.test_preserves_order_and_duplicates) ... ok\ntest_returns_new_list_without_mutating_inputs (test_solution.FlattenTests.test_returns_new_list_without_mutating_inputs) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(?=.*design decisions?)(?=.*python -m unittest discover -v)\n1: # Day 1 handoff\n2: \n3: ## Design decisions",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` implements `return [element for inner in items for element in inner]`. In `test_solution.py`, `test_preserves_order_and_duplicates` checks order and duplicates; `test_ignores_empty_inner_lists` checks empty inner lists; `test_flattens_exactly_one_level` checks nested lists remain elements and inputs retain their values; `test_returns_new_list_without_mutating_inputs` checks result and input/inner identities and verifies appending to the result does not change the inputs. `test_empty_input_returns_new_list` checks a distinct empty result.",
+      "reason": "The public implementation returns a new list containing elements from each inner list in iteration order, flattening exactly one level. Empty inner lists contribute nothing, and the implementation does not mutate the inputs. The visible tests assert order and duplicates, empty-list behavior, one-level flattening, new-list identity, and preservation of input values and inner-list identities."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

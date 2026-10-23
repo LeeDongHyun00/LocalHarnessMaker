@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-clamp-values-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-0ie_xi8e/codex-home/sessions/2026/10/23/rollout-2026-10-23T15-44-27-01a16780-eabe-7691-b7e9-c6470dff0ba0.jsonl",
+        "sha256": "ebccbe4f444c008d74c23e5949431083a992c9f371c9df5fba4a22622b7e098f"
+      }
+    ]
+  }
+]

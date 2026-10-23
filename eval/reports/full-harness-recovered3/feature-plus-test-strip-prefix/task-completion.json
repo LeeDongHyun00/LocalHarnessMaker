@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "f2a4ca27f5a78f7219e0c3c87ed1a602b03da2a4d96e80c43ac98b8da0d7b5ea",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered3/feature-plus-test-strip-prefix/final-1.md",
+    "sha256": "110d1aa58876c58b9efee6bf95c8b9642d2ed64195b6070d85ec7e4f83ad53e2"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `strip_prefix` with preserved type hints, removing exactly one matching prefix"
+  ],
+  "undefined_reason": null
+}

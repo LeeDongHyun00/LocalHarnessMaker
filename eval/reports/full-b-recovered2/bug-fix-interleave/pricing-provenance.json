@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-interleave-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-j0va91nk/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-07-01-01a16727-c246-7bd3-a641-57cfc8cbc097.jsonl",
+        "sha256": "f1e65ef706c6e17a9c16b72a80f6a564f10f2d9c76cf77b60279830cb10b463a"
+      }
+    ]
+  }
+]

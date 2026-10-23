@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "constrained-refactoring-flatten-once-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-2yfmcvxd/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-30-52-01a1673d-90ad-7e20-a134-9bf2bd7ce5ba.jsonl",
+        "sha256": "0b82313c80001f192c00d8ced888d9cb6a15a9f5d5bf12071040dc9424e15160"
+      }
+    ]
+  }
+]

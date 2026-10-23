@@ -1,0 +1,31 @@
+[
+  {
+    "call_id": "feature-plus-test-pairwise-edges-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-mx6jcgvt/codex-home/sessions/2026/10/23/rollout-2026-10-23T16-26-41-01a167a7-9fc7-7470-8b27-ea9041aed490.jsonl",
+        "sha256": "a3be6327e1ffd91a24bd72937365efc9c9992e0b1baef35941c2ff246b04b034"
+      }
+    ]
+  },
+  {
+    "call_id": "feature-plus-test-pairwise-edges-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "b73506a298f283b8127786381388ccdbba21286e4b4e3b92e4ae8632b7106ed6",
+    "record_sha256": "f80518dcd3d9e38b85a0ac6121457ac0b04ab9a947511f1e0c9d35e4a1e54058"
+  },
+  {
+    "call_id": "feature-plus-test-pairwise-edges-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "a0c8467b078c47d21feb9769639c41127568f34196fbb37fb081313c0a972844",
+    "record_sha256": "645546e6bada2aefbfb576048df753acb6a284a31b69e6c7c6d45a0f911b5396"
+  }
+]

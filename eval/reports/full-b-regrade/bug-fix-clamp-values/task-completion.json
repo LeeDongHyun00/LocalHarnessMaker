@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "9949c7a2dbb157cac15f4b808354995cefa1ab15056c6c11a3d7c3dbbfacd7fc",
+  "final_message": {
+    "path": "eval/reports/full-b-regrade/bug-fix-clamp-values/final-1.md",
+    "sha256": "bc6655377bc5a8fae2038e096726e690d7e9c8a6408c10ef913d27d609a75308"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

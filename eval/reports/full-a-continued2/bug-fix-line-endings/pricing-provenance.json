@@ -1,0 +1,15 @@
+[
+  {
+    "call_id": "bug-fix-line-endings-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-9graud22/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-23-07-01a166ff-868d-71d2-9a09-77a39b1458f9.jsonl",
+        "sha256": "faf9a36554d38ce5bcb579001dcd52cba579f1a1d8ad2f380ec8b626a39c55f1"
+      }
+    ]
+  }
+]

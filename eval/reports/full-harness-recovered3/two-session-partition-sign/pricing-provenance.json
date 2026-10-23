@@ -1,0 +1,84 @@
+[
+  {
+    "call_id": "two-session-partition-sign-exec-1",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-_z7snpf2/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-39-18-01a167ea-1a50-7862-b57b-a71c81a3cede.jsonl",
+        "sha256": "cf252d155602a9c30431cc3f51206ebaf33bf3e7dbecb0863f44f8251b4f2a6d"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-partition-sign-exec-2",
+    "observed_service_tier": "unknown",
+    "basis": "No retained per-process applied-tier capture.",
+    "captured_records": [],
+    "pricing_ref": null,
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-_z7snpf2/codex-home/sessions/2026/10/23/rollout-2026-10-23T17-40-34-01a167eb-47ae-74f0-a806-24865b0621cd.jsonl",
+        "sha256": "ca9883c5c5c392e33e4dde166e79964042db4136eb432b23e24c45d781a124d5"
+      }
+    ]
+  },
+  {
+    "call_id": "two-session-partition-sign-control-1",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "21e77616238af0c5df3efc1ff66cf87dfa2f57dfcacd7b7553d24ba4f78d7696",
+    "record_sha256": "1c647fcb73b8e2cbae854913804c51376c723843bf8a52e7f068d5136ab1a941"
+  },
+  {
+    "call_id": "two-session-partition-sign-control-2",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "85296523fb8cc103fb032add6178594418a13c8b5bc2bc60fcf3f00826407c71",
+    "record_sha256": "01acf2ecd4828a93ad665221a272446583a09775d86209120a290f3a7552feae"
+  },
+  {
+    "call_id": "two-session-partition-sign-control-3",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "9b73c92f81dbc059d5ef0fb835ee18ccae2b7de2675ea89227dc880bddaeb9f7",
+    "record_sha256": "a6ed037e698507d30a707b8e261ecf4df16df374d618f0f127cf3a8458158250"
+  },
+  {
+    "call_id": "two-session-partition-sign-control-4",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e7afefccdb82e710e9f49dc2ce1af139226ccbb671bcca8b8efd3028c4e97d39",
+    "record_sha256": "f8e8d2cf137e04ac7acceefe021b989942f5c21f2495534e7ec08edcda788c53"
+  },
+  {
+    "call_id": "two-session-partition-sign-control-5",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e7afefccdb82e710e9f49dc2ce1af139226ccbb671bcca8b8efd3028c4e97d39",
+    "record_sha256": "4c904221de907e457b848966b83d631c63f1e850758be4cc60eff4136875f56e"
+  },
+  {
+    "call_id": "two-session-partition-sign-control-6",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "e7afefccdb82e710e9f49dc2ce1af139226ccbb671bcca8b8efd3028c4e97d39",
+    "record_sha256": "f38659ae67fbdb115a4dfd6db0fe39fbd9afb45bc20329fadc5ff6de1b6f1f6f"
+  },
+  {
+    "call_id": "two-session-partition-sign-control-7",
+    "observed_service_tier": null,
+    "basis": "controller control_call.service_tier only",
+    "pricing_ref": null,
+    "stderr_sha256": "b2ba0c41d45f128cdedbd626e580543204156fc15daef08b553e009328664f5e",
+    "record_sha256": "aa36b165349adfcccef3692cc84c87b91d91f238aca4ceb7083e4081bd295cc3"
+  }
+]
