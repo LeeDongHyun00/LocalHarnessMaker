@@ -386,3 +386,11 @@ Claude's old-versus-new audit comparison over 369 retained finished tasks (pilot
 | r5/v2 (9ba06d5) | 366 | 3 | 0 |
 
 Fixed: full-a two-session-balanced-brackets (literal string expression), full-b multiple-requirements-line-endings (JSONL split on Unicode separators), full-harness multiple-requirements-round-robin (heredoc with quoted regex). No regression. The 3 remaining are the restart-interrupted full-b segment, which rerun_invalid handles, and the two code-mode shapes queued as r5-audit-004 (a backtick literal and a const array of commands). tests/eval: 1092 passed.
+
+## v2 calibration pilot, first half (2026-10-23, started 08:11 UTC at r5/v2 6c06e5c, Fast tier)
+
+After 12 of 20 tasks: 6 pass, 2 fail, 4 invalid. Executor attempts 14. On the 8 valid tasks A passes 75 percent, above the 30 to 70 percent target; the second half decides. The 4 invalid tasks are audit artifacts, not access:
+- Two two-session tasks show grader_access_detected on line fingerprints. Claude checked every grader line found in the executor output: all occur in the task's public files or in the executor's own test files, none only in the grader. The v2 graders reuse public test lines, so the fingerprints are not distinctive. r5-audit-006 makes fingerprints require absence from public inputs and makes grader validation reject shared assertion lines.
+- v2-routing-bug-fix: a String.raw template literal (unresolved_custom_input).
+- v2-inventory-constrained-refactoring: an in-workspace glob inside a for-loop list (unresolved_operand).
+Earlier audit fixes on the branch (64a825b, cd3bdb4) cleared both remaining harness v2 code-mode records; the two-session-line-endings record needed a second pass because Claude's first brief paraphrased the input instead of quoting it. Audit-precision rounds so far today: 7. The pattern is not converging on its own; the fingerprint change above removes one whole class, and the final evaluation will report the per-run invalid counts before and after each fix.
