@@ -20,6 +20,7 @@ from eval.runner.report import artifact, validate, usage as executor_usage
 from eval.runner.signals import stop_signals
 from eval.runner.publication import safe_source
 from eval.runner.telemetry import recover_partial_usage, interrupted_pricing_evidence
+from eval.runner.workspace_verification import verify as verify_workspace
 
 
 REASONS = frozenset({
@@ -142,6 +143,7 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
     config = state['config']
     selected = []
     causes_by_task = {}
+    workspace_checks = {}
     for task in original['tasks']:
         candidate = (task['outcome'] != 'invalid' and task['costs']['executor_usd'] is None
                      if _unaccounted else task['outcome'] == 'invalid' and reasons.intersection(task['invalid_reasons']))
@@ -157,9 +159,11 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         paths.extend(sorted((runtime / 'codex-home/sessions').rglob('*.jsonl')))
         if not safe_source(runtime, runtime) or any(not safe_source(p, runtime) for p in paths):
             raise ValueError('Unsafe retained evidence')
-        if ((_unaccounted or "workspace_exit_sha256" in entry) and
-                core.matching_workspace_digest_version(runtime / 'workspace', entry) is None):
-            raise ValueError('Workspace exit hash mismatch')
+        if _unaccounted or "workspace_exit_sha256" in entry:
+            verification = verify_workspace(runtime / 'workspace', entry, task)
+            if verification is None:
+                raise ValueError('Workspace exit hash mismatch')
+            workspace_checks[task['task_id']] = verification
         audit = audit_retained_logs(paths, private, retained_context=entry.get('retained_audit_context'),
                                     interrupted_paths=interrupted_logs(runtime, entry['segments']),
                                     workspace=runtime / 'workspace', repository=core.REPOSITORY,
@@ -217,6 +221,7 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
                     'source_segments': state['tasks'][task_id]['segments'],
                     'source_executor_segments': old['executor_segments'], 'source_artifacts': old['artifacts'],
                     'source_calls': old['calls'], 'source_costs': old['costs'], 'rerun_id': uuid.uuid4().hex}
+        evidence.update(workspace_checks.get(task_id, {}))
         core.write_json(out / task_id / 'rerun-provenance.json', evidence)
         provenance['tasks'].append(evidence)
         recovered_state['tasks'].pop(task_id)

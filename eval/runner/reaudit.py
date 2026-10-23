@@ -10,6 +10,7 @@ from typing import Any
 
 from eval.runner import core
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
+from eval.runner.workspace_verification import verify as verify_workspace
 
 
 class InputParser(argparse.ArgumentParser):
@@ -37,6 +38,7 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
     if any(entry.get("phase") != "finished" or entry.get("pid") for entry in tasks.values()):
         raise ValueError("Every executor must have finished")
     rows = []
+    published_tasks = {task['task_id']: task for task in report['tasks']}
     fingerprint_cache = FingerprintCache()
     for task, entry in sorted(tasks.items()):
         errors: set[str] = set()
@@ -68,7 +70,7 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
             if not workspace.is_dir():
                 errors.add("missing_retained_workspace")
             elif ("workspace_exit_sha256" in entry and
-                  core.matching_workspace_digest_version(workspace, entry) is None):
+                  verify_workspace(workspace, entry, published_tasks[task]) is None):
                 errors.add("workspace_exit_hash_mismatch")
         except Exception:
             # Exceptions can contain grader paths or source. Do not serialize them.

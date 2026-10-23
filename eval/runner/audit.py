@@ -393,9 +393,11 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
     separators = {";", "&&", "||", "|", "&"}
     data = shell_data_spans(command) if data is None else data
     loops: list[int] = []
+    positions: list[int] = []
     offset = 0
     for i, (value, raw) in enumerate(tokens):
         position = command.index(raw, offset)
+        positions.append(position)
         at_start = (i == 0 or "\n" in command[offset:position] or
                     tokens[i - 1][1] in separators | {"(", "do", "then", "else"})
         if (at_start and value == raw and value in {"for", "while", "until", "select"}
@@ -422,7 +424,8 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
     if boundary < 0 or tokens[boundary + 1:boundary + 2] != [("do", "do")]:
         return tokens, True
     words = tokens[start + 3:boundary]
-    # Relative static globs are the only supported word-list expansion.
+    # Literal absolute/relative paths need no expansion. Only bounded relative
+    # static globs may expand; variables and substitutions always fail closed.
     if not words or any(not value or any(ch in raw for ch in "$`{}~\\\n") or
                         raw in separators | {"(", ")"} for value, raw in words):
         return tokens, True
@@ -442,8 +445,10 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
     if len(ends) != 1:
         return tokens, True
     end = ends[0]
+    newline_after = (end + 1 < len(tokens) and
+                     "\n" in command[positions[end] + len(tokens[end][1]):positions[end + 1]])
     if (end <= boundary + 2 or tokens[end - 1] != (";", ";") or
-            (end + 1 < len(tokens) and tokens[end + 1][1] not in separators)):
+            (end + 1 < len(tokens) and tokens[end + 1][1] not in separators and not newline_after)):
         return tokens, True
     # No other assignment, mutation, directory change or indirect shell code can
     # be allowed to alter the induction variable or the meaning of its operands.
@@ -764,16 +769,21 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
     results = []
     if retained:
         historical = dict(kwargs, workspace=Path(retained_context['workspace']),
-                          grading_roots=tuple(Path(p) for p in retained_context['grading_roots']))
+                          grading_roots=tuple(Path(p).resolve() for p in retained_context['grading_roots']
+                                              if Path(p).resolve() != runtime.resolve()))
         results.append(audit(retained, private, **historical))
         for path in retained:
             if (not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)
                                         if p.is_relative_to(Path(retained_context['copied_runtime']))) or
                     digest(path.read_bytes()) != pinned[str(path)]):
                 results[-1]['errors'].append('retained_context_log_hash_mismatch:' + path.name)
-        from eval.runner.core import matching_workspace_digest_version
+        from eval.runner.workspace_verification import verify as verify_workspace
         try:
-            workspace_matches = matching_workspace_digest_version(Path(retained_context['workspace']), retained_context) is not None
+            recorded = dict(retained_context)
+            artifact_evidence = retained_context.get('workspace_artifact_evidence')
+            if artifact_evidence:
+                recorded['segments'] = artifact_evidence['executor_segments']
+            workspace_matches = verify_workspace(Path(retained_context['workspace']), recorded, artifact_evidence) is not None
         except (OSError, ValueError):
             workspace_matches = False
         if not workspace_matches:
@@ -809,6 +819,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
     errors: list[str] = []
     logs: list[dict[str, Any]] = []
     repository = (repository or Path(__file__).resolve().parents[2]).resolve()
+    repository_canonical = canonical_path(repository)
     roots = [Path.home() / ".claude", Path.home() / ".codex", repository.parent / "codex-bridge", repository,
              private.root, *grading_roots]
     aliases = {prefix + name: Path.home() / name
@@ -966,12 +977,12 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             def protected(candidate: Path, recursive: bool = False) -> bool:
                 canonical = canonical_path(candidate)
                 for root in ((private.root, *grading_roots) if metadata else roots):
+                    target = canonical_path(root)
                     # Only the repository restriction has a workspace exception.
-                    if root == repository and workspace is not None:
+                    if target == repository_canonical and workspace is not None:
                         allowed = canonical_path(workspace)
                         if canonical == allowed or canonical.startswith(allowed + "/"):
                             continue
-                    target = canonical_path(root)
                     if canonical == target or canonical.startswith(target + "/"):
                         return True
                     if recursive and (target.startswith(canonical + "/") or canonical == ""):

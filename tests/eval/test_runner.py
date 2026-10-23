@@ -747,7 +747,10 @@ def test_regrade_matches_live_outcomes_without_source_writes(setup: tuple[Path, 
     assert diagnostics['source_report_sha256'] == digest((out / 'report.json').read_bytes())
     assert diagnostics['workspace_hash_checks'][0]['matched'] is True
     assert set(diagnostics['audit_code_version']) == {
-        'audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py', 'telemetry.py'}
+        'audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py', 'telemetry.py',
+        'core.py', 'workspace_verification.py'}
+    assert diagnostics['audit_code_version']['workspace_verification.py'] == digest(
+        (Path(regrade.__file__).parent / 'workspace_verification.py').read_bytes())
     assert diagnostics['audit_code_version']['telemetry.py'] == digest(
         (Path(regrade.__file__).parent / 'telemetry.py').read_bytes())
 

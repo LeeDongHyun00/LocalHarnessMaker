@@ -319,9 +319,10 @@ def grade(
 
 def audit_roots(runtime: Path) -> tuple[Path, ...]:
     """Cover current legacy copies and all sibling/cross-run executor runtimes."""
-    temporary = Path(tempfile.gettempdir())
-    return (temporary / "lhm-retained-grading", *runtime.glob("grading-*"),
-            *(p for p in temporary.glob("lhm-eval-*") if p != runtime))
+    temporary, runtime = Path(tempfile.gettempdir()).resolve(), runtime.resolve()
+    siblings = (p.resolve() for p in temporary.glob("lhm-eval-*"))
+    return (temporary / "lhm-retained-grading", *(p.resolve() for p in runtime.glob("grading-*")),
+            *(p for p in siblings if p != runtime))
 
 
 class IncompleteRun(RuntimeError):
@@ -422,7 +423,8 @@ def run(
             continue
         if entry is None:
             runtime = Path(tempfile.mkdtemp(prefix="lhm-eval-"))
-            if runtime.is_relative_to(private.root) or runtime.is_relative_to(REPOSITORY):
+            if (runtime.resolve().is_relative_to(private.root.resolve()) or
+                    runtime.resolve().is_relative_to(REPOSITORY.resolve())):
                 raise ValueError("Runtime must be separate from private grader storage and repository")
             workspace = runtime / "workspace"
             shutil.copytree(public / "workspace", workspace)
