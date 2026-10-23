@@ -352,3 +352,10 @@ Review of what is weak, and the reinforcement dispatched for each:
 5. Audit precision: two new inconclusive patterns (JSONL splitting on Unicode separators, a heredoc with a quoted regex) are queued for Role 5 after the v2 pilot. The runtime-evidence idea of checking grader atime was tested and rejected: APFS does not update atime on reads.
 6. The runner leaves no diagnostics on SIGINT; queued for Role 5.
 7. Still open and not fixable by a job: the v1 ceiling (addressed by v2), single-run variance (no repeats planned), the C templates (user), and the concurrency of B and harness runs (latency only).
+
+## Full baseline B (2026-10-23, 05:04 to 07:05 UTC, d44feda, report 71397cb)
+
+eval/configs/full-b.yaml: the 100 single-session tasks, Sol max, codex-cli 0.163.0-alpha.11.1, resumed once after the 06:50 UTC session restart. Leak scan: 596 files, 0 private markers, 0 grader lines, 0 tracebacks, 0 user paths.
+- 98 pass, 0 fail, 2 invalid (multiple-requirements-line-endings: the JSONL splitting bug; feature-plus-test-partition-sign: the restart-interrupted session). pass_rate 1.0 on 98 valid tasks, avg_attempts 1.0.
+- Cost: 4.428 USD over the 99 tasks with accounting, 0.0447 USD per task. Full A on the same 100 tasks: 100 pass, 2.54 USD, 0.0254 USD per task. Max effort costs about 1.76 times medium for the same outcome on this set. The report's total_cost_usd is null because the interrupted task has no usage.
+- The report is invalid under the approved rule until the two tasks are recovered (r5-recovery-001).
