@@ -1,0 +1,956 @@
+{
+  "backend": "codex_cli",
+  "model": "gpt-6-luna",
+  "sample_source": "tests/controller/fixtures/requests-v1.json",
+  "estimated_usd": 0.066,
+  "estimate_pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+  "cheap_api": {
+    "status": "not measured",
+    "reason": "HTTP fallback requires an API key"
+  },
+  "local": {
+    "status": "not measured",
+    "reason": "Dropped by decision 0007"
+  },
+  "samples": [
+    {
+      "id": "health",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 4,
+      "criteria_by_type": {
+        "command": 1,
+        "file_exists": 0,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 14.236778131999017,
+      "usd": 0.001853,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 0,
+          "input_tokens": 17050,
+          "latency_seconds": 14.236778131999017,
+          "model": "gpt-6-luna",
+          "output_tokens": 296,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.001853
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "ambiguous-fast",
+      "ambiguous": true,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 10.82292101799976,
+      "usd": 0.00044266,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17025,
+          "latency_seconds": 10.82292101799976,
+          "model": "gpt-6-luna",
+          "output_tokens": 176,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044266
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "ambiguous-tests",
+      "ambiguous": true,
+      "exit_code": 2,
+      "schema_valid": false,
+      "assumptions_count": null,
+      "criteria_by_type": null,
+      "errors": [
+        "controller: Measurement permits one generation per sample; no retry"
+      ],
+      "latency_seconds": 8.312063837998721,
+      "usd": 0.00043906,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17029,
+          "latency_seconds": 8.312063837998721,
+          "model": "gpt-6-luna",
+          "output_tokens": 168,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00043906
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "ambiguous-dashboard",
+      "ambiguous": true,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 1,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 27.743451471997105,
+      "usd": 0.00042886,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17027,
+          "latency_seconds": 27.743451471997105,
+          "model": "gpt-6-luna",
+          "output_tokens": 148,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00042886
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "injection",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 1,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 9.145207110999763,
+      "usd": 0.00045106,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17064,
+          "latency_seconds": 9.145207110999763,
+          "model": "gpt-6-luna",
+          "output_tokens": 185,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00045106
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "unicode",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 9.403259177997825,
+      "usd": 0.0018484,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 0,
+          "input_tokens": 17104,
+          "latency_seconds": 9.403259177997825,
+          "model": "gpt-6-luna",
+          "output_tokens": 276,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.0018484
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "regex",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 1,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 8.900140128000203,
+      "usd": 0.00046676,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17036,
+          "latency_seconds": 8.900140128000203,
+          "model": "gpt-6-luna",
+          "output_tokens": 222,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00046676
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "empty-file",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 1,
+      "criteria_by_type": {
+        "command": 1,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.020328460999735,
+      "usd": 0.00045286,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17032,
+          "latency_seconds": 8.020328460999735,
+          "model": "gpt-6-luna",
+          "output_tokens": 195,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00045286
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "exact-output",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 1,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.374004930999945,
+      "usd": 0.00048196,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17048,
+          "latency_seconds": 8.374004930999945,
+          "model": "gpt-6-luna",
+          "output_tokens": 250,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00048196
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "scoped",
+      "ambiguous": true,
+      "exit_code": 2,
+      "schema_valid": false,
+      "assumptions_count": null,
+      "criteria_by_type": null,
+      "errors": [
+        "controller: Measurement permits one generation per sample; no retry"
+      ],
+      "latency_seconds": 12.787749350001832,
+      "usd": 0.00066468,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 12928,
+          "input_tokens": 17042,
+          "latency_seconds": 12.787749350001832,
+          "model": "gpt-6-luna",
+          "output_tokens": 248,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00066468
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "license",
+      "ambiguous": true,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 9.625395456998376,
+      "usd": 0.00046066,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17030,
+          "latency_seconds": 9.625395456998376,
+          "model": "gpt-6-luna",
+          "output_tokens": 211,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00046066
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "theme",
+      "ambiguous": true,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 1,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 9.591141804998188,
+      "usd": 0.00042316,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17025,
+          "latency_seconds": 9.591141804998188,
+          "model": "gpt-6-luna",
+          "output_tokens": 137,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00042316
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "migration",
+      "ambiguous": true,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 8.753326494002977,
+      "usd": 0.00044326,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17021,
+          "latency_seconds": 8.753326494002977,
+          "model": "gpt-6-luna",
+          "output_tokens": 178,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044326
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "deploy",
+      "ambiguous": true,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.508442794001894,
+      "usd": 0.0017487,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 0,
+          "input_tokens": 17027,
+          "latency_seconds": 8.508442794001894,
+          "model": "gpt-6-luna",
+          "output_tokens": 92,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.0017487
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "contributing",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 9.395110730998567,
+      "usd": 0.00044436,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17032,
+          "latency_seconds": 9.395110730998567,
+          "model": "gpt-6-luna",
+          "output_tokens": 178,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044436
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "changelog",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.239000917001249,
+      "usd": 0.00044296,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17033,
+          "latency_seconds": 8.239000917001249,
+          "model": "gpt-6-luna",
+          "output_tokens": 175,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044296
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "notice",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 7.438144419000309,
+      "usd": 0.00044796,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17028,
+          "latency_seconds": 7.438144419000309,
+          "model": "gpt-6-luna",
+          "output_tokens": 186,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044796
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "editorconfig",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 1,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 7.892871529998956,
+      "usd": 0.00043026,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17031,
+          "latency_seconds": 7.892871529998956,
+          "model": "gpt-6-luna",
+          "output_tokens": 150,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00043026
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "robots",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 9.327784105000319,
+      "usd": 0.00043786,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17037,
+          "latency_seconds": 9.327784105000319,
+          "model": "gpt-6-luna",
+          "output_tokens": 164,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00043786
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "sitemap",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.364624574001937,
+      "usd": 0.00045666,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17030,
+          "latency_seconds": 8.364624574001937,
+          "model": "gpt-6-luna",
+          "output_tokens": 203,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00045666
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "about",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 0,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 9.009364885998366,
+      "usd": 0.00042816,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17030,
+          "latency_seconds": 9.009364885998366,
+          "model": "gpt-6-luna",
+          "output_tokens": 146,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00042816
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "version",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 1,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 9.478061747002357,
+      "usd": 0.00045726,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17036,
+          "latency_seconds": 9.478061747002357,
+          "model": "gpt-6-luna",
+          "output_tokens": 203,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00045726
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "dockerignore",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 1,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 9.902601573001448,
+      "usd": 0.00053154,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 18304,
+          "input_tokens": 20794,
+          "latency_seconds": 9.902601573001448,
+          "model": "gpt-6-luna",
+          "output_tokens": 199,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00053154
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "gitignore",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 10.748326464003185,
+      "usd": 0.00044486,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17032,
+          "latency_seconds": 10.748326464003185,
+          "model": "gpt-6-luna",
+          "output_tokens": 179,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044486
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "config-json",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 1,
+        "file_exists": 0,
+        "regex": 0,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.404658688999916,
+      "usd": 0.00045076,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17031,
+          "latency_seconds": 8.404658688999916,
+          "model": "gpt-6-luna",
+          "output_tokens": 191,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00045076
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "index",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 9.083184685998276,
+      "usd": 0.00044046,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17033,
+          "latency_seconds": 9.083184685998276,
+          "model": "gpt-6-luna",
+          "output_tokens": 170,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044046
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "style",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 0,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.830177832998743,
+      "usd": 0.00043216,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17030,
+          "latency_seconds": 8.830177832998743,
+          "model": "gpt-6-luna",
+          "output_tokens": 154,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00043216
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "data-csv",
+      "ambiguous": false,
+      "exit_code": 2,
+      "schema_valid": false,
+      "assumptions_count": null,
+      "criteria_by_type": null,
+      "errors": [
+        "controller: Measurement permits one generation per sample; no retry"
+      ],
+      "latency_seconds": 8.105171225997765,
+      "usd": 0.00044276,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17031,
+          "latency_seconds": 8.105171225997765,
+          "model": "gpt-6-luna",
+          "output_tokens": 175,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044276
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "runbook",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 0,
+        "llm_judge": 1
+      },
+      "errors": [],
+      "latency_seconds": 7.9742458920009085,
+      "usd": 0.00045586,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17027,
+          "latency_seconds": 7.9742458920009085,
+          "model": "gpt-6-luna",
+          "output_tokens": 202,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00045586
+        }
+      ],
+      "accounting_complete": true
+    },
+    {
+      "id": "readme-link",
+      "ambiguous": false,
+      "exit_code": 0,
+      "schema_valid": true,
+      "assumptions_count": 2,
+      "criteria_by_type": {
+        "command": 0,
+        "file_exists": 1,
+        "regex": 1,
+        "llm_judge": 0
+      },
+      "errors": [],
+      "latency_seconds": 8.794576389002032,
+      "usd": 0.00044306,
+      "control_calls": [
+        {
+          "backend": "codex_cli",
+          "cached_input_tokens": 14976,
+          "input_tokens": 17029,
+          "latency_seconds": 8.794576389002032,
+          "model": "gpt-6-luna",
+          "output_tokens": 176,
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+          "reasoning_effort": "low",
+          "status": "success",
+          "usd": 0.00044306
+        }
+      ],
+      "accounting_complete": true
+    }
+  ],
+  "totals": {
+    "samples": 30,
+    "schema_valid": 27,
+    "schema_pass_rate": 0.9,
+    "assumptions_count": 51,
+    "criteria_by_type": {
+      "command": 6,
+      "file_exists": 11,
+      "regex": 12,
+      "llm_judge": 9
+    },
+    "criteria_count": 38,
+    "llm_judge_share": 0.23684210526315788,
+    "llm_judge_share_basis": "schema-valid contracts only",
+    "usd": 0.01779202,
+    "latency_seconds": 295.2121158299997,
+    "accounting_complete": true
+  }
+}
