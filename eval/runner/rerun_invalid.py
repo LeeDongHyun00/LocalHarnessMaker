@@ -9,16 +9,18 @@ import sys
 from typing import Any, Callable
 import uuid
 
-from eval.runner.pricing import extends, report_pricing
+from eval.runner.pricing import extends, report_pricing, select
 from eval.metrics import compute, total
 from eval.runner import core, harness, regrade
 from eval.runner.audit import PrivateGraders, audit_retained_logs, digest, interrupted_logs
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.control_accounting import control_calls
 from eval.runner.reaudit import InputParser
-from eval.runner.report import artifact, validate
+from eval.runner.report import artifact, validate, usage as executor_usage
 from eval.runner.signals import stop_signals
 from eval.runner.publication import safe_source
+from eval.runner.telemetry import recover_partial_usage, interrupted_pricing_evidence
+from eval.runner.workspace_verification import verify as verify_workspace
 
 
 REASONS = frozenset({
@@ -68,11 +70,69 @@ def eligible(task: dict[str, Any], entry: dict[str, Any], audit: dict[str, Any])
     return True
 
 
+def unaccounted_causes(task: dict[str, Any], entry: dict[str, Any],
+                       audit: dict[str, Any], pricing: dict[str, Any],
+                       native_paths: list[Path] | None = None) -> list[dict[str, Any]]:
+    """Select only valid tasks whose sole accounting gap is interrupted usage."""
+    result = entry.get('result', {})
+    if (task.get('outcome') not in {'pass', 'fail', 'timeout', 'error'} or
+            result.get('outcome') != task['outcome'] or
+            task.get('invalid_reasons') or result.get('invalid_reasons') or
+            entry.get('rerun_history') or
+            task.get('costs', {}).get('executor_usd') is not None or
+            task.get('costs', {}).get('control_usd') is None or
+            any(a.get('status') != 'clean' or a.get('matches') or a.get('errors') for a in
+                (task.get('grader_access_audit', {}), result.get('grader_access_audit', {}), audit))):
+        return []
+    calls = [c for c in task.get('calls', []) if c['purpose'] == 'executor']
+    segments = entry.get('segments', [])
+    if len(calls) != len(segments) or not calls or any(
+            c['usage']['usd'] is None for c in task['calls'] if c['purpose'] != 'executor'):
+        return []
+    causes = []
+    for index, (call, segment) in enumerate(zip(calls, segments)):
+        if call['call_id'] != f"{task['task_id']}-exec-{segment['attempt']}":
+            return []
+        usage = call['usage']
+        if usage['usd'] is not None:
+            continue
+        missing = [k for k in ('input_tokens', 'cached_input_tokens', 'output_tokens')
+                   if usage.get(k) is None]
+        # Missing prices, tier evidence, long-context coverage, control usage,
+        # and unmarked executor accounting gaps must not buy a new outcome.
+        price_evidence = segment.get('pricing_evidence')
+        recovered_price = price_evidence is None
+        if recovered_price:
+            price_evidence = interrupted_pricing_evidence(segment, native_paths or [])
+        tier = (price_evidence or {}).get('tier')
+        rate, reference = select(pricing, call['model'], tier)
+        if (not missing or rate is None or reference is None or
+                usage.get('pricing_ref') != reference and not (recovered_price and usage.get('pricing_ref') is None)):
+            return []
+        observed = executor_usage(Path(entry['runtime']) / segment['events'], 0, call['model'], pricing,
+                                  tier=tier, native_counts=segment.get('native_usage'))
+        if observed['usd'] is not None:
+            return []  # A stale report with recoverable complete usage is not an interruption gap.
+        markers = [key for key in ('interrupted', 'capacity_error') if segment.get(key) is True]
+        if segment.get('exit_code') == -2:
+            markers.append('exit_code=-2')
+        if segment.get('infrastructure_recovery') is True and any(
+                s.get('capacity_error') is True for s in segments[:index]):
+            markers.append('capacity_recovery')
+        if not markers:
+            return []
+        causes.append({'attempt': segment['attempt'], 'events': segment['events'],
+                       'markers': markers, 'missing_usage_fields': missing,
+                       'pricing_ref': reference, 'pricing_evidence': price_evidence})
+    return causes
+
+
 def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str], *,
                   execute: Callable[..., ProcessResult] = run_process,
-                  version: str | Callable[[], str] | None = None) -> Path:
+                  version: str | Callable[[], str] | None = None,
+                  _unaccounted: bool = False) -> Path:
     """Regrade unselected tasks and launch selected tasks in pristine runtimes."""
-    if not reasons or not reasons <= REASONS:
+    if (not _unaccounted and (not reasons or not reasons <= REASONS)) or (_unaccounted and reasons):
         raise ValueError('Unsupported infrastructure reason selector')
     source, out = source.resolve(), out.resolve()
     if out.exists() or out.is_relative_to(source) or source.is_relative_to(out):
@@ -82,8 +142,12 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
     state = json.loads((source / 'checkpoint.json').read_text())
     config = state['config']
     selected = []
+    causes_by_task = {}
+    workspace_checks = {}
     for task in original['tasks']:
-        if task['outcome'] != 'invalid' or not reasons.intersection(task['invalid_reasons']):
+        candidate = (task['outcome'] != 'invalid' and task['costs']['executor_usd'] is None
+                     if _unaccounted else task['outcome'] == 'invalid' and reasons.intersection(task['invalid_reasons']))
+        if not candidate:
             continue
         entry = state['tasks'][task['task_id']]
         runtime = Path(entry['runtime'])
@@ -95,9 +159,11 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         paths.extend(sorted((runtime / 'codex-home/sessions').rglob('*.jsonl')))
         if not safe_source(runtime, runtime) or any(not safe_source(p, runtime) for p in paths):
             raise ValueError('Unsafe retained evidence')
-        if ("workspace_exit_sha256" in entry and
-                core.matching_workspace_digest_version(runtime / 'workspace', entry) is None):
-            raise ValueError('Workspace exit hash mismatch')
+        if _unaccounted or "workspace_exit_sha256" in entry:
+            verification = verify_workspace(runtime / 'workspace', entry, task)
+            if verification is None:
+                raise ValueError('Workspace exit hash mismatch')
+            workspace_checks[task['task_id']] = verification
         audit = audit_retained_logs(paths, private, retained_context=entry.get('retained_audit_context'),
                                     interrupted_paths=interrupted_logs(runtime, entry['segments']),
                                     workspace=runtime / 'workspace', repository=core.REPOSITORY,
@@ -105,18 +171,23 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         previous_logs = Counter((log['name'], log['sha256'], log['bytes'])
                                 for log in entry.get('result', {}).get('grader_access_audit', {}).get('logs', []))
         current_logs = Counter((log['name'], log['sha256'], log['bytes']) for log in audit['logs'])
-        if current_logs - previous_logs:
+        if current_logs - previous_logs or (_unaccounted and current_logs != previous_logs):
             raise ValueError('Retained log manifest changed')
         if any(a.get('matches') or a.get('status') == 'access_detected' for a in (
                 task.get('grader_access_audit', {}), entry.get('result', {}).get('grader_access_audit', {}), audit)):
             raise ValueError('Refused task with access matches')
-        if not eligible(task, entry, audit):
+        causes = unaccounted_causes(task, entry, audit, original['metadata']['pricing'],
+                                   paths[len(entry['segments']):]) if _unaccounted else []
+        if not (bool(causes) if _unaccounted else eligible(task, entry, audit)):
             continue  # Precision/quality invalidity is regraded from retained evidence.
         # Never classify modified trusted control bytes as a restart artifact.
         harness.ControlFiles(runtime, entry.get('control_files', {}), lambda: None).verify()
+        if _unaccounted:
+            recover_partial_usage(entry['segments'], paths[len(entry['segments']):])
+            causes_by_task[task['task_id']] = causes
         selected.append(task['task_id'])
     if not selected:
-        raise ValueError('No eligible infrastructure-invalid tasks match the requested reasons')
+        raise ValueError('No eligible infrastructure tasks match the requested recovery')
     pricing = json.loads((core.REPOSITORY / 'eval/prices.yaml').read_text())
     if not extends(pricing, original['metadata']['pricing']):
         raise ValueError('Pinned pricing snapshot differs')
@@ -130,27 +201,35 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
     base = json.loads((out / 'report.json').read_text())
     recovered_state = json.loads((out / 'checkpoint.json').read_text())
     source_tasks = {t['task_id']: t for t in original['tasks']}
-    provenance = {'source': str(source), 'source_run_id': original['metadata']['run_id'],
+    operation = 'rerun-unaccounted' if _unaccounted else 'rerun-invalid'
+    provenance_path = out / f'{operation}.json'
+    provenance = {'operation': operation, 'source': str(source), 'source_run_id': original['metadata']['run_id'],
                   'source_report_sha256': digest(source_bytes),
                   'source_checkpoint_sha256': digest((source / 'checkpoint.json').read_bytes()),
                   'requested_reasons': sorted(reasons), 'selected_tasks': selected, 'status': 'pending',
                   'audit_code_version': regrade.audit_code_version() | {
                       name: digest((Path(__file__).parent / name).read_bytes())
-                      for name in ('core.py', 'harness.py', 'rerun_invalid.py')}, 'tasks': []}
+                      for name in ('core.py', 'harness.py', 'rerun_invalid.py', 'rerun_unaccounted.py')}, 'tasks': []}
     for task_id in selected:
         old = source_tasks[task_id]
         evidence = {**{k: v for k, v in provenance.items() if k != 'tasks'},
                     'task_id': task_id, 'invalid_reasons': old['invalid_reasons'],
+                    'source_outcome': old['outcome'],
+                    'reason': 'executor_usage_missing_after_infrastructure_interruption' if _unaccounted else 'infrastructure_invalidity',
+                    'accounting_policy': 'replace_with_fresh_session' if _unaccounted else 'retain_prior_spending',
+                    'infrastructure_causes': causes_by_task.get(task_id, []),
+                    'source_segments': state['tasks'][task_id]['segments'],
                     'source_executor_segments': old['executor_segments'], 'source_artifacts': old['artifacts'],
                     'source_calls': old['calls'], 'source_costs': old['costs'], 'rerun_id': uuid.uuid4().hex}
+        evidence.update(workspace_checks.get(task_id, {}))
         core.write_json(out / task_id / 'rerun-provenance.json', evidence)
         provenance['tasks'].append(evidence)
         recovered_state['tasks'].pop(task_id)
         recovered_state.setdefault('fresh_reruns', {})[task_id] = {
-            'rerun_id': evidence['rerun_id'], 'calls': copy.deepcopy(old['calls']),
-            'control_usd': old['costs']['control_usd']}
+            'rerun_id': evidence['rerun_id'], 'calls': [] if _unaccounted else copy.deepcopy(old['calls']),
+            'control_usd': 0 if _unaccounted else old['costs']['control_usd']}
     core.write_json(out / 'checkpoint.json', recovered_state)
-    core.write_json(out / 'rerun-invalid.json', provenance)
+    core.write_json(provenance_path, provenance)
     config_path = out / 'rerun-config.yaml'
     core.write_json(config_path, config)
     try:
@@ -158,7 +237,7 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
                  _recorded_config_sha256=state['config_sha256'])
     except (Exception, KeyboardInterrupt):
         provenance['status'] = 'incomplete'
-        core.write_json(out / 'rerun-invalid.json', provenance)
+        core.write_json(provenance_path, provenance)
         raise
     fresh = json.loads((out / 'report.json').read_text())
     new_by_id = {t['task_id']: t for t in fresh['tasks']}
@@ -197,25 +276,30 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
     base["metadata"]["pricing"] = report_pricing(pricing)
     validate(base, core.REPOSITORY)
     provenance['status'] = 'finished'
-    core.write_json(out / 'rerun-invalid.json', provenance)
+    core.write_json(provenance_path, provenance)
     diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
-    diagnostics['rerun_invalid'] = provenance
+    diagnostics[operation.replace('-', '_')] = provenance
     core.write_json(out / 'run-diagnostics.json', diagnostics)
     core.write_json(out / 'report.json', base)
     return out / 'report.json'
 
 
-def main() -> int:
+def main(*, _unaccounted: bool = False) -> int:
     """Print one output directory; keep private paths out of all error messages."""
-    parser: argparse.ArgumentParser = InputParser(description=__doc__)
+    parser: argparse.ArgumentParser = InputParser(description=(
+        'Fresh replacement of valid tasks with interruption-only missing executor usage.' if _unaccounted else __doc__))
     parser.add_argument('--private-root', type=Path, required=True)
     parser.add_argument('--from', dest='source', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
-    parser.add_argument('--reasons', required=True)
+    if not _unaccounted:
+        parser.add_argument('--reasons', required=True)
     try:
         args = parser.parse_args()
         with stop_signals(args.out):
-            rerun_invalid(args.private_root, args.source, args.out, set(args.reasons.split(',')))
+            if _unaccounted:
+                rerun_invalid(args.private_root, args.source, args.out, set(), _unaccounted=True)
+            else:
+                rerun_invalid(args.private_root, args.source, args.out, set(args.reasons.split(',')))
     except KeyboardInterrupt:
         print('Rerun interrupted; checkpoint and stop diagnostics retained', file=sys.stderr)
         return 130

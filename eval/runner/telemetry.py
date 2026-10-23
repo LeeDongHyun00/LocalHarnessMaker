@@ -1,8 +1,81 @@
 """Keep requested settings separate from observed session evidence."""
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+
+def _instant(value: Any) -> datetime | None:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return parsed if parsed.tzinfo else None
+    except (ValueError, AttributeError, TypeError):
+        return None
+
+
+def interrupted_pricing_evidence(segment: dict[str, Any], paths: list[Path]) -> dict[str, Any] | None:
+    """Recover a missing exit capture only from timestamp-bounded applied records."""
+    from hashlib import sha256
+
+    start, end = _instant(segment.get('started_at')), _instant(segment.get('exited_at'))
+    if start is None or end is None or end < start:
+        return None
+    observations = []
+    for path in paths:
+        for event in records(path):
+            when, payload = _instant(event.get('timestamp')), event.get('payload')
+            if (when is None or not start <= when <= end or event.get('type') != 'event_msg' or
+                    not isinstance(payload, dict) or payload.get('type') != 'thread_settings_applied'):
+                continue
+            settings = payload.get('thread_settings')
+            tier = settings.get('service_tier') if isinstance(settings, dict) else None
+            observations.append({'native_log': str(path), 'observed_service_tier': tier,
+                                 'record_sha256': sha256(json.dumps(event, sort_keys=True).encode()).hexdigest()})
+    tiers = {o['observed_service_tier'] for o in observations if isinstance(o['observed_service_tier'], str)}
+    if not observations or len(tiers) != 1 or any(o['observed_service_tier'] != next(iter(tiers)) for o in observations):
+        return None
+    return {'tier': next(iter(tiers)), 'records': observations,
+            'basis': 'Timestamp-bounded native applied records; historical exit capture absent'}
+
+
+def recover_partial_usage(segments: list[dict[str, Any]], paths: list[Path]) -> None:
+    """Retain interrupted cumulative counters as evidence, never billable usage.
+
+    Bound observations by process timestamps so a later resume in the same
+    rollout cannot supply counters for the interrupted process. Keep each
+    rollout separate: cumulative session counters are not process deltas.
+    """
+    for segment in segments:
+        if not (segment.get("interrupted") is True or segment.get("exit_code") == -2):
+            continue
+        start, end = _instant(segment.get("started_at")), _instant(segment.get("exited_at"))
+        if start is None or end is None or end < start:
+            continue
+        observations = []
+        for path in paths:
+            last = None
+            for event in records(path):
+                payload = event.get("payload")
+                when = _instant(event.get("timestamp"))
+                if (event.get("type") != "event_msg" or not isinstance(payload, dict) or
+                        payload.get("type") != "token_count" or when is None or not start <= when <= end):
+                    continue
+                info = payload.get("info")
+                counts = info.get("total_token_usage") if isinstance(info, dict) else None
+                if (isinstance(counts, dict) and counts and
+                        all(type(v) is int and v >= 0 for v in counts.values())):
+                    last = {"native_log": str(path), "timestamp": event["timestamp"],
+                            "tokens": counts}
+            if last:
+                observations.append(last)
+        if observations:
+            segment["partial_usage"] = {
+                "source": "native event_msg.token_count.info.total_token_usage",
+                "lower_bound": True,
+                "note": "Lower bound of cumulative session usage at interruption; may include earlier processes. Evidence only, never used for costs.",
+                "rollouts": observations,
+            }
 
 
 def records(path: Path) -> list[dict[str, Any]]:
@@ -120,6 +193,7 @@ def collect_runs(event_paths: list[Path], native_paths: list[Path],
         result.append({"attempt": segment["attempt"], "events": path.name,
                        "started_at": segment.get("started_at"), "exited_at": segment.get("exited_at"),
                        "tokens": segment.get("capacity_refusal_usage", segment.get("native_usage", evidence["tokens"])),
+                       **({"partial_usage": segment["partial_usage"]} if "partial_usage" in segment else {}),
                        "plan_usage": {"source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
                                       "before": before[-1] if before else None,
                                       "after": during[-1] if during else None,

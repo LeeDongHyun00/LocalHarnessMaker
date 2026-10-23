@@ -22,7 +22,7 @@ from eval.runner.report import build, build_task, current_commit, native_version
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, interrupted_logs, digest, executor_environment
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
-from eval.runner.telemetry import collect, collect_runs, applied_tier_records, capture_tier, native_token_delta, native_token_totals, records, session_id
+from eval.runner.telemetry import collect, collect_runs, applied_tier_records, capture_tier, native_token_delta, native_token_totals, records, session_id, recover_partial_usage
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -319,9 +319,10 @@ def grade(
 
 def audit_roots(runtime: Path) -> tuple[Path, ...]:
     """Cover current legacy copies and all sibling/cross-run executor runtimes."""
-    temporary = Path(tempfile.gettempdir())
-    return (temporary / "lhm-retained-grading", *runtime.glob("grading-*"),
-            *(p for p in temporary.glob("lhm-eval-*") if p != runtime))
+    temporary, runtime = Path(tempfile.gettempdir()).resolve(), runtime.resolve()
+    siblings = (p.resolve() for p in temporary.glob("lhm-eval-*"))
+    return (temporary / "lhm-retained-grading", *(p.resolve() for p in runtime.glob("grading-*")),
+            *(p for p in siblings if p != runtime))
 
 
 class IncompleteRun(RuntimeError):
@@ -422,7 +423,8 @@ def run(
             continue
         if entry is None:
             runtime = Path(tempfile.mkdtemp(prefix="lhm-eval-"))
-            if runtime.is_relative_to(private.root) or runtime.is_relative_to(REPOSITORY):
+            if (runtime.resolve().is_relative_to(private.root.resolve()) or
+                    runtime.resolve().is_relative_to(REPOSITORY.resolve())):
                 raise ValueError("Runtime must be separate from private grader storage and repository")
             workspace = runtime / "workspace"
             shutil.copytree(public / "workspace", workspace)
@@ -465,6 +467,7 @@ def run(
             for segment in entry["segments"]:
                 if "exit_code" not in segment:
                     segment.update(exit_code=-2, exited_at=now(), interrupted=True)
+            recover_partial_usage(entry["segments"], sorted((codex_home / "sessions").rglob("*.jsonl")))
             write_json(checkpoint, state)
             if not resumed_id:
                 raise IncompleteRun("Interrupted executor has no resumable session id; retained evidence requires host review")
@@ -665,10 +668,11 @@ def run(
                                   if native_before.get(p) != digest(p.read_bytes())]
                 segment["pricing_evidence"] = capture_tier(native_changed, tiers_before)
                 native_usage = native_token_delta(tokens_before, native_token_totals(native_changed))
-                if native_usage is not None:
+                if native_usage is not None and not interrupted and final_process.returncode != -2:
                     segment["native_usage"] = native_usage
                     segment["usage_evidence"] = "Native event_msg.token_count cumulative delta; output includes reasoning"
                 segment["native_logs"] = [str(p) for p in native_changed]
+                recover_partial_usage([segment], native_changed)
                 settings = collect([event_path], native_changed,
                                    config["model"], config["reasoning_effort"], config.get("service_tier"))["settings_evidence"]
                 segment["settings_verified"] = settings["verified"]

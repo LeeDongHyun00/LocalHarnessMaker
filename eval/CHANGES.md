@@ -1,3 +1,64 @@
+# Continuation roots, legacy workspace recovery and literal loops — 2026-10-23
+
+Resolve temp roots, runtime roots and grading roots before comparison. Exclude
+the task's own runtime from sibling protection under either system spelling,
+including persisted historical continuation contexts. Keep sibling runtimes,
+private roots, aliases and grading copies protected.
+
+Add a legacy-only fallback when both workspace digest algorithms fail: match
+every non-cache retained file against the source report's published workspace
+artifact hashes, require identical file sets and bound all file mtimes by
+matching checkpoint/report exit timestamps. Apply it to regrade, infrastructure
+reruns and day-2 source/copy verification, including retained-context audits
+and read-only re-audit selection. Preserve historical pins and record
+`workspace_verification: published_artifact_hashes` plus compared counts in task
+provenance and regrade diagnostics. Refuse absent pins, changed/missing/extra
+files, late mtimes, symlinks and unknown/explicit-v2 versions.
+
+Accept a newline between a literal loop's `done` and the following command.
+Absolute literal list entries already use ordinary operand resolution; cover
+the supplied absolute AGENTS.md loop shape in all four executor/native capture
+forms. Keep private-root/alias/traversal detection and unresolved dynamic lists.
+
+Validation: new offline recovery-boundary regressions plus the updated existing
+regrade provenance assertion — 58 passed in 29.35s.
+`.venv/bin/python -m pytest tests/eval -q` — 1608 passed in 176.19s.
+Authorized-path/frozen-file/branch/STATUS-heading checks passed and
+`git diff --check -- eval tests/eval state/STATUS-eval.md` exited 0. All model
+and executor calls are mocked. No host report was repaired, private grader
+storage accessed, frozen task or shared interface changed, or file staged.
+
+# Replacement of interruption-only accounting gaps — 2026-10-23
+
+Add `eval.runner.rerun_unaccounted` for finished reports containing valid tasks
+with null executor costs caused by recorded infrastructure interruptions. Use
+the existing fresh-runtime/regrade engine, replace selected outcome/accounting,
+and preserve old spending and outcomes in hash-referenced provenance. Keep the
+existing `rerun_invalid` policy of accumulating prior spending unchanged.
+
+Select only missing executor usage with interruption/capacity evidence, clean
+historical/current audits, known control costs, supported pinned prices, and
+unchanged retained inputs/logs/control/workspaces. Refuse other null-cost causes,
+recoverable complete usage and every access match. A missing hard-restart exit
+pricing capture requires independently timestamp-bounded native applied tier
+records; later resume settings cannot establish the interrupted process's price.
+Regrade every unselected task and retain any fresh quality failure. Record task
+IDs, reasons, replaced outcomes/calls/costs/segments, replacement policy and
+fresh outcomes/costs in per-task provenance and run diagnostics.
+
+Retain the last timestamp-bounded native cumulative counters per interrupted
+rollout as `partial_usage` in segment/result/checkpoint/telemetry evidence and
+replacement provenance. Label them cumulative-session lower bounds and never
+use them for costs. Recover them before resume and during retained regrade;
+new interrupted native deltas are never promoted to complete billable usage.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1551 passed in
+161.86s. Focused partial-usage/replacement/restart regressions — 72 passed in
+27.91s before the final missing-pin case. `git diff --check -- eval tests/eval
+state/STATUS-eval.md` exited 0; authorized-path/frozen-file/STATUS-heading/branch
+checks passed. Models and executors are mocked; no host report, private grader storage, frozen task, shared schema,
+existing CLI flag or other checkout is changed. No staging or commits.
+
 # Versioned workspace digests and post-verifier pins — 2026-10-23
 
 Exclude bytecode and Python tool caches from new v2 workspace digests and use

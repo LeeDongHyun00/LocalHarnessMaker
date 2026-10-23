@@ -107,6 +107,11 @@ a fresh trusted grading copy under the separate temporary
 executor runtimes. Every task audits that retained location, every other
 `lhm-eval-*` runtime in the temporary directory (including previous runs),
 legacy grading copies in its own runtime, and the private source root.
+Runtime and grading-root comparisons resolve system/temp aliases first, so a
+continuation recorded through `/private/var/...` cannot protect itself merely
+because the temp root is spelled `/var/...`. Saved historical continuation
+roots also exclude that context's own resolved runtime; sibling runtimes and
+grading copies remain protected.
 A later executor can reach these paths because reads are not denied;
 observed access invalidates the task. External raw logs are retained;
 public evidence uses redacted labels and hashes.
@@ -666,6 +671,13 @@ refusals exit 1, internal errors exit 2. Runs without exit hashes, including the
 existing pilot B, can use read-only `eval.runner.reaudit` for diagnostics but
 require a host executor rerun before regrading is possible.
 
+The shell operand resolver unrolls literal `for` lists containing absolute or
+relative paths and audits every iteration, including conditional reads of
+missing files. A command after `done` on a new line is audited separately.
+Absolute paths outside the workspace are allowed when no protected root or
+alias matches. Private-root, symlink-alias and traversal checks still apply;
+variables, command substitutions and unbounded/absolute globs stay unresolved.
+
 ## Workspace digest versions (2026-10-23)
 
 New checkpoint task entries and completed executor segments record
@@ -678,15 +690,39 @@ use the same exclusions. Version 1 retains the original complete manifest.
 Regrade, day-2 continuation (including the copy and retained audit context),
 infrastructure reruns, re-audit and republication check an existing workspace
 pin with its recorded algorithm. Unversioned pins may match either version 1
-or version 2. Unknown versions and mismatches under both algorithms are refused
-(or reported inconclusive by re-audit). Read-only re-audit and republication
+or version 2. Unknown versions are refused. Read-only re-audit and republication
 still support historical entries without a workspace pin; regrade and day-2
 continuation require one. Selected infrastructure reruns may lack a pin after
-an interruption or pre-launch failure, but any existing pin must match.
+an interruption or pre-launch failure, but any existing pin must verify.
 No recovery command rewrites a historical hash or infers one from current bytes.
 A historical v1 pin that included caches can still fail both algorithms after
 cache changes; version fallback cannot reconstruct that original manifest.
-Regrade diagnostics record which algorithm matched.
+
+For legacy unversioned/v1 entries only, regrade, infrastructure reruns and day-2
+continuation have a second verification path after both v1 and v2 recomputations
+fail. Every retained non-cache regular file must match the SHA-256 pinned in
+the source report's per-task `TASK/workspace/...` artifacts. The non-cache file
+sets must be identical, and every file mtime must be at or before the last
+recorded executor exit. Checkpoint and report exit timestamps must agree and
+include timezones. Missing/duplicate pins, changed/missing/extra files, late
+mtimes, symlinks and unknown/explicit-v2 digest versions cannot use this path.
+The hashes establish file bytes and the file set; they do not recover the old
+digest's mode/directory/cache manifest. No new executor or model call supplies
+this evidence.
+
+Regrade records `workspace_verification: published_artifact_hashes`, published
+and retained file counts, hashes compared and mtimes checked in per-task
+`regrade-provenance.json` and `run-diagnostics.json.workspace_hash_checks`.
+It preserves the original artifact pins for subsequent recovery. Infrastructure
+reruns and continuation retain the same verification counts in their respective
+task provenance. Continuation verifies both source and copied workspaces, and
+rechecks the historical workspace during later audits. Its legacy provenance
+sets `copy_hash_matched: false` and records the observed copy digest separately;
+the artifact comparison, rather than the old digest, verifies the copy.
+Read-only re-audit uses
+the same legacy check so continuation selection can proceed; republication's
+existing digest policy is unchanged. Digest matches record their algorithm as
+before, and no historical workspace pin is replaced.
 
 In harness mode, each attempt's workspace pin is recorded after its verifier
 checks finish, including failed/interrupted checks and recovered pending
@@ -748,6 +784,55 @@ Checkpoint resume and subsequent regrade preserve that accounting. The report
 schema and existing CLI flags are unchanged. Success prints `NEW` plus a newline;
 input refusals exit 1, internal/incomplete execution exits 2, signals exit 130.
 The existing cost-estimate/spending checks still apply before host calls.
+
+For a completed, valid task whose executor cost is unknown after an
+infrastructure interruption, use the separate replacement operation:
+
+```sh
+.venv/bin/python -m eval.runner.rerun_unaccounted --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW
+```
+
+This command selects valid tasks only when every executor accounting gap has
+missing token counts and a recorded `interrupted=true`, `exit_code=-2`, capacity
+refusal, or recovery following a capacity refusal. It requires clean historical
+and current audits, unchanged log/control/workspace pins, known control costs,
+and a supported pinned price for each missing-usage call. Missing pricing or
+observed tiers, ordinary unmarked usage gaps, stale accounting with recoverable
+complete usage, and all access matches refuse selection. If a hard restart
+prevented the exit pricing capture, timestamp-bounded native applied settings
+must independently prove the tier and pinned price; a later resume's settings
+cannot supply that evidence. Existing ambiguous or unknown tier captures remain
+refused. Unsupported/malformed evidence is never waived.
+
+Each selected task starts once in a pristine public workspace, with all ordinary
+retry/audit/grading rules. Its outcome, attempts, calls and costs replace the old
+task's in the new report; a fresh failure remains a failure. Every other task is
+re-audited and regraded from retained evidence with its original accounting.
+Source reports, checkpoints and runtimes are not rewritten. This differs from
+`rerun_invalid`, which continues to include prior spending in its accounting.
+
+`rerun-unaccounted.json`, `run-diagnostics.json.rerun_unaccounted`, and each
+selected task's hash-referenced `rerun-provenance.json` record selected IDs,
+source outcome/calls/costs/segments/artifact references, exact infrastructure
+causes, source hashes, fresh outcome and added calls/costs. The provenance states
+`accounting_policy=replace_with_fresh_session`: replaced historical spending is
+archived there, excluded from replacement report totals, and remains unknown
+when originally unknown. Final comparisons must disclose the task IDs, reasons
+and replacement policy. Resume and later regrade retain this accounting and
+provenance. Existing CLI flags and the shared report schema are unchanged.
+
+Interrupted native `token_count.info.total_token_usage` observations are retained
+as segment `partial_usage` in checkpoint/result evidence and per-process
+telemetry, or in `source_segments` of replacement provenance. Recovery runs on
+ordinary interruption/resume and during retained regrade/replacement. For each
+rollout it records the last cumulative counters inside the segment's recorded
+time bounds, including reasoning counters without adding them to output tokens.
+These are explicitly labeled lower bounds of cumulative session usage and may
+include earlier processes. Missing/naive timestamps or absent valid counters
+produce no invented observation; later resume records are excluded. Partial
+usage never supplies billable tokens, fills an unknown cost, or changes retained
+accounting. New interrupted native counters are not saved as complete
+`native_usage`.
 
 JSONL framing uses only the newline character, so U+0085, U+2028 and U+2029 inside
 JSON strings remain data in executor/native streams, control envelopes,

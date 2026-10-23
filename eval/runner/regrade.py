@@ -18,13 +18,16 @@ from eval.runner.process import ProcessResult, run_process
 from eval.runner.signals import stop_signals
 from eval.runner.reaudit import InputParser
 from eval.runner.report import build_task, validate
+from eval.runner.workspace_verification import verify as verify_workspace, workspace_artifacts
+from eval.runner.telemetry import recover_partial_usage
 
 
 def audit_code_version() -> dict[str, str]:
     """Pin the audit implementation, including uncommitted parser changes."""
     directory = Path(__file__).parent
     return {name: digest((directory / name).read_bytes())
-            for name in ('audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py')}
+            for name in ('audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py', 'telemetry.py',
+                         'core.py', 'workspace_verification.py')}
 
 
 def regrade(private_root: Path, source: Path, out: Path, *,
@@ -71,6 +74,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     if out.is_relative_to(private_root.resolve()) or private_root.resolve().is_relative_to(out):
         raise ValueError("Regrade output must be separate from private grader storage")
     checks = []
+    workspace_checks = {}
     old_by_id = {t['task_id']: t for t in original['tasks']}
     for task, entry in entries.items():
         runtime = Path(entry['runtime'])
@@ -85,12 +89,14 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                 not any(s.get('day') == 2 for s in entry['segments'])):
             if not core.valid_day2_observation(entry, core.task_directory(config) / task):
                 raise ValueError("Regrade refused: two-session exit hashes or day-2 observation missing")
-        matched_version = core.matching_workspace_digest_version(runtime / 'workspace', entry)
+        verification = verify_workspace(runtime / 'workspace', entry, old_by_id[task])
         expected = entry['workspace_exit_sha256']
-        if matched_version is None:
+        if verification is None:
             raise ValueError(f"Regrade refused: workspace exit hash mismatch for {task}")
-        checks.append({'task_id': task, 'expected_sha256': expected, 'observed_sha256': expected,
-                       'workspace_digest_version': matched_version, 'matched': True})
+        workspace_checks[task] = verification
+        checks.append({'task_id': task, 'expected_sha256': expected,
+                       'observed_sha256': expected if verification['workspace_verification'] == 'workspace_digest' else None,
+                       **verification, 'matched': True})
     # All task hashes are checked before any destination or grading copy is made.
     out.mkdir(parents=True)
     cache = FingerprintCache()
@@ -122,6 +128,14 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         if audit['errors'] and audit['status'] == 'clean':
             audit['status'] = 'inconclusive'
         result = copy.deepcopy(entry['result'])
+        if audit['status'] == 'clean':
+            recover_partial_usage(entry['segments'], [p for p in paths if p not in
+                                  {runtime / s['events'] for s in entry['segments']}])
+            new_state['tasks'][task]['segments'] = copy.deepcopy(entry['segments'])
+            result['segments'] = copy.deepcopy(entry['segments'])
+            for run, segment in zip(result.get('executor_runs', []), entry['segments']):
+                if 'partial_usage' in segment:
+                    run['partial_usage'] = copy.deepcopy(segment['partial_usage'])
         result['grader_access_audit'] = audit
         result['invalid_reasons'] = [reason for reason in result['invalid_reasons']
                                      if reason not in {'incomplete_access_audit', 'grader_access_detected'}]
@@ -142,14 +156,14 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         if (audit['status'] == 'clean' and not result['invalid_reasons'] and
                 last['exit_code'] == 0 and not last.get('timed_out') and
                 old_task['outcome'] not in {'timeout', 'error'}):
-            if core.matching_workspace_digest_version(workspace, entry) is None:
+            if verify_workspace(workspace, entry, old_task) is None:
                 raise ValueError(f"Regrade refused: workspace exit hash mismatch for {task}")
             scratch = Path(tempfile.mkdtemp(prefix='lhm-eval-regrade-'))
             result['grading'] = core.grade(
                 workspace, private, scratch, task_out / 'grading.log',
                 json.loads((core.task_directory(config) / task / 'expected.json').read_text()),
                 config['grading_timeout_seconds'], execute)
-            if core.matching_workspace_digest_version(workspace, entry) is None:
+            if verify_workspace(workspace, entry, old_task) is None:
                 raise ValueError(f"Regrade refused: workspace changed during grading for {task}")
         result['outcome'] = ('invalid' if result['invalid_reasons'] else
                              old_task['outcome'] if old_task['outcome'] in {'timeout', 'error'} else
@@ -157,8 +171,15 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                              result['grading']['result'] if result['grading'] else 'error')
         sanitized = json.loads(private.redact(json.dumps(result)))
         core.write_json(task_out / 'result.json', sanitized)
+        verification = workspace_checks[task]
+        if verification['workspace_verification'] == 'published_artifact_hashes':
+            core.write_json(task_out / 'regrade-provenance.json', {
+                'task_id': task, 'source_report_sha256': digest(source_bytes), **verification})
         new_state['tasks'][task]['result'] = sanitized
         shared = build_task(result, entry, task_out, config, original['metadata']['pricing'], old_task)
+        if verification['workspace_verification'] == 'published_artifact_hashes':
+            # Preserve the original published pins for subsequent retained recovery.
+            shared['artifacts'].extend(copy.deepcopy(ref) for _, ref in workspace_artifacts(old_task))
         # Regrading does not change executor/control accounting or observations.
         for key in ('calls', 'costs', 'done_claims'):
             shared[key] = copy.deepcopy(old_task[key])
