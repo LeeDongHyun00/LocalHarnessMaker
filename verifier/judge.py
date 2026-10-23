@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 from jsonschema import ValidationError
 
-from verifier.processes import run_owned
+from verifier.processes import CaptureState, run_owned
 from verifier.rules import Result
 from verifier.schema import validate
 
@@ -31,13 +31,43 @@ def run_judge(
     runner: Callable[..., subprocess.Popen[str]] | None = None,
     clock: Callable[[], float] | None = None,
     kill_group: Callable[[int, int], None] | None = None,
+    capture: CaptureState | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Poll controller exit independently of descendant-held pipes, then clean up."""
     return run_owned(
         argv, cwd=cwd, env=env, timeout=timeout, runner=runner, clock=clock,
-        kill_group=kill_group, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        kill_group=kill_group, capture=capture, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         stderr=subprocess.PIPE, text=True,
     )
+
+
+def _forward_accounting(capture: CaptureState, backend: str, criterion_id: str, outcome: str) -> None:
+    """Forward only accounting records, followed by one flushed transport summary."""
+    stderr = capture.stderr or ""
+    if isinstance(stderr, bytes):
+        # TimeoutExpired retains bytes even for text-mode children. A final UTF-8
+        # character may be cut off; complete accounting lines still survive.
+        stderr = stderr.decode("utf-8", errors="surrogateescape")
+    calls = 0
+    forwarded = False
+    unterminated = False
+    for line in stderr.splitlines(keepends=True):
+        if line.startswith(("control_call ", "control_cli_events ")):
+            sys.stderr.write(line)
+            forwarded = True
+            calls += line.startswith("control_call ")
+            unterminated = not line.endswith(("\n", "\r"))
+    if unterminated:
+        sys.stderr.write("\n")  # Separate the summary from an unterminated child record.
+    if not capture.launched:
+        outcome = "not_launched"
+    complete = (outcome == "not_launched" and not forwarded) or (
+        capture.exited_by_itself and capture.stderr_complete and calls > 0 and outcome != "timeout"
+    )
+    print("judge_delegation " + json.dumps({
+        "accounting_complete": complete, "backend": backend, "criterion_id": criterion_id,
+        "forwarded_control_calls": calls, "outcome": outcome,
+    }, sort_keys=True, separators=(",", ":")), file=sys.stderr, flush=True)
 
 
 def judge_criterion(
@@ -52,6 +82,8 @@ def judge_criterion(
         raise ValueError("judge timeout must be finite and positive")
     if not artifact.is_dir():
         raise ValueError("judge artifact must be an existing workspace directory")
+    capture = CaptureState()
+    outcome = "failed"
     try:
         with tempfile.TemporaryDirectory(prefix="localharness-judge-") as directory:
             source = Path(directory) / "criterion.json"
@@ -61,8 +93,14 @@ def judge_criterion(
                 [sys.executable, "-m", "controller", "judge", "--criterion", str(source),
                  "--artifact", str(artifact.resolve()), "--backend", backend, "--out", str(output)],
                 cwd=Path(__file__).resolve().parents[1],
-                env={**os.environ, "HARNESS_NESTED": "1"}, timeout=timeout,
+                env={**os.environ, "HARNESS_NESTED": "1"}, timeout=timeout, capture=capture,
             )
+            # Injected transports may supply only the standard CompletedProcess.
+            if not capture.launched:
+                capture.launched = True
+                capture.exited_by_itself = completed.returncode >= 0
+                capture.stderr_complete = True
+                capture.stderr = completed.stderr
             if completed.returncode != 0:
                 raise RuntimeError(f"controller judge exited {completed.returncode}")
             if completed.stdout != str(output) + "\n":
@@ -82,8 +120,13 @@ def judge_criterion(
                                                   ("input_tokens", "cached_input_tokens", "output_tokens"))
             ):
                 raise ValueError("judgment cost lacks usage or pricing reference")
+            outcome = "completed"
             return Result(judgment["status"], judgment["evidence"], judgment["reason"])
     except subprocess.TimeoutExpired as exc:
+        capture.launched = True
+        if exc.stderr is not None:
+            capture.stderr = exc.stderr
+        outcome = "timeout"
         return Result("unverifiable", f"llm_judge: {exc}",
                       f"judge delegation timed out after {timeout:g} seconds")
     except (OSError, ValueError, RuntimeError, ValidationError, subprocess.SubprocessError) as exc:
@@ -91,3 +134,5 @@ def judge_criterion(
         reason = f"judge delegation unavailable: {type(exc).__name__}"
         detail = str(exc).splitlines()[0] if str(exc) else type(exc).__name__
         return Result("unverifiable", f"llm_judge: {detail}", reason)
+    finally:
+        _forward_accounting(capture, backend, criterion["id"], outcome)

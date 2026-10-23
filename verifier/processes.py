@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from contextvars import ContextVar
+from dataclasses import dataclass
 import errno
 import locale
 import os
@@ -30,6 +31,16 @@ class Shutdown(BaseException):
 
 class LaunchError(OSError):
     """Only process creation failed; later execution/cleanup is not a launch."""
+
+
+@dataclass
+class CaptureState:
+    """Transport facts retained even when capture raises or cleanup kills a child."""
+
+    launched: bool = False
+    exited_by_itself: bool = False
+    stderr_complete: bool = False
+    stderr: bytes | str | None = None
 
 
 class ProcessGroups:
@@ -158,7 +169,7 @@ def _partial_output(data: bytes | str | None, stream: Any, text: bool) -> bytes 
 
 def _capture(
     process: Any, argv: list[str], timeout: float, deadline: float,
-    owner: ProcessGroups, now: Callable[[], float], text: bool,
+    owner: ProcessGroups, now: Callable[[], float], text: bool, capture: CaptureState,
 ) -> subprocess.CompletedProcess[Any]:
     """Drain in short communicate slices and observe leader exit independently."""
     partial_stdout: bytes | str | None = None
@@ -167,12 +178,16 @@ def _capture(
     while True:
         code = process.poll()
         if code is not None:
+            capture.exited_by_itself = code >= 0
             # Pipe EOF can be held open by descendants long after the leader
             # exits. Kill the group now, preserving the leader's own result.
             owner.cleanup(graceful=False)
             try:
                 stdout, stderr = process.communicate(input=None, timeout=DRAIN_SECONDS)
+                capture.stderr = stderr
+                capture.stderr_complete = True
             except subprocess.TimeoutExpired as exc:
+                capture.stderr = exc.stderr if exc.stderr is not None else partial_stderr
                 # An escaped or unsignalable descendant must not hold us here.
                 stdout = _partial_output(
                     exc.output if exc.output is not None else partial_stdout, process.stdout, text,
@@ -195,7 +210,11 @@ def _capture(
                 partial_stdout = exc.output
             if exc.stderr is not None:
                 partial_stderr = exc.stderr
+                capture.stderr = exc.stderr
         else:
+            capture.stderr = stderr
+            capture.stderr_complete = True
+            capture.exited_by_itself = process.returncode is not None and process.returncode >= 0
             return subprocess.CompletedProcess(argv, process.returncode, stdout, stderr)
         first = False
 
@@ -204,9 +223,11 @@ def run_owned(
     argv: list[str], *, timeout: float, runner: Callable[..., Any] | None = None,
     clock: Callable[[], float] | None = None,
     kill_group: Callable[[int, int], None] | None = None,
-    sleep: Callable[[float], None] | None = None, **kwargs: Any,
+    sleep: Callable[[float], None] | None = None,
+    capture: CaptureState | None = None, **kwargs: Any,
 ) -> subprocess.CompletedProcess[Any]:
     """Capture a child with bounded waits and cleanup on every exit path."""
+    capture = capture or CaptureState()
     now = clock or time.monotonic
     owner = _active.get() or ProcessGroups(clock=now, kill_group=kill_group, sleep=sleep)
     started = now()
@@ -221,6 +242,7 @@ def run_owned(
                 process = (runner or subprocess.Popen)(argv, start_new_session=True, shell=False, **kwargs)
             except OSError as exc:
                 raise LaunchError(str(exc)) from exc
+            capture.launched = True
             owner.children[process.pid] = process
         finally:
             owner.launching = False
@@ -228,7 +250,8 @@ def run_owned(
             owner.deferred_shutdown = None
             if deferred is not None:
                 deferred()
-        result = _capture(process, argv, timeout, started + timeout, owner, now, bool(kwargs.get("text")))
+        result = _capture(process, argv, timeout, started + timeout, owner, now,
+                          bool(kwargs.get("text")), capture)
         normal = True
         return result
     finally:

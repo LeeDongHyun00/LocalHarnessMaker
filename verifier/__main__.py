@@ -13,6 +13,7 @@ from jsonschema import ValidationError
 from verifier.check import check_contract
 from verifier.handoff_validate import HandoffInputError, validate_handoff
 from verifier.processes import Shutdown, shutdown_scope
+from verifier.sample import OUTPUT_NAME, SampleInputError, sample_report
 
 
 class InputParser(argparse.ArgumentParser):
@@ -32,7 +33,29 @@ def main(argv: Sequence[str] | None = None) -> int:
     check.add_argument("--out", required=True, type=Path)
     handoff = commands.add_parser("validate-handoff")
     handoff.add_argument("--handoff", required=True)
+    sample = commands.add_parser("sample")
+    sample.add_argument("--reports", required=True, type=Path)
+    sample.add_argument("--n", type=int, default=20)
     args = parser.parse_args(argv)
+    if args.operation == "sample":
+        try:
+            review = sample_report(args.reports, args.n)
+        except SampleInputError as exc:
+            print(f"input error: {exc}", file=sys.stderr)
+            return 1
+        except Exception as exc:
+            print(f"internal error: {type(exc).__name__}: {exc}", file=sys.stderr)
+            return 2
+        output = args.reports / OUTPUT_NAME
+        try:
+            output.write_text(json.dumps(review, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        except Exception as exc:
+            print(f"internal error: cannot write sample: {exc}", file=sys.stderr)
+            return 2
+        print(f"verifier sample selected={len(review['samples'])} available={review['available']} "
+              f"seed={review['seed']}", file=sys.stderr)
+        print(output)
+        return 0
     if args.operation == "validate-handoff":
         try:
             validate_handoff(Path(args.handoff))

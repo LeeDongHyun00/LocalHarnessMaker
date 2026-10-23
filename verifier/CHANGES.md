@@ -1,3 +1,56 @@
+# Verifier changes — 2026-10-23
+
+Judge delegation now forwards only child stderr records starting with
+`control_call ` or `control_cli_events `, unchanged and in order. One flushed,
+compact, sorted-key `judge_delegation` JSON line follows each attempted delegation.
+Launch, natural exit and stderr completeness are tracked separately: nonzero
+exits can retain complete accounting, while timeout, killed children, truncated
+capture and missing control-call records cannot. Verdicts, stdout, existing CLI
+flags, exit codes and judgment semantics are preserved. `verifier/README.md`
+documents the exact protocol for Role 5.
+
+D-3 `python -m verifier sample --reports DIR --n 20` validates report.json and
+hash-pinned listed verdicts, then selects verdict attempts with seed 42 in rounds
+across task types. The output records each item's exact status/evidence/reason,
+task identity/type, attempt, verdict overall result and final report grading and
+outcome. Missing grading remains null. Only the report and named verdicts are
+read; grader sources, grading copies and logs are unnecessary. Successful stdout
+contains only the generated verifier-sample.json path and a newline.
+
+Claude's user-reported host results complete the earlier pending six Seatbelt
+checks, macOS EPERM/pipe-holding grandchild cleanup (10/10, e927b73 and 7de2f99)
+and live validate-handoff acceptance in plugin/evidence/2026-10-22-real. These
+results were not rerun here. STATUS removes those checks from Remaining.
+
+## Verification
+
+`.venv/bin/python -m pytest tests/verifier -q`: 292 passed, 6 skipped in 3.94s.
+The six skips are the existing host-only Seatbelt tests. Accounting tests use
+mocked children for success, nonzero exit with two calls, partial timeout stderr,
+no call records, launch failure, truncation, unreadable pipes, killed children,
+shutdown flushing and interleaving with elapsed_seconds/budget cutoffs. Sampling
+tests use synthetic schema-valid reports, including a real module-entry call,
+without controller, grader or model calls.
+
+## Pending
+
+Host integration must verify the accounting records with the real controller and
+Role 5 parser, sample a completed proposed-system report, and check real
+controller/Codex descendants and hook deadlines. Full-suite verification remains
+a host pre-merge task. No live calls, nested Codex, sandbox-exec, staging or
+commits ran here; eval/, controller/ and plugin/ were not edited.
+
+## Assumptions
+
+- The user explicitly requested the D-3 command already named in the role prompt; existing shared schemas, check/validate-handoff flags and hook interfaces remain frozen.
+- The unspecified sample destination/seed/format are DIR/verifier-sample.json, fixed seed 42 and documented review JSON. Up to n verdict attempts are selected, and an empty candidate pool produces an explicit empty sample.
+- Listed verdict names use the existing runner's verdict-N.json and prefixed/archived forms; plain verdict.json is accepted. Paths must resolve inside the report directory; missing, duplicated, changed or invalid verdicts are input errors.
+- A sample compares a verdict attempt with final task grading from report.json, without inferring a hidden-test result for that attempt. Invalid/timeout/error tasks may have null grading.
+- Signaled child exits conservatively have incomplete accounting. Unterminated forwarded records receive a separator before the summary; their content is not parsed or rewritten.
+- Exact host commands for Claude's latest results were not supplied; STATUS labels them as user-reported host evidence, not checks executed in this session.
+
+---
+
 # Verifier fixes — 2026-10-22
 
 ## Leader exit before inherited pipe EOF

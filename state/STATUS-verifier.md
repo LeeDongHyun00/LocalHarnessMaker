@@ -1,10 +1,16 @@
 ## Done
 
+- Forwarded only captured control_call/control_cli_events lines in order on judge completion, failure, timeout and shutdown; added one compact sorted-key judge_delegation summary with launch/exit/EOF accounting facts and an explicit flush, preserving stdout/verdict/status semantics (.venv/bin/python -m pytest tests/verifier -q: 292 passed, 6 skipped in 3.94s; mocked judge children only).
+- Implemented D-3 human-review sampling from schema-validated report.json and listed SHA-256-pinned verdicts, with seed 42, task-type rounds, exact item evidence/reasons, final grading/outcome context, input/internal errors and path-only stdout; no graders or logs are opened (.venv/bin/python -m pytest tests/verifier -q: 292 passed, 6 skipped; synthetic report fixtures and a real sample module entry point).
+- Documented the exact stderr line protocol and all three verifier CLI commands in verifier/README.md; added the change summary and Assumptions in verifier/CHANGES.md (.venv/bin/python -m pytest tests/verifier -q: 292 passed, 6 skipped).
+- Recorded Claude's completed host verifications supplied by the user: all six Seatbelt tests passed; real macOS EPERM and pipe-holding grandchild cleanup passed 10 of 10 runs, commits e927b73 and 7de2f99 (user-reported host results; exact host commands were not supplied and were not rerun in this sandbox).
+- Recorded validate-handoff acceptance of a live controller handoff in the plugin real-mode demo on 2026-10-22 (user-reported host evidence: plugin/evidence/2026-10-22-real; exact host command was not supplied and was not rerun here).
+
 - Separated direct-child exit detection from pipe EOF using 50 ms communicate slices and polling in the shared command/judge runner; completed children trigger immediate group cleanup and a 200 ms final drain, preserving their own exit code/output (.venv/bin/python -m pytest tests/verifier -q: 254 passed, 6 skipped).
 - Added four real plain-Python trees covering command-rule and judge transport exits 0/7 with descendants holding stdout/stderr; each finishes within three seconds under a one-second deadline, preserves exact output, passes expected exit 0, and observes the descendant PID gone (.venv/bin/python -m pytest tests/verifier -q: 254 passed, 6 skipped in 2.88s).
 - Added two real UTF-8 stdout/stderr capture cases and four injected no-EOF cases for bounded post-exit draining; retained timeout, budget, signal, launch-race and EPERM/ESRCH regressions with clocks accounting for communication slices (.venv/bin/python -m pytest tests/verifier -q: 254 passed, 6 skipped).
 - Recorded Claude's user-supplied host verification and commit e927b73 as evidence before this change: six Seatbelt tests passed, SIGTERM left zero processes, and all five 6-second budget runs produced valid exit-0 verdicts (.venv/bin/python -m pytest tests/verifier -q: 250 passed on host, as reported by the user; stdout-holding background-child repro remained unfinished after 40 seconds).
-- Updated verifier/CHANGES.md and this STATUS; six Seatbelt tests still skip in this sandbox and Claude's new real sandbox-exec repro remains pending host verification (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
+- Updated verifier/CHANGES.md and this STATUS; six Seatbelt tests skipped in that sandbox; the then-pending real sandbox-exec repro was subsequently verified by Claude as recorded above (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
 
 - Fixed killpg EPERM/ESRCH handling with exit-checked direct-child signaling and bounded reaping; timeout and shutdown reasons survive group/direct-child exit races, and completed groups are removed from ownership (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
 - Restricted "cannot launch command" to Popen construction failures; later communication failures have a distinct execution reason, and cleanup OS errors cannot replace the original timeout (.venv/bin/python -m pytest tests/verifier -q: 244 passed, 6 skipped).
@@ -25,29 +31,32 @@
 - Fixed M3/M4: exception phrases exclude later IDs, comma-separated lists share completion predicates, and per-item negatives retain their scope; an unclaimed mechanical failure retains its own reason (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
 - Fixed M5: judge launches in its own process group, kills the group and reaps the child on timeout/errors/completion; timeout remains unverifiable; injected runner/clock/signal tests cover controller and grandchild cleanup without sleeps (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
 - Added finite positive HARNESS_JUDGE_TIMEOUT_SECONDS configuration with the existing 120-second default, validated before execution; verified unset HARNESS_MAX_ATTEMPTS=3 and HARNESS_BACKEND=codex_cli defaults without fixture-injected values (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
-- Claude completed the prior host Seatbelt verification on 2026-10-21; this is historical evidence before this job, and a fresh host run remains pending (.venv/bin/python -m pytest tests/verifier -q: 131 passed; .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v: 25 passed, as supplied by the user and docs/weekly/2026-10-21-host-verification.md).
+- Claude completed the prior host Seatbelt verification on 2026-10-21; this is historical evidence before that job; Claude's subsequent host completion is recorded above (.venv/bin/python -m pytest tests/verifier -q: 131 passed; .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v: 25 passed, as supplied by the user and docs/weekly/2026-10-21-host-verification.md).
 - Retained mechanical checks, measured exec/TUI final-report parsing, claimed_without_evidence, schema validation, quality warnings, deterministic mocked verdicts, timing logs and controller import independence (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped).
 - Retained approved judge criterion serialization, schema/accounting checks, backend selection and copied HARNESS_NESTED=1 environment; valid judge status/reason/evidence remain unchanged (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped; all judge processes mocked).
 - Kept only the six real macOS Seatbelt tests skipped in this sandbox, without changing verifier/sandbox.py (.venv/bin/python -m pytest tests/verifier -q: 151 passed, 6 skipped with explicit pending-host reasons).
 - Updated verifier/CHANGES.md and this status with the review fixes, evidence, decisions and assumptions (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
 
+- Confirmed the final owned-path diff has no whitespace errors (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
+
 ## Remaining
 
-- Pending host verification, highest priority: Claude must rerun the real sandbox-exec command that starts a background Python descendant and immediately exits. Confirm completion within about three seconds, passing expected exit 0, captured output, exact CLI stdout/exit 0 and zero descendants. Repeat for judge/controller transport, plus timeout/budget and shutdown regressions; rerun the six Seatbelt tests after this change.
-- Pending host verification: observe controller/Codex descendants and the 450-second verifier budget inside Role 2's 480-second hook deadline, including children that might create their own sessions. Injected tests do not establish production process-tree behavior.
-
-- D-3: implement human-review sampling (`python -m verifier sample --reports DIR --n 20`); validate-handoff is complete.
-- Pending host verification: rerun validate-handoff against the live controller-produced handoff and exercise Role 2's Stop/SessionStart integration. No live controller/model calls or nested Codex ran in this session.
-- Pending host verification after this job: rerun the six real macOS Seatbelt tests outside Codex, using .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. They passed on the prior host run but skip in this sandbox; do not weaken isolation or run sandbox-exec here.
-- Verify Role 2's concurrent 480-second outer deadline and shutdown protocol on the host; the user approved this coordination and the verifier now defaults to a 450-second total budget. This session did not edit plugin/ or controller/.
-- Pending host verification: exercise real controller/Codex process-group timeout cleanup and confirm no grandchild survives. Mocked signals establish requested group teardown, not observed production process behavior. No nested codex exec or live model call ran this session.
-- Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the approved controller judge CLI after Role 3 is ready. The full-contract smoke helper invokes live judge calls; run only with host/live-call authorization.
-- Pending host verification: real plugin continuation for unverifiable checks and contract-quality warnings, shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency.
-- D-2: complete broader command support, bounded capture, deterministic-evidence policy and sandbox auditing. The Python-only macOS subset does not establish general destructive-operation prevention, read isolation, cross-platform support or complete SC-4/SC-5.
+- Pending host verification for this change: exercise the new judge_delegation/control_call/control_cli_events stderr protocol with the real controller and Role 5's parser, including failed/retried calls and timeout/budget paths. No network, nested Codex or live model calls ran here.
+- Pending host verification: observe real controller/Codex descendants and the 450-second verifier budget within Role 2's 480-second hook deadline, including children creating their own sessions. Claude's completed macOS EPERM/pipe-holding process-tree checks are recorded in Done; those specific checks are no longer pending.
+- Pending host verification: sample a completed proposed-system evaluation report after Role 5 writes it; synthetic schema-valid reports cover D-3 locally. Do not touch the host's in-progress evaluation.
+- Pending host verification: exercise Role 2's Stop/SessionStart loop, shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency. Live controller handoff acceptance is already verified as recorded in Done.
+- Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the controller judge CLI. The full-contract smoke helper invokes live judge calls; run only with host/live-call authorization.
+- D-2: complete broader command support, bounded output capture, deterministic-evidence policy and sandbox auditing. The Python-only macOS subset does not establish general destructive-operation prevention, read isolation, cross-platform support or complete SC-4/SC-5.
 - D-4: investigate measured misjudgments and write verifier/RULES.md when comparison evidence exists.
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
+
+- Preserve raw captured accounting record order and emit/flush one summary per attempted delegation: Role 5 must bill child judge calls without changing verdict schemas or judgment semantics.
+- Track process launch, natural exit and complete stderr independently of verdict validity: nonzero exits may have complete accounting, while timeout, killed children, missing records and bounded-drain truncation cannot claim completeness.
+- Use the explicitly requested D-3 CLI from the role prompt and write DIR/verifier-sample.json with no new flags or shared schema: provide the frozen path-only stdout convention within verifier-owned files.
+- Sample verdict attempts in fixed-seed rounds across task types and include final task grading separately: reviewers can distinguish verifier judgments from final hidden-test outcomes, including missing/invalid grading.
+- Open only report.json and recognized, listed, hash-checked verdicts resolving inside its directory: human review needs no grader source, grading copy or grading log.
 
 - Poll direct-child exit between at most 50 ms communicate slices: inherited pipes must not delay normal-exit cleanup or fabricate a criterion timeout, and built-in POSIX selectors drain stdout/stderr together.
 - Save the direct child's exit code, KILL its group immediately, then drain at most 200 ms: background descendants are cleanup targets and their pipe lifetime does not determine the command verdict.
@@ -81,7 +90,7 @@
 - .venv/bin/python -m pytest tests/verifier -q
 - .venv/bin/python -m verifier validate-handoff --handoff schemas/examples/handoff.json
 - git diff --check -- verifier tests/verifier state/STATUS-verifier.md
-- Host only, pending rerun: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v
+- Host command: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v (the six Seatbelt checks are already verified by Claude; this command was not rerun here).
 - Host only with live-call authorization, pending: .venv/bin/python tests/verifier/smoke.py
 - Host only before merge, pending: .venv/bin/python -m pytest
 
@@ -95,14 +104,18 @@
 
 ## Assumptions
 
-- The user's current leader-exit/inherited-pipe priority defines this follow-up's scope; human-review sampling and later deliverables remain unfinished. Earlier Done bullets and Claude's supplied host results are historical evidence.
+- This session follows the user's judge-accounting, host-status and D-3 priority order. The requested sample command is authorized by the current task and role prompt; check/validate-handoff flags, shared schemas and hook interfaces remain unchanged.
+- The role prompt does not specify sample filename, seed, review format or handling of small pools: use verifier-sample.json, seed 42, documented review JSON and up to n verdicts (including an explicit empty result). These choices are recorded in verifier/README.md and verifier/CHANGES.md for review.
+- Candidate verdict names follow the existing runner's verdict-N.json and prefixed/archived naming; plain verdict.json is also accepted. Absolute paths or report-relative paths must resolve inside the report directory. Duplicate references and hash/schema failures are input errors.
+- Sample units are verdict attempts, so tasks may repeat; final_grading_outcome is the task's final report grading, not a fabricated per-attempt hidden result. Invalid/time-out/error tasks can retain null grading.
+- Supplied host results are evidence from Claude reported by the user, not commands rerun here. They complete the specific Seatbelt, macOS EPERM/pipe-holding cleanup and live handoff acceptance items, but do not verify this session's new accounting protocol or live sampling.
 - The post-exit drain bound is 200 ms; any output still unavailable after that bound is omitted while preserving the completed child's own exit code. Actual same-group descendants are killed before this drain.
 - Same-state handoff entries may represent multiple artifacts or remaining steps; only contradictory done/remaining membership is rejected beyond the schema, without adding an unspecified uniqueness requirement.
 - Rule 6 failed items means status other than pass, as explicitly instructed; this replaces the prior contrary assumption. Up to three items receive details and further items are counted.
 - Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
 - HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. Verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS defaults to 120 and HARNESS_VERIFY_BUDGET_SECONDS to 450; both must be finite and positive.
 - The two-second reserve covers graceful group termination. Post-KILL reaping uses at most two 0.1-second waits per direct child; verdict serialization and scheduling use the margin before the 480-second outer deadline.
-- Cleanup reaches signalable owned POSIX groups. Per user instruction, group EPERM/ESRCH is treated as gone or unsignalable; fallback can address only the known live direct child. Injected tests model descendants already exiting at that race; Claude must confirm actual zero-survivor behavior on macOS. A direct SIGKILL to the verifier is uncatchable and cannot execute Python shutdown handlers.
+- Cleanup reaches signalable owned POSIX groups. Per user instruction, group EPERM/ESRCH is treated as gone or unsignalable; fallback can address only the known live direct child. Injected tests model descendants already exiting at that race; Claude reported the real macOS EPERM/pipe-holding cleanup passed 10/10. Separate-session controller/Codex descendants still require host verification. A direct SIGKILL to the verifier is uncatchable and cannot execute Python shutdown handlers.
 - The public workspace is the judge artifact directory. Missing before/after material remains unverifiable under the rubric. Judge outcomes/controller calls remain mocked; real plain-Python helpers exercise run_judge transport without any controller/model call.
 - Current transcript support is pinned to published exec/TUI evidence. Resume/compaction variants and installed-wheel schema resources remain unverified.
 - No optional FastAPI/httpx provisioning, real macOS sandbox, live model or real controller integration was attempted here. Historical host results do not verify this job's changes.
