@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 import shlex
 import tokenize
-from typing import Any
+from typing import Any, Callable
 from urllib.parse import unquote
 
 from eval.runner.javascript import tool_calls
@@ -685,6 +685,51 @@ def valid_native_metadata(kind: str, payload: Any) -> bool:
         if any(type(value) is not int or value < 0 for value in counts.values()):
             return False
     return True
+
+
+def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
+                        retained_context: dict[str, Any] | None = None,
+                        _audit: Callable[..., dict[str, Any]] | None = None, **kwargs: Any) -> dict[str, Any]:
+    """Audit copied day-1 bytes in their original filesystem context only.
+
+    Day-2 events always use the new workspace and protected roots. A changed
+    retained log cannot inherit the historical context without invalidation.
+    """
+    audit = _audit or audit_logs
+    if not retained_context:
+        return audit(paths, private, **kwargs)
+    runtime = Path(retained_context['runtime'])
+    pinned = retained_context['logs']
+    retained = [path for path in paths if str(path) in pinned]
+    fresh = [path for path in paths if str(path) not in pinned]
+    results = []
+    if retained:
+        historical = dict(kwargs, workspace=Path(retained_context['workspace']),
+                          grading_roots=tuple(Path(p) for p in retained_context['grading_roots']))
+        results.append(audit(retained, private, **historical))
+        for path in retained:
+            if (not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)
+                                        if p.is_relative_to(Path(retained_context['copied_runtime']))) or
+                    digest(path.read_bytes()) != pinned[str(path)]):
+                results[-1]['errors'].append('retained_context_log_hash_mismatch:' + path.name)
+        from eval.runner.core import workspace_digest
+        try:
+            workspace_matches = workspace_digest(Path(retained_context['workspace'])) == retained_context['workspace_exit_sha256']
+        except (OSError, ValueError):
+            workspace_matches = False
+        if not workspace_matches:
+            results[-1]['errors'].append('retained_context_workspace_hash_mismatch')
+        if not runtime.is_absolute():
+            results[-1]['errors'].append('invalid_retained_context')
+    if fresh or not paths:
+        current = dict(kwargs, grading_roots=(*kwargs.get('grading_roots', ()), runtime))
+        results.append(audit(fresh, private, **current))
+    combined = dict(results[0])
+    for key in ('logs', 'matches', 'errors'):
+        combined[key] = [item for result in results for item in result[key]]
+    combined['status'] = ('access_detected' if combined['matches'] else
+                          'inconclusive' if combined['errors'] else 'clean')
+    return combined
 
 
 def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion: bool = True,

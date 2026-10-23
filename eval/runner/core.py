@@ -1,6 +1,7 @@
 """Minimal baseline runner with durable execution segments and private grading."""
 
 from datetime import datetime, timezone
+from functools import partial
 import json
 import os
 from pathlib import Path
@@ -19,7 +20,7 @@ import uuid
 from eval.runner import harness
 from eval.runner.publication import checkout_text
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, digest, executor_environment
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.telemetry import collect, collect_runs, native_token_delta, native_token_totals, records, session_id
@@ -271,6 +272,7 @@ def run(
     config_path: Path, out: Path, private_root: Path, *,
     execute: Callable[..., ProcessResult] = run_process,
     version: str | Callable[[], str] | None = None,
+    _recorded_config_sha256: str | None = None,
 ) -> Path:
     """Run or recover baseline tasks without relying on plugin hooks."""
     config = load_config(config_path)
@@ -284,7 +286,7 @@ def run(
     if any(meta.get("frozen") is not True for meta in metadata.values()):
         raise ValueError("Evaluation requires every selected task to be frozen")
     out = out.resolve()
-    config_hash = digest(config_path.read_bytes())
+    config_hash = _recorded_config_sha256 or digest(config_path.read_bytes())
     version_reader = version if callable(version) else (lambda: version) if version else installed_version
     actual_version = version_reader()
     if actual_version != config["codex_version"]:
@@ -318,13 +320,15 @@ def run(
             raise ValueError("Historical provisional checkpoint requires offline migration; use a fresh output directory")
         if state.get("static_templates", {}) != template_hashes:
             raise ValueError("Static templates changed since run start")
-        if state["config_sha256"] != config_hash:
+        if state["config_sha256"] != config_hash or state.get("config") != config:
             raise ValueError("Resume configuration differs from checkpoint")
         if state.get("selected_task_set_sha256", selected_hash) != selected_hash:
             raise ValueError("Resume selected inputs differ from checkpoint")
         if state.get("task_set_sha256") != task_set_hash:
             raise ValueError("Resume task set differs from checkpoint")
     else:
+        if _recorded_config_sha256 is not None:
+            raise ValueError("Recorded configuration requires an existing checkpoint")
         state = {"report_schema": "evaluation-report-v1", "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
                  "task_set_sha256": task_set_hash, "config": config, "tasks": {},
                  "static_templates": template_hashes, "selected_task_set_sha256": selected_hash,
@@ -365,6 +369,7 @@ def run(
             write_json(checkpoint, state)
         runtime = Path(entry["runtime"])
         workspace, codex_home = runtime / "workspace", runtime / "codex-home"
+        audit = partial(audit_retained_logs, retained_context=entry.get("retained_audit_context"), _audit=audit_logs)
         guard = harness.ControlFiles(runtime, entry.setdefault("control_files", {}),
                                      lambda: write_json(checkpoint, state))
         if entry.get("pid"):
@@ -398,7 +403,7 @@ def run(
             final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
         interrupted = False
         infrastructure_stop: str | None = None
-        prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if prior else None
+        prior_audit = audit(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if prior else None
         blocked = prior_audit is not None and prior_audit["status"] != "clean"
         two_session = metadata[task_id]["two_session"]
         control_error = entry.get("control_error")
@@ -414,7 +419,7 @@ def run(
             day_segments = [s for s in entry["segments"] if s.get("day", 1) == day]
             day_paths = [runtime / s["events"] for s in day_segments]
             resumed_id = session_id(day_paths)
-            current_audit = audit_logs(day_paths, private, workspace=workspace, repository=REPOSITORY,
+            current_audit = audit(day_paths, private, workspace=workspace, repository=REPOSITORY,
                                        grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if day_paths else None
             day_finished = execution_finished or day in entry.get("completed_days", [])
             if day_segments:
@@ -470,7 +475,7 @@ def run(
 
             if entry.get("pending_verification") and not blocked and not control_error:
                 native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                current_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY,
+                current_audit = audit(native, private, workspace=workspace, repository=REPOSITORY,
                                            grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 if current_audit["status"] != "clean":
                     blocked = True
@@ -579,11 +584,11 @@ def run(
                     entry["workspace_exit_sha256"] = workspace_digest(workspace)
                     segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
                 write_json(checkpoint, state)
-                current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                current_audit = audit([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 infrastructure_stop = usage_limit_message([event_path])
                 capacity = capacity_message([event_path])
                 if capacity:
-                    current_audit = audit_logs([event_path, *native_changed], private, workspace=workspace,
+                    current_audit = audit([event_path, *native_changed], private, workspace=workspace,
                                                repository=REPOSITORY, grading_roots=audit_roots(runtime),
                                                fingerprint_cache=fingerprint_cache)
                 if capacity and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
@@ -619,7 +624,7 @@ def run(
                         break
                     try:
                         native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                        native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                        native_audit = audit(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                         if native_audit["status"] != "clean":
                             break
                         if verify_executor():
@@ -646,7 +651,7 @@ def run(
                 write_json(checkpoint, state)
             if two_session and day == 1 and not execution_finished:
                 native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                day1_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY,
+                day1_audit = audit(native, private, workspace=workspace, repository=REPOSITORY,
                                         grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 if day1_audit["status"] != "clean":
                     break
@@ -682,8 +687,8 @@ def run(
             write_json(checkpoint, state)
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
-        audit = audit_logs(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
-        write_json(task_out / "access-audit.json", json.loads(private.redact(json.dumps(audit))))
+        access_audit = audit(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+        write_json(task_out / "access-audit.json", json.loads(private.redact(json.dumps(access_audit))))
         telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"])
         telemetry["executor_runs"] = collect_runs(event_paths, native_paths, entry["segments"])
         # Extract only settings and token/rate-limit evidence from native transcripts.
@@ -731,8 +736,8 @@ def run(
             invalid.append("missing_two_session_handoff_observation")
         if two_session and observation:
             write_json(task_out / "handoff-evidence.json", observation)
-        if audit["status"] != "clean":
-            invalid.append("grader_access_detected" if audit["status"] == "access_detected" else "incomplete_access_audit")
+        if access_audit["status"] != "clean":
+            invalid.append("grader_access_detected" if access_audit["status"] == "access_detected" else "incomplete_access_audit")
         if not telemetry["settings_evidence"]["verified"] or (two_session and
                 any(not s.get("settings_verified") for s in entry["segments"] if not s.get("capacity_error"))):
             invalid.append("executor_settings_unverified")
@@ -755,7 +760,7 @@ def run(
                   "invalid_reasons": invalid, "attempts": max(1, sum(not s.get("capacity_error") for s in entry["segments"])),
                   "session_id": session_id(event_paths), "segments": entry["segments"],
                   "two_session": two_session, "day2_observation": observation,
-                  "grader_access_audit": audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
+                  "grader_access_audit": access_audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
         write_json(task_out / "result.json", json.loads(private.redact(json.dumps(result))))
         # Preserve completed source only; no private grader or grading copy is published.
         if grading and grading.get("executor_already_exited") and not (task_out / "workspace").exists():

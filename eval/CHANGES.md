@@ -1,3 +1,41 @@
+# Literal JavaScript expressions and day-2 continuation — 2026-10-23
+
+Decode quoted string expressions using literal concatenation and literal
+`replace`/`replaceAll` chains without evaluating JavaScript. Preserve first-only
+string-pattern replacement, replacement-dollar substitutions, empty patterns,
+escapes and UTF-16 semantics. Resolved command/workdir/patch inputs pass through
+the existing access checks. Synthetic native regressions cover the stray-X
+patch wrapper, replacement into a private path, and unresolved near misses.
+
+Add the host-only `python -m eval.runner.continue_day2 --private-root P --from
+SOURCE --out NEW` command. Select only audit-recoverable pre-day-2 invalid tasks,
+requiring all retained day-1 logs clean under current code and unchanged
+manifests. Regrade other tasks, copy the selected workspace/evidence into a
+fresh external runtime, verify its exit hash, and reuse the normal runner's
+version checks, exact prompt delivery, harness orchestration and retries.
+Grade completed eligible work once after exit in a fresh trusted copy.
+
+Preserve source evidence and accounting, append new calls/costs, and record
+source/code/config hashes, copy checks, both days' timestamps and their gap.
+Copied day-1 logs retain their original audit context with hash checks; new
+access to the source runtime remains protected. Re-audit/regrade understands
+continued evidence, and regrade checks full-population hashes where configured.
+No frozen tasks, retained reports, shared schemas or existing CLI flags change.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1023 passed in 97.92s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports` both exited 0. Mocked executors
+only; no model calls, real private-root lookup, staging or commits occurred.
+
+## Assumptions
+
+- Full A results and the balanced-brackets day-1 failure are user-provided host
+  evidence. This session uses synthetic paths/graders; historical regrading and
+  day-2 execution remain host work with the recorded CLI version and pricing.
+- The source checkpoint supplies the recorded semantic configuration; its
+  original config byte hash is retained and the materialized copy is separately
+  hashed. A fresh output command does not resume an incomplete continuation.
+
 # Heredoc regression in literal-loop audit — 2026-10-23
 
 Restrict loop discovery to shell syntax. Heredoc payloads/delimiters and comments

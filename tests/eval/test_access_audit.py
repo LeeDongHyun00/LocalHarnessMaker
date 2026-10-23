@@ -724,7 +724,7 @@ def test_dynamic_custom_command_remains_inconclusive(tmp_path: Path, private: Pr
     ("protected_command", "access_detected"),
     ("protected_workdir", "access_detected"),
     ("later_command", "access_detected"),
-    ("concatenation", "inconclusive"),
+    ("concatenation", "clean"),
     ("dynamic_workdir", "inconclusive"),
     ("unknown_tool", "inconclusive"),
     ("unknown_json_tool", "inconclusive"),
@@ -990,3 +990,43 @@ def test_private_root_macos_alias_is_redacted() -> None:
     private = PrivateGraders(Path('/private/var/folders/synthetic/trusted'), ())
     assert private.markers()['/var/folders/synthetic/trusted'] == 'private_root'
     assert private.redact('cat /var/folders/synthetic/trusted/unit/test_one.py') == 'cat <private_root>/unit/test_one.py'
+
+
+@pytest.mark.parametrize('expression', [
+    '{patch}.replace("X", "")',
+    '{patch}.replaceAll("X", "")',
+    '"*** Begin Patch\\n" + {body} + "*** End Patch\\n"',
+    '({patch} + "").replace("X", "")',
+])
+@pytest.mark.parametrize('protected', [False, True])
+def test_code_mode_literal_patch_expressions(tmp_path: Path, private: PrivateGraders,
+                                             native_session: list[dict[str, Any]],
+                                             expression: str, protected: bool) -> None:
+    target = str(private.root / 'synthetic.py') if protected else 'synthetic.py'
+    body = f'*** Update File: {target}\n@@\n-old\n+new\n'
+    patch = '*** Begin Patch\n' + body + '*** End Patch\n'
+    supplied = patch if expression.startswith('"*** Begin') else patch.replace('*** Update', 'X*** Update')
+    source = 'text(await tools.apply_patch(' + expression.format(patch=json.dumps(supplied), body=json.dumps(body)) + '));'
+    native_session[22]['payload']['input'] = source
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit['status'] == ('access_detected' if protected else 'clean'), audit
+    if protected:
+        assert any(m['line'] == 23 and m['marker'] == 'protected_path' for m in audit['matches'])
+    else:
+        assert not audit['errors'] and not audit['matches']
+
+
+@pytest.mark.parametrize('expression', [
+    '{patch}.replace("X", value)', '{patch}.replace(value, "")',
+    '{patch}.replace(/X/, "")', '{patch}.replaceAll(/X/g, "")',
+    '{patch}.replace("X", getValue())', '{patch}.trim()',
+    '{patch} + value', 'getPatch({patch})', '`patch${value}`',
+    '{patch}.replace("X", "", "extra")',
+])
+def test_code_mode_patch_expression_near_misses(tmp_path: Path, private: PrivateGraders,
+                                              native_session: list[dict[str, Any]], expression: str) -> None:
+    patch = '*** Begin Patch\nX*** Update File: synthetic.py\n@@\n-old\n+new\n*** End Patch\n'
+    native_session[22]['payload']['input'] = 'text(await tools.apply_patch(' + expression.format(patch=json.dumps(patch), value='{value}') + '));'
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit['status'] == 'inconclusive', audit
+    assert any(e.startswith('unresolved_custom_input:') for e in audit['errors'])

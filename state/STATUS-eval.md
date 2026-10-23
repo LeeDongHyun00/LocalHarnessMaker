@@ -1,58 +1,54 @@
 ## Done
 
-- Updated eval README/CHANGES and verified the complete eval package using this worktree's .venv (`.venv/bin/python -m pytest tests/eval -q`: 943 passed in 83.58s).
-- Restored pre-loop audit behavior for both supplied Python heredoc shapes, comparing complete audits with loop transformation disabled; covered item.started/completed pairs and native command/function/code-mode records (`.venv/bin/python -m pytest tests/eval/test_access_audit.py -q`: 464 passed in 5.44s).
-- Preserved legacy treatment for heredoc data, quoted arguments, here strings and comments, including private matches and unresolved expansions; real unsupported shell loops remain inconclusive (`.venv/bin/python -m pytest tests/eval/test_access_audit.py -q`: 464 passed in 5.44s).
-- Retained literal parent-directory loop resolution and synthetic protected traversal, symlink and recursive ancestor checks, with the expanded pilot-B directory/printf shape covered (`.venv/bin/python -m pytest tests/eval/test_access_audit.py -q`: 464 passed in 5.44s).
-- Preserved frozen tasks and retained reports; checked patch whitespace (`git diff --exit-code -- eval/tasks eval/reports`: exit 0; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0).
+- Resolved quoted JavaScript literal expressions using concatenation and literal replace/replaceAll chains, preserving first-occurrence, replacement-dollar, escape and UTF-16 semantics; synthetic native patch/private-path/near-miss regressions pass (`.venv/bin/python -m pytest tests/eval -q`: 1023 passed in 97.92s).
+- Added the host continuation command with strict audit-only eligibility, copied-workspace exit-hash verification, normal runner day-2 orchestration, exact prompt bytes, fresh sessions, post-exit grading, retained accounting and continuation provenance (`.venv/bin/python -m pytest tests/eval -q`: 1023 passed in 97.92s).
+- Preserved separate historical/new audit contexts with log/workspace hash checks; covered source immutability, protected source access, changed evidence, copy corruption, symlinks, version drift, known control costs and regrading other tasks once; retained re-audit/regrade support includes configured population hashes (`.venv/bin/python -m pytest tests/eval/test_continue_day2.py -q`: 33 passed in 15.15s; final `.venv/bin/python -m pytest tests/eval -q`: 1023 passed in 97.92s).
+- Updated eval README/CHANGES and this handoff; frozen public tasks and retained reports remain unchanged (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/reports`: exit 0).
 
 ## Remaining
 
-- Host: repeat Claude's task-by-task old/new re-audit across all 104 finished retained tasks using this worktree's code and .venv. Acceptance is all 104 clean with no private matches, retaining the three literal-loop fixes and removing the bug-chunk-tail heredoc regressions. External logs/private roots were unavailable here; no retained outcome has been changed or claimed clean.
-- Host: continue full baseline A in the main checkout without this worktree's changes. Verify control model/costs, grading publication and relative checkout paths from retained smoke evidence as needed.
-- The user fills all twenty C skeletons once using only each public prompt/workspace, before any C run starts. Agents must never fill them or revise them from outcomes.
-- Host: finish live capacity recovery/timeout and Role 3/4 integration verification; mocked tests do not establish live compatibility. Preserve full-a-attempt1 as historical interrupted-run evidence.
-- Host: run C, reduced B and full harness under the approved spending workflow. B/C fingerprint all 120 population graders; historical subset digests cannot be relabeled as full-population digests.
-- Run paired comparisons of harness versus A (120), B (100 singles) and C (20 singles); compare handoff_success with A. Local Gemma and QLoRA remain dropped; parity is not measured.
-- Complete done-claim denominator observations, five valid pilot-A human reviews and twenty-sample review/reporting; inspect historical pilot evidence on the host before use.
-- Run the full repository suite once before future merge. Only eval tests are authorized in this session. Do not stage or commit; use the final Commit plan.
+- Host: re-audit full A using this worktree's audit implementation and the real retained logs/private root. The user reports full A at a21eda2: 120 tasks, 115 pass, 3 fail, 2 invalid; these outcomes were not inspected or rewritten here.
+- Host: run `.venv/bin/python -m eval.runner.continue_day2 --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/full-a --out eval/reports/full-a-continued` with the recorded CLI version, pricing and approved spending workflow. It should regrade rotate-left and continue balanced-brackets only if all real day-1 logs are now clean. Confirm selection, hashes, timestamps/gap, added costs and the final full report; no historical cleanliness or recovered pass is claimed here.
+- Preserve the main checkout's in-progress full harness/full B runs. Transfer this worktree's changes only when the host operator can do so without changing code under active runs.
+- The user fills all twenty C skeletons once from public inputs before C starts; agents must never fill them or revise them from outcomes. B/C must fingerprint all 120 population graders.
+- Host: complete live capacity/timeout recovery and Role 3/4 integration verification; finish C, reduced B and full harness under the approved workflow. Keep interrupted historical runs as evidence.
+- Run paired harness comparisons with A (120), B (100 singles), C (20 singles), and handoff_success with A. Complete done-claim observations, five valid pilot-A human reviews and twenty-sample reporting. Local Gemma/QLoRA remain dropped; parity is not measured.
+- Run the full repository suite once before merge on the host. Only eval tests were authorized here. Do not stage or commit in this session; use the final Commit plan.
 
 ## Decisions
 
-- Exclude heredoc payloads/delimiters and comments only from loop discovery: data keeps the legacy operand, expansion and protected-path checks, and quoted arguments keep their existing raw boundaries.
-- Compare full synthetic audit results against the pre-loop path by disabling only transformation: the regression tests must preserve statuses, errors, matches, hashes and evidence rather than merely accept a clean label.
-- Keep commands mixing actual shell loops and heredoc/comment spans inconclusive: bounded unrolling must never rewrite data or let data hide unsupported shell syntax.
-- Unroll only one bounded literal-list for loop with simple commands/if guards: inspect every substituted filesystem word through the existing protection checks without executing captured shell code.
-- Preserve uncertainty for unsupported loop shapes and variable use: expansions/globs in the list, mutations anywhere else, arithmetic, nested/while loops, directory changes and indirect code cannot establish audit cleanliness.
-- Detect loop keywords at command boundaries: ordinary search arguments such as `rg for solution.py` retain their previous behavior.
-- Keep host re-audit read-only and pending: synthetic regression success does not establish the historical smoke/pilot outcomes or rewrite retained evidence.
-- Bound control-file symlink checks to the runtime: macOS `/var` is an acceptable ancestor; links at/below the runtime and manifest escapes remain rejected.
-- Publish grading identifiers/status and summary lines only: path redaction cannot remove assertion source, messages or other private grader content reliably.
-- Keep full grading logs only in external runtimes: published report/checkpoint grading fields contain counts/status and safe log references.
-- Resolve repository-relative report references against the repository root: validation must work outside the checkout, with historical absolute references still accepted.
-- Normalize regenerated/copied review evidence without altering retained sources: historical reports, frozen tasks, interfaces and accounting provenance remain intact.
-- Preserve prior capacity recovery, static-template, population-hash and paired-comparison decisions: this patch changes only the user-prioritized smoke defects.
+- Resolve only quoted literals, literal concatenation/parentheses and replace/replaceAll with two quoted literal arguments: all other expressions remain inconclusive, and resolved text uses existing operand/patch-target auditing.
+- Continue only tasks with exactly incomplete_access_audit and missing_two_session_handoff_observation, no prior detected access or day-2 observation, consistent day-1 evidence and a clean current re-audit: a new successful session cannot erase unsupported historical evidence.
+- Reuse the normal runner from a copied checkpoint and fresh external runtime: version checks, model/effort, deadlines, retry limits, exact day2.md bytes, harness controls and nested guard retain their recorded behavior.
+- Preserve the original config byte hash as source provenance and separately hash its materialized semantic copy: no original raw config bytes are fabricated.
+- Audit copied historical logs using their original workspace context and pinned bytes/workspace hash; audit new logs against the new workspace with the source runtime protected: moving logs must not create false historical matches or exempt new accesses.
+- Regrade every other task before day-2 execution, using fresh trusted grading copies and unchanged accounting: selected tasks lack day-2 evidence and are not graded during that pass.
+- Account new control streams separately with continuation call IDs: filename ordering can shift old ordinal IDs, so source calls/costs are retained and new calls counted once. Unknown accounting remains null.
+- Record continuation source/code/config hashes, both days' timestamps, gap, copy check and added calls/costs in diagnostic/task artifacts: shared report schemas and existing CLI flags remain unchanged.
+- Preserve prior heredoc/literal-loop auditing, private grading publication, checkout-relative references, capacity recovery and C-template decisions: no task/report or unrelated implementation changes were made.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
+- .venv/bin/python -m pytest tests/eval/test_continue_day2.py -q
 - git diff --check -- eval tests/eval state/STATUS-eval.md
 - git diff --exit-code -- eval/tasks eval/reports
-- .venv/bin/python -m pytest tests/eval/test_access_audit.py -q
-- Host only, for each retained run: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out RETAINED_RUN_DIRECTORY
-- Before future merge only: full repository suite once.
+- Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/full-a
+- Host only: .venv/bin/python -m eval.runner.continue_day2 --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/full-a --out eval/reports/full-a-continued
 
 ## Do not touch
 
-- Edit only eval/, tests/eval/ and state/STATUS-eval.md in the separate r5/harness-smoke worktree, using its own .venv. Do not access or modify the main checkout running full baseline A. Role 3 may concurrently change its own paths here; preserve those changes.
-- Frozen eval/tasks/, retained eval/reports/, controller/, verifier/, plugin/, schemas, CLI flags, root configuration and other roles' files. Never share tasks with Role 3.
+- Edit only eval/, tests/eval/ and state/STATUS-eval.md in r5/harness-smoke with its own .venv. Do not access/change the main checkout while full harness/full B run there; preserve other roles' work.
+- Frozen eval/tasks/, retained eval/reports/, controller/, verifier/, plugin/, schemas, existing CLI flags, root configuration and other roles' paths. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or file deletion.
-- No live executor/controller/judge calls, network, nested Codex, macOS sandbox-exec or real private-root lookup here. Synthetic graders exist only in tests.
-- Never run Codex in grading copies or expose grader output to executor/controller context; never backfill historical provenance or relabel report digests.
-- Keep C skeletons unfilled until the user authors them. Once any C run starts, no template revision is permitted.
+- No live executor/controller/judge calls, network, nested Codex, macOS sandbox-exec or real private-root lookup here. All new grader/path fixtures are synthetic.
+- Never execute Codex in a grading copy, copy old grading artifacts into continued runtimes, expose grader contents to controller/executor context, backfill exit hashes or relabel report digests.
+- Source runs and source runtimes are immutable during regrade/continuation. Incomplete continuation output requires host review; the fresh-output command does not resume it automatically.
+- Keep C skeletons unfilled until the user authors them; do not revise templates after C starts.
 
 ## Assumptions
 
-- Claude's 104-task old/new host comparison and the supplied heredoc failures are user-provided evidence. External reports/private graders were unavailable and were not inspected here; no 104-clean claim has been made. All new log/path fixtures are synthetic and no model calls were made.
-- Repository-relative published references use the repository root; external runtime references remain absolute to preserve verifiable raw evidence.
-- The user's supplied worktree/main-checkout split supersedes the prior STATUS instructions about working in the main checkout. No actual retained-run re-audit or new measurement is possible in this session.
+- Full-A totals, the rotate-left fix and balanced-brackets failure shape are user-provided host evidence. Actual retained logs/private graders were unavailable; regression results do not establish recovered historical outcomes.
+- The retained checkpoint supplies the recorded semantic configuration, and the host provides its matching CLI version, pinned pricing snapshot and existing login. Source config/report provenance remains pinned while the normalized config copy has a separate hash.
+- The user's worktree/main-checkout split supersedes older instructions to run full A in this session. No live calls, real regrade/continuation, staging or commits were performed.
+- A clean access audit means no access was observed in supported retained evidence; it does not prove filesystem isolation.

@@ -13,7 +13,7 @@ import uuid
 
 from eval.metrics import compute, total
 from eval.runner import core
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, digest
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.reaudit import InputParser
 from eval.runner.report import build_task, validate
@@ -55,7 +55,12 @@ def regrade(private_root: Path, source: Path, out: Path, *,
             any(config.get(key) != metadata[field] for key, field in config_metadata.items())):
         raise ValueError("Regrade refused: source report and checkpoint provenance differ")
     private_by_task = {task: PrivateGraders.load(private_root, task, core.REPOSITORY) for task in entries}
-    if core.taskset_digest(private_by_task) != state['task_set_sha256']:
+    population = dict(private_by_task)
+    for task in config.get('task_population', []):
+        if task not in population:
+            population[task] = PrivateGraders.load(private_root, task, core.REPOSITORY)
+    if (core.taskset_digest(population) != state['task_set_sha256'] or
+            core.taskset_digest(private_by_task) != state.get('selected_task_set_sha256', state['task_set_sha256'])):
         raise ValueError("Regrade refused: public/private task inputs differ from the source run")
     if out.is_relative_to(private_root.resolve()) or private_root.resolve().is_relative_to(out):
         raise ValueError("Regrade output must be separate from private grader storage")
@@ -92,7 +97,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         workspace = runtime / 'workspace'
         paths = [runtime / segment['events'] for segment in entry['segments']]
         paths.extend(sorted((runtime / 'codex-home/sessions').rglob('*.jsonl')))
-        audit = audit_logs(paths, private, workspace=workspace, repository=core.REPOSITORY,
+        audit = audit_retained_logs(paths, private, retained_context=entry.get("retained_audit_context"), workspace=workspace, repository=core.REPOSITORY,
                            grading_roots=core.audit_roots(runtime), fingerprint_cache=cache)
         previous = entry['result']['grader_access_audit']
         manifest = lambda logs: Counter((log['name'], log['sha256'], log['bytes']) for log in logs)

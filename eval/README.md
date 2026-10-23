@@ -14,8 +14,8 @@ exit codes are 0 for computed reports (including invalid tasks), 1 for input
 errors and 2 for internal errors. Configs use the JSON subset of YAML.
 Completed version-1 checkpoints do not call models again. Historical provisional
 checkpoints require an explicit offline migration or a fresh output directory;
-they are not silently relabeled as version 1. Interrupted or unsupported
-streams remain invalid even after a later successful continuation.
+they are not silently relabeled as version 1. A later successful session cannot clear interrupted or unsupported
+retained streams; every stream must pass the current access audit.
 
 Private graders must already exist outside the repository, supplied through
 `LHM_PRIVATE_GRADERS` in the trusted parent environment. This session does not
@@ -149,8 +149,15 @@ Literal `exec` JavaScript wrappers around `tools.exec_command` and
 command and its literal `workdir` (when supplied) is audited separately;
 JavaScript glue and patch contents are never parsed as shell commands. Patch
 targets receive path checks, including moves and bare symlink filenames.
-Dynamic commands (including string concatenation), dynamic directories, unknown
-tools and unsupported custom code stay inconclusive. Other unknown record/item kinds
+Quoted literal expressions may use `+` concatenation, parentheses and chained
+`.replace(literal, literal)` / `.replaceAll(literal, literal)`. String-pattern
+`replace` changes the first occurrence; `replaceAll` changes every occurrence.
+JavaScript escape, UTF-16 and replacement-dollar semantics apply, including
+empty patterns. The resolved text receives exactly the plain-input command or
+patch-target checks. Variables, interpolated templates, regular-expression
+patterns, computed method access, nonliteral arguments and other method/function
+calls remain unresolved. Dynamic directories, unknown tools and unsupported
+custom code stay inconclusive. Other unknown record/item kinds
 also stay inconclusive. The synthetic 33-record regression fixture preserves
 the supplied host session's structure and record order, with categorical
 discriminators retained and all task, identity, path and usage content replaced.
@@ -481,8 +488,9 @@ remain pending. No executor/model or private-root access occurred in preparation
 
 Code-mode audit extracts each direct `tools.exec_command(...)` and
 `tools.apply_patch(...)` call independently of arrays, Promise combinators,
-loops, spread in display output and other surrounding JavaScript. Only literal
-`cmd` and optional `workdir` operands establish resolved execution. Tool aliases,
+loops, spread in display output and other surrounding JavaScript. Only quoted
+literals and the bounded string-expression grammar above resolve `cmd`, optional
+`workdir`, and patch operands. Tool aliases,
 computed/optional tool access, unknown tools, eval/Function and unresolved
 callables remain inconclusive. Command-object spreads remain unresolved because
 they can override an operand. Shell rules apply to extracted commands, never to
@@ -523,6 +531,60 @@ schema fields were added. Successful stdout is `NEW` plus a newline; input
 refusals exit 1, internal errors exit 2. Runs without exit hashes, including the
 existing pilot B, can use read-only `eval.runner.reaudit` for diagnostics but
 require a host executor rerun before regrading is possible.
+
+## Continuing an audit-recoverable day 2
+
+On the host, use this separate command when the original runner stopped before
+day 2 solely because a day-1 audit was inconclusive:
+
+```sh
+.venv/bin/python -m eval.runner.continue_day2 --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/full-a --out eval/reports/full-a-continued
+```
+
+The command selects only two-session tasks whose report and checkpoint both
+record exactly `incomplete_access_audit` and
+`missing_two_session_handoff_observation`, an inconclusive audit without matches,
+and no day-2 execution/observation or grading. Every retained day-1 log must now
+be clean, with its original log/grader manifests intact. Access-detected tasks,
+other invalid reasons and still-inconclusive evidence are never selected. Finding no
+eligible task is an input error. All source exit hashes, selected/population
+input hashes and report/config provenance receive the normal regrade checks.
+
+`--out` must be fresh. The source run and every source runtime stay unchanged.
+The command re-audits/regrades all other tasks just as regrade does, retaining
+their original accounting. For each selected task it copies the retained
+workspace into a new external `lhm-eval-continue-*` runtime and verifies the
+recorded day-1 exit hash after copying. Only retained executor/native logs and
+hash-pinned runner control artifacts accompany the workspace; old grading
+artifacts and credentials are not copied. Absolute/outward workspace symlinks
+are refused. The new Codex home uses the normal external login symlink.
+
+The normal runner finishes any pending day-1 verification/handoff from pinned
+artifacts, then performs the recorded day-2 contract, new executor session,
+verification and retries. The user input is the exact `day2.md` bytes; harness
+contracts use developer instructions. Model/effort, version checks, deadlines,
+retry limits, nested guard and cost-estimate guard use the recorded config.
+Historical log bytes are audited in their original workspace context with
+pinned hashes; new events protect the original runtime as well as private
+storage and grading copies. Changed historical logs/workspaces are inconclusive.
+No Codex session runs in a grading copy. Eligible completed day-2 work is graded
+once, after exit, in a fresh trusted copy.
+
+The complete report retains source pricing/bootstrap/config provenance and all
+old calls/costs, adding only new executor/control calls. Unknown cost stays null.
+`continuation.json`, task-level continuation artifacts and run diagnostics record
+the source run/report hash, implementation hashes, original day-1 and new day-2
+start/exit timestamps, elapsed gap, workspace-copy check and added call IDs/costs.
+The materialized semantic config copy has its own diagnostic hash; the report's
+config hash still identifies the source run's recorded config bytes. No report
+schema or existing CLI flags change. Subsequent re-audit/regrade understands the
+two retained filesystem contexts.
+
+Success prints only the supplied new directory plus a newline. Input refusals
+exit 1; execution interruption/version drift/internal errors exit 2 and retain
+the fresh checkpoint/diagnostics for host review. Incomplete evidence does not
+become a successful continuation. This command can launch paid calls on the
+host; apply the existing approved estimate/spending workflow before running it.
 
 ## Baseline C and paired comparisons (2026-10-23)
 
