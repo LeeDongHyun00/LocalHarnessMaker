@@ -1,3 +1,31 @@
+# Read-only command-array display callbacks — 2026-10-23
+
+Resolve the retained const-array shape with a later
+`results.forEach((result, i) => text({command: commands[i], result}))` callback.
+Permit indexed reads only in this read-only display grammar, after the single
+collection use. Continue auditing every command element independently. Existing
+support for `Promise.allSettled`/`Promise.all` and shorthand `cmd` followed by
+literal options now has explicit regression coverage.
+
+Retain whole-input binding checks. Index assignments/updates, push, splice, pop,
+shift, unshift, sort, reverse, aliases and reassignment before, inside or after
+the callback remain inconclusive. Computed indices, transformed values, opaque
+callbacks and reads before the collection use also remain inconclusive.
+
+Add a synthetic JavaScript fixture preserving the supplied complete structure,
+including a Python one-liner with embedded double quotes. Verify native audit
+cleanliness and access detection through a middle-element synthetic alias.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1279 passed in
+123.01s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas` — exit 0.
+
+## Assumptions
+
+- The user reports commit 64a825b and a clean host re-audit of the template case.
+  The const-array host record still needs re-audit after this follow-up. This
+  session uses synthetic evidence only, without host streams or private graders.
+
 # Code-mode templates and immutable command arrays — 2026-10-23
 
 Decode substitution-free backtick literals with JavaScript escape and newline

@@ -1,5 +1,7 @@
 """Literal code-mode string expressions use JavaScript replacement semantics."""
 
+from pathlib import Path
+
 import pytest
 
 from eval.runner.javascript import TOKEN, string_expression, tool_calls
@@ -51,6 +53,8 @@ COLLECTION_USES = [
     'for (const cmd of commands) { text(await tools.exec_command({cmd})); }',
     'for (let cmd of commands) text(await tools.exec_command({cmd}));',
     'await tools.exec_command({cmd:commands});',
+    'await Promise.allSettled(commands.map(cmd => tools.exec_command({cmd, max_output_tokens:4000})));',
+    'await Promise.all(commands.map(cmd => tools.exec_command({cmd, max_output_tokens:4000})));',
 ]
 
 
@@ -93,3 +97,57 @@ def test_literal_collection_resolves_each_command(binding: str, use: str) -> Non
 def test_collection_near_misses_are_unresolved(source: str) -> None:
     source = source.replace('ARRAY', COMMAND_ARRAY).replace('USE', COLLECTION_USES[0])
     assert tool_calls(source)[2]
+
+
+@pytest.mark.parametrize('promise', ['all', 'allSettled'])
+def test_retained_array_with_readonly_display(promise: str) -> None:
+    source = (Path(__file__).parent / 'fixtures/code-mode-command-array.js').read_text()
+    commands, patches, unknown = tool_calls(source.replace('Promise.allSettled', 'Promise.' + promise))
+    assert not unknown
+    assert patches == []
+    assert [command['cmd'] for command in commands] == [
+        'python -m py_compile solution.py',
+        'python -c \'from solution import solve; values = ["synthetic", "example"]; '
+        'assert len(values) == 2; print("synthetic verification", values)\'',
+        'python -m unittest discover -v',
+    ]
+
+
+@pytest.mark.parametrize('mutation', [
+    'commands[i] = "other"', 'commands[i] += "other"', 'commands[i]++',
+    '++commands[i]', 'delete commands[i]', 'delete (commands[i])',
+    'commands.push("other")', 'commands.splice(0, 1)', 'commands.pop()',
+    'commands.shift()', 'commands.unshift("other")', 'commands.sort()', 'commands.reverse()',
+    'const alias = commands', 'commands = ["other"]',
+])
+@pytest.mark.parametrize('location', ['before', 'callback', 'after'])
+def test_display_never_allows_array_mutation_or_escape(mutation: str, location: str) -> None:
+    source = (Path(__file__).parent / 'fixtures/code-mode-command-array.js').read_text()
+    if location == 'before':
+        source = source.replace('const results', mutation + ';\nconst results')
+    elif location == 'after':
+        source += '\n' + mutation + ';'
+    else:
+        source = source.replace('=> text({command: commands[i], result})',
+                                '=> { ' + mutation + '; text({command: commands[i], result}); }')
+    assert tool_calls(source)[2]
+
+
+@pytest.mark.parametrize(('original', 'replacement'), [
+    ('commands[i]', '(commands[i] = "other")'),
+    ('commands[i]', 'commands[i++]'),
+    ('commands[i]', 'commands[opaque]'),
+    ('commands[i]', 'commands[i].trim()'),
+    ('commands[i]', 'commands'),
+    ('commands[i]', 'commands[i], alias: commands'),
+    ('text({command:', 'opaque({command:'),
+])
+def test_display_near_misses_are_unresolved(original: str, replacement: str) -> None:
+    source = (Path(__file__).parent / 'fixtures/code-mode-command-array.js').read_text()
+    assert tool_calls(source.replace(original, replacement))[2]
+
+
+def test_display_before_collection_is_unresolved() -> None:
+    source = (Path(__file__).parent / 'fixtures/code-mode-command-array.js').read_text()
+    lines = source.splitlines(keepends=True)
+    assert tool_calls(''.join(lines[:-2] + [lines[-1], lines[-2]]))[2]

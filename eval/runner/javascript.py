@@ -159,13 +159,65 @@ def command_fields(tokens: list[str], pairs: dict[int, int], tool: int) -> list[
     return fields
 
 
+def display_reads(tokens: list[str], pairs: dict[int, int], name: str) -> dict[int, int]:
+    """Recognize indexed array data only in read-only forEach text callbacks.
+
+    The entire callback must display an object containing local parameters,
+    literal values or name[index]. No statement, assignment, method call,
+    computed index or array escape is accepted by this small grammar.
+    """
+    reads: dict[int, int] = {}
+    for start in range(len(tokens) - 11):
+        if tokens[start + 1:start + 5] != ['.', 'forEach', '(', '(']:
+            continue
+        result, index = tokens[start + 5], tokens[start + 7]
+        if (tokens[start + 6] != ',' or tokens[start + 8:start + 11] != [')', '=', '>'] or
+                result == index or any(not re.fullmatch(r'[A-Za-z_$][\w$]*', value)
+                                       for value in (tokens[start], result, index))):
+            continue
+        end = pairs.get(start + 3, -1)
+        body = start + 11
+        if tokens[body:body + 3] != ['text', '(', '{'] or pairs.get(body + 1) != end - 1:
+            continue
+        object_end = pairs.get(body + 2, -1)
+        if object_end != end - 2:
+            continue
+        cursor = body + 3
+        found: dict[int, int] = {}
+        while cursor < object_end:
+            key = literal(tokens[cursor]) or tokens[cursor]
+            if not re.fullmatch(r'[A-Za-z_]\w*', key):
+                break
+            if tokens[cursor + 1] == ':':
+                cursor += 2
+                if tokens[cursor:cursor + 4] == [name, '[', index, ']']:
+                    found[cursor] = start
+                    cursor += 4
+                elif (tokens[cursor] in {result, index, 'true', 'false', 'null'} or
+                      literal(tokens[cursor]) is not None or re.fullmatch(r'\d+', tokens[cursor])):
+                    cursor += 1
+                else:
+                    break
+            elif tokens[cursor] in {result, index}:
+                cursor += 1
+            else:
+                break
+            if cursor < object_end:
+                if tokens[cursor] != ',':
+                    break
+                cursor += 1
+        if cursor == object_end:
+            reads.update(found)
+    return reads
+
+
 def collection_commands(tokens: list[str], pairs: dict[int, int],
                         fields: dict[int, list[tuple[str, int, int, int]]]) -> dict[int, list[str]]:
     """Resolve one-use literal arrays only at direct tool command operands.
 
     Match all identifier occurrences across the input, including after the call.
-    Extra bindings, aliases, mutations, escapes and element transformations thus
-    cannot be hidden by an otherwise recognized map or for-of loop.
+    Only later read-only display callbacks may add array references. Extra
+    bindings, aliases, mutations, escapes and transformations stay unresolved.
     """
     # Escaped identifiers and dynamic scope defeat textual binding identity.
     if any(token in {'\\', 'with'} for token in tokens):
@@ -198,14 +250,17 @@ def collection_commands(tokens: list[str], pairs: dict[int, int],
         if cursor != end or not values:
             continue
         uses = positions.get(name, set()) - {i + 1}
-        if len(uses) != 1:
+        reads = display_reads(tokens, pairs, name) if len(uses) > 1 else {}
+        collections = uses - reads.keys()
+        if len(collections) != 1:
             continue
-        use = next(iter(uses))
-        if use <= end or any(opening < i < closing < use for opening, closing in pairs.items()
-                             if tokens[opening] == '{'):
+        use = next(iter(collections))
+        if use <= end or any(opening < i < closing < ref for opening, closing in pairs.items()
+                             if tokens[opening] == '{' for ref in uses):
             continue
         if use in slots:
-            resolved[use] = values
+            if not reads:
+                resolved[use] = values
             continue
         # commands.map(cmd => tools.exec_command({cmd})), optionally with a
         # parenthesized single parameter or a braced callback body.
@@ -237,6 +292,8 @@ def collection_commands(tokens: list[str], pairs: dict[int, int],
                 while body_end < len(tokens) and tokens[body_end] != ';':
                     body_end = pairs[body_end] + 1 if body_end in pairs else body_end + 1
         else:
+            continue
+        if any(callback <= body_end for callback in reads.values()):
             continue
         element = tokens[binding]
         if element == name or not re.fullmatch(r'[A-Za-z_$][\w$]*', element):

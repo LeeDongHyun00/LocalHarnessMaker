@@ -1,5 +1,7 @@
 ## Done
 
+- Supported later read-only commands[i] display callbacks in the supplied complete const-array structure; verified all/allSettled, shorthand cmd plus literal options, nested Python quotes, synthetic alias access detection and rejection of every listed mutation before/inside/after the callback (`.venv/bin/python -m pytest tests/eval -q`: 1279 passed in 123.01s)
+- Updated eval/CHANGES.md for the read-only callback follow-up and preserved frozen tasks, retained reports and schemas (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas`: exit 0)
 - Resolved substitution-free command templates and immutable const/let string arrays through map, for-of and direct tool arguments; audited every element and verified native synthetic private-path detection plus fail-closed near misses (`.venv/bin/python -m pytest tests/eval -q`: 1218 passed in 114.77s)
 - Recorded this parser correction in eval/CHANGES.md and preserved frozen task files, retained reports and schemas (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas`: exit 0)
 - Enabled boolean calibration (default false) before freeze, with checkpoint/diagnostic/report-artifact labeling, stderr notice and compare refusal; enabled the v2 A pilot and revised its Fast planning estimate (`.venv/bin/python -m pytest tests/eval -q`: 1126 passed in 113.59s)
@@ -10,7 +12,7 @@
 
 ## Remaining
 
-- Host: transfer the template/immutable-array parser correction at a safe boundary and re-audit the affected full-harness two-session retained streams. Host streams and the actual private grader root are unavailable here; no recovery outcome is claimed.
+- Host: transfer this read-only display follow-up at a safe boundary and re-audit the remaining const-array full-harness record. The user reports the template case is clean after 64a825b; host streams and the actual private grader root remain unavailable here.
 - Review and transfer repository changes and the matching private v2 candidate artifacts at a safe boundary for other checkouts. Do not stage or commit here; use the final Commit plan on the host.
 - Host: obtain spending approval for the 24-session baseline-A calibration using calibration=true. Run with the approved Codex version and observed priority tiers; retain candidate hashes and all outcomes. Calibration precedes freeze and is never headline evidence.
 - After calibration: revise only at whole-family/type level if needed, build the remaining sixteen planned families, validate the whole population and publish its separate freeze through Role 1.
@@ -21,7 +23,8 @@
 
 ## Decisions
 
-- Decode substitution-free templates and one-use literal command arrays without executing JavaScript: expand every array element into an independently audited command, and retain inconclusive outcomes for interpolation, nonliterals, rebinding, mutation, aliases, extra uses or unsupported binding identity/scope.
+- Permit later indexed display reads only inside a read-only forEach text callback: the supplied retained record logs commands[i] after its single collection use; every mutation, alias and unsupported extra reference must still prevent binding resolution.
+- Decode substitution-free templates and one-use literal command arrays without executing JavaScript: expand every array element into an independently audited command, and retain inconclusive outcomes for interpolation, nonliterals, rebinding, mutation, aliases, unsupported uses or unsupported binding identity/scope.
 - Permit an explicit calibration procedure before freeze: the default freeze rule remains, candidate bytes remain hash-pinned, and calibration status is persisted through recovery and refused by compare.
 - Keep the original Standard snapshot intact and add dated tier snapshots: schema-compatible metadata serializes their complete pins in the existing source field; per-call artifacts retain tier/source/pricing_ref evidence.
 - Capture newly emitted native applied settings at process exit: later resumes cannot reprice earlier calls. Control calls without an observed tier remain unknown, including existing controller versions without that field.
@@ -52,8 +55,8 @@
 
 ## Assumptions
 
-- The two supplied full-harness input shapes describe the host failures; synthetic native custom_tool_call regressions verify parser behavior here. The unavailable host streams/private root require retained-evidence re-audit on the host before changing any task outcome.
+- The user reports 64a825b was committed and the template record re-audited clean; the supplied full const-array structure supersedes the earlier brief. Synthetic native custom_tool_call regressions verify this follow-up, and the const-array outcome awaits host re-audit.
 - The Fast prices, 2026-07-30 naming change and Luna CLI priority default are user-supplied official-page/host observations; network verification is unavailable. No live cost or quality measurement is claimed.
 - The existing verifier exposes criterion extraction only. Binding task-scoped prose to one synthetic task ID applies its completion vocabulary, negation, exceptions and quote/code rules without treating criterion counts or test-only statements as whole-task completion.
 - Only the retained final output of the final process in the last required session supplies completion evidence; absent evidence is explicitly undefined, with no earlier-session or intermediate-message substitution.
-- Prior host recovery outcomes are still unknown. Private v2 artifacts are local companion changes and must remain paired with the revised public candidate; no v1 private grader was edited.
+- Other historical host recovery outcomes are still unknown. Private v2 artifacts are local companion changes and must remain paired with the revised public candidate; no v1 private grader was edited.

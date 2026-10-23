@@ -752,6 +752,24 @@ def test_native_custom_template_and_array_commands(tmp_path: Path, private: Priv
         assert audit['matches'] == []
 
 
+@pytest.mark.parametrize('protected', [False, True])
+def test_native_retained_array_with_readonly_display(tmp_path: Path, private: PrivateGraders,
+                                                     native_session: list[dict[str, Any]],
+                                                     protected: bool) -> None:
+    source = (Path(__file__).parent / 'fixtures/code-mode-command-array.js').read_text()
+    if protected:
+        # Resolve a synthetic alias through a middle array element, not raw marker text.
+        (tmp_path / 'array-alias').symlink_to(private.files[0])
+        source = source.replace('"python -m py_compile solution.py",',
+                                '"python -m py_compile solution.py", "cat array-alias",')
+    native_session[22]['payload']['input'] = source
+    audit = audit_native(tmp_path, private, native_session)
+    assert audit['status'] == ('access_detected' if protected else 'clean'), audit
+    assert audit['errors'] == []
+    assert any(match['marker'] == 'protected_path' and match['line'] == 23
+               for match in audit['matches']) == protected
+
+
 @pytest.mark.parametrize('source', [
     'tools.exec_command({cmd:`python ${command}`});',
     'tools.exec_command({cmd:`python ${}`});',
