@@ -1,5 +1,8 @@
 ## Done
 
+- Published user-approved interface version 2 under decision 0009: required task_false_done_rate, claimed_complete_task unit, valid-task-only numerator/denominator, missing-final exclusions and version 1 compatibility; updated example, AGENTS.md, interfaces and Role 5 prompt without changing eval/ or any other report field (`make validate-schemas`: Validated 6 draft 2020-12 schemas and 8 examples; `.venv/bin/python -m pytest tests/lead -q`: 104 passed in 4.07s).
+- Added lead regression checks for version 2 requirements, rate/unit/null boundaries, preservation of all version 1 fields and continued validity of the original version 1 example; recorded implementation follow-up for Role 5 and left staging/commits to the host (`.venv/bin/python -m pytest tests/lead -q`: 104 passed in 4.07s; `git diff --check -- AGENTS.md docs/interfaces.md docs/decisions/0009-task-level-false-done.md prompts/05-eval-engineer.md schemas tests/lead state/STATUS-lead.md`: exit 0, no output).
+
 - Wrote decision 0009 as a definition-only proposal for task-level false done across all configurations, retaining the criterion metric and exposing the invalid-task population conflict; confirmed that the frozen report rejects the new metric name and stopped without schema/runtime changes (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 5.46s; inline `Draft202012Validator` mutation check: Confirmed version 1 rejects metrics.task_false_done_rate, additionalProperties=false).
 
 - Published user-approved decision 0008, the version 2 W2/W3 schedule and a separate-record notice in the version 1 freeze document; recorded Fast/priority policy, A-only calibration, fresh frozen-set full runs and anti-contamination disclosure without changing evaluation files or interfaces (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 3.93s; `git diff --check -- docs/decisions/0008-task-set-v2.md docs/plan.md docs/eval-freeze.md state/STATUS-lead.md`: exit 0, no output).
@@ -26,7 +29,8 @@
 
 ## Remaining
 
-- STOP-1 / STOP-L1: decision 0009 needs user approval for a report-schema revision and resolution of executor-caused invalid tasks in the numerator versus valid tasks only in the denominator. Do not implement in eval/metrics.py before approval/publication. D-6 docs/qa.md and docs/slides/outline.md are deferred by the explicit stop-at-definition instruction; resume those next after the blocker is resolved, with measured/pending labels and evidence sources only.
+- Role 5 follow-up for published interface version 2: implement task_false_done_rate in eval/metrics.py and the report builder using verifier/claims.py rules on the retained final message of the last session; validate valid-task-only populations, missing-final exclusions/reasons, bootstrap behavior and dual-version tools. Publication does not establish implementation or measurement. Host evaluation remains untouched.
+- D-6 docs/qa.md and docs/slides/outline.md remain deferred to a separate continuation after this user-prioritized interface publication, with measured/pending labels and evidence sources only.
 
 - Track decision 0008 with Role 5: W2 build/validate/A-only calibration of separate version 2, then receive its freeze inventory/digest/evidence and publish a separate freeze record before fresh full A/B/harness runs in W2/W3. Final analysis is due 2026-11-13; retain native priority-tier evidence, pinned Standard-rate accounting and disclosure of version 1 runs informing the 10/23 fixes. No version 2 result may inform a harness change after freeze. This session completes documentation only; no task construction, freeze or tier verification is claimed.
 - Pending Claude host acceptance for D-5/SC-4: execute the fresh-clone checklist in docs/demo.md (clone, venv, disposable installation/--check, committed offline evidence checkers, schema validation, full suite and a fresh typed-approval real demo); retain log/commit/version and all skip/xfail reasons. Documentation and existing-capture audits are complete; fresh-clone acceptance is not done.
@@ -41,8 +45,10 @@
 
 ## Decisions
 
-- Stop at decision 0009 definition and leave schemas/VERSION unchanged: /properties/metrics has additionalProperties=false, so the requested new name requires approval; D-6 cannot proceed in this explicitly stopped session.
-- Preserve the requested formula and flag its population conflict: choosing how executor-caused invalid tasks affect the denominator would otherwise guess at a change to decision 0003.
+- Publish interface version 2 under decision 0009, approved 2026-10-23: both task_false_done_rate populations contain valid tasks only; invalid tasks remain visible through existing invalid_reasons and validity fields. This resolves the earlier STOP-1 / STOP-L1 blocker.
+- Identify report versions by metrics.task_false_done_rate presence: version 1 reports remain valid under the original schema in decision 0003 and are compared only with tools accepting both versions; no historical report migration or new version field.
+- Exclude tasks without a retained last-session final message with an explicit reason: missing evidence is undefined, not absence of a completion claim; the reference fixture therefore uses a null metric.
+- Keep implementation with Role 5: this session publishes schema/example, decision, shared instructions and lead regression checks only, without touching running evaluation work.
 
 - Adopt decision 0008, approved 2026-10-23: version 1 remains frozen/reported; harder version 2 tests the project claim, usage is not a constraint and result completeness is the goal. Use priority for Codex development jobs and all version 2 configurations, verified from native settings, with pinned Standard-rate API-equivalent costs.
 - Limit this continuation to decision 0008, docs/plan.md, a separate-version-2-record notice in docs/eval-freeze.md and lead STATUS: the user prioritizes these documentation changes while host evaluation runs continue; no schema, CLI, hook or runtime change is needed.
@@ -70,7 +76,8 @@
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/lead -q
-- git diff --check -- docs/decisions/0009-task-level-false-done.md state/STATUS-lead.md
+- make validate-schemas
+- git diff --check -- AGENTS.md docs/interfaces.md docs/decisions/0009-task-level-false-done.md prompts/05-eval-engineer.md schemas/evaluation-report.schema.json schemas/examples/evaluation_report.json schemas/VERSION tests/lead/test_interface_proposals.py state/STATUS-lead.md
 
 - git diff --check -- docs/decisions/0008-task-set-v2.md docs/plan.md docs/eval-freeze.md state/STATUS-lead.md
 - .venv/bin/python -m pytest tests/lead -q
@@ -100,7 +107,7 @@
 
 ## Do not touch
 
-- This session: eval/, docs/weekly/, docs/handoff/, CLAUDE.md, schemas/, other roles' paths and read-only .git; no staging, commits, network, nested Codex or live model calls. Only decision 0009 and lead STATUS were edited.
+- This session: eval/, docs/weekly/, docs/handoff/, CLAUDE.md, other roles' implementation/tests/STATUS and read-only .git; no staging, commits, network, nested Codex, live model calls or macOS sandbox-exec. The approved schema publication and prompts/05-eval-engineer.md update are explicitly authorized. Historical session scopes below do not restrict this approved revision.
 
 - Version 1 interfaces without new user approval, a decision record and a version increment.
 - Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation edits only docs/decisions/0008-task-set-v2.md, docs/plan.md, docs/eval-freeze.md and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
@@ -110,8 +117,9 @@
 
 ## Assumptions
 
-- Decision 0009 is a definition-only proposal because the user explicitly requires a stop if the metric needs a schema change. No resolution of the invalid-task population conflict or task-level extractor implementation is assumed.
-- No PR was requested; decision 0009 and this STATUS supply the change summary and assumptions for a future PR. The current commit plan is limited to these two files; historical commit scopes below do not apply to this session.
+- Decision 0009 approval and the valid-task-only population resolution are explicit user instructions dated 2026-10-23; no additional population assumption is made.
+- Existing artifact references carry final-message provenance and exclusion reasons without new per-task fields; Role 5 owns runtime integration and dual-version tool validation. No historical report migration or measured result is inferred.
+- No PR was requested; decision 0009 and this STATUS supply the change summary and assumptions for a future PR. The current commit plan contains the nine publication/documentation/test/status paths edited here; historical commit scopes below do not apply to this session.
 
 - Decision 0008 approval, baseline A figures/commit/version and the CLI Fast description are user-supplied facts; no host or network verification was performed. W2/W3 use decision 0007’s through-11/06 and through-11/13 windows. Version 2 task count, exact freeze date and digest await owning-role evidence.
 - Historical D-5 assumption: that session documented current code and committed evidence only. Fresh-clone and live acceptance are assigned to Claude on the host after the active evaluation finishes; no result is inferred in advance.

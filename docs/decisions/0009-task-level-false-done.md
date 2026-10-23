@@ -2,7 +2,7 @@
 
 Date: 2026-10-23
 
-Status: definition-only proposal; blocked by STOP-1 / STOP-L1 pending user approval of a report-schema revision. No interface change or implementation is authorized by this record.
+Status: approved by the user on 2026-10-23; published as interface version 2.
 
 ## Problem
 
@@ -12,84 +12,95 @@ It requires a verifier, so baselines A, B and C cannot supply that measurement.
 It therefore cannot support the project's central comparison across all
 configurations. An unavailable criterion-level rate must not be reported as zero.
 
-## Proposed definition
+## Approved definition
 
 Add `task_false_done_rate` alongside the existing criterion-level
 `false_done_rate`, never replacing or renaming it. Apply the same extraction and
 classification rules to A, B, C and every harness configuration, using retained
 evidence alone and no new executor or judge calls.
 
-A task is **claimed complete** when the executor's final message of its last
-session claims that the task is finished under the claim extractor's rules.
-Earlier sessions, intermediate completion statements, tool output and controller
-or verifier messages cannot substitute for that final message. For a two-session
-task, use the last session. Retain the selected message's source segment/hash and
-claim evidence so the classification is reproducible. Do not substitute a count
-of criterion-ID claims for this task-level decision: baseline messages need not
-contain criterion IDs. The task-level extractor rules and version must be fixed
-and applied identically across configurations before comparison; their
-implementation and validation remain pending.
+A task is **claimed complete** when the executor's retained final message of its
+last session claims completion under the claim extractor rules from
+`verifier/claims.py`. Earlier sessions, intermediate completion statements, tool
+output and controller or verifier messages cannot substitute for that final
+message. For a two-session task, use the last session. Retain the selected
+message's source segment/hash and claim evidence so classification is
+reproducible. Apply the same extractor rules and version across configurations;
+a count of criterion-ID claims alone is not a task-completion classification.
+Role 5 owns task-level integration and validation; this publication does not
+claim that the current criterion extractor already implements that integration.
 
-A claimed-complete task is **false done** when it fails hidden grading or ends
-invalid for an executor-caused reason supported by retained evidence. Keep the
-reason and evidence for executor attribution. Infrastructure failures, missing
-logs and inconclusive audits alone do not establish executor fault or hidden
-grading failure. Missing final-message evidence is an unknown observation, not
-an inferred absence of a claim. Do not rerun hidden grading on invalid tasks or
-override the existing prohibition on grading invalid tasks.
+A claimed-complete **valid** task is **false done** when it fails hidden grading.
+The approved formula is:
 
-The requested formula is:
+`task_false_done_rate = false done valid tasks / claimed-complete valid tasks`
 
-`task_false_done_rate = false done tasks / claimed-complete valid tasks`
+Both numerator and denominator are restricted to valid tasks. Invalid tasks,
+including executor-caused invalidity, are excluded from both populations and
+remain visible through existing `invalid_reasons` and `validity` fields. Do not
+rerun hidden grading on invalid tasks or override the prohibition on grading
+them. Infrastructure failures, missing logs and inconclusive audits do not
+establish hidden grading failure. Any invalid task still makes aggregate
+validity invalid; clean-subset metrics remain diagnostic only.
 
-This formula has an unresolved population conflict: its numerator includes
-executor-caused invalid tasks while its denominator excludes invalid tasks.
-It can exceed one, or have a zero denominator despite observed false-done
-tasks. Decision 0003 also excludes invalid tasks from quality samples and marks
-any report containing an invalid task invalid. These rules are not silently
-changed here. User approval must resolve the population treatment before
-implementation; this definition is not yet an executable rate specification.
-Executor-caused invalidity must remain visible in retained evidence, and an
-invalid aggregate must not become a valid headline comparison.
+A task with **no retained final message** has an undefined completion claim and
+is excluded from both populations with an explicit reason. Missing evidence is
+not an inferred absence of a claim or a passing task. Publish numerator,
+denominator and exclusion reasons through existing artifact references without
+adding per-task report fields. `sample_size` is the number of claimed-complete
+valid tasks with retained final evidence; `sample_unit` is
+`claimed_complete_task`. If none remain, the rate and bounds are null with a
+specific `undefined_reason`.
 
 Use the seeded 95% task-cluster percentile bootstrap, retaining each task's
 sessions, final claim and outcome together and recomputing the ratio in each
-replicate. Follow decision 0003's default 10,000/minimum 1,000 resamples and
-2.5th/97.5th percentiles. A zero original or bootstrap denominator yields null
-value/bounds and a specific undefined reason; never discard such replicates.
-Missing evidence needed for classification also requires an explicit undefined
-reason. Publish the numerator, denominator and unresolved/invalid cases for
-audit; do not turn unknown observations into passing tasks. Final sample-unit
-and invalid-population rules require approval with the schema revision.
+replicate over the same eligible valid-task population. Follow decision 0003's
+default 10,000/minimum 1,000 resamples and 2.5th/97.5th percentiles. A zero
+original or bootstrap denominator yields null value/bounds and a specific
+undefined reason; never discard such replicates. Missing evidence needed for
+classification requires an explicit undefined reason.
 
-## Schema finding and implementation ownership
+## Interface revision and compatibility
 
-`schemas/evaluation-report.schema.json`, at `/properties/metrics`, is an object
-of named entries, but it is **not extensible**: `additionalProperties` is false
-and `properties` permits exactly `pass_rate`, `false_done_rate`, `cost_per_pass`,
-`avg_attempts`, `handoff_success` and `parity`. Consequently a new
-`task_false_done_rate` name is rejected. `$defs/metric/properties/sample_unit`
-also has a closed enum with no explicit claimed-complete-task unit.
+The user approved the report-schema revision and resolved the population
+conflict on 2026-10-23. Role 1 publishes `schemas/VERSION` as 2 and adds exactly
+one required metric entry, `task_false_done_rate`, at `/properties/metrics`,
+using the existing `$defs/metric` shape with the `claimed_complete_task` unit
+and rate bounds. That unit is added to the metric `sample_unit` enum. Every
+other report field and all CLI/hook interfaces remain unchanged.
 
-**A schema change requires the user's approval, a decision record and an
-increment of `schemas/VERSION`. Stop at this definition.** Do not overload an
-existing metric name, change its unit, or write an extra entry into version 1.
-No schema/example, CLI, hook or runtime file is changed by this proposal.
+The schema description identifies version 2 by the presence of the required
+`metrics.task_false_done_rate` entry. Version 1 reports omit that entry and
+validate against the original schema preserved in decision 0003; no report
+version field is introduced. Version 1 reports already produced, including
+full-a, full-b, smoke reports and pilots, remain valid version 1 documents.
+They are compared only through tools that accept both versions. Do not rewrite
+those reports or treat their absent task-level metric as zero. Report-interface
+version and evaluation task-set version are separate identities.
 
-After approval and interface publication, Role 5 owns implementation in
-`eval/metrics.py`, evidence extraction/integration and its tests. Role 1 owns
-the approved schema/example and shared-documentation changes; Role 4 should
-review consistency with criterion claim semantics without changing that metric.
-Affected roles are Role 1 (report contract), Role 5 (producer/consumer/tests)
-and Role 4 (claim semantics review). This session does not edit or inspect the
-running evaluation's reports and claims no measured task-level result.
+The reference report gains a null task-level metric with an explicit reason:
+it has no retained final message. This synthetic fixture is not a measurement.
+`make validate-schemas` validates the revised schema and reference example.
+
+## Implementation ownership
+
+Role 5 implements the metric in `eval/metrics.py` and the report builder,
+including retained-final-message extraction, reproducible claim evidence,
+exclusion reasons, bootstrap handling and tests. Claim extractor rules come
+from `verifier/claims.py`, applied to the retained final message of the last
+session. Role 1 owns schema/example publication and shared documentation;
+Role 4 reviews consistency with claim semantics without changing the
+criterion-level metric. Affected roles are Role 1 (report contract), Role 5
+(producer/consumer/tests) and Role 4 (claim semantics review).
+
+Publication is not implementation or measurement evidence. This lead session
+does not touch `eval/`, inspect running reports or claim a task-level result.
 
 ## Assumptions
 
-- The request authorizes the additional metric's definition, not a frozen-schema
-  revision; it explicitly requires stopping if that revision is necessary.
-- Executor attribution and task-level claim extraction need reproducible rules
-  before retrospective measurements can be compared. Existing criterion claim
-  counts alone do not establish task completion claims for all baselines.
-- The numerator/denominator conflict is reported for approval rather than
-  resolved by guessing a different population or silently changing decision 0003.
+- User approval and the valid-task population resolution are explicit session
+  instructions dated 2026-10-23; no additional population rule is inferred.
+- Existing artifact references carry extraction provenance and exclusion
+  reasons; the approved revision adds no per-task fields.
+- Runtime implementation and dual-version consumer validation remain Role 5's
+  responsibility. No historical report is migrated by this publication.

@@ -41,6 +41,12 @@ interfaces. Later revisions require user approval, a decision record and an
 increment of schemas/VERSION. Publishing an interface is not proof that its
 owning role has implemented or measured it.
 
+Version 2 was approved by the user and published on 2026-10-23 under
+docs/decisions/0009-task-level-false-done.md. It adds the required evaluation
+metric task_false_done_rate and sample unit claimed_complete_task; schemas/VERSION
+is 2. Both numerator and denominator use valid tasks only. Version 1 reports
+remain valid version 1 documents; compare versions only with tools accepting both.
+
 ### 3.1 Schemas (directory schemas/, JSON Schema draft 2020-12)
 
 All objects reject unknown fields. make validate-schemas checks all six schemas
@@ -87,7 +93,7 @@ File evaluation-report.schema.json, eval/reports/NAME/report.json:
 - metadata records run/config/task-set identity, hashes, Codex version, executor model/effort, control backend/model, seed, retry limit, pinned API-equivalent pricing, bootstrap configuration and optional hash-pinned parity comparator.
 - tasks records task identity/type, two-session flag, outcome, invalid reasons, executor segments and their --json logs/hashes, grader_access_audit, trusted grading, handoff evidence, done claims, calls, costs and artifact references.
 - grader_access_audit uses method=access_audit and status=clean, access_detected or inconclusive. Detected or incomplete audits require outcome=invalid, nonempty reasons and no grading result. Any invalid task makes aggregate validity=invalid; remaining quality metrics are diagnostic only.
-- metrics contains exactly pass_rate, false_done_rate, cost_per_pass, avg_attempts, handoff_success and parity. Every metric has value, sample_size, sample_unit, ci95 and undefined_reason. ci95 has level=0.95, lower, upper and method=task_cluster_percentile_bootstrap.
+- metrics contains exactly pass_rate, false_done_rate, task_false_done_rate, cost_per_pass, avg_attempts, handoff_success and parity. task_false_done_rate is false done valid tasks / claimed-complete valid tasks, with sample_unit=claimed_complete_task; tasks without a retained final message are undefined and excluded with a reason. Every metric has value, sample_size, sample_unit, ci95 and undefined_reason. ci95 has level=0.95, lower, upper and method=task_cluster_percentile_bootstrap.
 - Use seeded task-cluster percentile bootstrap, default 10000 and minimum 1000 resamples; use paired tasks for parity. Zero original/bootstrap denominators or missing required accounting yield null value/bounds and a reason. Preserve local-minus-cheap_api parity; compare identical task sets/seeds/executor settings/Codex versions.
 - accounting records attempted/valid/invalid task counts and total_cost_usd. Invalid tasks are excluded from quality samples, but their costs remain in total cost and cost_per_pass. Audit-clean failures/timeouts/errors remain valid quality samples.
 - All costs are API-equivalent USD from a versioned per-model price snapshot, including CLI/local calls, failed calls, retries and fallbacks. Unknown usage/pricing stays null; a logged-in subscription is not free usage. Sum executor and all control calls once.
