@@ -5,10 +5,11 @@ import json
 import logging
 import sys
 import tempfile
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
+from controller.backends.base import Backend
 from controller.backends.routing import RoutedBackend
 from controller.judge import generate_judgment
 from controller.handoff_gen import generate_handoff, validate_handoff_inputs
@@ -38,7 +39,11 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(
+    argv: Sequence[str] | None = None, *,
+    backend_factory: Callable[[str], Backend] | None = None,
+) -> int:
+    factory = backend_factory or RoutedBackend
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
     parser = Parser(prog="python -m controller")
     commands = parser.add_subparsers(dest="command", required=True, parser_class=Parser)
@@ -66,16 +71,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             if handoff is not None:
                 validate_input(handoff, "handoff.schema.json")
             examples = retrieve_cases(request, args.cases)
-            result = generate_contract(request, RoutedBackend(args.backend), handoff=handoff, examples=examples)
+            result = generate_contract(request, factory(args.backend), handoff=handoff, examples=examples)
         elif args.command == "judge":
             criterion = load_object(args.criterion)
             validate_input(criterion, "judgment-input.schema.json")
-            result = generate_judgment(criterion, args.artifact, RoutedBackend(args.backend))
+            result = generate_judgment(criterion, args.artifact, factory(args.backend))
         else:
             transcript = read_text(args.transcript)
             contract, verdict = load_object(args.contract), load_object(args.verdict)
             validate_handoff_inputs(contract, verdict)
-            result = generate_handoff(transcript, contract, verdict, RoutedBackend(args.backend))
+            result = generate_handoff(transcript, contract, verdict, factory(args.backend))
         write_json(args.out, result)
     except InputError as exc:
         print(f"controller: {exc}", file=sys.stderr)
