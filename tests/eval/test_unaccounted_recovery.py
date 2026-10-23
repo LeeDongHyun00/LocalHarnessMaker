@@ -63,11 +63,23 @@ def unaccounted_source(setup: tuple[Path, Path, Path], monkeypatch: pytest.Monke
 
 
 @pytest.mark.parametrize('fresh_fail', [False, True])
+@pytest.mark.parametrize('historical_pricing', ['captured', 'unknown', 'absent'])
 def test_fresh_replacement_regrades_rest_and_survives_recovery(setup: tuple[Path, Path, Path],
-        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fresh_fail: bool) -> None:
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fresh_fail: bool, historical_pricing: str) -> None:
     root, _, source = unaccounted_source(setup, monkeypatch, tmp_path)
     original = json.loads((source / 'report.json').read_text())
     state = json.loads((source / 'checkpoint.json').read_text())
+    entry = state['tasks']['bug-chunk-tail']
+    if historical_pricing != 'captured':
+        if historical_pricing == 'absent':
+            entry['segments'][0].pop('pricing_evidence')
+        else:
+            entry['segments'][0]['pricing_evidence'] = {'tier': 'unknown', 'basis': 'Historical unknown tier'}
+        entry['segments'][1]['resumed'] = True
+        entry['result']['segments'] = copy.deepcopy(entry['segments'])
+        original['tasks'][0]['calls'][0]['usage']['pricing_ref'] = None
+        core.write_json(source / 'checkpoint.json', state)
+        core.write_json(source / 'report.json', original)
     before = {p.relative_to(source): p.read_bytes() for p in source.rglob('*') if p.is_file()}
     source_runtime = Path(state['tasks']['bug-chunk-tail']['runtime'])
     original_runtime = {p.relative_to(source_runtime): p.read_bytes() for p in source_runtime.rglob('*')
@@ -151,9 +163,16 @@ def test_unaccounted_marker_eligibility(setup: tuple[Path, Path, Path], monkeypa
         first[marker] = True
     assert rerun_invalid.unaccounted_causes(task, entry, entry['result']['grader_access_audit'],
                                            report['metadata']['pricing'])
+    # An unmarked gap cannot qualify even with otherwise clean supplied audits.
+    for segment in entry['segments']:
+        segment.update(interrupted=False, capacity_error=False, infrastructure_recovery=False, exit_code=1)
+    refused: list[str] = []
+    assert not rerun_invalid.unaccounted_causes(task, entry, entry['result']['grader_access_audit'],
+                                               report['metadata']['pricing'], refusals=refused)
+    assert refused == ['infrastructure_interruption_marker_missing']
 
 
-@pytest.mark.parametrize('case', ['no_marker', 'price_only', 'unknown_price', 'unknown_tier', 'control',
+@pytest.mark.parametrize('case', ['no_marker', 'price_only', 'control',
     'other_gap', 'historical_access', 'report_access', 'current_access', 'malformed', 'audit_error',
     'invalid', 'changed_control', 'changed_workspace', 'changed_log_pin', 'stale_usage',
     'recovery_without_capacity', 'missing_workspace_pin'])
@@ -169,10 +188,6 @@ def test_unaccounted_refuses_other_causes_before_calls(setup: tuple[Path, Path, 
         entry['segments'][0].update(interrupted=False, exit_code=1)
     elif case == 'price_only':
         task['calls'][0]['usage'].update(input_tokens=20, cached_input_tokens=5, output_tokens=8)
-    elif case == 'unknown_price':
-        task['calls'][0]['usage']['pricing_ref'] = 'not-a-pinned-price'
-    elif case == 'unknown_tier':
-        entry['segments'][0]['pricing_evidence']['tier'] = 'unknown'
     elif case == 'control':
         task['costs']['control_usd'] = None
     elif case == 'other_gap':
@@ -209,7 +224,14 @@ def test_unaccounted_refuses_other_causes_before_calls(setup: tuple[Path, Path, 
         raise AssertionError('No executor, controller, judge or grading call before refusal')
 
     out = tmp_path / 'refused'
-    with pytest.raises((ValueError, core.harness.HarnessError)):
+    reasons = {'no_marker': 'clean_access_audits_required',
+               'price_only': 'missing_executor_usage_required', 'control': 'control_cost_missing',
+               'other_gap': 'complete_executor_usage_recoverable',
+               'audit_error': 'clean_access_audits_required',
+               'invalid': 'valid_task_with_null_executor_cost_required',
+               'stale_usage': 'complete_executor_usage_recoverable',
+               'recovery_without_capacity': 'clean_access_audits_required'}
+    with pytest.raises((ValueError, core.harness.HarnessError), match=reasons.get(case)):
         rerun_unaccounted.rerun_unaccounted(root, source, out, execute=forbidden, version=VERSION)
     assert not out.exists()
 
@@ -247,9 +269,18 @@ def test_unaccounted_cli_conventions(tmp_path: Path, monkeypatch: pytest.MonkeyP
     assert observed == [(set(), {'_unaccounted': True})]
     assert capsys.readouterr().out == str(out) + '\n'
 
+    def refused(*args: Any, **kwargs: Any) -> Path:
+        raise rerun_invalid.RecoveryEligibilityError(
+            'No eligible infrastructure tasks match the requested recovery: synthetic-task: control_cost_missing')
+
+    monkeypatch.setattr(rerun_invalid, 'rerun_invalid', refused)
+    assert rerun_unaccounted.main() == 1
+    captured = capsys.readouterr()
+    assert not captured.out and 'synthetic-task: control_cost_missing' in captured.err
+
 
 @pytest.mark.parametrize('bounded', [False, True])
-def test_host_loss_without_exit_price_capture_needs_native_price_proof(
+def test_host_loss_without_exit_price_capture_preserves_available_price_proof(
         setup: tuple[Path, Path, Path], monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path, bounded: bool) -> None:
     _, _, source = unaccounted_source(setup, monkeypatch, tmp_path)
@@ -266,7 +297,9 @@ def test_host_loss_without_exit_price_capture_needs_native_price_proof(
         'payload': {'type': 'thread_settings_applied', 'thread_settings': {'service_tier': 'standard'}}}) + '\n')
     causes = rerun_invalid.unaccounted_causes(task, entry, entry['result']['grader_access_audit'],
                                             report['metadata']['pricing'], [native])
-    assert bool(causes) == bounded
+    assert causes
     if bounded:
         assert causes[0]['pricing_evidence']['tier'] == 'standard'
         assert causes[0]['pricing_ref'] is not None
+    else:
+        assert causes[0]['pricing_evidence'] is None and causes[0]['pricing_ref'] is None

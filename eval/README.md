@@ -75,9 +75,14 @@ context-only evidence does not verify the tier. Missing/different evidence adds
 config, segment verification, task telemetry and run diagnostics retain the
 request and observations. The shared report schema and CLI flags are unchanged.
 Executor pricing reads the native applied tier separately for every segment.
+When no tier is requested and the applied record omits it, carries null, or is
+absent, use the known CLI model default: gpt-6.1-sol uses default/Standard and
+gpt-6-luna uses priority. Per-process `pricing_evidence` and the pricing artifact
+identify inference from the model default. Native `default` maps to Standard.
+Explicit requests still require matching applied evidence; missing/different
+tiers invalidate the task. Unsupported tiers/models remain unpriced.
 Control pricing reads only service_tier on the controller's control_call line.
-Absent or unsupported tiers have null price and cost; config requests and CLI
-defaults never substitute for observed evidence. pricing-provenance.json pins
+Absent or unsupported control tiers have null price and cost. pricing-provenance.json pins
 per-call tier, source evidence and selected snapshot through task artifacts.
 
 [pilot-v2-a.yaml](configs/pilot-v2-a.yaml) uses full A's gpt-6.1-sol / medium,
@@ -737,25 +742,30 @@ cache changes; version fallback cannot reconstruct that original manifest.
 
 For legacy unversioned/v1 entries only, regrade, infrastructure reruns and day-2
 continuation have a second verification path after both v1 and v2 recomputations
-fail. Every retained non-cache regular file must match the SHA-256 pinned in
-the source report's per-task `TASK/workspace/...` artifacts. The non-cache file
+fail. If the source report has per-task `TASK/workspace/...` artifact pins,
+every retained non-cache regular file must match those SHA-256 values. When
+there are no workspace artifact entries, use the trusted published
+`SOURCE/TASK/workspace` copy retained at grading time (including the committed
+full-harness copy). Compare every non-cache file byte for byte against that
+reference. The non-cache file
 sets must be identical, and every file mtime must be at or before the last
 recorded executor exit. Checkpoint and report exit timestamps must agree and
-include timezones. Missing/duplicate pins, changed/missing/extra files, late
+include timezones. Missing published evidence, duplicate/bad pins, changed/missing/extra files, late
 mtimes, symlinks and unknown/explicit-v2 digest versions cannot use this path.
 The hashes establish file bytes and the file set; they do not recover the old
 digest's mode/directory/cache manifest. No new executor or model call supplies
 this evidence.
 
-Regrade records `workspace_verification: published_artifact_hashes`, published
+Regrade records `workspace_verification: published_artifact_hashes` or
+`workspace_verification: published_workspace_copy`, published
 and retained file counts, hashes compared and mtimes checked in per-task
 `regrade-provenance.json` and `run-diagnostics.json.workspace_hash_checks`.
-It preserves the original artifact pins for subsequent recovery. Infrastructure
+It preserves the original artifact pins or published workspace copy for subsequent recovery. Infrastructure
 reruns and continuation retain the same verification counts in their respective
 task provenance. Continuation verifies both source and copied workspaces, and
 rechecks the historical workspace during later audits. Its legacy provenance
 sets `copy_hash_matched: false` and records the observed copy digest separately;
-the artifact comparison, rather than the old digest, verifies the copy.
+the published comparison verifies the copy independently of the old digest.
 Read-only re-audit uses
 the same legacy check so continuation selection can proceed; republication's
 existing digest policy is unchanged. Digest matches record their algorithm as
@@ -832,14 +842,16 @@ infrastructure interruption, use the separate replacement operation:
 This command selects valid tasks only when every executor accounting gap has
 missing token counts and a recorded `interrupted=true`, `exit_code=-2`, capacity
 refusal, or recovery following a capacity refusal. It requires clean historical
-and current audits, unchanged log/control/workspace pins, known control costs,
-and a supported pinned price for each missing-usage call. Missing pricing or
-observed tiers, ordinary unmarked usage gaps, stale accounting with recoverable
-complete usage, and all access matches refuse selection. If a hard restart
-prevented the exit pricing capture, timestamp-bounded native applied settings
-must independently prove the tier and pinned price; a later resume's settings
-cannot supply that evidence. Existing ambiguous or unknown tier captures remain
-refused. Unsupported/malformed evidence is never waived.
+and current audits, unchanged log/control/workspace evidence, and known control
+costs. Both executor and total task cost must be null. An interrupted segment
+with no usage followed by a successful resume qualifies even if the historical
+pricing capture/tier/reference is missing or unknown. Available timestamp-bounded
+price evidence is retained; missing historical prices/costs stay unknown.
+Price-only gaps, ordinary unmarked usage gaps, stale accounting with recoverable
+complete usage, and all access matches refuse selection. Unsupported/malformed
+audit evidence is never waived. Selection refusals name the failed condition
+(for example, `control_cost_missing` or `infrastructure_interruption_marker_missing`)
+and the affected task when available; CLI errors retain these safe diagnostics.
 
 Each selected task starts once in a pristine public workspace, with all ordinary
 retry/audit/grading rules. Its outcome, attempts, calls and costs replace the old

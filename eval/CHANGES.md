@@ -1,3 +1,34 @@
+# Host recovery, default-tier pricing and eligibility diagnostics — 2026-10-24
+
+When a legacy workspace pin fails both digest algorithms and the report has no
+workspace artifact entries, compare the retained non-cache files with the
+trusted published TASK/workspace copy. Require identical bytes/file sets and
+runtime file mtimes at or before the matching recorded exits. Preserve the
+pinned-artifact path and historical hashes. Regrade, rerun, continuation and
+retained-context audits record `workspace_verification: published_workspace_copy`
+with comparison counts; regrade retains the published copy for later recovery.
+
+For unrequested executor tiers, omitted/null applied tiers use the model's CLI
+default: Sol 6.1 Standard and Luna priority. Per-process evidence and pricing
+provenance label the inference; explicit native default maps to Standard.
+Explicit requests still require matching native applied evidence. Control
+accounting and retained historical report costs remain unchanged.
+
+Allow valid null-cost interrupted/resumed tasks with missing usage to qualify
+for rerun_unaccounted even without historical tier/price evidence. Archive those
+unknowns under the existing replacement policy. Keep complete-usage/price-only
+gaps, missing controls, unmarked gaps and access/audit failures ineligible.
+Refusals identify safe failed conditions, including through CLI stderr.
+
+Regression coverage uses synthetic retained workspaces/logs and mocked executor,
+controller and judge protocols. Host reruns and actual recovery metrics remain
+pending; no private grader root, model call, network, staging or commit was used.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1,662 passed in
+357.51s. Focused eligibility/CLI checks after the diagnostic refinement —
+21 passed in 28.73s; published-copy boundary checks — 12 passed in 14.66s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` — exit 0.
+
 # Full unfrozen version 2 population — 2026-10-24
 
 Record the user-supplied calibration result (15/19 valid tasks, 0.789,

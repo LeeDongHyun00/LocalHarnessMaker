@@ -783,7 +783,10 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
             artifact_evidence = retained_context.get('workspace_artifact_evidence')
             if artifact_evidence:
                 recorded['segments'] = artifact_evidence['executor_segments']
-            workspace_matches = verify_workspace(Path(retained_context['workspace']), recorded, artifact_evidence) is not None
+            published = retained_context.get('published_workspace')
+            workspace_matches = verify_workspace(
+                Path(retained_context['workspace']), recorded, artifact_evidence,
+                published_workspace=Path(published) if published else None) is not None
         except (OSError, ValueError):
             workspace_matches = False
         if not workspace_matches:
