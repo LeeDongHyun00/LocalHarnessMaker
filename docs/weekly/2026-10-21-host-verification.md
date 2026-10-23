@@ -476,3 +476,10 @@ r5-freeze-002 set frozen=true on all 100 meta.json files (only that field change
 - Interim paired comparison (docs/evaluation/interim-v1/): harness vs A pass rate +0.017 (CI -0.017 to 0.050); per-type cost_per_pass ratio 1.37 (bug_fix) and 1.42 (constrained_refactoring), harness more expensive; handoff 0.95 vs 0.85. Harness vs B: equal pass rate 1.0; cost ratio 0.81 and 0.75, harness cheaper, intervals below 1. Overall cost ratios wait for the re-pricing.
 - Version 2 full runs started at 11:35 UTC from the pinned checkout 51d2e52 (the freeze commit plus the population test), three configurations concurrently on the Fast tier, detached. Concurrency affects latency only.
 - Reports committed: the recovered version 1 reports and both v2 calibration pilots (b659815; leak scans 0 private markers, 0 user paths).
+
+## Version 2 harness run stopped after 8 tasks (2026-10-24, about 16:45 UTC)
+
+After 8 tasks (4 pass, 1 fail, 3 invalid) Claude stopped full-v2-harness and kept it as full-v2-harness-attempt1 (diagnostic). Causes of the invalid tasks:
+- v2-calendar-windows-multiple-requirements: `controller contract` exit 2. The gpt-6-luna call hit the controller's 35 s per-call deadline with null tokens on a 650-word, 16-requirement prompt, and the fallback was refused without an API key. The 35 s deadline came from version 1 latencies. r3-cont-010 makes the deadline configurable through HARNESS_CONTROL_TIMEOUT_SECONDS for evaluation runs and adds a control_failure stderr line; the plugin budgets are unchanged. This is a capacity parameter, not a change to prompts, routing or output, and it is disclosed under decision 0008.
+- v2-cache-invalidation-feature-plus-test: a multi-file apply_patch literal (unresolved_custom_input). v2-text-indexing-constrained-refactoring: `pkill -f '<regex>'`, a process pattern treated as an operand. r5-audit-009 resolves both and classifies control timeouts as control_timeout.
+full-v2-a and full-v2-b continue (A 14 of 14 passed so far, B 5 of 6). The harness run restarts from a new pinned commit once both fixes are merged.
