@@ -210,6 +210,50 @@
         {
           "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-8o5i6_nf/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-43-28-01a16749-1936-7320-bc47-ca3fe48c763d.jsonl",
           "sha256": "8f4bf965901f9f1c1c9b30c55887fc4408ee5f28b164c9075e11717b8a53ea13"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/contract.control.json",
+          "sha256": "7c7cf752790e839ce20aa7629ba6f16a343ed5013ade5de2cf4f5bdfb50adfef"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/contract.json",
+          "sha256": "b4127bff45afcdc1e6f48b0e5d75e17468ff94dcbe7a93b47923461d5a0cd248"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/contract.stderr",
+          "sha256": "f90a560638c2b8262e1dd6aadc80baff5c0e5128167ef0588d2f581075315982"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/contract.stdout",
+          "sha256": "bd1c72df4ced14c05529a5f12516f105c880273e3b3ea3550d6804a4480093e1"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/exec-1.jsonl",
+          "sha256": "bac6de963684da82a8e7ac2edb45d34c66a7c46e269b8ac48368b08b79dbc1a9"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/final-1.md",
+          "sha256": "44ec436aa9358c80cc136f332a928ce85bad2699bc836709435e6c9af37feb12"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/verdict-1.control.json",
+          "sha256": "013fbf72d43aafabb3e992d6ad8854a82c90d3035650305a579b24031d601f5d"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/verdict-1.json",
+          "sha256": "94340cc9863426504990d991bc8f7320ebf040cea923d9f7683e2c89fad47a50"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/verdict-1.stderr",
+          "sha256": "771e4412c5ecd8818a36edf5e81366b3ecc0f7fbbe555de3b061ef823d2a770a"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/verdict-1.stdout",
+          "sha256": "0de3e6ec8b6f7704193c98ea0ae81c51de464ac55817feee6ff0e25a8d24e598"
         }
       ],
       "handoff": null
@@ -433,6 +477,122 @@
         {
           "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-njrzazf5/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-46-03-01a1674b-810b-7802-9951-f7d4d00e4a61.jsonl",
           "sha256": "5254bc45f51283794fc1de9b13580a63fa62a9a24780fb2f92c4b58389663350"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-contract.control.json",
+          "sha256": "9818845b7061b5ec28c4c524c4792e2067a6949c06db6f1f5cee830d7766e08f"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-contract.json",
+          "sha256": "8abfd936cab8c1cfd0ac502e3e48ff7ad6744e8309e0411eae023fb62bb42a52"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-contract.stderr",
+          "sha256": "c5ef4383eeb4f589db89b8ab74c0c91e5defbd0138ecf3fac8620f610ffe1399"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-contract.stdout",
+          "sha256": "f36b57f51b7450628ab807e394c7364fa5b46124ad1adcb2c637d0975af172f8"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-verdict-1.control.json",
+          "sha256": "8cbfd1ed17f2f46d865487c4a71087e760253b2e39a750e38b3c8ec888f3315d"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-verdict-1.json",
+          "sha256": "00ce8ecaee3f73ac1c624dee0d335dfc4188ad9be3c9c21c93e06058917ecd26"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-verdict-1.stderr",
+          "sha256": "a9a4cee777dc3ae3415c4e117a4d5d4248f2cd5d31435e1f1d75eb12c98d4b07"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-1-verdict-1.stdout",
+          "sha256": "73b706f199162a966007b21eab59eb6861cb8fcab7c84f78962e61624ec5653b"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-contract.control.json",
+          "sha256": "4c376de6c290c1e46e99a8746f191354c3883cca0c12c968799c05121e6794c4"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-contract.json",
+          "sha256": "bec309a564368ea7bb71102b99deb372656e6406313ad72de56e1293adf9fa8f"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-contract.stderr",
+          "sha256": "fb5f9a9c964e1f606a53d304886bbf6b780dc6e61f99587f5e86ca99481f7400"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-contract.stdout",
+          "sha256": "bf9ac511ccb0e4715d08b82029224ad832702378fa05029e7006dd8929ae44d3"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-verdict-1.control.json",
+          "sha256": "41e52f44f4838f6349cc0404be5b383a437646cf0b7d1505482becfdb261a196"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-verdict-1.json",
+          "sha256": "0fb542eb460e82281b07741cf69e8be6acce3a00ce59a81a98de28b94569132f"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-verdict-1.stderr",
+          "sha256": "7d7f2b2751754f1ade90a606ff806494350c9e1504b9f5b22a558a2740c45480"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/day-2-verdict-1.stdout",
+          "sha256": "c5c40b2c31e59ac0c3fd9f3e72557f3dd9fcde9f5a8b30a215f83a6a1b56f075"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/exec-1.jsonl",
+          "sha256": "65278f7eafdf1879334f1e3435b5f161e2253a33b81c315b06eda450a9f05cd0"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/exec-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/exec-2.jsonl",
+          "sha256": "245fe652812b7636a2ff65d1199d5d92dca2cda449a62ac793904cd09171a08c"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/exec-2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/final-1.md",
+          "sha256": "2c64c2b7f8d2511ec0bf733764eb2b22e19daf7d849cdef1f50351f2f024e19e"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/final-2.md",
+          "sha256": "7e2787ecfca15e29e54770e7bb21ee65be707c882d376f5ece80b427d02417c9"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff-validation.control.json",
+          "sha256": "ef399b2a63223ee90a9f74162b0c8c63d2fbb42d34e15b73c32a8acafda42769"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff-validation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff-validation.stdout",
+          "sha256": "210fe33d154ea2391f014e6883080f5b444e18dde6d701b4c8172a6b002bb51d"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff.control.json",
+          "sha256": "b8cde3173bf2017d748d69898e454a43c815a07dc827875508762bd66d7378d4"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff.json",
+          "sha256": "03d0fc1c96724e795176d90c04e3796a11a0a29251f0355004d2d37287c2ddbf"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff.stderr",
+          "sha256": "147b2bc4bc202d4a5ddc5e83ab7210958e27b66c42c792c60016710fef8d8254"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff.stdout",
+          "sha256": "210fe33d154ea2391f014e6883080f5b444e18dde6d701b4c8172a6b002bb51d"
         }
       ],
       "handoff": {

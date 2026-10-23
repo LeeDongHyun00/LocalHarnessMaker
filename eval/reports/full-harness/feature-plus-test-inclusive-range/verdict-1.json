@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_ascending (test_solution.InclusiveTests.test_ascending) ... ok\ntest_descending (test_solution.InclusiveTests.test_descending) ... ok\ntest_equal_endpoints (test_solution.InclusiveTests.test_equal_endpoints) ... ok\ntest_invalid_numeric_inputs (test_solution.InclusiveTests.test_invalid_numeric_inputs) ... ok\ntest_large_integer_endpoints (test_solution.InclusiveTests.test_large_integer_endpoints) ... ok\ntest_negative_and_zero_boundaries (test_solution.InclusiveTests.test_negative_and_zero_boundaries) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: solution.py",
+      "reason": "required file exists"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?){2}\n9:     def test_ascending(self):\n10:         self.assertEqual(inclusive(2, 5), [2, 3, 4, 5])\n11: \n12:     def test_descending(self):\n15:     def test_equal_endpoints(self):\n16:         for endpoint in (-3, 0, 4):\n17:             with self.subTest(endpoint=endpoint):\n18:                 self.assertEqual(inclusive(endpoint, endpoint), [endpoint])\n19: \n20:     def test_negative_and_zero_boundaries(self):",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

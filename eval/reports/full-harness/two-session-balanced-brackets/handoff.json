@@ -1,0 +1,42 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "solution.py exists in the workspace."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "test_solution.py contains at least three unittest methods; the structural check passed."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`python -m unittest discover -v` passed with all five tests."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "HANDOFF.md includes design decisions and the requested verification command."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Use a stack to track opening brackets and require each closing bracket to match the most recent opener.",
+      "why": "This checks correct pairing and nesting; unmatched or mismatched brackets return false."
+    },
+    {
+      "what": "Ignore all characters outside `()`, `[]`, and `{}`, including quote characters; do not mutate the input.",
+      "why": "This follows the specified text behavior."
+    },
+    {
+      "what": "Keep the `balanced(text: str) -> bool` API and use only the Python standard library with type hints.",
+      "why": "These choices satisfy the task constraints."
+    }
+  ],
+  "verify_commands": [
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Work only in the supplied task workspace.",
+    "Do not access parent repositories or external services."
+  ]
+}

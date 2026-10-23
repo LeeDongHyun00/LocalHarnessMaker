@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+normalize\\s*\\(\n4: def normalize(text: str) -> str:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: solution.py defines `normalize(text: str) -> str` and returns `text.replace(\"\\r\\n\", \"\\n\").replace(\"\\r\", \"\\n\")`. The tests in test_solution.py also cover preserved trailing LF and non-line-ending characters.",
+      "reason": "normalize has string input and return type hints, and its chained replacements convert CRLF and lone CR to LF while leaving existing LF and other characters, including trailing newlines, intact. It operates on immutable strings and does not mutate input collections."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\).*?def\\s+test_\\w+\\s*\\(.*?def\\s+test_\\w+\\s*\\(\n6: class NormalizeTests(unittest.TestCase):\n7:     def test_ordinary_line_endings(self) -> None:\n8:         for text, expected in (\n9:             (\"first\\r\\nsecond\\rthird\\nfourth\", \"first\\nsecond\\nthird\\nfourth\"),\n10:             (\"plain text\", \"plain text\"),\n11:             (\"already\\nnormalized\\n\", \"already\\nnormalized\\n\"),\n12:             (\" \\t한글\\x00\\v\\f\\u2028\\u2029\\r\\n \", \" \\t한글\\x00\\v\\f\\u2028\\u2029\\n \"),\n13:         ):\n14:             with self.subTest(text=text):\n15:                 self.assertEqual(normalize(text), expected)",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_boundary_and_trailing_line_breaks (test_solution.NormalizeTests.test_boundary_and_trailing_line_breaks) ... ok\ntest_empty_input (test_solution.NormalizeTests.test_empty_input) ... ok\ntest_ordinary_line_endings (test_solution.NormalizeTests.test_ordinary_line_endings) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

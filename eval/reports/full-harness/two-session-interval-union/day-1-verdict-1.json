@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)\\bdef\\s+\\w+\\s*\\([^)]*\\)\\s*->[^:]+:.*\n4: def union(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]:\n5:     \"\"\"Return the sorted union of closed intervals without changing the input.\n6: \n7:     Intervals sharing an endpoint merge. Any reversed interval raises ValueError.\n8:     \"\"\"\n9:     for start, end in intervals:\n10:         if start > end:\n11:             raise ValueError(f\"Interval start {start} exceeds end {end}\")\n12: \n13:     merged: list[tuple[int, int]] = []",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\") for c in ast.walk(tree) if isinstance(c, ast.ClassDef) for n in c.body) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_does_not_mutate_input_and_returns_independent_list (test_solution.UnionTests.test_does_not_mutate_input_and_returns_independent_list) ... ok\ntest_empty_input (test_solution.UnionTests.test_empty_input) ... ok\ntest_merges_overlapping_and_touching_intervals (test_solution.UnionTests.test_merges_overlapping_and_touching_intervals) ... ok\ntest_nested_duplicate_and_point_intervals (test_solution.UnionTests.test_nested_duplicate_and_point_intervals) ... ok\ntest_rejects_reversed_intervals_without_mutating_input (test_solution.UnionTests.test_rejects_reversed_intervals_without_mutating_input) ... ok\ntest_sorts_disjoint_intervals_without_merging_integer_neighbors (test_solution.UnionTests.test_sorts_disjoint_intervals_without_merging_integer_neighbors) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(design decisions|design:).*(python -m unittest discover -v)|(python -m unittest discover -v).*(design decisions|design:)\n3: ## Design decisions\n4: \n5: - Preserve the supplied public API: `union(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]`.\n6: - Validate every interval before merging; raise `ValueError` when `start > end`.\n7: - Sort a new list, then accumulate new tuples in a separate result list so input collections remain unchanged.\n8: - Merge when the next start is at most the current end. Closed intervals sharing an endpoint touch; integer neighbors such as `(1, 2)` and `(3, 4)` remain separate.\n9: - Extend merged ends with `max` to handle nested intervals. Empty input naturally returns a new empty list.\n10: - Sorting takes O(n log n) time; additional space is O(n).\n11: \n12: ## Verification",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, union validates every interval and raises ValueError when start > end, sorts intervals and merges overlapping or endpoint-touching closed intervals, and returns the initially empty result list for empty input. It sorts without modifying the input and constructs a separate result list. In test_solution.py, tests exercise merging and sorting, empty input, multiple reversed-interval cases, unchanged input after both successful and failing calls, and result-list independence.",
+      "reason": "The visible implementation and tests cover every behavior in the criterion."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

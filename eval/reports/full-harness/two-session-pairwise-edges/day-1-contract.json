@@ -1,0 +1,107 @@
+{
+  "task_summary": "Implement overlapping adjacent pairs in solution.py, add public unittest regression coverage in test_solution.py, and document design decisions plus the verification command in HANDOFF.md.",
+  "constraints": [
+    "Work only within the supplied task workspace.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Maintain type hints and do not mutate input collections.",
+    "Do not impose an algorithmic complexity constraint.",
+    "Include at least 3 passing unittest test methods exercising the public API.",
+    "HANDOFF.md must include design decisions and the verification command."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The solution exposes the requested function for producing overlapping adjacent pairs in input order.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public behavior returns [] for fewer than two items and overlapping adjacent pairs for a sequence such as [1, 2, 3].",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the solution code. Assess whether its public behavior returns an empty list when given fewer than two items and returns [(1, 2), (2, 3)] for [1, 2, 3], preserving input order and including overlapping adjacent pairs."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The solution maintains type hints and does not mutate input collections.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the solution code and assess whether its relevant public API has type hints and whether the implementation avoids mutating the input collection."
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The public test file contains at least three unittest test methods that exercise the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\).*?(?:def\\s+test\\w+\\s*\\(self[^)]*\\).*?){3}"
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The requested unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-7",
+      "description": "HANDOFF.md records design decisions and the verification command.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read HANDOFF.md. Assess whether it records the implementation's design decisions and includes the verification command `python -m unittest discover -v`."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py, test_solution.py, and HANDOFF.md may not exist yet and may be created.",
+    "The request does not name the public function or its exact signature; the implementation may choose an appropriate function name and typed signature, and the public tests should exercise that API.",
+    "The stated unittest discovery command is run from the task workspace and discovers the public tests there."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=836; distinct_files=3; tests_requested=true; requirement_segments=16; score=7"
+  },
+  "cost_estimate": {
+    "input_tokens": 17411,
+    "output_tokens": 705,
+    "usd": 0.00074576
+  }
+}

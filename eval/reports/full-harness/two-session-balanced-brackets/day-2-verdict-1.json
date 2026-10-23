@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+balanced_many\\s*\\(\n17: def balanced_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, `return [balanced(*arguments) for arguments in cases]` iterates in order, calls balanced once per tuple with positional unpacking, returns `[]` for empty input, and propagates an exception directly without processing later cases. The implementation only reads cases and unpacks each tuple; it does not mutate either. test_solution.py also covers ordered forwarding, empty input, exception identity and stopping, and unchanged inputs.",
+      "reason": "solution.py implements balanced_many with one ordered positional call to balanced per case. Empty input produces an empty list, and list-comprehension evaluation propagates the first exception unchanged. The function does not modify the cases or argument tuples."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for c in tree.body if isinstance(c, ast.ClassDef) for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3; assert any(\"many\" in n.name.lower() or \"batch\" in n.name.lower() for n in methods)'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_many_empty_does_not_call_balanced (test_solution.BalancedManyTests.test_many_empty_does_not_call_balanced) ... ok\ntest_many_forwards_positional_arguments_once_in_order (test_solution.BalancedManyTests.test_many_forwards_positional_arguments_once_in_order) ... ok\ntest_many_propagates_first_exception_unchanged_and_stops (test_solution.BalancedManyTests.test_many_propagates_first_exception_unchanged_and_stops) ... ok\ntest_many_results_in_order_without_mutation (test_solution.BalancedManyTests.test_many_results_in_order_without_mutation) ... ok\ntest_balanced_pairs_and_nesting (test_solution.BalancedTests.test_balanced_pairs_and_nesting) ... ok\ntest_empty_and_non_bracket_text (test_solution.BalancedTests.test_empty_and_non_bracket_text) ... ok\ntest_mismatched_and_crossed_pairs (test_solution.BalancedTests.test_mismatched_and_crossed_pairs) ... ok\ntest_other_characters_are_ignored (test_solution.BalancedTests.test_other_characters_are_ignored) ... ok\ntest_unmatched_openers_and_closers (test_solution.BalancedTests.test_unmatched_openers_and_closers) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.002s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?s)python\\s+-m\\s+unittest\\s+discover\\s+-v.*?(?:passed|pass).*?(?:test|tests)\n31: python -m unittest discover -v\n32: ```\n33: \n34: Observed result: passed all 9 tests (`Ran 9 tests`, `OK`), exit code 0.",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

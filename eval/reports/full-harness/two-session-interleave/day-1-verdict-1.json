@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+interleave\\s*\\(\n11: def interleave(left: Iterable[Left], right: Iterable[Right]) -> list[Left | Right]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\") for c in tree.body if isinstance(c, ast.ClassDef) and any(isinstance(b, ast.Name) and b.id == \"TestCase\" for b in c.bases) for n in c.body) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_inputs (test_solution.InterleaveTests.test_empty_inputs) ... ok\ntest_equal_lengths_alternate_left_first (test_solution.InterleaveTests.test_equal_lengths_alternate_left_first) ... ok\ntest_inputs_are_unchanged_and_result_is_new (test_solution.InterleaveTests.test_inputs_are_unchanged_and_result_is_new) ... ok\ntest_iterables_and_mixed_values (test_solution.InterleaveTests.test_iterables_and_mixed_values) ... ok\ntest_longer_left_keeps_remainder_in_order (test_solution.InterleaveTests.test_longer_left_keeps_remainder_in_order) ... ok\ntest_longer_right_keeps_remainder_in_order (test_solution.InterleaveTests.test_longer_right_keeps_remainder_in_order) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(design decisions|design decision).*(python -m unittest discover -v)|(python -m unittest discover -v).*(design decisions|design decision)\n3: ## Design decisions\n4: \n5: - `interleave` accepts two finite iterable inputs and returns a new list, with generic type hints supporting different item types.\n6: - Consume one left item, then one right item. Once either iterator ends, append the other iterator's remainder in order.\n7: - Use iterator exhaustion rather than a sentinel value, so every input value, including `None`, is preserved.\n8: - Input collections are not mutated; iterator inputs are consumed. Items are retained by reference rather than copied.\n9: - The implementation uses Python 3.11-compatible standard library features. Runtime and output storage are linear in the total number of items.\n10: - Six unittest methods cover equal lengths, both longer-input cases, empty inputs, input preservation/new result allocation, and mixed iterable/item types.\n11: \n12: ## Verification",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

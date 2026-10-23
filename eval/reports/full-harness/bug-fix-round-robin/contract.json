@@ -1,0 +1,91 @@
+{
+  "task_summary": "Fix round_robin in solution.py without changing its signature, and add a small regression test in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve the round_robin signature and maintain type hints.",
+    "Take one item from each nonempty group in order each round until exhausted; preserve each group's internal order.",
+    "Never modify groups or mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least one passing unittest test method exercising the public API.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The implementation module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The regression test module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public API implementation and regression tests satisfy the stated round-robin behavior, preserve the function signature and type hints, and do not mutate input collections.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether round_robin retains its existing signature and type hints, takes one item from each nonempty group in order each round until exhausted, preserves order within each group, and leaves input groups and collections unmodified. Assess whether test_solution.py contains at least one unittest test method that exercises the public API and covers the regression. Judge only from the workspace files."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named relative paths solution.py and test_solution.py are workspace-root-relative; test_solution.py may not exist yet and may be created.",
+    "The current round_robin definition and its signature are in solution.py, as named by the request.",
+    "The unittest suite is discoverable using the requested python -m unittest discover -v command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=779; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 21149,
+    "output_tokens": 533,
+    "usd": 0.00073404
+  }
+}

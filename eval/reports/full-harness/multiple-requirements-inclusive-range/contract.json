@@ -1,0 +1,81 @@
+{
+  "task_summary": "Repair the inclusive integer-range behavior in solution.py, document its public specification, and add regression tests in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve input values and collection order; do not mutate input collections.",
+    "Maintain type hints and retain the stated behavior and compatibility requirements.",
+    "Add at least 3 passing unittest test methods exercising the public API.",
+    "Verify with unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains a public specification docstring and a typed public API that returns integers from start through stop inclusively, stepping in the appropriate direction and returning a singleton for equal endpoints.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py. Decide whether it documents the public specification in a docstring, retains type hints, and implements the requested inclusive integer sequence behavior: +1 from start to stop when ascending, -1 when descending, and a singleton when endpoints are equal. Assess only content visible in the file."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods exercising the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?=(?:.*?\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\(\\s*self\\s*\\))){3}"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named relative paths solution.py and test_solution.py are relative to the supplied task workspace; either file may not exist yet and may be created.",
+    "The public API's symbol name and exact parameter types are not specified, so the implementation and tests must use or define the intended public API without assuming a particular name here.",
+    "Unittest discovery from the workspace root is supported as requested; the test module is discoverable by that command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=820; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17394,
+    "output_tokens": 528,
+    "usd": 0.00065556
+  }
+}

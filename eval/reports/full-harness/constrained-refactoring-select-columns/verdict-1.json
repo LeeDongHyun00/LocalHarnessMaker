@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "unverifiable",
+      "evidence": "llm_judge: In `solution.py`, `_select(rows: list[dict[str, int]], columns: list[str]) -> list[dict[str, int]]` creates a dictionary per row, traverses requested columns in order, and filters missing keys; both `select` and `select_legacy` delegate to `_select` with matching visible signatures and return annotations. The snapshot provides no earlier version for comparison.",
+      "reason": "The visible implementation has a single private helper used by both public functions, preserves their shown signatures and return annotations, and implements the requested selection behavior. But the snapshot does not include prior implementation evidence to compare compatibility requirements such as existing imports, public names, type hints, and error behavior; the rubric asks that these be preserved, so that comparison cannot be verified."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?){2}\n7:     def test_column_order_missing_keys_duplicates_and_row_order(self):\n8:         for function in (select, select_legacy):\n9:             with self.subTest(function=function.__name__):\n10:                 rows = [{\"a\": 1, \"b\": 2, \"c\": 3}, {\"a\": 4}, {}]\n11:                 columns = [\"b\", \"missing\", \"a\", \"b\"]\n12:                 result = function(rows, columns)\n13:                 self.assertEqual(result, [{\"b\": 2, \"a\": 1}, {\"a\": 4}, {}])\n14:                 self.assertEqual(list(result[0]), [\"b\", \"a\"])\n15:                 self.assertEqual(rows, [{\"a\": 1, \"b\": 2, \"c\": 3}, {\"a\": 4}, {}])\n16:                 self.assertEqual(columns, [\"b\", \"missing\", \"a\", \"b\"])",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_column_order_missing_keys_duplicates_and_row_order (test_solution.SelectTests.test_column_order_missing_keys_duplicates_and_row_order) ... ok\ntest_empty_inputs (test_solution.SelectTests.test_empty_inputs) ... ok\ntest_error_behavior_and_lazy_empty_rows (test_solution.SelectTests.test_error_behavior_and_lazy_empty_rows) ... ok\ntest_results_are_fresh_and_values_are_preserved (test_solution.SelectTests.test_results_are_fresh_and_values_are_preserved) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "fail",
+  "reinstruct_message": null,
+  "attempt": 1
+}

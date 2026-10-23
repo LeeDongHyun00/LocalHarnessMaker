@@ -1,0 +1,92 @@
+{
+  "task_summary": "Refactor clamp and clamp_legacy in solution.py to share one private algorithm helper while preserving compatibility and behavior, and add public API unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Preserve both public function signatures, return types, error behavior, and input immutability.",
+    "Keep imports and public names compatible.",
+    "Maintain type hints and do not mutate input collections.",
+    "Clamp values into the inclusive [low, high] range; raise ValueError when low > high; equal bounds are valid.",
+    "Do not impose an algorithmic complexity constraint."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines clamp and clamp_legacy and a shared private helper used by both public functions.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py. Confirm it defines clamp and clamp_legacy, preserves their public signatures and type hints, and delegates their shared algorithm to one private helper that both functions use. Assess only content visible in the file."
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public functions implement the specified inclusive clamp behavior, reject low > high with ValueError, accept equal bounds, and do not mutate input collections.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether the visible implementation clamps to the inclusive range, raises ValueError when low > high, permits equal bounds, and avoids mutating input collections while preserving return types and error behavior."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least two unittest test methods that exercise the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\).*?(?:def\\s+test\\w*\\s*\\(|def\\s+test\\w*\\s*\\()[\\s\\S]*?(?:def\\s+test\\w*\\s*\\()"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The solution module compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The relative paths solution.py and test_solution.py refer to files in the supplied task workspace; target files may not exist yet and may be created.",
+    "The existing signatures, return types, imports, compatibility surface, and detailed error behavior are discoverable from the supplied workspace and should be preserved; no specific signatures or legacy behavior were supplied in the request.",
+    "The unittest suite is discoverable using the requested command python -m unittest discover -v.",
+    "The test method check assumes tests are defined in a unittest.TestCase subclass and have names beginning with test; the requested minimum of two public API test methods does not specify exact cases."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=841; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 21166,
+    "output_tokens": 696,
+    "usd": 0.00081724
+  }
+}

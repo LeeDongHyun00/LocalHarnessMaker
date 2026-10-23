@@ -1,0 +1,43 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` contains the typed `runs(items: list[str]) -> list[tuple[str, int]]` implementation."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`python -m py_compile solution.py test_solution.py` passed (exit 0)."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`python -m unittest discover -v` passed; six tests ran successfully."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`HANDOFF.md` records design decisions and the verification command."
+    },
+    {
+      "criterion_id": "SC-6",
+      "artifact": "`test_solution.py` contains six unittest methods exercising the public API."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Preserved the existing `runs` API and scanned input in order, extending a run only when the current string matches the last output value.",
+      "why": "This encodes adjacent equal strings together while keeping nonadjacent repeats in separate runs."
+    },
+    {
+      "what": "Built a new list of tuple results without modifying the input.",
+      "why": "This satisfies the non-mutation requirement and naturally returns an empty list for empty input."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py test_solution.py",
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Parent repositories",
+    "External services"
+  ]
+}

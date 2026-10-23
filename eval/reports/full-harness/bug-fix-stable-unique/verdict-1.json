@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def unique\\s*\\([^\\n]*\\)\\s*->\\s*[^:\\n]+\\s*:\n4: def unique(items: list[str]) -> list[str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'from solution import unique; assert unique([\"a\", \"b\", \"a\", \"A\"]) == [\"a\", \"b\", \"A\"]; assert unique([]) == []'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'from solution import unique; values = [\"a\", \"b\", \"a\"]; original = values.copy(); unique(values); assert values == original'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:.*?def\\s+test\\w*\\s*\\(\n6: class UniqueTests(unittest.TestCase):\n7:     def test_preserves_first_occurrence_order_and_case(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.UniqueTests.test_empty_input) ... ok\ntest_preserves_first_occurrence_order_and_case (test_solution.UniqueTests.test_preserves_first_occurrence_order_and_case) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

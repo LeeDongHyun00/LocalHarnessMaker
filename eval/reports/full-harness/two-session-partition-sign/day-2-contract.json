@@ -1,0 +1,97 @@
+{
+  "task_summary": "Extend the existing public API with partition_many(cases: list[tuple]) -> list, preserving the day-1 API, processing cases in order, returning [] for no cases, and propagating the first exception unchanged. Add unittest coverage and update HANDOFF.md with the verification command and observed result.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Keep the day-1 API compatible.",
+    "Do not mutate cases or their arguments.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines the public partition_many(cases: list[tuple]) function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+partition_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The batch implementation calls partition once per case using that tuple's positional arguments, returns results in case order, returns an empty list for no cases, and propagates the first exception unchanged.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the implementation in solution.py. Determine whether partition_many calls the existing partition function once for each case, expands each tuple as positional arguments, preserves case order in its returned list, returns [] for no cases, and lets the first exception propagate unchanged. Assess only code visible in the workspace."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The day-1 partition API remains compatible and partition_many does not mutate cases or their arguments.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether the existing partition API is retained compatibly with the handoff description (partition(items: list[int]) returning three fresh lists in negative, zero, positive order, preserving order and duplicates) and whether the batch implementation avoids mutating cases or their argument values. Use only workspace files."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The named Python implementation and test files compile.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "test_solution.py contains at least three unittest test methods, including batch coverage, and unittest discovery passes.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "HANDOFF.md records the verification command and its observed result.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read HANDOFF.md and determine whether it records a verification command and the observed result of running it. Evaluate the recorded content only; do not infer or claim execution from other evidence."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files solution.py, test_solution.py, and HANDOFF.md are relative to the runner-supplied workspace; the requested target files may not exist yet and may be created.",
+    "The handoff description is the available specification for day-1 partition compatibility; no additional day-1 behavior is assumed.",
+    "Unittest discovery via `python -m unittest discover -v` is assumed to discover the requested suite in the supplied workspace.",
+    "The request does not specify exact verification result wording; HANDOFF.md should record the command and the actually observed result after execution."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=610; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17684,
+    "output_tokens": 772,
+    "usd": 0.00080656
+  }
+}

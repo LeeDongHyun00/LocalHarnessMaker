@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py",
+      "reason": "required file exists"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+\\w+\\s*\\(\n4: \n5: \n6: def permutations(text: str) -> list[str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:^|\\n)\\s*def\\s+test_\\w+\\s*\\([^)]*\\):.*(?:^|\\n)\\s*def\\s+test_\\w+\\s*\\([^)]*\\):.*(?:^|\\n)\\s*def\\s+test_\\w+\\s*\\([^)]*\\):\n6: class PermutationsTests(unittest.TestCase):\n7:     def test_distinct_characters_are_sorted(self):\n8:         self.assertEqual(\n9:             permutations(\"cba\"), [\"abc\", \"acb\", \"bac\", \"bca\", \"cab\", \"cba\"]\n10:         )\n11: \n12:     def test_repeated_characters_are_deduplicated(self):\n13:         self.assertEqual(permutations(\"aba\"), [\"aab\", \"aba\", \"baa\"])\n14:         self.assertEqual(permutations(\"aaaa\"), [\"aaaa\"])\n15: ",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_distinct_characters_are_sorted (test_solution.PermutationsTests.test_distinct_characters_are_sorted) ... ok\ntest_empty_string_has_one_permutation (test_solution.PermutationsTests.test_empty_string_has_one_permutation) ... ok\ntest_input_values_and_collection_order_are_preserved (test_solution.PermutationsTests.test_input_values_and_collection_order_are_preserved) ... ok\ntest_lexicographic_order_for_mixed_characters (test_solution.PermutationsTests.test_lexicographic_order_for_mixed_characters) ... ok\ntest_repeated_characters_are_deduplicated (test_solution.PermutationsTests.test_repeated_characters_are_deduplicated) ... ok\ntest_seven_distinct_characters (test_solution.PermutationsTests.test_seven_distinct_characters) ... ok\ntest_single_character (test_solution.PermutationsTests.test_single_character) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.011s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` defines `permutations(text: str) -> list[str]`; its docstring specifies sorted lexicographic distinct permutations, at most seven input characters, unchanged input, and `[\"\"]` behavior for the empty string. The implementation builds a set of joined permutations and sorts it without mutating inputs. `test_solution.py` covers ordering, deduplication, empty and single-character inputs, input preservation, and seven distinct characters (5,040 results).",
+      "reason": "The public API documents the required distinct, sorted permutations, the empty-string result, the seven-character limit, and that the input remains unchanged. Its type hint and implementation are consistent; tests exercise the public API for these behaviors and verify input collection order is preserved."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

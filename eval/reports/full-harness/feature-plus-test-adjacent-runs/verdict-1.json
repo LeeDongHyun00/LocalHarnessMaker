@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+\\w+\\s*\\(\n4: def runs(items: list[str]) -> list[tuple[str, int]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:.*?){2}\n9:     def test_adjacent_and_nonadjacent_values(self):\n10:         items = [\"a\", \"a\", \"b\", \"b\", \"b\", \"a\"]\n11:         original = items.copy()\n12:         self.assertEqual(runs(items), [(\"a\", 2), (\"b\", 3), (\"a\", 1)])\n13:         self.assertEqual(items, original)\n14: \n15:     def test_boundary_inputs(self):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_adjacent_and_nonadjacent_values (test_solution.RunsTests.test_adjacent_and_nonadjacent_values) ... ok\ntest_boundary_inputs (test_solution.RunsTests.test_boundary_inputs) ... ok\ntest_empty_input (test_solution.RunsTests.test_empty_input) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, runs is typed to accept list[str] and return list[tuple[str, int]], groups only adjacent equal strings, and naturally returns [] for empty input; it only iterates over items and does not mutate them. test_solution.py contains three unittest methods covering adjacent and nonadjacent runs, singleton/repeated/distinct and Unicode/empty-string boundary cases, empty input, and input preservation. The visible files use only the standard library.",
+      "reason": "The implementation and tests satisfy the criterion based on the visible files."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

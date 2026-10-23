@@ -1,0 +1,113 @@
+{
+  "task_summary": "Implement inclusive integer range behavior in solution.py, add public unittest regression coverage, and document design decisions plus the verification command in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Edit solution.py and public tests; HANDOFF.md is an allowed output.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Return integers from start through stop inclusive, stepping +1 or -1 as appropriate; equal endpoints produce a singleton.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "Verify with `python -m unittest discover -v`.",
+    "test_solution.py must contain at least 3 passing unittest methods exercising the public API.",
+    "HANDOFF.md must include design decisions and the verification command."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains a typed public function definition; its location and name are not specified in the request.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^def\\s+\\w+\\s*\\([^\\n]*\\)\\s*->\\s*[^:]+:"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "Public unittest regression coverage includes at least three test methods in test_solution.py.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 3'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest suite passes using the requested discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "HANDOFF.md records design decisions and the requested verification command.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from pathlib import Path; text = Path(\"HANDOFF.md\").read_text(); assert \"design\" in text.lower() and \"python -m unittest discover -v\" in text'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 3'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'from pathlib import Path; text = Path(\"HANDOFF.md\").read_text(); assert \"design\" in text.lower() and \"python -m unittest discover -v\" in text'",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named relative paths solution.py, test_solution.py, and HANDOFF.md are interpreted relative to the supplied task workspace; requested output files may not exist yet and may be created.",
+    "The public API's function name and precise signature are unspecified; the caller should expose a typed public function that accepts start and stop, and tests can discover and exercise that API.",
+    "The regex check requires at least one typed top-level function definition in solution.py; if the intended public API has another structure or location, that is subject to review.",
+    "The unittest suite is assumed discoverable by `python -m unittest discover -v` from the workspace root.",
+    "The requested integer-range behavior is assumed to apply to integer start and stop arguments; exact validation behavior for other input types is unspecified."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=833; distinct_files=3; tests_requested=true; requirement_segments=15; score=7"
+  },
+  "cost_estimate": {
+    "input_tokens": 17401,
+    "output_tokens": 836,
+    "usd": 0.00081026
+  }
+}

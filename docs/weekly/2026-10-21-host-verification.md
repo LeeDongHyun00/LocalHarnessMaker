@@ -430,3 +430,42 @@ While drawing the verifier's human-review sample from the harness report, Claude
 - Branches dev/reinforce (b92b064) and r5/v2 (1c440cd) merged into main as 05e8dd4 and ad90607 without conflicts. schemas/VERSION is 2. Full suite on main: 2738 passed, 1 skipped. CI green.
 - Republication of smoke-harness-3, full-a, full-b and full-harness from the backed-up runtimes runs with --allow-unpinned, followed by a re-audit with the merged code.
 - The v2 calibration pilot could not be regraded: r5-v2-003 and r5-audit-006 revised the four multiple_requirements tasks and every pilot grader after the pilot ran, so regrade correctly refused ("public/private task inputs differ from the source run"). The first pilot is kept as eval/reports/pilot-v2-a-attempt1 (diagnostic, republished) and the pilot reruns on main at ad90607, detached, on the revised set.
+
+## v2 calibration pilot rerun (2026-10-23, 10:17 to 11:17 UTC, main ad90607, revised tasks and graders)
+
+20 tasks, 24 sessions, Fast tier: 15 pass, 4 fail, 1 invalid (v2-reservations-bug-fix, a literal for-loop over absolute paths that the resolver does not expand yet; r5-audit-008). 2.86 USD.
+
+| Metric | Value | n | 95% CI |
+|---|---|---|---|
+| pass_rate | 0.789 | 19 | 0.579 to 0.947 |
+| task_false_done_rate | 0.308 | 13 | 0.071 to 0.583 |
+| cost_per_pass | 0.191 USD | 20 | 0.145 to 0.270 |
+| handoff_success | 0.75 | 4 | 0.25 to 1.0 |
+| avg_attempts | 1.21 | 19 | 1.05 to 1.42 |
+
+By type: bug_fix 3 of 3 valid pass, constrained_refactoring 3 of 4, feature_plus_test 3 of 4, multiple_requirements 6 of 8; two-session 3 of 4. The pass rate on valid tasks is above the 30 to 70 percent target, so under decision 0008 the remaining 16 families get a harder design: more interacting requirements, stricter constraints and day-2 work that depends on more day-1 decisions. No pilot task is dropped or selected on its outcome. The task-level false-done rate on these harder tasks, 4 of 13 claimed-complete tasks failing hidden grading, is the first measurement of the behavior the harness targets.
+
+Regrades with the merged code: full-a 116 pass, 3 fail, 1 invalid (balanced-brackets, day 2 being continued); task_false_done_rate 0.045 (1 of 22 claimed-complete tasks); full-b valid, 100 of 100, task_false_done_rate 0 of 20, cost null because the restart-interrupted task has no usage (r5-rerun-002 adds a fresh rerun of unaccounted tasks). The claim extractor finds completion claims in only about a fifth of the final messages, so the metric's denominator is small; the final evaluation will state this.
+
+The harness regrade was refused on 104 of 120 tasks: the verifier runs contract commands inside the real workspace after the exit hash is recorded, and Python writes __pycache__ there. r5-digest-001 excludes caches from the digest, versions it, records the hash after verification and suppresses bytecode in verifier launches; merged as c4cec06, CI green. Harness recovery with rerun_invalid is running.
+
+## Late 2026-10-23: continuation false positive, legacy hashes, accounting rerun
+
+- Full A continuation (continue_day2 on two-session-balanced-brackets) ran day 2 but the task came back as grader_access_detected with 25 protected_path matches on the executor's own commands and private_context_path on its own settings records, and 0 fingerprint matches. Cause: audit_roots protects every sibling lhm-eval-* runtime except the task's own, compared as unresolved paths; the continuation records its runtime under /private/var while the temp root is spelled /var, so the task's own runtime was protected. The fourth /var symlink defect. r5-fixes-003 resolves paths in every root comparison; the continuation reruns afterwards.
+- Legacy harness hashes: digest v2 does not recover the harness run because the recorded v1 hashes included the executor's 3.13 bytecode and, for multi-attempt and two-session tasks, verifier bytecode that later verification overwrote (11 of 12 sampled single-attempt tasks match after removing cache files newer than exit; two-session-common-prefix cannot). r5-fixes-003 adds verification against the per-file sha256 values the runner pinned in report.json at run time, plus an mtime bound.
+- r5-rerun-002 (branch 6865b45): rerun_unaccounted reruns a valid task whose cost is unknown because of an infrastructure interruption and records partial native usage as a lower bound only. tests/eval 1551 passed. To apply to full-b feature-plus-test-partition-sign and, after recovery, to the harness.
+- Audit-precision and recovery rounds so far today: 12. Every one so far was a parser or path-comparison defect, never an access.
+
+## 2026-10-24, early: v2 population complete, recovery chain results
+
+- r5-v2-004 (branch 8a70983, 14:21 to 15:05 UTC on the Fast tier): 80 new tasks bring version 2 to 100 tasks in 20 families, with full-v2-a, full-v2-b and full-v2-harness configurations and Fast-priced estimates. Role 5's validation: 100 references pass, 100 starters fail, 1564 requirements covered, 6092 mutants killed, 49 equivalents, 0 survivors. Claude's host checks: tests/eval 1611 passed; 0 private markers in the 1321 public files; 100 private grader directories match the 100 public tasks; no grader shared between tasks; 80 public workspace files share one non-assertion line each with their grader, which the public-input exclusion in the audit already ignores. All meta.json remain frozen=false pending host validation and the separate freeze.
+- Recovery chain on main d87e5f3 (12 audit and recovery rounds in): the full-a continuation now works. two-session-balanced-brackets passed day 2 with the handoff used and the audit clean. Report full-a-continued2 is valid: 117 pass, 3 fail, 0 invalid; pass_rate 0.975 (n 120, CI 0.942 to 1.0); handoff_success 0.85 (n 20). Its cost is null because the new day-2 session's tier was recorded as unknown; r5-fixes-004 prices tier-less records at the model default.
+- The harness rerun still refuses: report.json pins no workspace files, so the artifact path cannot apply; r5-fixes-004 uses the runner's published workspace copy (committed in git at c1207c9) as the reference. rerun_unaccounted rejects full-b's interrupted task; r5-fixes-004 fixes the eligibility.
+
+Claude's independent v2 grader validation (validate_graders, 30 mutants per task, all 100 tasks): 100 rows, 0 errors, 2994 mutants killed, 6 recorded equivalents, 0 survivors.
+
+Spot-check of two new v2 prompts (calendar-windows multiple_requirements, rate-budgets two-session; about 650 words each): every task follows one template of 16 numbered requirements (R1 to R16) with the domain, normalization recipe, duplicate policy and error namespace substituted per family, over a 7-module package with protected files, a protected verify.py and a required final-response report. The set is harder than version 1 and its hidden tests follow the public text, but it is homogeneous: the 100 tasks are 20 domain variants of one structure, so a model that masters the structure transfers across families, and families are not independent samples of software work. The final evaluation must state this. Version 2 therefore measures the harness on dense, interacting, explicitly specified requirements, not on varied task shapes.
+
+## Version 2 frozen (2026-10-24, main 9097281)
+
+r5-freeze-002 set frozen=true on all 100 meta.json files (only that field changed); tests/eval 1664 passed. Claude computed the digest on the host with eval.freeze_v2 over public inputs plus external grader contents: 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, 100 tasks, 20 families of 5, 20 two-session tasks. full-v2-a and full-v2-harness select that digest; full-v2-b selected its own 80-task digest, so r5-v2-005 adds the task_population declaration before any v2 run. Role 1 publishes docs/eval-freeze-v2.md (r1-cont-009). After this point no harness change may use version 2 results.

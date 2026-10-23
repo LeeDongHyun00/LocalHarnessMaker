@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+rotate_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:\n12: def rotate_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_batch_results_preserve_order_and_inputs (test_solution.RotateManyTests.test_batch_results_preserve_order_and_inputs) ... ok\ntest_empty_batch (test_solution.RotateManyTests.test_empty_batch) ... ok\ntest_first_exception_is_propagated_unchanged (test_solution.RotateManyTests.test_first_exception_is_propagated_unchanged) ... ok\ntest_invalid_argument_count_uses_rotate_error (test_solution.RotateManyTests.test_invalid_argument_count_uses_rotate_error) ... ok\ntest_empty_input (test_solution.RotateTests.test_empty_input) ... ok\ntest_input_is_preserved_and_result_is_new (test_solution.RotateTests.test_input_is_preserved_and_result_is_new) ... ok\ntest_negative_steps (test_solution.RotateTests.test_negative_steps) ... ok\ntest_positive_steps (test_solution.RotateTests.test_positive_steps) ... ok\ntest_single_item (test_solution.RotateTests.test_single_item) ... ok\ntest_zero_and_full_rotations (test_solution.RotateTests.test_zero_and_full_rotations) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?s)(python -m unittest discover -v).*?(pass|passed|success|successful)\n19: python -m unittest discover -v\n20: python -m py_compile solution.py test_solution.py\n21: ```\n22: \n23: Observed verification results on 2026-10-23:\n24: \n25: - `python -m unittest discover -v`: passed, exit code 0; `Ran 10 tests in 0.002s`, followed by `OK`.",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+rotate\\s*\\(\\s*items\\s*:\\s*list\\s*\\[\\s*int\\s*\\]\\s*,\\s*steps\\s*:\\s*int\\s*\\)\\s*->\\s*list\\s*\\[\\s*int\\s*\\]\n4: def rotate(items: list[int], steps: int) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-7",
+      "status": "fail",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:(?:async\\s+)?def\\s+test\\w*\\s*\\([^)]*\\)\\s*:.*?){3}",
+      "reason": "pattern did not match"
+    }
+  ],
+  "overall": "fail",
+  "reinstruct_message": "Items 6 are not done. Read the evidence below, fix only those items, then finish again.\n6. At least three unittest test methods are defined in test_solution.py.: path: test_solution.py; pattern: (?s)(?:(?:async\\s+)?def\\s+test\\w*\\s*\\([^)]*\\)\\s*:.*?){3}",
+  "attempt": 1
+}

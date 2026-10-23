@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: solution.py defines the typed public function words(text: str) -> dict[str, int], uses text.split() for arbitrary whitespace, casefolds each token before counting, retains punctuation, and returns the initially empty dictionary when there are no tokens. It does not mutate input collections. test_solution.py contains five unittest methods covering ordinary counts, arbitrary whitespace and Unicode casefolding, punctuation, a single token, and empty or whitespace-only input.",
+      "reason": "The visible implementation and tests meet the specified word-count behavior and coverage requirements."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_arbitrary_whitespace_and_unicode_casefolding (test_solution.WordsTests.test_arbitrary_whitespace_and_unicode_casefolding) ... ok\ntest_empty_and_whitespace_only (test_solution.WordsTests.test_empty_and_whitespace_only) ... ok\ntest_ordinary_counts (test_solution.WordsTests.test_ordinary_counts) ... ok\ntest_punctuation_remains_in_tokens (test_solution.WordsTests.test_punctuation_remains_in_tokens) ... ok\ntest_single_token (test_solution.WordsTests.test_single_token) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

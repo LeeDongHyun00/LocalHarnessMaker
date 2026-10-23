@@ -1,0 +1,100 @@
+{
+  "task_summary": "Refactor runs and runs_legacy in solution.py to delegate their shared algorithm to one private helper while preserving required behavior and compatibility, and provide public API tests in test_solution.py.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Edit solution.py and public tests.",
+    "Preserve both function signatures, return types, error behavior, input immutability, imports, and public names.",
+    "Run-length encode adjacent equal strings as (value, count) pairs; nonadjacent equal values form separate runs; empty input returns [].",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least two passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains definitions for runs and runs_legacy.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)\\bdef\\s+runs\\s*\\(|\\bdef\\s+runs_legacy\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The implementation visibly uses a private helper to share the run-length encoding algorithm between the public functions.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether runs and runs_legacy delegate the shared run-length encoding algorithm to one private helper while retaining the public function definitions. Base the judgment only on source code visible in the file."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py exists and contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\):.*?\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\):"
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The public API tests cover adjacent equal strings, separate nonadjacent equal runs, and empty input.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read test_solution.py and determine whether its unittest methods exercise the public API for adjacent equal strings encoded as value/count pairs, nonadjacent repetitions represented as separate runs, and empty input returning an empty list. Judge only the test code visible in the file."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "No previous signatures or more specific error behavior were supplied; preservation of those details must be evaluated against the available workspace context.",
+    "The unittest suite is discoverable from the workspace root using the requested command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=868; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 38686,
+    "output_tokens": 1520,
+    "usd": 0.00211724
+  }
+}

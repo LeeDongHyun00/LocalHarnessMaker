@@ -1,0 +1,104 @@
+{
+  "task_summary": "Extend the existing public API with `unique_many(cases: list[tuple]) -> list`, preserving the Day 1 API, adding unittest coverage, and documenting verification evidence in HANDOFF.md.",
+  "constraints": [
+    "Return results in case order and return [] for no cases.",
+    "Each tuple supplies positional arguments for one call of unique.",
+    "Propagate the first exception unchanged.",
+    "Do not mutate cases or arguments.",
+    "Keep the Day 1 API compatible.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result.",
+    "Use the workspace and handoff provided by the runner."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines unique_many with the requested signature.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+unique_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The existing solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods, including batch coverage.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\")]; assert len(methods) >= 3; assert any(\"batch\" in n.name.lower() or \"many\" in n.name.lower() for n in methods)'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest suite passes.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "HANDOFF.md records the verification command and an observed result.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?is)(?=.*python -m unittest discover -v)(?=.*(?:observed result|result)\\s*[:\\-].*(?:passed|ok|tests?))"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\")]; assert len(methods) >= 3; assert any(\"batch\" in n.name.lower() or \"many\" in n.name.lower() for n in methods)'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The handoff identifies solution.py, test_solution.py, and HANDOFF.md as the relevant workspace paths; their existence and contents have not been independently inspected.",
+    "The target file may not exist yet and may be created.",
+    "The public API is implemented in solution.py, and its unique function accepts each cases tuple as positional arguments; preserve the existing unique implementation and behavior.",
+    "The requested test suite is discoverable with `python -m unittest discover -v`.",
+    "Batch coverage can be identified by a unittest method whose name includes “batch” or “many”; no specific test naming convention was supplied.",
+    "HANDOFF.md can record the verification command and observed result after execution; the exact result text format was not specified."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=604; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17747,
+    "output_tokens": 794,
+    "usd": 0.00082386
+  }
+}

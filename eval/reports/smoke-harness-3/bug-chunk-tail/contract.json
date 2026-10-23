@@ -1,0 +1,76 @@
+{
+  "task_summary": "Fix `chunking.chunked` to split a list into consecutive chunks of the requested positive size while preserving item order and values, allowing a shorter final chunk and returning an empty list for empty input. Preserve the function signature and leave the input list unmodified.",
+  "constraints": [
+    "Preserve the existing `chunking.chunked` function signature.",
+    "Do not modify the input list."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The `chunked` function is defined in the inferred module file.",
+      "check": {
+        "type": "regex",
+        "path": "chunking.py",
+        "pattern": "(?m)^\\s*def\\s+chunked\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The implementation in `chunking.py` compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile chunking.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The function partitions non-empty input into consecutive chunks of the requested positive size, preserves all items and their order, and permits a shorter final chunk.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files and assess whether the `chunked` implementation partitions a list into consecutive chunks of the requested positive size, preserving every item and its order, with a possibly shorter final chunk. Do not infer behavior that is not visible in the files."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The function returns an empty list for empty input.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files and assess whether the `chunked` implementation returns an empty list when given an empty list. Do not infer behavior that is not visible in the files."
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The implementation preserves the existing function signature and does not modify the input list.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files and assess whether the implementation preserves the existing `chunked` function signature and avoids modifying its input list. Consider only evidence visible in the files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile chunking.py",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named dotted module `chunking.chunked` maps to the relative workspace file `chunking.py`; this path is inferred and must be confirmed during review.",
+    "The target file may not exist yet and may be created.",
+    "The request does not specify how invalid sizes should be handled; this contract covers only requested positive sizes."
+  ],
+  "reasoning_effort": {
+    "value": "medium",
+    "rationale": "effort-v1: utf8_byte_bound=310; distinct_files=1; tests_requested=false; requirement_segments=6; score=3"
+  },
+  "cost_estimate": {
+    "input_tokens": 34744,
+    "output_tokens": 856,
+    "usd": 0.00255456
+  }
+}

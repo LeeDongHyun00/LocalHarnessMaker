@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+flatten\\s*\\([^\\n]*\\)\\s*->\\s*[^\\n]+:\n2: \n3: \n4: def flatten(items: list[list[int]]) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:^|\\n)\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?(?:^|\\n)\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\(\n6: class FlattenTests(unittest.TestCase):\n7:     def test_ordinary_input_preserves_order(self):\n8:         self.assertEqual(flatten([[3, 1], [2, 2], [-1, 0]]), [3, 1, 2, 2, -1, 0])\n9: \n10:     def test_empty_inputs(self):\n15:                 self.assertIsNot(result, items)\n16: \n17:     def test_single_element_and_empty_inner_lists(self):\n18:         self.assertEqual(flatten([[7]]), [7])\n19:         self.assertEqual(flatten([[], [0], [], [-5], []]), [0, -5])",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: [test_solution.py] imports `flatten` from `solution` and tests ordinary nested lists with order preserved, empty outer and inner lists, single-element and mixed empty-inner-list boundaries, and exactly-one-level flattening. [solution.py] defines the public `flatten` function.",
+      "reason": "The test code visibly calls the public `flatten` API and covers ordinary nested input, boundary cases, and empty input."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_inputs (test_solution.FlattenTests.test_empty_inputs) ... ok\ntest_flattens_exactly_one_level (test_solution.FlattenTests.test_flattens_exactly_one_level) ... ok\ntest_ordinary_input_preserves_order (test_solution.FlattenTests.test_ordinary_input_preserves_order) ... ok\ntest_returns_new_list_without_mutating_inputs (test_solution.FlattenTests.test_returns_new_list_without_mutating_inputs) ... ok\ntest_single_element_and_empty_inner_lists (test_solution.FlattenTests.test_single_element_and_empty_inner_lists) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_inputs (test_solution.FlattenTests.test_empty_inputs) ... ok\ntest_flattens_exactly_one_level (test_solution.FlattenTests.test_flattens_exactly_one_level) ... ok\ntest_ordinary_input_preserves_order (test_solution.FlattenTests.test_ordinary_input_preserves_order) ... ok\ntest_returns_new_list_without_mutating_inputs (test_solution.FlattenTests.test_returns_new_list_without_mutating_inputs) ... ok\ntest_single_element_and_empty_inner_lists (test_solution.FlattenTests.test_single_element_and_empty_inner_lists) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

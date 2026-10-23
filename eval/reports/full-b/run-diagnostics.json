@@ -6486,5 +6486,1215 @@
         "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
       }
     }
-  ]
+  ],
+  "republication": {
+    "artifacts": [
+      {
+        "path": "eval/reports/full-b/bug-fix-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-window-slices/final-1.md",
+        "sha256": "6d37677b5a23846a2880e78ebd4a1132ccb997bf7b9459e6f6eccb70ccc2ecc4",
+        "task_id": "bug-fix-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-interval-union/final-1.md",
+        "sha256": "cb0680eae4368a061ae3c45ff8ad7dc4d574e8740719d97462afe57450aab264",
+        "task_id": "bug-fix-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-line-endings/final-1.md",
+        "sha256": "672db64189d36c09e806ba08e7b4c8459ecd34da458dc081919233076abe567e",
+        "task_id": "bug-fix-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-interleave/final-1.md",
+        "sha256": "9ead6daa983f7b5f271abf56606a1c1590cdda269fd0d6c7fd70d02ff11c71b2",
+        "task_id": "bug-fix-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-window-slices/final-1.md",
+        "sha256": "0126359ca17d6768f8f791eee6b1c2c0a49bbd3f23c4a555ca97937d2c3db4fc",
+        "task_id": "constrained-refactoring-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-pairwise-edges/final-1.md",
+        "sha256": "e322479738e771ec0eafe68781c1930dea077fc8e72eea2223875eef256f6324",
+        "task_id": "bug-fix-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-adjacent-runs/final-1.md",
+        "sha256": "8991cafca6095452587518f90a92881cc6e0699b2c73bad4a9dfed61a488845b",
+        "task_id": "bug-fix-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-prefix-sums/final-1.md",
+        "sha256": "c1c1418aa446c7b4647ab80e726226ef7dfe55bf704a41f4de1b556d1498a040",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-select-columns/final-1.md",
+        "sha256": "084bdea9965e39b0f0c3b9e54b0e5de4c8878a63c02561635b3975fc5bb1c837",
+        "task_id": "multiple-requirements-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-flatten-once/final-1.md",
+        "sha256": "f5efd8611aec620e39eacaea4e92c6e170d9d89f5135f67f643802cf56486ce1",
+        "task_id": "feature-plus-test-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-prefix-sums/final-1.md",
+        "sha256": "e4e06fd3c9320aaed0c5bc8206941d9e7fe98be23c0bde79792ce69284d15d96",
+        "task_id": "bug-fix-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-pairwise-edges/final-1.md",
+        "sha256": "9d6b962ef78742f5ed5aae4d9a7ed477eadb4ecf593633b6a9069c37bbd2da14",
+        "task_id": "feature-plus-test-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-clamp-values/final-1.md",
+        "sha256": "c4c311b6a9736baf9352fc4b46de3cccbfa439f37004199873cee8827bbd1977",
+        "task_id": "feature-plus-test-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-prefix-sums/final-1.md",
+        "sha256": "d2d0f5459098bdca3d4375661c6cbf55ee7c762cc5a6d54f1387fcff98b89f86",
+        "task_id": "constrained-refactoring-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-inclusive-range/final-1.md",
+        "sha256": "4c36822e80564e3d5b10a349993c2954616463049a7a216b6830cd2c096d23ee",
+        "task_id": "multiple-requirements-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-balanced-brackets/final-1.md",
+        "sha256": "9089d18dc9095cc98694e39cdff8807da6e3138e5f3cb01f0bea3da2540ff6e8",
+        "task_id": "bug-fix-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-unique-permutations/final-1.md",
+        "sha256": "e082449387eb94b95db21e87bea46d803e5b99142e877bd29df55f93fcd8db5f",
+        "task_id": "constrained-refactoring-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-ordinal-labels/final-1.md",
+        "sha256": "2c5210d63aae22d01dfaced64eb0d0c18ac930542fa93e4f313d9ec8089c6e46",
+        "task_id": "multiple-requirements-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-common-prefix/final-1.md",
+        "sha256": "9f50e24271403c2eb845babc4c2fbcf31721acb6664ff06733ad56e81847bb9d",
+        "task_id": "multiple-requirements-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-prefix-sums/final-1.md",
+        "sha256": "e2506cad55c01508f0e76fbf55a675cba58a81563d9129781b2b36e396ddaae6",
+        "task_id": "feature-plus-test-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-select-columns/final-1.md",
+        "sha256": "2ba9f26ebe06706ea1bcd6dadfa4ea5a417a7393eac7f48f090cd764447165d2",
+        "task_id": "bug-fix-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-inclusive-range/final-1.md",
+        "sha256": "47b8ca98ee3197fdd528b29b83033f9b62015f98ad3567d003302f5ca44ac164",
+        "task_id": "bug-fix-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-word-counts/final-1.md",
+        "sha256": "f784c937903aac7a9d0ea1c10c865f886eaf9ac094338fbed05679bb790e3e35",
+        "task_id": "bug-fix-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-last-index/final-1.md",
+        "sha256": "b42fac1e07f81bd5917901b5b18ed0c891526caf926fc072f1cbef97aaa98a30",
+        "task_id": "bug-fix-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-last-index/final-1.md",
+        "sha256": "9239eeb4ae2320c2ef69d3cdb71c8af0e7e67ea5832f9afdf2cadcb47c8d0422",
+        "task_id": "feature-plus-test-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-inclusive-range/final-1.md",
+        "sha256": "cf93dd603ac29363769fc5e37d48a9e95629cda7b2a174e11474dd6c9b7c0e1d",
+        "task_id": "constrained-refactoring-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-unique-permutations/final-1.md",
+        "sha256": "d4f2d535d9b68b8f6a1125e6dd16d1b94b079ed9e97cb18ff0942b79fab14654",
+        "task_id": "bug-fix-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-flatten-once/final-1.md",
+        "sha256": "3c1580989570532ce5beccc994897bac7711625662ad51f978991b9d1b94fd62",
+        "task_id": "constrained-refactoring-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-invert-groups/final-1.md",
+        "sha256": "f7224f48903ae4685e0f002ef1746c25029e7a9e7a99daee9e721471269351b3",
+        "task_id": "multiple-requirements-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-ordinal-labels/final-1.md",
+        "sha256": "985b225ce1bafe86efce901b62f13c4374d3fcc6b50bd54d049202cabe603e7e",
+        "task_id": "constrained-refactoring-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-round-robin/final-1.md",
+        "sha256": "9716aa2eb65be8d45259f78c0e224e46849e4f4f555ae41bbc69fc02ed25bca2",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-interleave/final-1.md",
+        "sha256": "6552bbf4881a4cb758aa8f1691adc001230bc71903901fe899bf000513938cf7",
+        "task_id": "multiple-requirements-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-round-robin/final-1.md",
+        "sha256": "c1dfbc236c3b6c0a9b95651dc08da225e46aefef5baa14d55c9892ab3c1fe87d",
+        "task_id": "constrained-refactoring-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-word-counts/final-1.md",
+        "sha256": "92dd1e1e3604d506c531f4a98c7e9f039d04c7bfcd7fca9876ad8692cb37fb95",
+        "task_id": "multiple-requirements-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-merge-counts/final-1.md",
+        "sha256": "9b93c60e2991c8ebd3c5c97aec562146ca155b51bba1adf48aae7bc5581d76cb",
+        "task_id": "multiple-requirements-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-common-prefix/final-1.md",
+        "sha256": "5b1a5ac1b0188a973f581dd3824ef4dc2298cff3f60fda711792d83e183d6e27",
+        "task_id": "constrained-refactoring-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-last-index/final-1.md",
+        "sha256": "f3008702bf7b254af5139851f788f461095fc7cc3927546934f85a10e9de1d8f",
+        "task_id": "constrained-refactoring-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-pairwise-edges/final-1.md",
+        "sha256": "be1f411dce997ee2c026466cd98c25afb1103e98a287f6e8b37a6cad7b22bb0d",
+        "task_id": "multiple-requirements-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-select-columns/final-1.md",
+        "sha256": "bd9105e01e87c5fe7f7efa7e03cd274c15b1e9ce1e8d2a0c7b81694dc2a072c0",
+        "task_id": "constrained-refactoring-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-parse-pairs/final-1.md",
+        "sha256": "23bb7a79591d233e962754637784b82b17f46d726dd8a4e8327355ba24fd6ce3",
+        "task_id": "bug-fix-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-last-index/final-1.md",
+        "sha256": "542045e0880b8397b9c7e64f0946705e6b5c07fd73a8685b48f762e575b38b20",
+        "task_id": "multiple-requirements-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-stable-unique/final-1.md",
+        "sha256": "256bad713891c7bc12ec27491e0ab33f288aae012a9c4cb5018ef534b03f2081",
+        "task_id": "feature-plus-test-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-common-prefix/final-1.md",
+        "sha256": "49139be780df584bbb16895ee47801a018ae8f51a78fb69f54b29e0c7a208504",
+        "task_id": "bug-fix-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-stable-unique/final-1.md",
+        "sha256": "e7d92ce910b87ebedbfd2b28c3b81627dee48260f963fd13bed88349f7a8ccde",
+        "task_id": "bug-fix-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-partition-sign/final-1.md",
+        "sha256": "3fd080c4bda75ce5effd8006d2bdab63716014e8eee222959fd54a022567abc9",
+        "task_id": "bug-fix-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-strip-prefix/final-1.md",
+        "sha256": "6b11f8d9946e9a5ae66dff9f2c7baab15f7fb4e2f2219f48e16403dd67b3bc87",
+        "task_id": "bug-fix-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-interleave/final-1.md",
+        "sha256": "4d49534686ec47d2457274d18408769f1823afee701a856ca95c3412f8bdac46",
+        "task_id": "constrained-refactoring-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-balanced-brackets/final-1.md",
+        "sha256": "390196438d0e23a4aec39c4d1fc8009cf3067f66680e142116695dfaf73f9b61",
+        "task_id": "multiple-requirements-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-interval-union/final-1.md",
+        "sha256": "6801a014f02bb79b116d7cedec86d00acffe40c88a41c73bf6bc8329f0fdbea7",
+        "task_id": "feature-plus-test-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-rotate-left/final-1.md",
+        "sha256": "7130ac012bf9684bf5a457578b0b6bcbf5b186978386a1638e9c122a3e0971f6",
+        "task_id": "feature-plus-test-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-window-slices/final-1.md",
+        "sha256": "c9f0b53ed2274be9a75c99b06a7848686926749a7d5bd6def87d877579837fad",
+        "task_id": "feature-plus-test-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-adjacent-runs/exec-1.stderr",
+        "sha256": "66d4b5e3f049595c57cf3a8aefa335080cb5b915937583d4ecb624df7e6c175c",
+        "task_id": "feature-plus-test-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-adjacent-runs/final-1.md",
+        "sha256": "220582f4cbbf1b19fec2d47dddfdc53b05fc899220b71014605acb3389719722",
+        "task_id": "feature-plus-test-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-select-columns/final-1.md",
+        "sha256": "1a3eb263523ed299ae7cbce87e10263e43323f43abe69444295daaf83f79601e",
+        "task_id": "feature-plus-test-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-adjacent-runs/final-1.md",
+        "sha256": "d0da2bda715db62d5d9216dc4496805a64ddca98211e1a7d5d6f9ad8f75d8887",
+        "task_id": "constrained-refactoring-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-window-slices/final-1.md",
+        "sha256": "9c795efe674dc59668b5d7feca6c489fea367bc980ddc90f0ba984cd4e6768b2",
+        "task_id": "multiple-requirements-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-strip-prefix/final-1.md",
+        "sha256": "a0a24a93639e36fe75423ae2a543fbb72117bb8c4b9003134e1ee2b0488b1237",
+        "task_id": "constrained-refactoring-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-strip-prefix/final-1.md",
+        "sha256": "29b07c43c1e51fd1f9b309fc764946e357372091fc62ad1cf41fdad8e0ce9a31",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-chunk-tail/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-chunk-tail/final-1.md",
+        "sha256": "9e66d1c9e5732c0569d8b564fa32a3825d8e0a05933a8ad1a795297f26981775",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-unique-permutations/final-1.md",
+        "sha256": "123a571514c38089300363ce31e5e0fe2e4fce510db474eafac01dfebde5aa25",
+        "task_id": "feature-plus-test-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-line-endings/final-1.md",
+        "sha256": "f924ed08d9faf29439aaae68973770435979a90f25dedf40ef3675f9471ac653",
+        "task_id": "constrained-refactoring-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-invert-groups/final-1.md",
+        "sha256": "ff43a64860d24490767b6732dac5ac5b57b9edf3def57f08e7ca8b7111246ab8",
+        "task_id": "feature-plus-test-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-rotate-left/final-1.md",
+        "sha256": "041fd420e60cefccdb14c63b2e5fef76d46129a3b4d7eeac2e31749d0fe9ba52",
+        "task_id": "multiple-requirements-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-clamp-values/final-1.md",
+        "sha256": "bc6655377bc5a8fae2038e096726e690d7e9c8a6408c10ef913d27d609a75308",
+        "task_id": "bug-fix-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-stable-unique/final-1.md",
+        "sha256": "6c8bbffd442eaa3f45fac653ab0d78424bb1dd1d9265954a64763422d6d39d2d",
+        "task_id": "multiple-requirements-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-interleave/final-1.md",
+        "sha256": "b143b66832962da8a4945da8bf2621192c7438848970f9da6844325ec905cac1",
+        "task_id": "feature-plus-test-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-partition-sign/final-1.md",
+        "sha256": "e884fbe1bccd42ebd91dd30059aa308e889aa838ba0a09211a328fa013214cdd",
+        "task_id": "multiple-requirements-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-balanced-brackets/final-1.md",
+        "sha256": "ed79b01fb88afeab0f69c836db2d15e91708e36033a87a5eaa645b69356ff3cc",
+        "task_id": "constrained-refactoring-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-partition-sign/final-1.md",
+        "sha256": "654e689740e994d1a4c5f39ce80d5d15fd8ee55d2c1eb9b983046bb9c0d4dcde",
+        "task_id": "constrained-refactoring-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-inclusive-range/final-1.md",
+        "sha256": "1e209d5f331f0fb41f1f31d404ce0fee5d0fa9b91a72ea8190b6f1eb46a415a1",
+        "task_id": "feature-plus-test-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-parse-pairs/final-1.md",
+        "sha256": "bd9eecd13c2e7303064161c5a505c1d9594ffd2ac5fc545edae8c4cb1d13087d",
+        "task_id": "multiple-requirements-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-adjacent-runs/final-1.md",
+        "sha256": "319512cb1d41ffe39fd96595a74e0a0448e30e046132f8440789c35ecee51687",
+        "task_id": "multiple-requirements-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-strip-prefix/final-1.md",
+        "sha256": "4ccb1dca39b9271e5d1841e4da5eff742a43862d893c0b720e117ecbe4e48ce7",
+        "task_id": "feature-plus-test-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-line-endings/final-1.md",
+        "sha256": "5699fa9d34becf771af50414d2b490e4ecd1949e4c6acd2a70661ed59783b264",
+        "task_id": "feature-plus-test-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-rotate-left/final-1.md",
+        "sha256": "c45809988e60ed7ab8547702eaafe034f94bd5fd2836ce2daf1025a8e743b317",
+        "task_id": "constrained-refactoring-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-invert-groups/final-1.md",
+        "sha256": "84abde8ba0fea6a1334f2932907711f08837ee00a434dcf061a341fa39d1f288",
+        "task_id": "bug-fix-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-interval-union/final-1.md",
+        "sha256": "1a4be0cacd51706a46488d48a213746b0b42e7a20de7c06354eeafb01b1eb3c3",
+        "task_id": "multiple-requirements-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-parse-pairs/final-1.md",
+        "sha256": "51fd01a0de43255c24e3ce3c222046e29639d29d91144787f966334d32f5e9cf",
+        "task_id": "constrained-refactoring-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-round-robin/final-1.md",
+        "sha256": "334f96fee19fd72f6500ec8d1ae31917c0e63a3f80140234f831c465a1d867f3",
+        "task_id": "bug-fix-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-clamp-values/final-1.md",
+        "sha256": "8668f4fc3d0c098c5ec9a2c1d93465ce8290e89792be0732e6c83b8198302e84",
+        "task_id": "multiple-requirements-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-round-robin/final-1.md",
+        "sha256": "56bf715b1ea4da598e18c90b7823eb2a1a47a7e3c0afaf37f8bac584a21b1e24",
+        "task_id": "feature-plus-test-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-interval-union/final-1.md",
+        "sha256": "2bf8ffd317f8f0b5261f3f8539d698f2a3569bea43302a5c50dee921778004cc",
+        "task_id": "constrained-refactoring-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-flatten-once/final-1.md",
+        "sha256": "68aafa0986fd7e1ff3dc253c6b93102c57254d81049cee5e562b160ce3fc5ecf",
+        "task_id": "multiple-requirements-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-merge-counts/final-1.md",
+        "sha256": "0e4acc16e094ee46f9ae7550df465d7813d4174334930d4839a01bdb757dc9f4",
+        "task_id": "bug-fix-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-line-endings/final-1.md",
+        "sha256": "673720bb332e9bbee02f4ea3c9a35e263caea5e41ccf223e966ba5d77745ac71",
+        "task_id": "multiple-requirements-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-merge-counts/final-1.md",
+        "sha256": "f90600e0a6fe60509fe7598ed567c37d37395ab1c86f5980c4c445c217fb3c49",
+        "task_id": "constrained-refactoring-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-rotate-left/final-1.md",
+        "sha256": "6b5c9f3d4a1d45ffb8f13499e04911e547caf1e13728ec39603677912bfa33c1",
+        "task_id": "bug-fix-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-parse-pairs/final-1.md",
+        "sha256": "961a561e3ad404fbc88b1ef83f353c77ac541d9c39bc35fe486f11dedd74c330",
+        "task_id": "feature-plus-test-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-clamp-values/final-1.md",
+        "sha256": "d4e4e60edcdff212ed98a8adfbf27fad6e4b3a1f8f0146b669f613240c293533",
+        "task_id": "constrained-refactoring-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-word-counts/final-1.md",
+        "sha256": "417af4ef7c9a392671dd5513441c54080677771c511d180416d768eae6b8b6e8",
+        "task_id": "feature-plus-test-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-stable-unique/final-1.md",
+        "sha256": "ae4a19f3114365e18893c7aef7bf830fcdfc3bb7ff27401d700a0fc79dff9951",
+        "task_id": "constrained-refactoring-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-merge-counts/final-1.md",
+        "sha256": "7e91fc950ed7370673b3490353f96e082bb298f9d81efda5ab73d7dc4bd6dd86",
+        "task_id": "feature-plus-test-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-pairwise-edges/final-1.md",
+        "sha256": "101319b34b9e3cdce39dfa85bf280f03e87e06ce0c69ae4b22c4ded4b6b7a34c",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-balanced-brackets/final-1.md",
+        "sha256": "70287e9688162de485fc21dca1af76db67b8fc1a2430062ec4599a6fccf2cf18",
+        "task_id": "feature-plus-test-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-ordinal-labels/final-1.md",
+        "sha256": "96d329a190c9bc66fa19570483b75d30c717fb36cf7383897b433f68ba10097e",
+        "task_id": "feature-plus-test-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-partition-sign/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-partition-sign/final-2.md",
+        "sha256": "06900a895b8bdc4f85b35f8ead22fa59ee41ca066e0a88460c870d1bbb008bba",
+        "task_id": "feature-plus-test-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-invert-groups/final-1.md",
+        "sha256": "1b49a43c18e402c03c96fa06ed4e5c66b0d1ae86eb49a80aac47cda80b7fa00d",
+        "task_id": "constrained-refactoring-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/bug-fix-flatten-once/final-1.md",
+        "sha256": "cfecb96f9871016bf5750eac7701e2db72714295f068d4b04f4c6bcf2d11c531",
+        "task_id": "bug-fix-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/feature-plus-test-common-prefix/final-1.md",
+        "sha256": "e4898161b331782e973f32a6caca557be5666a9291102401bf74350eaa8f3925",
+        "task_id": "feature-plus-test-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/multiple-requirements-unique-permutations/final-1.md",
+        "sha256": "89eca067f33e20062900c18c30be646b4770687aae82b71c762d7965ffb574da",
+        "task_id": "multiple-requirements-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-b/constrained-refactoring-word-counts/final-1.md",
+        "sha256": "15b613feeec21653adb137807c88d1f90ba2d401fd84b6b64ab7c660d8264122",
+        "task_id": "constrained-refactoring-word-counts",
+        "provenance": "republished_unpinned"
+      }
+    ]
+  }
 }

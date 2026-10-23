@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)(?:def\\s+\\w+\\s*\\([^)]*\\)\\s*(?:->[^:]+)?\\s*:\\s*\\n\\s*(?:[rubfRUBF]*\\\"\\\"\\\"|[rubfRUBF]*''' )|(?:\\\"\\\"\\\"|'''))\n1: \"\"\"Public task implementation.\"\"\"\n4: def words(text: str) -> dict[str, int]:\n5:     \"\"\"Count casefolded tokens split on arbitrary whitespace.\n10:     \"\"\"",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s*def\\s+test_\\w+\\s*\\(\n7:     def test_arbitrary_whitespace(self) -> None:\n12: \n13:     def test_unicode_casefolding(self) -> None:\n18: \n19:     def test_punctuation_is_retained(self) -> None:\n24: \n25:     def test_empty_and_whitespace_only(self) -> None:\n29: \n30:     def test_first_occurrence_order_and_input_preservation(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_arbitrary_whitespace (test_solution.WordsTests.test_arbitrary_whitespace) ... ok\ntest_empty_and_whitespace_only (test_solution.WordsTests.test_empty_and_whitespace_only) ... ok\ntest_first_occurrence_order_and_input_preservation (test_solution.WordsTests.test_first_occurrence_order_and_input_preservation) ... ok\ntest_punctuation_is_retained (test_solution.WordsTests.test_punctuation_is_retained) ... ok\ntest_unicode_casefolding (test_solution.WordsTests.test_unicode_casefolding) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` documents the public `words(text: str) -> dict[str, int]` API, including whitespace splitting, casefolding, retained punctuation, empty input, order, and input preservation. Its body uses `text.split()`, casefolds each token, counts without stripping punctuation, and naturally returns `{}` when no tokens are present. `test_solution.py` has five unittest methods covering whitespace, Unicode casefolding, punctuation, empty/whitespace-only input, and order/input preservation.",
+      "reason": "The implementation and regression tests satisfy the stated behavior, documentation, typing, input-preservation, and test-count requirements."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

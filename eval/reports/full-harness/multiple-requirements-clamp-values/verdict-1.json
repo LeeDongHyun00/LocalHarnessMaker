@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^def clamp\\s*\\(\n4: def clamp(value: int, low: int, high: int) -> int:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)^def clamp\\s*\\([^)]*\\)[^:]*:\\s*(?:\"\"\"|''').*?(?:\"\"\"|''')\n4: def clamp(value: int, low: int, high: int) -> int:\n5:     \"\"\"Clamp value into the inclusive [low, high] range.\n6: \n7:     Return low if value is below low, high if value is above high,\n8:     and value otherwise. Equal bounds are valid. Raise ValueError if\n9:     low > high. Inputs are not mutated.\n10:     \"\"\"",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_clamping_collection_preserves_inputs_and_order (test_solution.ClampTests.test_clamping_collection_preserves_inputs_and_order) ... ok\ntest_equal_bounds_are_valid (test_solution.ClampTests.test_equal_bounds_are_valid) ... ok\ntest_reversed_bounds_raise_value_error (test_solution.ClampTests.test_reversed_bounds_raise_value_error) ... ok\ntest_values_outside_bounds_are_clamped (test_solution.ClampTests.test_values_outside_bounds_are_clamped) ... ok\ntest_values_within_inclusive_bounds_are_preserved (test_solution.ClampTests.test_values_within_inclusive_bounds_are_preserved) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

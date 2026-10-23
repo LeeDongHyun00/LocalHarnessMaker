@@ -1,5 +1,7 @@
 ## Done
 
+- Published docs/eval-freeze-v2.md with the supplied 2026-10-24 Claude host evidence at main commit 9097281: digest, 100-task/20-family inventory, validation, calibration, shared-template limitation, immutable version 2 and post-freeze anti-contamination rule; moved fresh full A/B/harness runs to W2 in docs/plan.md. Host findings are attributed, not rerun here (`.venv/bin/python -m pytest tests/lead -q`: 104 passed; `git diff --check -- docs/eval-freeze-v2.md docs/plan.md state/STATUS-lead.md`: exit 0, no output).
+
 - Published user-approved interface version 2 under decision 0009: required task_false_done_rate, claimed_complete_task unit, valid-task-only numerator/denominator, missing-final exclusions and version 1 compatibility; updated example, AGENTS.md, interfaces and Role 5 prompt without changing eval/ or any other report field (`make validate-schemas`: Validated 6 draft 2020-12 schemas and 8 examples; `.venv/bin/python -m pytest tests/lead -q`: 104 passed in 4.07s).
 - Added lead regression checks for version 2 requirements, rate/unit/null boundaries, preservation of all version 1 fields and continued validity of the original version 1 example; recorded implementation follow-up for Role 5 and left staging/commits to the host (`.venv/bin/python -m pytest tests/lead -q`: 104 passed in 4.07s; `git diff --check -- AGENTS.md docs/interfaces.md docs/decisions/0009-task-level-false-done.md prompts/05-eval-engineer.md schemas tests/lead state/STATUS-lead.md`: exit 0, no output).
 
@@ -30,9 +32,9 @@
 ## Remaining
 
 - Role 5 follow-up for published interface version 2: implement task_false_done_rate in eval/metrics.py and the report builder using verifier/claims.py rules on the retained final message of the last session; validate valid-task-only populations, missing-final exclusions/reasons, bootstrap behavior and dual-version tools. Publication does not establish implementation or measurement. Host evaluation remains untouched.
-- D-6 docs/qa.md and docs/slides/outline.md remain deferred to a separate continuation after this user-prioritized interface publication, with measured/pending labels and evidence sources only.
+- D-6 docs/qa.md and docs/slides/outline.md remain deferred to a separate continuation after this user-prioritized freeze publication, with measured/pending labels and evidence sources only.
 
-- Track decision 0008 with Role 5: W2 build/validate/A-only calibration of separate version 2, then receive its freeze inventory/digest/evidence and publish a separate freeze record before fresh full A/B/harness runs in W2/W3. Final analysis is due 2026-11-13; retain native priority-tier evidence, pinned Standard-rate accounting and disclosure of version 1 runs informing the 10/23 fixes. No version 2 result may inform a harness change after freeze. This session completes documentation only; no task construction, freeze or tier verification is claimed.
+- Track Role 5's fresh full A, B and harness runs on frozen version 2 in W2, through 2026-11-06: A/harness on 100 tasks, B on 80 single-session tasks. Freeze publication is complete in docs/eval-freeze-v2.md; run completion remains unverified here. Final analysis is due 2026-11-13; retain native priority-tier evidence, pinned Standard-rate accounting and disclosure of version 1 runs informing the 10/23 fixes. No version 2 result may inform a harness change after freeze; task-set changes require version 3. Keep host evaluation untouched.
 - Pending Claude host acceptance for D-5/SC-4: execute the fresh-clone checklist in docs/demo.md (clone, venv, disposable installation/--check, committed offline evidence checkers, schema validation, full suite and a fresh typed-approval real demo); retain log/commit/version and all skip/xfail reasons. Documentation and existing-capture audits are complete; fresh-clone acceptance is not done.
 - Track decision 0006 run/session version recording, one-task audit smoke and mid-run detection through owning-role evidence. Registry publication is complete at 53cb8a9; registry membership alone does not prove all runtime version-policy behavior.
 
@@ -44,6 +46,8 @@
 - Role 5 expected failure: tests/eval/test_runner.py::test_stop_e1_partial_report_is_invalid_with_counts reports that aggregate-only halt invalidity would require a frozen-schema revision. Recorded only; no schema or eval change was made by this lead session.
 
 ## Decisions
+
+- Publish the version 2 freeze from user-supplied Claude host findings at 9097281, dated 2026-10-24: the user prioritizes this separate immutable record and moves full A/B/harness measurements into W2; no runtime, interface or historical freeze record changes are needed.
 
 - Publish interface version 2 under decision 0009, approved 2026-10-23: both task_false_done_rate populations contain valid tasks only; invalid tasks remain visible through existing invalid_reasons and validity fields. This resolves the earlier STOP-1 / STOP-L1 blocker.
 - Identify report versions by metrics.task_false_done_rate presence: version 1 reports remain valid under the original schema in decision 0003 and are compared only with tools accepting both versions; no historical report migration or new version field.
@@ -74,6 +78,8 @@
 - Retain the historical analyzer timing disagreement: decision 0007 resolves the QLoRA disagreement by dropping training and supersedes conflicting measurement dates with the approved W1–W3 windows.
 
 ## Verify commands
+
+- git diff --check -- docs/eval-freeze-v2.md docs/plan.md state/STATUS-lead.md
 
 - .venv/bin/python -m pytest tests/lead -q
 - make validate-schemas
@@ -107,23 +113,26 @@
 
 ## Do not touch
 
-- This session: eval/, docs/weekly/, docs/handoff/, CLAUDE.md, other roles' implementation/tests/STATUS and read-only .git; no staging, commits, network, nested Codex, live model calls or macOS sandbox-exec. The approved schema publication and prompts/05-eval-engineer.md update are explicitly authorized. Historical session scopes below do not restrict this approved revision.
+- This session: eval/, docs/weekly/, docs/handoff/, CLAUDE.md, other roles' implementation/tests/STATUS and read-only .git; no staging, commits, network, nested Codex, live model calls or macOS sandbox-exec. Edit only docs/eval-freeze-v2.md, docs/plan.md and state/STATUS-lead.md. Historical session scopes below do not restrict this publication.
 
 - Version 1 interfaces without new user approval, a decision record and a version increment.
-- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation edits only docs/decisions/0008-task-set-v2.md, docs/plan.md, docs/eval-freeze.md and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
+- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. The earlier decision-0008 session edited its decision, plan, version 1 freeze notice and lead STATUS; that historical scope does not authorize further edits here.
 - Existing harness/, experiments/, scripts/, legacy tests and unrelated user edits.
 - No git add -A, broad staging, foreign-path commit, deletion, history rewrite, hook registration or external configuration change.
 - Keep the canonical hook contract and captured evidence; never replace measured evidence with a placeholder or claim production behavior from startup probes.
 
 ## Assumptions
 
+- Version 2 inventory, frozen metadata, digest, validation, calibration and template limitation are user-supplied Claude host findings dated 2026-10-24 at main commit 9097281; this offline session does not independently verify them. The supplied pilot CI has no stated confidence level or interval method, so neither is inferred.
+- No PR was requested; this STATUS and the freeze record provide the change summary and assumptions for a future PR. The current commit plan contains only docs/eval-freeze-v2.md, docs/plan.md and state/STATUS-lead.md; no staging or commit is performed.
+
 - Decision 0009 approval and the valid-task-only population resolution are explicit user instructions dated 2026-10-23; no additional population assumption is made.
 - Existing artifact references carry final-message provenance and exclusion reasons without new per-task fields; Role 5 owns runtime integration and dual-version tool validation. No historical report migration or measured result is inferred.
-- No PR was requested; decision 0009 and this STATUS supply the change summary and assumptions for a future PR. The current commit plan contains the nine publication/documentation/test/status paths edited here; historical commit scopes below do not apply to this session.
+- Historical decision-0009 session: no PR was requested; its decision and STATUS supplied the change summary and assumptions, with nine publication/documentation/test/status paths in that session's commit plan.
 
-- Decision 0008 approval, baseline A figures/commit/version and the CLI Fast description are user-supplied facts; no host or network verification was performed. W2/W3 use decision 0007’s through-11/06 and through-11/13 windows. Version 2 task count, exact freeze date and digest await owning-role evidence.
+- Decision 0008 approval, baseline A figures/commit/version and the CLI Fast description are user-supplied facts; no host or network verification was performed. W2/W3 use decision 0007’s through-11/06 and through-11/13 windows. The formerly pending version 2 inventory, freeze date and digest are now published from the supplied 10/24 host evidence.
 - Historical D-5 assumption: that session documented current code and committed evidence only. Fresh-clone and live acceptance are assigned to Claude on the host after the active evaluation finishes; no result is inferred in advance.
-- No PR was requested; these decisions, assumptions and documented verification results are the change summary for a future PR description. The commit plan contains only the four documentation/status paths edited here.
+- Historical decision-0008 session: no PR was requested; its decisions, assumptions and verification results supplied a future PR summary, with four documentation/status paths in that session's commit plan.
 
 - No additional scope assumption: decision 0007 approval and the usage-limit clarification are explicit user instructions dated 2026-10-23. Integration review 1 is attributed Claude host evidence; this offline documentation session does not independently verify its measurements.
 

@@ -1,0 +1,91 @@
+{
+  "task_summary": "Implement the common-prefix behavior in solution.py, add public unittest regression coverage, and document design decisions and a verification command in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "Implement case-sensitive longest common character prefix behavior, including empty input returning an empty string and one item returning that item.",
+    "Do not impose an algorithmic complexity constraint."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines a typed public API that returns the longest case-sensitive common character prefix, with the specified empty-input and single-item behavior.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py. Assess whether it defines a type-hinted public API for returning the longest common character prefix, compares characters case-sensitively, returns an empty string for empty input, returns the sole item unchanged for one item, and does not mutate the input collection. Do not infer requirements beyond those stated."
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public test file contains at least three unittest test methods exercising the API.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); classes = [node for node in tree.body if isinstance(node, ast.ClassDef) and any((isinstance(base, ast.Name) and base.id == \"TestCase\") or (isinstance(base, ast.Attribute) and base.attr == \"TestCase\") for base in node.bases)]; assert sum(isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\") for cls in classes for node in cls.body) >= 3'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "HANDOFF.md records design decisions and the verification command `python -m unittest discover -v`.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?s)(?=.*design decisions)(?=.*python -m unittest discover -v)"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The implementation module and public test file compile successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "All named files are relative to the supplied task workspace; solution.py, test_solution.py, or HANDOFF.md may not exist yet and may be created.",
+    "The public API name and signature are unspecified; implementation and tests should use a suitable public function with type hints.",
+    "The unittest discovery command is expected to discover test_solution.py from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=843; distinct_files=3; tests_requested=true; requirement_segments=17; score=7"
+  },
+  "cost_estimate": {
+    "input_tokens": 17399,
+    "output_tokens": 658,
+    "usd": 0.00072106
+  }
+}

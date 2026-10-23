@@ -1,0 +1,74 @@
+{
+  "task_summary": "Refactor unique and unique_legacy in solution.py to share one private helper while preserving compatibility and behavior, and update public tests to exercise the API.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve both public signatures, return types, error behavior, input immutability, imports, and public names.",
+    "Return each string once in first-occurrence order; empty input returns []; equality is case-sensitive.",
+    "Maintain type hints; no algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least two passing unittest test methods exercising the public API.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py contains both public function definitions and a private helper used to share their algorithm.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)def unique\\b.*?def unique_legacy\\b.*?def _[A-Za-z0-9_]+\\b"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public tests contain at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def test_[A-Za-z0-9_]+\\s*\\(.*?\\):.*?){2}"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The requested unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "Both public functions and the private helper preserve the stated first-occurrence, case-sensitive unique-string behavior, empty-input result, and input immutability.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether unique and unique_legacy delegate the shared algorithm to one private helper, preserve both signatures, return types, error behavior, input immutability, imports and public names, and implement the stated behavior: each string appears once in first-occurrence order, empty input returns [], and equality is case-sensitive. Assess whether type hints are maintained. Do not infer behavior absent from the files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are interpreted as paths relative to the supplied workspace; solution.py or test_solution.py may not exist yet and may be created.",
+    "No pre-existing signatures, return type details, or error cases are specified beyond the requirement to preserve them; their prior forms must be determined from available task files before editing.",
+    "The requested unittest discovery command is used as written; the suite is assumed to be discoverable by python -m unittest discover -v."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=842; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17395,
+    "output_tokens": 594,
+    "usd": 0.00068866
+  }
+}

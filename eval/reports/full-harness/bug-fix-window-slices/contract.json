@@ -1,0 +1,82 @@
+{
+  "task_summary": "Fix incorrect window generation behavior in solution.py without changing its signature, add regression coverage in test_solution.py, and preserve the stated API and compatibility requirements.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Keep the existing function signature and type hints.",
+    "Return contiguous windows of exactly size, advancing by one; raise ValueError when size <= 0; return [] when size exceeds input length.",
+    "Do not mutate input collections; no algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least one passing unittest test method exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py and test_solution.py compile successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The regression tests pass under unittest discovery.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least one unittest test method.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The implementation retains a callable windows definition with type hints and does not mutate the input collection; its visible code should produce contiguous windows of the requested size, reject nonpositive sizes with ValueError, and return an empty list when size exceeds input length.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether it preserves the existing windows function signature and type hints, avoids mutating input collections, and implements the requested public behavior: contiguous windows of exactly size advancing by one, ValueError for size <= 0, and [] when size exceeds input length. Do not infer behavior from files outside the workspace."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are interpreted as relative paths in the supplied task workspace; they may not exist yet and may be created.",
+    "The exact windows function location within solution.py and its current signature are unknown; preserve the signature present in the supplied file.",
+    "The unittest suite is assumed discoverable by `python -m unittest discover -v` as requested.",
+    "The test file is assumed to exercise the public API through the existing import and invocation conventions in the supplied workspace."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=777; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17393,
+    "output_tokens": 571,
+    "usd": 0.00067696
+  }
+}

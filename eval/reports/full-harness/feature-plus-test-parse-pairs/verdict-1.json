@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+parse_pairs\\s*\\(\n2: \n3: \n4: def parse_pairs(text: str) -> dict[str, str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:^|\\n)\\s*def\\s+test_\\w+\\s*\\([^)]*\\).*?(?:^|\\n)\\s*def\\s+test_\\w+\\s*\\(\n8: class ParsePairsTests(unittest.TestCase):\n9:     def test_ordinary_records_and_repeated_keys(self) -> None:\n10:         text = \" name = Alice \\n city=Seoul\\nname = Bob \"\n11:         self.assertEqual(parse_pairs(text), {\"name\": \"Bob\", \"city\": \"Seoul\"})\n12: \n13:     def test_first_equals_and_empty_values(self) -> None:\n17:         )\n18: \n19:     def test_empty_and_blank_inputs(self) -> None:\n20:         for text in (\"\", \"\\n\", \" \\t\\r\\n\\n  \"):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_blank_lines_and_crlf (test_solution.ParsePairsTests.test_blank_lines_and_crlf) ... ok\ntest_empty_and_blank_inputs (test_solution.ParsePairsTests.test_empty_and_blank_inputs) ... ok\ntest_first_equals_and_empty_values (test_solution.ParsePairsTests.test_first_equals_and_empty_values) ... ok\ntest_invalid_records (test_solution.ParsePairsTests.test_invalid_records) ... ok\ntest_ordinary_records_and_repeated_keys (test_solution.ParsePairsTests.test_ordinary_records_and_repeated_keys) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

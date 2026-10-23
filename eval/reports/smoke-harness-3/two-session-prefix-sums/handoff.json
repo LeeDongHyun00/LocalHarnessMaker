@@ -1,0 +1,45 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` exists in the workspace."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`solution.py` defines typed public function `prefix(items: list[int]) -> list[int]`."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "The verified implementation returns inclusive prefix sums, preserves input length and contents, and handles empty and negative-valued inputs."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`test_solution.py` contains six unittest methods exercising the public API."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "`python -m unittest discover -v` completed successfully; all six tests passed."
+    },
+    {
+      "criterion_id": "SC-6",
+      "artifact": "`HANDOFF.md` records design decisions and the requested verification command."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Use a running total, appending each cumulative value to a fresh list.",
+      "why": "Produces inclusive prefix sums while preserving input contents and length."
+    },
+    {
+      "what": "Keep the public API as `prefix(items: list[int]) -> list[int]`.",
+      "why": "Preserves the typed function signature already present in `solution.py`."
+    }
+  ],
+  "verify_commands": [
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` implements typed `common(items: list[str]) -> str`, with case-sensitive prefix comparison, empty/single-item behavior, and no input mutation; `test_solution.py` also checks input preservation."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`test_solution.py` contains eight unittest methods; the contract’s AST check exited 0."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`HANDOFF.md` records design decisions and `python -m unittest discover -v`."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`python -m py_compile solution.py test_solution.py` exited 0."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "`python -m unittest discover -v` exited 0; all eight tests passed."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Preserve `common(items: list[str]) -> str` and shorten a local prefix using direct character comparisons.",
+      "why": "Implements the required case-sensitive common character prefix while avoiding mutation."
+    },
+    {
+      "what": "Return an empty string for empty input and the original sole item for one-item input.",
+      "why": "Matches the specified edge-case behavior."
+    },
+    {
+      "what": "Use Python 3.11+ and only the standard library; compare Unicode characters directly without normalization or case folding.",
+      "why": "Documented design choices in HANDOFF.md."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py test_solution.py",
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": []
+}

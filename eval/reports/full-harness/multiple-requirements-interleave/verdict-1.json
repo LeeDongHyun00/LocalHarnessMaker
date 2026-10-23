@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)\"\"\"(?:(?!\"\"\").)*(?:left|first).*(?:right|second).*(?:remainder|remaining).*(?:empty).*(?:mutat|unchanged)(?:(?!\"\"\").)*\"\"\"\n1: \"\"\"Public task implementation.\"\"\"\n2: \n3: \n4: def interleave(left: list[int], right: list[int]) -> list[int]:\n5:     \"\"\"Alternate left then right items, preserving their values and order.\n6: \n7:     Append the longer input's remainder in order. Either or both inputs may be\n8:     empty. Return a new list without mutating either input collection.\n9:     \"\"\"",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\")]; assert len(methods) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "llm_judge: `test_solution.py` imports `interleave` from `solution` and asserts `[1, 4, 2, 5, 3, 6]` for equal-length inputs. Its remainder test checks longer left and longer right outputs in order. Its empty-input test covers both inputs empty and either side empty. `solution.py` defines the public `interleave` function.",
+      "reason": "The tests call the public `interleave` API and cover left-then-right alternation, both longer-input remainder directions, and empty inputs."
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_accepts_empty_inputs (test_solution.InterleaveTests.test_accepts_empty_inputs) ... ok\ntest_accepts_same_collection_for_both_inputs (test_solution.InterleaveTests.test_accepts_same_collection_for_both_inputs) ... ok\ntest_alternates_left_then_right (test_solution.InterleaveTests.test_alternates_left_then_right) ... ok\ntest_preserves_longer_input_remainder_order (test_solution.InterleaveTests.test_preserves_longer_input_remainder_order) ... ok\ntest_preserves_values_and_does_not_mutate_inputs (test_solution.InterleaveTests.test_preserves_values_and_does_not_mutate_inputs) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}
