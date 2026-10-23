@@ -1,0 +1,10 @@
+{
+  "id": "v2-cache-invalidation-two-session",
+  "type": "multiple_requirements",
+  "family": "cache-invalidation",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

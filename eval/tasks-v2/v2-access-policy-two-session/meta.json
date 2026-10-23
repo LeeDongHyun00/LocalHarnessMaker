@@ -1,0 +1,10 @@
+{
+  "id": "v2-access-policy-two-session",
+  "type": "multiple_requirements",
+  "family": "access-policy",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

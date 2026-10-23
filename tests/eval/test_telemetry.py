@@ -2,10 +2,13 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 
-from eval.runner.telemetry import collect
+from eval.runner.telemetry import collect, capture_tier
+from eval.runner.pricing import select
+from eval.runner import core
 
 
 def test_records_account_snapshots_without_inferring_a_task_charge(tmp_path: Path) -> None:
@@ -97,3 +100,33 @@ def test_native_unknown_tier_is_not_assumed_standard(tmp_path: Path) -> None:
     native.write_text(json.dumps({'type': 'turn_context', 'payload': {
         'model': 'gpt-6.1-sol', 'effort': 'medium', 'service_tier': 'priority'}}) + '\n')
     assert collect([], [native], 'gpt-6.1-sol', 'medium')['pricing_evidence']['tier'] == 'unknown'
+
+
+@pytest.mark.parametrize('model,tier', [('gpt-6.1-sol', 'standard'), ('gpt-6-luna', 'priority')])
+@pytest.mark.parametrize('record', ['absent', 'omitted', 'null'])
+def test_unrequested_tier_uses_model_default_snapshot(tmp_path: Path, model: str, tier: str, record: str) -> None:
+    native = tmp_path / 'native.jsonl'
+    settings: dict[str, Any] = {'model': model, 'reasoning_effort': 'medium'}
+    if record == 'null':
+        settings['service_tier'] = None
+    applied = {'type': 'event_msg', 'payload': {'type': 'thread_settings_applied', 'thread_settings': settings}}
+    native.write_text((json.dumps(applied) + '\n') if record != 'absent' else '')
+    prices = json.loads((core.REPOSITORY / 'eval/prices.yaml').read_text())
+    for evidence in (collect([], [native], model, 'medium')['pricing_evidence'],
+                     capture_tier([native], {}, model=model)):
+        assert evidence['tier'] == tier
+        assert 'inferred from the model default' in evidence['basis']
+        rate, reference = select(prices, model, evidence['tier'])
+        assert rate is not None and ('-fast-' in reference) == (tier == 'priority')
+    assert capture_tier([native], {}, model=model, service_tier='priority')['tier'] == 'unknown'
+    assert not collect([], [native], model, 'medium', 'priority')['settings_evidence']['service_tier_verified']
+
+
+@pytest.mark.parametrize('value,expected', [('default', 'standard'), ('priority', 'priority'),
+                                         ('unknown', 'unknown'), (42, 'unknown')])
+def test_explicit_native_tier_is_preserved_without_default_guessing(tmp_path: Path, value: Any, expected: str) -> None:
+    native = tmp_path / 'native.jsonl'
+    native.write_text(json.dumps({'type': 'event_msg', 'payload': {'type': 'thread_settings_applied',
+        'thread_settings': {'service_tier': value}}}) + '\n')
+    assert capture_tier([native], {}, model='gpt-6.1-sol')['tier'] == expected
+    assert collect([], [native], 'gpt-6.1-sol', 'medium')['pricing_evidence']['tier'] == expected

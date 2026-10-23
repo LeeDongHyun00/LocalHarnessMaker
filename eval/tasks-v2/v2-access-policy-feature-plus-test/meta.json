@@ -1,0 +1,10 @@
+{
+  "id": "v2-access-policy-feature-plus-test",
+  "type": "feature_plus_test",
+  "family": "access-policy",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

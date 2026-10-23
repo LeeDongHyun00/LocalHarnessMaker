@@ -18,7 +18,8 @@ def test_candidate_inventory_and_pilot_configuration() -> None:
     config = core.load_config(core.REPOSITORY / 'eval/configs/pilot-v2-a.yaml')
     root = core.task_directory(config)
     tasks = sorted(p.name for p in root.iterdir() if p.is_dir())
-    assert sorted(config['tasks']) == tasks and len(tasks) == 20
+    pilot_tasks = set(config['tasks'])
+    assert pilot_tasks < set(tasks) and len(pilot_tasks) == 20 and len(tasks) == 100
     v1 = {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir() if p.is_dir()}
     assert not set(tasks) & v1
     families: dict[str, list[dict[str, Any]]] = {}
@@ -28,9 +29,16 @@ def test_candidate_inventory_and_pilot_configuration() -> None:
         assert meta['frozen'] is False and meta['version'] == 2
         assert (root / task / 'day2.md').is_file() == meta['two_session']
         assert 3 <= len(list((root / task / 'workspace/project').glob('*.py'))) <= 8
-        assert len(__import__('re').findall(r'(?m)^R\d+\.', (root / task / 'prompt.md').read_text())) == (10 if meta['two_session'] else 12)
+        text = (root / task / 'prompt.md').read_text()
+        count = len(__import__('re').findall(r'(?m)^R\d+\.', text))
+        assert count == ((10 if meta['two_session'] else 12) if task in pilot_tasks else 16)
+        if task not in pilot_tasks and meta['two_session']:
+            tomorrow = (root / task / 'day2.md').read_text()
+            assert len(__import__('re').findall(r'(?m)^D\d+\.', tomorrow)) == 2
+            assert meta['family'] not in tomorrow
+            assert 'casefold' not in tomorrow and "replace('_'" not in tomorrow
         families.setdefault(meta['family'], []).append(meta)
-    assert len(families) == 4
+    assert len(families) == 20
     for members in families.values():
         assert len(members) == 5 and sum(m['two_session'] for m in members) == 1
         assert {m['type'] for m in members} == {'bug_fix', 'feature_plus_test', 'multiple_requirements', 'constrained_refactoring'}
@@ -40,6 +48,43 @@ def test_candidate_inventory_and_pilot_configuration() -> None:
     assert config['codex_version'] == 'codex-cli 0.163.0-alpha.11.1'
     assert config['timeout_seconds'] == 900 and core.paid_call_bound(config) == 24
     assert set(config['task_timeout_seconds'].values()) == {1800}
+
+
+@pytest.mark.parametrize('name, count, effort, calls', [
+    ('a', 100, 'medium', 120), ('b', 80, 'max', 80),
+    ('harness', 100, 'medium', 780),
+])
+def test_full_v2_population_and_prefreeze_refusal(
+    tmp_path: Path, name: str, count: int, effort: str, calls: int,
+) -> None:
+    path = core.REPOSITORY / f'eval/configs/full-v2-{name}.yaml'
+    config = core.load_config(path)
+    population = sorted(p.name for p in core.task_directory(config).glob('v2-*') if p.is_dir())
+    assert config['tasks'] == sorted(config['tasks'])
+    assert len(config['tasks']) == count and len(population) == 100
+    assert config.get('task_population', config['tasks']) == population
+    assert config['reasoning_effort'] == effort and config['model'] == 'gpt-6.1-sol'
+    assert config['service_tier'] == 'priority' and config['calibration'] is False
+    assert config['codex_version'] == 'codex-cli 0.163.0-alpha.11.1'
+    assert config['retry_limit'] == 0 and core.paid_call_bound(config) == calls
+    assert config['harness'] == (name == 'harness')
+    assert config['control_backend'] == ('codex_cli' if name == 'harness' else 'none')
+    assert config['reinstruction_limit'] == (2 if name == 'harness' else 0)
+    expected_two = {task for task in population
+                    if (core.task_directory(config) / task / 'day2.md').is_file()}
+    assert set(config['task_timeout_seconds']) == (set() if name == 'b' else expected_two)
+    if name == 'b':
+        assert not set(config['tasks']) & expected_two
+    else:
+        assert config['tasks'] == population
+
+    def forbidden(*args: Any, **kwargs: Any) -> Any:
+        raise AssertionError('Unfrozen population must fail before external calls')
+
+    with pytest.raises(ValueError, match='frozen'):
+        core.run(path, tmp_path / 'out', tmp_path / 'unused-private',
+                 execute=forbidden, version=forbidden)
+    assert not (tmp_path / 'out').exists()
 
 
 @pytest.mark.parametrize('root', ['', '../tasks', '/tmp/tasks', 'eval/../tasks', 'eval/tasks/', 'eval/tasks/a', None, 1])

@@ -45,11 +45,12 @@ def exit_time_ns(recorded: dict[str, Any], task: dict[str, Any]) -> int:
 
 
 def verify(workspace: Path, recorded: dict[str, Any],
-           task: dict[str, Any] | None = None) -> dict[str, Any] | None:
-    """Try recorded digests first, then legacy published hashes plus exit mtimes.
+           task: dict[str, Any] | None = None, *,
+           published_workspace: Path | None = None) -> dict[str, Any] | None:
+    """Try recorded digests, then legacy published pins/copy plus exit mtimes.
 
     Explicit v2/unknown versions never use legacy recovery. Both v1 and v2 must
-    fail before published artifacts can establish the unchanged source set.
+    fail before published evidence can establish the unchanged source set.
     Return provenance only; never repin historical workspace or artifact hashes.
     """
     version = core.matching_workspace_digest_version(workspace, recorded)
@@ -64,34 +65,50 @@ def verify(workspace: Path, recorded: dict[str, Any],
     try:
         refs = workspace_artifacts(task)
         pinned = {name: ref['sha256'] for name, ref in refs}
-        if (not pinned or len(pinned) != len(refs) or
+        if (len(pinned) != len(refs) or
                 any(not re.fullmatch(r'[0-9a-f]{64}', value) for value in pinned.values()) or
                 not safe_source(workspace, workspace.parent)):
             return None
         cutoff = exit_time_ns(recorded, task)
-        observed = {}
-
-        def unreadable(error: OSError) -> None:
-            raise error
-
-        for directory, directories, files in os.walk(workspace, followlinks=False, onerror=unreadable):
-            ignored = core.WORKSPACE_COPY_IGNORE(directory, directories + files)
-            directories[:] = [name for name in directories if name not in ignored]
-            for name in directories + files:
-                if name in ignored:
-                    continue
-                path = Path(directory) / name
-                info = path.lstat()
-                if stat.S_ISDIR(info.st_mode):
-                    continue
-                if not stat.S_ISREG(info.st_mode) or info.st_mtime_ns > cutoff:
-                    return None
-                observed[path.relative_to(workspace).as_posix()] = digest(path.read_bytes())
+        method = 'published_artifact_hashes'
+        if not refs:
+            if (published_workspace is None or not safe_source(
+                    published_workspace, published_workspace.parent.parent) or
+                    published_workspace.resolve() == workspace.resolve()):
+                return None
+            pinned = _files(published_workspace)
+            method = 'published_workspace_copy'
+        observed = _files(workspace, cutoff=cutoff)
         if observed != pinned:
             return None
-        return {'workspace_verification': 'published_artifact_hashes',
+        return {'workspace_verification': method,
                 'published_file_count': len(pinned), 'workspace_file_count': len(observed),
                 'hashes_compared': len(observed), 'mtimes_checked': len(observed),
                 'last_exit_time_ns': cutoff}
     except (KeyError, TypeError, ValueError, OSError, OverflowError):
         return None
+
+
+def _files(root: Path, *, cutoff: int | None = None) -> dict[str, str]:
+    """Hash regular non-cache files; refuse links, unreadable trees and late files."""
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError('Missing or unsafe workspace copy')
+    observed: dict[str, str] = {}
+
+    def unreadable(error: OSError) -> None:
+        raise error
+
+    for directory, directories, files in os.walk(root, followlinks=False, onerror=unreadable):
+        ignored = core.WORKSPACE_COPY_IGNORE(directory, directories + files)
+        directories[:] = [name for name in directories if name not in ignored]
+        for name in directories + files:
+            if name in ignored:
+                continue
+            path = Path(directory) / name
+            info = path.lstat()
+            if stat.S_ISDIR(info.st_mode):
+                continue
+            if not stat.S_ISREG(info.st_mode) or cutoff is not None and info.st_mtime_ns > cutoff:
+                raise ValueError('Unsafe or modified workspace file')
+            observed[path.relative_to(root).as_posix()] = digest(path.read_bytes())
+    return observed

@@ -1,0 +1,10 @@
+{
+  "id": "v2-job-queues-two-session",
+  "type": "multiple_requirements",
+  "family": "job-queues",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

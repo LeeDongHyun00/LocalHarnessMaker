@@ -1,0 +1,10 @@
+{
+  "id": "v2-rate-budgets-bug-fix",
+  "type": "bug_fix",
+  "family": "rate-budgets",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

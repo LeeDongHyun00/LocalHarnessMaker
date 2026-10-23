@@ -1,0 +1,10 @@
+{
+  "id": "v2-text-indexing-feature-plus-test",
+  "type": "feature_plus_test",
+  "family": "text-indexing",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

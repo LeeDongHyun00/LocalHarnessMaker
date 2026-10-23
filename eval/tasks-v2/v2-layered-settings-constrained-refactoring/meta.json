@@ -1,0 +1,10 @@
+{
+  "id": "v2-layered-settings-constrained-refactoring",
+  "type": "constrained_refactoring",
+  "family": "layered-settings",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

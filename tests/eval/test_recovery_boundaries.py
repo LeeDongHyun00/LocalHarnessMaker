@@ -156,11 +156,14 @@ def change_legacy(source: Path, case: str) -> None:
         source_file.write_text('modified source')
         # A bounded timestamp cannot waive a published content-hash mismatch.
         os.utime(source_file, ns=(retained_mtime, retained_mtime))
-    elif case == 'missing_artifacts':
+    elif case in {'missing_artifacts', 'missing_publication'}:
         report = json.loads((source / 'report.json').read_text())
         for task in report['tasks']:
             task['artifacts'] = [ref for ref in task['artifacts'] if '/workspace/' not in ref['path']]
         core.write_json(source / 'report.json', report)
+        if case == 'missing_publication':
+            for task in report['tasks']:
+                (source / task['task_id'] / 'workspace').rename(source / task['task_id'] / 'unavailable-workspace')
     elif case == 'late_mtime':
         cutoff = exit_time_ns(entry, next(t for t in json.loads((source / 'report.json').read_text())['tasks']
                                         if t['task_id'] == 'bug-chunk-tail'))
@@ -173,17 +176,21 @@ def change_legacy(source: Path, case: str) -> None:
 
 
 @pytest.mark.parametrize('explicit', [False, True])
-@pytest.mark.parametrize('case', ['unchanged', 'modified', 'missing_artifacts', 'late_mtime', 'extra_file', 'missing_file'])
+@pytest.mark.parametrize('reference', ['pins', 'copy'])
+@pytest.mark.parametrize('case', ['unchanged', 'modified', 'missing_artifacts', 'missing_publication', 'late_mtime', 'extra_file', 'missing_file'])
 def test_harness_legacy_regrade_requires_all_published_hashes_and_bounded_mtimes(
-        setup: tuple[Path, Path, Path], tmp_path: Path, explicit: bool, case: str) -> None:
+        setup: tuple[Path, Path, Path], tmp_path: Path, explicit: bool, reference: str, case: str) -> None:
     root, config, source = setup
     harness_config(config)
     core.run(config, source, root, execute=HarnessExecutor(), version=VERSION)
     state, _ = legacy_workspace(source, explicit=explicit)
+    if reference == 'copy':
+        change_legacy(source, 'missing_artifacts')
     change_legacy(source, case)
+    method = 'published_workspace_copy' if reference == 'copy' or case == 'missing_artifacts' else 'published_artifact_hashes'
     before = (source / 'checkpoint.json').read_bytes()
     out = tmp_path / 'regraded'
-    if case != 'unchanged':
+    if case not in {'unchanged', 'missing_artifacts'}:
         def forbidden(*args: Any, **kwargs: Any) -> ProcessResult:
             pytest.fail('Refusal must precede all calls')
         with pytest.raises(ValueError, match='hash mismatch'):
@@ -194,11 +201,11 @@ def test_harness_legacy_regrade_requires_all_published_hashes_and_bounded_mtimes
         report = json.loads(regrade.regrade(root, source, out).read_text())
         assert report['tasks'][0]['outcome'] == 'pass'
         provenance = json.loads((out / 'bug-chunk-tail/regrade-provenance.json').read_text())
-        assert provenance['workspace_verification'] == 'published_artifact_hashes'
+        assert provenance['workspace_verification'] == method
         assert provenance['hashes_compared'] == provenance['mtimes_checked'] > 0
         assert provenance['published_file_count'] == provenance['workspace_file_count']
         checks = json.loads((out / 'run-diagnostics.json').read_text())['workspace_hash_checks']
-        assert checks[0]['workspace_verification'] == 'published_artifact_hashes'
+        assert checks[0]['workspace_verification'] == method
         assert checks[0]['observed_sha256'] is None
         assert any(Path(ref['path']).name == 'regrade-provenance.json' for ref in report['tasks'][0]['artifacts'])
         assert json.loads(regrade.regrade(root, out, tmp_path / 'again').read_text())['tasks'][0]['outcome'] == 'pass'
@@ -206,7 +213,7 @@ def test_harness_legacy_regrade_requires_all_published_hashes_and_bounded_mtimes
     assert (source / 'checkpoint.json').read_bytes() == before
 
 
-@pytest.mark.parametrize('case', ['unchanged', 'modified', 'missing_artifacts'])
+@pytest.mark.parametrize('case', ['unchanged', 'modified', 'missing_artifacts', 'missing_publication'])
 def test_rerun_invalid_legacy_verification(
         setup: tuple[Path, Path, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
     root, _, source = infrastructure_source(setup, monkeypatch, tmp_path)
@@ -215,11 +222,11 @@ def test_rerun_invalid_legacy_verification(
     executor = Executor()
 
     def execute(argv: list[str], **kwargs: Any) -> ProcessResult:
-        assert case == 'unchanged', 'Refusal must precede all calls'
+        assert case in {'unchanged', 'missing_artifacts'}, 'Refusal must precede all calls'
         return executor(argv, **kwargs) if argv[0] == 'codex' else run_process(argv, **kwargs)
 
     out = tmp_path / 'rerun'
-    if case != 'unchanged':
+    if case not in {'unchanged', 'missing_artifacts'}:
         with pytest.raises(ValueError, match='hash mismatch'):
             rerun_invalid.rerun_invalid(root, source, out, {'execution_interrupted'}, execute=execute, version=VERSION)
         assert not out.exists()
@@ -228,11 +235,11 @@ def test_rerun_invalid_legacy_verification(
                                                       execute=execute, version=VERSION).read_text())
         assert executor.calls == 1 and all(task['outcome'] == 'pass' for task in report['tasks'])
         evidence = json.loads((out / 'bug-chunk-tail/rerun-provenance.json').read_text())
-        assert evidence['workspace_verification'] == 'published_artifact_hashes'
+        assert evidence['workspace_verification'] == ('published_workspace_copy' if case == 'missing_artifacts' else 'published_artifact_hashes')
         assert evidence['hashes_compared'] == evidence['mtimes_checked'] > 0
 
 
-@pytest.mark.parametrize('case', ['unchanged', 'modified', 'missing_artifacts'])
+@pytest.mark.parametrize('case', ['unchanged', 'modified', 'missing_artifacts', 'missing_publication'])
 def test_day2_legacy_verification_and_aliased_continuation(
         stopped: tuple[Path, Path, Any], tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
     root, source, executor = stopped
@@ -243,7 +250,7 @@ def test_day2_legacy_verification_and_aliased_continuation(
     base = continuation_executor(executor, old_runtime)
 
     def execute(argv: list[str], **kwargs: Any) -> ProcessResult:
-        assert case == 'unchanged', 'Refusal must precede all calls'
+        assert case in {'unchanged', 'missing_artifacts'}, 'Refusal must precede all calls'
         result = base(argv, **kwargs)
         if argv[0] == 'codex':
             runtime = kwargs['cwd'].parent
@@ -259,7 +266,7 @@ def test_day2_legacy_verification_and_aliased_continuation(
         return result
 
     out = tmp_path / 'continued'
-    if case != 'unchanged':
+    if case not in {'unchanged', 'missing_artifacts'}:
         with pytest.raises(ValueError):
             continue_day2.continue_day2(root, source, out, execute=execute, version=VERSION)
         assert not out.exists()
@@ -267,7 +274,7 @@ def test_day2_legacy_verification_and_aliased_continuation(
         report = json.loads(continue_day2.continue_day2(root, source, out, execute=execute, version=VERSION).read_text())
         assert report['tasks'][0]['outcome'] == 'pass'
         evidence = json.loads((out / 'bug-chunk-tail/continuation.json').read_text())
-        assert evidence['workspace_verification'] == 'published_artifact_hashes'
+        assert evidence['workspace_verification'] == ('published_workspace_copy' if case == 'missing_artifacts' else 'published_artifact_hashes')
         assert evidence['hashes_compared'] == evidence['mtimes_checked'] > 0
         assert evidence['copy_hash_matched'] is False
         assert evidence['copied_workspace_sha256'] != evidence['day1_workspace_exit_sha256']
@@ -295,4 +302,55 @@ def test_artifact_fallback_stays_fail_closed(setup: tuple[Path, Path, Path], cas
         entry['segments'][-1]['exited_at'] = '2099-01-01T00:00:00+00:00'
     else:
         entry['segments'][-1]['exited_at'] = task['executor_segments'][-1]['exited_at'] = '2026-10-23T00:00:00'
-    assert verify(workspace, entry, task) is None
+    assert verify(workspace, entry, task, published_workspace=source / task['task_id'] / 'workspace') is None
+
+
+@pytest.mark.parametrize('case', ['unchanged', 'changed_bytes', 'missing', 'extra', 'late',
+    'copy_symlink', 'inner_symlink', 'runtime_symlink', 'missing_copy', 'v2', 'unknown_version', 'bad_pin'])
+def test_published_copy_checks_noncache_bytes_file_sets_and_runtime_mtimes(tmp_path: Path, case: str) -> None:
+    workspace = tmp_path / 'runtime/workspace'
+    workspace.mkdir(parents=True)
+    (workspace / 'nested').mkdir()
+    binary = workspace / 'nested/source.bin'
+    binary.write_bytes(b'\x00\xff\r\nretained bytes')
+    published = tmp_path / 'report/legacy-task/workspace'
+    shutil.copytree(workspace, published)
+    exits = [{'exited_at': '2026-10-23T00:00:00+00:00'}]
+    entry = {'segments': exits, 'workspace_exit_sha256': '0' * 64}
+    task = {'task_id': 'legacy-task', 'artifacts': [], 'executor_segments': copy.deepcopy(exits)}
+    cutoff = exit_time_ns(entry, task)
+    os.utime(binary, ns=(cutoff, cutoff))  # Equal to the last exit is permitted.
+    # Committed/copy mtimes are irrelevant; runtime cache bytes/mtimes are ignored.
+    for root in (workspace, published):
+        add_caches(root)
+    (published / '__pycache__/solution.cpython-313.pyc').write_bytes(b'different cache')
+    if case == 'changed_bytes':
+        binary.write_bytes(b'\x00\xff\nretained bytes')  # No text/newline normalization.
+        os.utime(binary, ns=(cutoff, cutoff))
+    elif case == 'missing':
+        binary.rename(workspace.parent / 'unavailable.bin')
+    elif case == 'extra':
+        extra = workspace / 'extra.bin'
+        extra.write_bytes(b'extra')
+        os.utime(extra, ns=(cutoff, cutoff))
+    elif case == 'late':
+        os.utime(binary, ns=(cutoff + 1, cutoff + 1))
+    elif case == 'copy_symlink':
+        published.rename(published.parent / 'reference')
+        published.symlink_to('reference', target_is_directory=True)
+    elif case == 'inner_symlink':
+        (published / 'linked').symlink_to('nested/source.bin')
+    elif case == 'runtime_symlink':
+        (workspace / 'linked').symlink_to('nested/source.bin')
+    elif case == 'missing_copy':
+        published.rename(published.parent / 'unavailable')
+    elif case in {'v2', 'unknown_version'}:
+        entry['workspace_digest_version'] = 2 if case == 'v2' else 3
+    elif case == 'bad_pin':
+        task['artifacts'] = [{'path': str(published / 'nested/source.bin'), 'sha256': '1' * 64}]
+    result = verify(workspace, entry, task, published_workspace=published)
+    if case == 'unchanged':
+        assert result['workspace_verification'] == 'published_workspace_copy'
+        assert result['hashes_compared'] == result['mtimes_checked'] == 1
+    else:
+        assert result is None

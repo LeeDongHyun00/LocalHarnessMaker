@@ -1,0 +1,10 @@
+{
+  "id": "v2-layered-settings-multiple-requirements",
+  "type": "multiple_requirements",
+  "family": "layered-settings",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

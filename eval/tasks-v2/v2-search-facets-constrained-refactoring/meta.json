@@ -1,0 +1,10 @@
+{
+  "id": "v2-search-facets-constrained-refactoring",
+  "type": "constrained_refactoring",
+  "family": "search-facets",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

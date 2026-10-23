@@ -1,3 +1,70 @@
+# Host recovery, default-tier pricing and eligibility diagnostics — 2026-10-24
+
+When a legacy workspace pin fails both digest algorithms and the report has no
+workspace artifact entries, compare the retained non-cache files with the
+trusted published TASK/workspace copy. Require identical bytes/file sets and
+runtime file mtimes at or before the matching recorded exits. Preserve the
+pinned-artifact path and historical hashes. Regrade, rerun, continuation and
+retained-context audits record `workspace_verification: published_workspace_copy`
+with comparison counts; regrade retains the published copy for later recovery.
+
+For unrequested executor tiers, omitted/null applied tiers use the model's CLI
+default: Sol 6.1 Standard and Luna priority. Per-process evidence and pricing
+provenance label the inference; explicit native default maps to Standard.
+Explicit requests still require matching native applied evidence. Control
+accounting and retained historical report costs remain unchanged.
+
+Allow valid null-cost interrupted/resumed tasks with missing usage to qualify
+for rerun_unaccounted even without historical tier/price evidence. Archive those
+unknowns under the existing replacement policy. Keep complete-usage/price-only
+gaps, missing controls, unmarked gaps and access/audit failures ineligible.
+Refusals identify safe failed conditions, including through CLI stderr.
+
+Regression coverage uses synthetic retained workspaces/logs and mocked executor,
+controller and judge protocols. Host reruns and actual recovery metrics remain
+pending; no private grader root, model call, network, staging or commit was used.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1,662 passed in
+357.51s. Focused eligibility/CLI checks after the diagnostic refinement —
+21 passed in 28.73s; published-copy boundary checks — 12 passed in 14.66s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` — exit 0.
+
+# Full unfrozen version 2 population — 2026-10-24
+
+Record the user-supplied calibration result (15/19 valid tasks, 0.789,
+95% interval 0.579–0.947) and retain all twenty pilot tasks unchanged. Add the
+remaining sixteen families / eighty tasks with sixteen numbered requirements
+per single-session task and eighteen across two days. Make interacting policies,
+shared call paths, exact constraints and structured day-1 records explicit in
+the public prompts. Keep graders, coverage, references and mutation material
+external; publish task IDs and numbers in reports/full-v2-validation.md.
+
+Offline validation: 100 references pass, 100 starters fail, 1,564 requirements
+have executed mappings, and all 100 graders are distinct. Public assertion
+line overlap is zero. Exhaustive AST mutation validation records 6,092 killed,
+49 explicitly reviewed/hash-bound equivalents and zero survivors. Input pins
+and candidate enumeration are checked independently after all mutation runs.
+Against 376 actual corpus files, retain 20 task warnings / 224 assertion-line
+occurrences; these diagnostics do not waive public-input overlap failures.
+
+Add lexicographic full-v2 A and harness selections over 100 tasks / 120 sessions,
+and B over 80 single-session tasks at Sol max with the 100-task population pin.
+A/harness use Sol medium; all request Fast priority and Codex
+0.163.0-alpha.11.1. Harness uses codex_cli and reinstruction_limit=2. Matched
+STOP-3 estimates use the existing Fast snapshot with 120/80/780 call bounds
+before dynamic judges. New config tests verify population parity and refusal
+before any external call while unfrozen.
+
+Validation: `PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest tests/eval -q`
+— 1611 passed in 233.65s. `git diff --check -- eval tests/eval state/STATUS-eval.md`
+— exit 0. Scope checks: 1,068 changed files, zero protected/pilot changes,
+zero private-root occurrences and zero staged changes.
+
+All metadata remains frozen=false and full configs use calibration=false.
+Claude's host validation, separate freeze and approved benchmark execution remain
+pending. No live model, nested Codex, network, staging or commit operation was
+performed; v1 tasks/graders, retained reports and shared interfaces are unchanged.
+
 # Continuation roots, legacy workspace recovery and literal loops — 2026-10-23
 
 Resolve temp roots, runtime roots and grading roots before comparison. Exclude

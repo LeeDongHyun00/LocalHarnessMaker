@@ -151,6 +151,48 @@ def test_continuation_reuses_runner_and_preserves_source(stopped: tuple[Path, Pa
     assert graded['tasks'][0]['calls'] == task['calls']
 
 
+@pytest.mark.parametrize('tier_record', ['absent', 'omitted', 'null', 'default'])
+def test_continued_day2_prices_unrequested_cli_default(stopped: tuple[Path, Path, TwoSessionExecutor],
+                                                     tmp_path: Path, tier_record: str) -> None:
+    root, source, executor = stopped
+    old_report = json.loads((source / 'report.json').read_text())
+    entry = json.loads((source / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+    base = continuation_executor(executor, Path(entry['runtime']))
+
+    def execute(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = base(argv, **kwargs)
+        if argv[0] == 'codex':
+            native = Path(kwargs['env']['CODEX_HOME']) / 'sessions/rollout-day-2.jsonl'
+            events = [json.loads(line) for line in native.read_text().splitlines()]
+            for event in events:
+                if event.get('payload', {}).get('type') == 'thread_settings_applied':
+                    settings = event['payload']['thread_settings']
+                    settings.pop('service_tier', None)
+                    if tier_record in {'null', 'default'}:
+                        settings['service_tier'] = None if tier_record == 'null' else 'default'
+            if tier_record == 'absent':
+                events = [e for e in events if e.get('payload', {}).get('type') != 'thread_settings_applied']
+            native.write_text(''.join(json.dumps(e) + '\n' for e in events))
+        return result
+
+    out = tmp_path / 'continued-default'
+    report = json.loads(continue_day2.continue_day2(root, source, out, execute=execute, version=VERSION).read_text())
+    task = report['tasks'][0]
+    assert report['validity']['status'] == 'valid' and task['outcome'] == 'pass'
+    assert task['costs']['executor_usd'] == pytest.approx(2 * .0001105)
+    assert task['calls'][0] == old_report['tasks'][0]['calls'][0]
+    entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+    evidence = entry['segments'][-1]['pricing_evidence']
+    assert evidence['tier'] == 'standard'
+    if tier_record != 'default':
+        assert 'inferred from the model default' in evidence['basis']
+    price_ref = next(a for a in task['artifacts'] if Path(a['path']).name == 'pricing-provenance.json')
+    provenance = json.loads(core.REPOSITORY.joinpath(price_ref['path']).read_text())
+    fresh_call = next(c for c in task['calls'] if c['purpose'] == 'executor' and c['call_id'].endswith('-2'))
+    row = next(p for p in provenance if p['call_id'] == fresh_call['call_id'])
+    assert row['basis'] == evidence['basis'] and row['pricing_ref'] == fresh_call['usage']['pricing_ref']
+
+
 @pytest.mark.parametrize('case', ['other_reason', 'detected', 'day2_present', 'failed_day1',
                                   'still_inconclusive', 'changed_log', 'changed_workspace', 'wrong_version'])
 def test_continuation_refuses_ineligible_or_changed_evidence(stopped: tuple[Path, Path, TwoSessionExecutor],

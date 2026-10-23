@@ -48,7 +48,8 @@ def eligible(task: dict[str, Any], entry: dict[str, Any]) -> bool:
 
 
 def copy_runtime(entry: dict[str, Any], private: PrivateGraders,
-                 task: dict[str, Any] | None = None) -> dict[str, Any]:
+                 task: dict[str, Any] | None = None, *,
+                 published_workspace: Path | None = None) -> dict[str, Any]:
     """Copy workspace and allowlisted public evidence; never copy grading artifacts."""
     old = Path(entry['runtime'])
     workspace = old / 'workspace'
@@ -84,8 +85,9 @@ def copy_runtime(entry: dict[str, Any], private: PrivateGraders,
         raise ValueError('Continuation runtime must be separate from repository, source and private storage')
     shutil.copytree(workspace, runtime / 'workspace', symlinks=True)
     expected = entry['workspace_exit_sha256']
-    verification = verify_workspace(workspace, entry, task)
-    if (verification is None or verify_workspace(runtime / 'workspace', entry, task) is None):
+    verification = verify_workspace(workspace, entry, task, published_workspace=published_workspace)
+    if (verification is None or verify_workspace(runtime / 'workspace', entry, task,
+                                                published_workspace=published_workspace) is None):
         raise ValueError('Continuation refused: copied day-1 workspace exit hash mismatch')
     for name in names:
         target = runtime / name
@@ -107,10 +109,12 @@ def copy_runtime(entry: dict[str, Any], private: PrivateGraders,
            if 'workspace_digest_version' in entry else {}),
         'grading_roots': [str(p) for p in core.audit_roots(old)],
         'logs': {str(runtime / name): digest((old / name).read_bytes()) for name in logs}}
-    if verification['workspace_verification'] == 'published_artifact_hashes' and task is not None:
+    if verification['workspace_verification'] != 'workspace_digest' and task is not None:
         copied['retained_audit_context']['workspace_artifact_evidence'] = {
             key: copy.deepcopy(task[key]) for key in ('task_id', 'artifacts', 'executor_segments')}
         copied['retained_audit_context']['workspace_verification'] = verification
+        if verification['workspace_verification'] == 'published_workspace_copy':
+            copied['retained_audit_context']['published_workspace'] = str(published_workspace)
         copied['retained_audit_context']['workspace_copy'] = {
             'sha256': core.workspace_digest(runtime / 'workspace'),
             'digest_version': core.WORKSPACE_DIGEST_VERSION}
@@ -152,7 +156,8 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
     source_tasks = {task['task_id']: task for task in original['tasks']}
     for task in selected:
         private = PrivateGraders.load(private_root, task, core.REPOSITORY, task_root=config.get('task_root'))
-        state['tasks'][task] = copy_runtime(source_state['tasks'][task], private, source_tasks[task])
+        state['tasks'][task] = copy_runtime(source_state['tasks'][task], private, source_tasks[task],
+                                           published_workspace=source / task / 'workspace')
     core.write_json(out / 'checkpoint.json', state)
     config_path = out / 'continuation-config.yaml'
     core.write_json(config_path, config)
@@ -223,7 +228,7 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
             'added_call_ids': [call['call_id'] for call in extra],
             'added_cost_usd': total([call['usage']['usd'] for call in extra])}
         evidence.update(entry.get('retained_audit_context', {}).get('workspace_verification', {}))
-        if evidence.get('workspace_verification') == 'published_artifact_hashes':
+        if evidence.get('workspace_verification') in {'published_artifact_hashes', 'published_workspace_copy'}:
             observed_copy = entry['retained_audit_context']['workspace_copy']
             evidence.update(copied_workspace_sha256=observed_copy['sha256'],
                             copied_workspace_digest_version=observed_copy['digest_version'],

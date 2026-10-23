@@ -6,6 +6,7 @@ import copy
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
 import tempfile
 from typing import Any, Callable
@@ -89,7 +90,8 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                 not any(s.get('day') == 2 for s in entry['segments'])):
             if not core.valid_day2_observation(entry, core.task_directory(config) / task):
                 raise ValueError("Regrade refused: two-session exit hashes or day-2 observation missing")
-        verification = verify_workspace(runtime / 'workspace', entry, old_by_id[task])
+        verification = verify_workspace(runtime / 'workspace', entry, old_by_id[task],
+                                        published_workspace=source / task / 'workspace')
         expected = entry['workspace_exit_sha256']
         if verification is None:
             raise ValueError(f"Regrade refused: workspace exit hash mismatch for {task}")
@@ -156,14 +158,16 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         if (audit['status'] == 'clean' and not result['invalid_reasons'] and
                 last['exit_code'] == 0 and not last.get('timed_out') and
                 old_task['outcome'] not in {'timeout', 'error'}):
-            if verify_workspace(workspace, entry, old_task) is None:
+            if verify_workspace(workspace, entry, old_task,
+                                published_workspace=source / task / 'workspace') is None:
                 raise ValueError(f"Regrade refused: workspace exit hash mismatch for {task}")
             scratch = Path(tempfile.mkdtemp(prefix='lhm-eval-regrade-'))
             result['grading'] = core.grade(
                 workspace, private, scratch, task_out / 'grading.log',
                 json.loads((core.task_directory(config) / task / 'expected.json').read_text()),
                 config['grading_timeout_seconds'], execute)
-            if verify_workspace(workspace, entry, old_task) is None:
+            if verify_workspace(workspace, entry, old_task,
+                                published_workspace=source / task / 'workspace') is None:
                 raise ValueError(f"Regrade refused: workspace changed during grading for {task}")
         result['outcome'] = ('invalid' if result['invalid_reasons'] else
                              old_task['outcome'] if old_task['outcome'] in {'timeout', 'error'} else
@@ -172,9 +176,13 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         sanitized = json.loads(private.redact(json.dumps(result)))
         core.write_json(task_out / 'result.json', sanitized)
         verification = workspace_checks[task]
-        if verification['workspace_verification'] == 'published_artifact_hashes':
+        if verification['workspace_verification'] != 'workspace_digest':
             core.write_json(task_out / 'regrade-provenance.json', {
                 'task_id': task, 'source_report_sha256': digest(source_bytes), **verification})
+        if verification['workspace_verification'] == 'published_workspace_copy':
+            # Retain the trusted legacy reference for a later regrade/recovery.
+            shutil.copytree(source / task / 'workspace', task_out / 'workspace',
+                            ignore=core.WORKSPACE_COPY_IGNORE)
         new_state['tasks'][task]['result'] = sanitized
         shared = build_task(result, entry, task_out, config, original['metadata']['pricing'], old_task)
         if verification['workspace_verification'] == 'published_artifact_hashes':

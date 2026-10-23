@@ -666,7 +666,8 @@ def run(
                 entry.pop("pid", None)
                 native_changed = [p for p in (codex_home / "sessions").rglob("*.jsonl")
                                   if native_before.get(p) != digest(p.read_bytes())]
-                segment["pricing_evidence"] = capture_tier(native_changed, tiers_before)
+                segment["pricing_evidence"] = capture_tier(native_changed, tiers_before,
+                                                            model=config['model'], service_tier=config.get('service_tier'))
                 native_usage = native_token_delta(tokens_before, native_token_totals(native_changed))
                 if native_usage is not None and not interrupted and final_process.returncode != -2:
                     segment["native_usage"] = native_usage

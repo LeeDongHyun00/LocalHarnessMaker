@@ -70,7 +70,8 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
             if not workspace.is_dir():
                 errors.add("missing_retained_workspace")
             elif ("workspace_exit_sha256" in entry and
-                  verify_workspace(workspace, entry, published_tasks[task]) is None):
+                  verify_workspace(workspace, entry, published_tasks[task],
+                                   published_workspace=out / task / 'workspace') is None):
                 errors.add("workspace_exit_hash_mismatch")
         except Exception:
             # Exceptions can contain grader paths or source. Do not serialize them.

@@ -6,6 +6,18 @@ from pathlib import Path
 from typing import Any
 
 
+def _pricing_tier(values: list[Any], model: str | None,
+                  requested: str | None) -> tuple[str, bool]:
+    """Apply known CLI model defaults only when no tier was requested."""
+    default = {'gpt-6.1-sol': 'standard', 'gpt-6-luna': 'priority'}.get(model or '')
+    inferred = requested is None and default is not None and (not values or None in values)
+    tiers = {('standard' if value == 'default' else value) if isinstance(value, str)
+             else default if inferred and value is None else 'unknown' for value in values}
+    if not values:
+        tiers = {default if inferred else 'unknown'}
+    return (next(iter(tiers)) if len(tiers) == 1 else 'unknown', inferred)
+
+
 def _instant(value: Any) -> datetime | None:
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
@@ -134,11 +146,14 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
         and event["payload"].get("rate_limits") is not None
     ]
     values = [p.get("service_tier") if isinstance(p, dict) else None for p in applied]
-    tiers = {value if isinstance(value, str) else "unknown" for value in values}
-    pricing_tier = next(iter(tiers)) if len(tiers) == 1 else "unknown"
+    # A context's explicit tier is not applied-tier evidence and cannot justify
+    # inferring an omitted tier when the applied record itself is unavailable.
+    can_infer = bool(applied) or not any(p.get('service_tier') is not None for p in contexts)
+    pricing_tier, inferred = _pricing_tier(values, model if can_infer else None, service_tier)
     return {
         "pricing_evidence": {"tier": pricing_tier,
-                             "basis": "native event_msg.thread_settings_applied.service_tier only"},
+                             "basis": ("Tier inferred from the model default; native applied service_tier omitted/null"
+                                       if inferred else "native event_msg.thread_settings_applied.service_tier only")},
         "settings_evidence": {"verified": verified, "source": settings_source or "native_session_jsonl",
                               "observed": observed,
                               **({"requested_service_tier": service_tier, "service_tier_verified": tier_verified,
@@ -241,7 +256,8 @@ def applied_tier_records(paths: list[Path]) -> dict[str, list[dict[str, Any]]]:
             and event["payload"].get("type") == "thread_settings_applied"] for path in paths}
 
 
-def capture_tier(paths: list[Path], before: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def capture_tier(paths: list[Path], before: dict[str, list[dict[str, Any]]], *,
+                 model: str | None = None, service_tier: str | None = None) -> dict[str, Any]:
     """Capture only newly emitted applied settings, including repeated records."""
     from collections import Counter
     from hashlib import sha256
@@ -260,8 +276,9 @@ def capture_tier(paths: list[Path], before: dict[str, list[dict[str, Any]]]) -> 
             settings = event["payload"].get("thread_settings", {})
             value = settings.get("service_tier") if isinstance(settings, dict) else None
             observations.append({"native_log": path, "record_sha256": identity,
-                                 "observed_service_tier": value if isinstance(value, str) else None})
-    tiers = {o["observed_service_tier"] or "unknown" for o in observations}
-    return {"tier": next(iter(tiers)) if len(tiers) == 1 else "unknown",
-            "basis": "new native thread_settings_applied records captured at process exit",
+                                 "observed_service_tier": value})
+    tier, inferred = _pricing_tier([o['observed_service_tier'] for o in observations], model, service_tier)
+    return {"tier": tier,
+            "basis": ("Tier inferred from the model default; new native applied service_tier omitted/null at process exit"
+                      if inferred else "new native thread_settings_applied records captured at process exit"),
             "records": observations}
