@@ -278,4 +278,4 @@ eval/configs/full-a.yaml ran 120 tasks and 139 executor sessions on codex-cli 0.
   - two-session-balanced-brackets: day-1 audit inconclusive with unresolved_custom_input. Sol wrote `tools.apply_patch("...".replace('X',''))`, a patch literal with one stray character removed at runtime. The runner correctly stopped before day 2, so a regrade cannot recover the task. r5-continue-001 adds narrow resolution of literal JS string expressions and a continue_day2 command. That command runs the missing day 2 from a copy of the retained day-1 workspace into a fresh run directory and leaves the source run untouched.
 - Implication for the comparison: A sits at a ceiling on single-session tasks. The harness can match but not exceed A's pass rate there, and its control calls add cost. Any harness gain has to come from the two-session tasks or from cost.
 
-Full harness and full B (100 single-session tasks) started at 05:06 UTC from d44feda, concurrently, with the fixed audit.
+Full harness and full B (100 single-session tasks) started at 05:04 UTC from d44feda, concurrently, with the fixed audit.
