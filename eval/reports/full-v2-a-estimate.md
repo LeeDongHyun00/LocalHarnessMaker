@@ -4,8 +4,10 @@ Offline preparation only; no model calls or run authorization. Config:
 [full-v2-a.yaml](../configs/full-v2-a.yaml). The population is 100 tasks;
 this selection has 100 tasks and 120 required executor sessions.
 Sol uses medium effort, priority (Fast), seed 0, Codex
-0.163.0-alpha.11.1. calibration=false; frozen=false metadata intentionally blocks
-execution until host validation and a separate freeze. Obtain spending approval
+0.163.0-alpha.11.1. calibration=false; all 100 metadata files are frozen=true
+as of 2026-10-24. The final public-plus-private digest awaits host computation
+with `.venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"`.
+A/harness select the full population; B pins it through task_population. Obtain spending approval
 on the host before launching this batch.
 
 ## Call accounting
@@ -38,5 +40,6 @@ and 1800 per process of a two-session task; grading deadline is 30 seconds.
 - Every actual process must retain native applied-tier evidence; an absent or
   different observed tier cannot be priced from this requested config.
 - All failed, invalid, retry and fallback usage belongs in actual accounting;
-  unknown usage/prices stay null. Host validation and separate freeze remain
-  pending. No live evaluation is run in this worktree.
+  unknown usage/prices stay null. Host validation passed as supplied by the
+  user; final digest computation and Role 1 publication remain pending. No live
+  evaluation is run in this worktree.

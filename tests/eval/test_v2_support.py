@@ -26,7 +26,7 @@ def test_candidate_inventory_and_pilot_configuration() -> None:
     for task in tasks:
         meta = json.loads((root / task / 'meta.json').read_text())
         assert meta['id'] == task and task.startswith('v2-')
-        assert meta['frozen'] is False and meta['version'] == 2
+        assert meta['frozen'] is True and meta['version'] == 2
         assert (root / task / 'day2.md').is_file() == meta['two_session']
         assert 3 <= len(list((root / task / 'workspace/project').glob('*.py'))) <= 8
         text = (root / task / 'prompt.md').read_text()
@@ -54,8 +54,8 @@ def test_candidate_inventory_and_pilot_configuration() -> None:
     ('a', 100, 'medium', 120), ('b', 80, 'max', 80),
     ('harness', 100, 'medium', 780),
 ])
-def test_full_v2_population_and_prefreeze_refusal(
-    tmp_path: Path, name: str, count: int, effort: str, calls: int,
+def test_full_v2_population_and_frozen_digest_selection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, name: str, count: int, effort: str, calls: int,
 ) -> None:
     path = core.REPOSITORY / f'eval/configs/full-v2-{name}.yaml'
     config = core.load_config(path)
@@ -78,12 +78,29 @@ def test_full_v2_population_and_prefreeze_refusal(
     else:
         assert config['tasks'] == population
 
-    def forbidden(*args: Any, **kwargs: Any) -> Any:
-        raise AssertionError('Unfrozen population must fail before external calls')
+    class PopulationSelected(Exception):
+        pass
 
-    with pytest.raises(ValueError, match='frozen'):
+    observed: list[set[str]] = []
+
+    def selected_digest(graders: dict[str, Any], requested: dict[str, Any]) -> str:
+        assert requested == config
+        observed.append(set(graders))
+        if set(graders) == set(population):
+            raise PopulationSelected
+        return 'selected-subset'
+
+    def forbidden(*args: Any, **kwargs: Any) -> Any:
+        raise AssertionError('No executor calls during freeze verification')
+
+    # Synthetic graders only; reach the real runner's post-freeze digest selection.
+    monkeypatch.setattr(core.PrivateGraders, 'load', lambda *a, **k: object())
+    monkeypatch.setattr(core, 'configured_digest', selected_digest)
+    with pytest.raises(PopulationSelected):
         core.run(path, tmp_path / 'out', tmp_path / 'unused-private',
-                 execute=forbidden, version=forbidden)
+                 execute=forbidden, version=config['codex_version'])
+    assert observed[-1] == set(population)
+    assert len(observed) == (2 if name == 'b' else 1)
     assert not (tmp_path / 'out').exists()
 
 

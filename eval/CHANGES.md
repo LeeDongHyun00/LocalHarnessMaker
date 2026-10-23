@@ -1,3 +1,29 @@
+# Version 2 public freeze — 2026-10-24
+
+Freeze all 100 v2 meta.json files by changing only frozen=false to true after
+the user-approved decision 0008 procedure. Preserve all task contents and v1
+files. Population: 20 bug_fix, 20 feature_plus_test, 40 multiple_requirements
+(including 20 two-session), 20 constrained_refactoring; 20 families of five.
+User-supplied independent host validation: 100 distinct grader directories,
+zero public private markers, 2,994 mutants killed, 6 equivalents, zero survivors.
+
+The final digest is not computed here: external private graders are unavailable.
+Add read-only `python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"`
+to print inventory and the exact runner-compatible tracked-public-plus-private
+population/selection digests on the host. DESIGN.md records the 2026-10-24 public
+freeze, digest procedure and pending Role 1 publication. Existing full-v2 configs
+already specify calibration=false, priority Fast and codex-cli
+0.163.0-alpha.11.1; update their estimates to reflect the frozen metadata without
+changing scenario costs or call bounds. Verify real runner freeze/digest
+selection using mocked graders and no executor calls; preserve unfrozen-input
+refusal coverage. No schema or existing CLI flag changes, model calls, staging
+or commits.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1664 passed in
+331.06s. HEAD byte comparison confirms all 100 metadata files changed only
+the freeze flag; exact scope check passes for 110 authorized paths with zero
+staged paths. `git diff --check -- eval tests/eval state/STATUS-eval.md` passes.
+
 # Host recovery, default-tier pricing and eligibility diagnostics — 2026-10-24
 
 When a legacy workspace pin fails both digest algorithms and the report has no

@@ -3,8 +3,8 @@
 Written before pilot task construction, 2026-10-23. Version 1 remains frozen.
 The user approved the separate version under decision 0008, being recorded by
 Role 1. The pilot has 4 families and 20 tasks; the full candidate has 20 families and
-100 tasks. All metadata stays frozen=false
-until design calibration and a separate freeze. No baseline outcome was used to
+100 tasks. Public metadata was frozen on 2026-10-24 after user approval;
+the final digest still requires external grader contents on the host. No baseline outcome was used to
 select these tasks.
 
 The design targets incomplete requirement coverage, broken constraints, claims
@@ -156,9 +156,9 @@ day-1 artifacts remain available, as in the pilot protocol. Every private check
 must follow a numbered public requirement; no reference algorithm or private
 input is needed to infer the required behavior.
 
-The full configs use calibration=false and remain blocked by frozen=false until
-Claude's host validation and the separate freeze. Offline construction and
-mutation validation are not a new quality calibration or a freeze.
+The full configs use calibration=false and pass the public freeze check as of
+2026-10-24. The host must compute the final digest below before Role 1 publishes
+the freeze record. Offline checks are not a new quality calibration.
 
 Run baseline A first on the complete 20-task pilot with full A's model/effort.
 Set calibration=true for this pre-freeze procedure. The runner pins candidate
@@ -174,3 +174,69 @@ new candidate; retain all prior candidate identities and results. Never select,
 drop or rewrite individual tasks based on their pilot outcome. Freeze only after
 calibration; compare only reports with the same task-set digest. V1 results are
 context, not a matched v2 quality comparison.
+
+
+## Public freeze — 2026-10-24
+
+The user approved freezing under decision 0008 after Claude's host validation:
+100 tasks, 100 distinct private grader directories, no shared grader, zero
+private markers in public files. Independent testing of 30 mutants per task
+reported 2,994 killed, 6 recorded equivalents and zero survivors. These are
+user-supplied host results, separate from the earlier generated AST mutation
+counts. This sandbox did not rerun private validation or make model calls.
+Only `frozen: false` changed to `frozen: true` in each of the 100 meta.json
+files; all other public task bytes and metadata fields are unchanged.
+
+| Frozen type | Tasks |
+| --- | ---: |
+| bug_fix | 20 |
+| feature_plus_test | 20 |
+| multiple_requirements | 40 |
+| constrained_refactoring | 20 |
+| Total | 100 |
+
+Twenty multiple_requirements tasks are two-session tasks, giving 120 required
+sessions. Every family has five tasks: access-policy, cache-invalidation,
+calendar-windows, command-dispatch, csv-import, dependency-graph,
+document-patches, event-replay, filesystem-manifests, inventory, job-queues,
+layered-settings, ledger, rate-budgets, reservations, routing, schema-migration,
+search-facets, text-indexing and workflow-state.
+
+### Final digest procedure (host required)
+
+The final SHA-256 is pending because this session has no private grader root.
+After transferring these exact changes to the main checkout, run there with its
+own environment and the existing external root (never copy graders into git):
+
+```sh
+.venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"
+```
+
+This read-only command prints the task count, counts by type/family, the complete
+100-task task_set_sha256 and each configuration's selected-input digest. It
+checks every freeze flag and the three full-v2 configurations without launching
+an executor, controller, judge or grader. Pass the output and freeze date to
+Role 1 for docs/eval-freeze-v2.md; do not substitute a public-only or earlier
+unfrozen candidate hash. Until then, the digest and Role 1 publication are pending.
+
+The command calls the runner's core.configured_digest/core.taskset_digest,
+using the same content procedure as v1: for each task, `git ls-files -z` selects
+tracked public inputs; sorted task-relative paths pair with SHA-256 of their
+current bytes. Private inputs are the sorted SHA-256 values of the external
+`test_*.py` files loaded by PrivateGraders, without private locations or names.
+Hash the default json.dumps(sort_keys=True) UTF-8 encoding of the per-task map;
+v2 uses the existing namespace wrapper
+`{"task_root": "eval/tasks-v2", "tasks": TASK_MAP}`. V1's unwrapped format is
+unchanged. DESIGN.md and generated caches are outside the per-task tracked
+input list. Transfer/track the complete public task files before computing;
+do not use the candidate validation helper's recursive, untracked-file hash.
+
+A and harness select all 100 tasks; B selects 80 single-session tasks and uses
+its task_population to pin all 100. The runner therefore records the same full
+population digest for all three; B additionally retains a distinct selected
+80-task digest. No digest literal is added to config: the existing runner
+computes and records it from the frozen public and private contents. Resumes
+refuse changed hashes. All three configs retain calibration=false, Fast priority,
+seed 0 and codex-cli 0.163.0-alpha.11.1. Their matched STOP-3 estimates retain
+120, 80 and 780 calls respectively before dynamic harness judges; the pricing
+scenarios are unchanged and execution still requires host spending approval.
