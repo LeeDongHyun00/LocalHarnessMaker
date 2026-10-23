@@ -430,3 +430,21 @@ While drawing the verifier's human-review sample from the harness report, Claude
 - Branches dev/reinforce (b92b064) and r5/v2 (1c440cd) merged into main as 05e8dd4 and ad90607 without conflicts. schemas/VERSION is 2. Full suite on main: 2738 passed, 1 skipped. CI green.
 - Republication of smoke-harness-3, full-a, full-b and full-harness from the backed-up runtimes runs with --allow-unpinned, followed by a re-audit with the merged code.
 - The v2 calibration pilot could not be regraded: r5-v2-003 and r5-audit-006 revised the four multiple_requirements tasks and every pilot grader after the pilot ran, so regrade correctly refused ("public/private task inputs differ from the source run"). The first pilot is kept as eval/reports/pilot-v2-a-attempt1 (diagnostic, republished) and the pilot reruns on main at ad90607, detached, on the revised set.
+
+## v2 calibration pilot rerun (2026-10-23, 10:17 to 11:17 UTC, main ad90607, revised tasks and graders)
+
+20 tasks, 24 sessions, Fast tier: 15 pass, 4 fail, 1 invalid (v2-reservations-bug-fix, a literal for-loop over absolute paths that the resolver does not expand yet; r5-audit-008). 2.86 USD.
+
+| Metric | Value | n | 95% CI |
+|---|---|---|---|
+| pass_rate | 0.789 | 19 | 0.579 to 0.947 |
+| task_false_done_rate | 0.308 | 13 | 0.071 to 0.583 |
+| cost_per_pass | 0.191 USD | 20 | 0.145 to 0.270 |
+| handoff_success | 0.75 | 4 | 0.25 to 1.0 |
+| avg_attempts | 1.21 | 19 | 1.05 to 1.42 |
+
+By type: bug_fix 3 of 3 valid pass, constrained_refactoring 3 of 4, feature_plus_test 3 of 4, multiple_requirements 6 of 8; two-session 3 of 4. The pass rate on valid tasks is above the 30 to 70 percent target, so under decision 0008 the remaining 16 families get a harder design: more interacting requirements, stricter constraints and day-2 work that depends on more day-1 decisions. No pilot task is dropped or selected on its outcome. The task-level false-done rate on these harder tasks, 4 of 13 claimed-complete tasks failing hidden grading, is the first measurement of the behavior the harness targets.
+
+Regrades with the merged code: full-a 116 pass, 3 fail, 1 invalid (balanced-brackets, day 2 being continued); task_false_done_rate 0.045 (1 of 22 claimed-complete tasks); full-b valid, 100 of 100, task_false_done_rate 0 of 20, cost null because the restart-interrupted task has no usage (r5-rerun-002 adds a fresh rerun of unaccounted tasks). The claim extractor finds completion claims in only about a fifth of the final messages, so the metric's denominator is small; the final evaluation will state this.
+
+The harness regrade was refused on 104 of 120 tasks: the verifier runs contract commands inside the real workspace after the exit hash is recorded, and Python writes __pycache__ there. r5-digest-001 excludes caches from the digest, versions it, records the hash after verification and suppresses bytecode in verifier launches; merged as c4cec06, CI green. Harness recovery with rerun_invalid is running.
