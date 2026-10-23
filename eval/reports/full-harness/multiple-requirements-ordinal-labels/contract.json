@@ -1,0 +1,94 @@
+{
+  "task_summary": "Repair the ordinal formatter, document its public specification in a docstring, and add regression tests in test_solution.py.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Edit solution.py and public tests.",
+    "Maintain type hints and do not mutate input collections.",
+    "Preserve the specified ordinal behavior: nonnegative integers use English suffixes; 11, 12, and 13, including 111, 112, and 113, use th; zero is 0th; negative values raise ValueError.",
+    "No algorithmic complexity constraint is imposed.",
+    "Verify with python -m unittest discover -v.",
+    "test_solution.py must contain at least 3 passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The solution module contains a public ordinal specification docstring describing suffix behavior, teen exceptions, zero, and negative-value handling.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)(?=.*(?:ordinal|suffix))(?=.*(?:11|teen))(?=.*(?:zero|0th))(?=.*(?:negative|ValueError)).*"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The solution module defines a public callable with type hints for the ordinal formatter.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^def\\s+\\w+\\s*\\([^\\n]*\\)\\s*->\\s*[^:]+:"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least three unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:.*?){3}"
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The requested unittest discovery command exits successfully, indicating the discovered suite passes.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The public formatter's callable name is unspecified; the implementation may select a suitable public name, and the tests should exercise that API.",
+    "Unittest discovery from the workspace root using the requested command is expected to find the public tests.",
+    "The docstring wording is unspecified; it is expected to state the supplied behavior and exceptions clearly."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=861; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 38732,
+    "output_tokens": 1422,
+    "usd": 0.00323636
+  }
+}

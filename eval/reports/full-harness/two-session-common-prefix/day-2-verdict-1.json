@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^def\\s+common_many\\s*\\(\n22: def common_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); n=[x.name for c in t.body if isinstance(c, ast.ClassDef) for x in c.body if isinstance(x, ast.FunctionDef) and x.name.startswith(\"test_\")]; assert len(n) >= 3 and any(\"many\" in s.lower() or \"batch\" in s.lower() for s in n)'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_many_empty (test_solution.CommonManyTests.test_many_empty) ... ok\ntest_many_forwards_positional_arguments (test_solution.CommonManyTests.test_many_forwards_positional_arguments) ... ok\ntest_many_propagates_first_exception_and_stops (test_solution.CommonManyTests.test_many_propagates_first_exception_and_stops) ... ok\ntest_many_results_in_order_without_mutation (test_solution.CommonManyTests.test_many_results_in_order_without_mutation) ... ok\ntest_case_sensitive (test_solution.CommonTests.test_case_sensitive) ... ok\ntest_empty_input (test_solution.CommonTests.test_empty_input) ... ok\ntest_input_is_not_mutated (test_solution.CommonTests.test_input_is_not_mutated) ... ok\ntest_no_common_prefix_and_empty_item (test_solution.CommonTests.test_no_common_prefix_and_empty_item) ... ok\ntest_shared_prefix (test_solution.CommonTests.test_shared_prefix) ... ok\ntest_single_item (test_solution.CommonTests.test_single_item) ... ok\ntest_unicode_characters (test_solution.CommonTests.test_unicode_characters) ... ok\ntest_whole_item_and_identical_items (test_solution.CommonTests.test_whole_item_and_identical_items) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.002s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?s)(?=.*python -m unittest discover -v)(?=.*(?:passed|pass|tests? run|OK))\n1: # Day 2 handoff\n2: \n3: ## design decisions\n4: \n5: - Preserve the public API `common(items: list[str]) -> str`.\n6: - Add `common_many(cases: list[tuple]) -> list`, calling `common(*case)`\n7:   once per tuple in input order. Return `[]` for no cases and let the first\n8:   exception propagate unchanged, without processing later cases.\n9: - The batch wrapper does not mutate cases or their arguments.\n10: - Start with the first string and shorten a local prefix using case-sensitive",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,49 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+prefix_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\b\n14: def prefix_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, prefix_many uses [prefix(*case) for case in cases], calling prefix with each tuple unpacked as positional arguments and collecting results in input order. An empty cases iterable produces [], and exceptions from prefix propagate directly, stopping the comprehension at the first exception. The implementation supports these observations; HANDOFF.md and test_solution.py also describe and test the behavior.",
+      "reason": "The implementation meets the criterion for the behavior assessed."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: In `solution.py`, `prefix` retains its typed signature, iterates over `items` without writing to it, and builds a fresh result list. `prefix_many` is a list comprehension over `cases` that calls `prefix(*case)`, with no mutation operations. `test_solution.py` additionally checks input preservation for both APIs, but the judgment is based on source code as required.",
+      "reason": "The source preserves the day-1 public `prefix(items: list[int]) -> list[int]` signature and behavior. `prefix_many` forwards each case with argument unpacking and does not modify the cases or supplied arguments."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?=.*class\\s+\\w+\\s*\\(\\s*unittest\\.TestCase\\s*\\))(?=(?:.*?def\\s+test_){3,})(?=.*def\\s+test_\\w*.*(?:batch|many|cases))\n1: \"\"\"Regression tests for the public prefix API.\"\"\"\n2: \n3: import unittest\n4: from unittest.mock import call, patch\n5: \n6: from solution import prefix, prefix_many\n7: \n8: \n9: class PrefixTests(unittest.TestCase):\n10:     def test_positive_numbers(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_batch_propagates_first_exception_unchanged_and_stops (test_solution.PrefixManyTests.test_batch_propagates_first_exception_unchanged_and_stops) ... ok\ntest_batch_results_and_inputs_are_unchanged (test_solution.PrefixManyTests.test_batch_results_and_inputs_are_unchanged) ... ok\ntest_batch_unpacks_positional_arguments_in_order (test_solution.PrefixManyTests.test_batch_unpacks_positional_arguments_in_order) ... ok\ntest_empty_batch_does_not_call_prefix (test_solution.PrefixManyTests.test_empty_batch_does_not_call_prefix) ... ok\ntest_empty_input (test_solution.PrefixTests.test_empty_input) ... ok\ntest_input_is_unchanged_and_result_is_independent (test_solution.PrefixTests.test_input_is_unchanged_and_result_is_independent) ... ok\ntest_mixed_numbers_and_zero (test_solution.PrefixTests.test_mixed_numbers_and_zero) ... ok\ntest_negative_numbers (test_solution.PrefixTests.test_negative_numbers) ... ok\ntest_positive_numbers (test_solution.PrefixTests.test_positive_numbers) ... ok\ntest_single_item (test_solution.PrefixTests.test_single_item) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.002s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?s)(?=.*python -m unittest discover -v)(?=.*(?:passed|OK|successfully|successful))\n1: # Day 2 handoff\n2: \n3: ## Design decisions\n4: \n5: - Preserve the existing typed public API: `prefix(items: list[int]) -> list[int]`.\n6: - Accumulate a running total and append it after each input value, producing inclusive prefix sums with the same length as the input.\n7: - Return a fresh list without changing the input. Empty input naturally returns `[]`; negative values and zeros use ordinary integer addition.\n8: - The implementation uses only the Python standard library and takes O(n) time and O(n) space for the returned list.\n9: - Six unittest methods cover positive, empty, negative, mixed/zero, single-item, and input-preservation behavior.\n10: - Add `prefix_many(cases: list[tuple]) -> list`, calling `prefix(*case)` once per tuple in input order. Empty input returns `[]`; the first exception propagates unchanged and stops further calls.",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-7",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

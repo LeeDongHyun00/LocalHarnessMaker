@@ -1,0 +1,84 @@
+{
+  "task_summary": "Refactor merge and merge_legacy in solution.py to delegate their shared algorithm to one private helper, preserving the stated compatibility and behavior requirements, and update public tests.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Edit solution.py and public tests.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Preserve both public signatures, return types, error behavior, input immutability, imports, and public names.",
+    "Return the union of keys, adding counts for shared keys; preserve zero and negative totals.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least 2 passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public test file contains at least two unittest test methods.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [node for cls in tree.body if isinstance(cls, ast.ClassDef) for node in cls.body if isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\")]; assert len(methods) >= 2'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public tests pass under unittest discovery.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [node for cls in tree.body if isinstance(cls, ast.ClassDef) for node in cls.body if isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\")]; assert len(methods) >= 2'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named solution.py and test_solution.py are relative paths in the supplied workspace; either file may not exist yet and may be created.",
+    "The existing merge and merge_legacy signatures and error behavior can be determined from the supplied workspace; their exact signatures and error cases are not specified in the request.",
+    "The public tests are discoverable by the requested unittest discovery command from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=858; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17401,
+    "output_tokens": 566,
+    "usd": 0.0020231
+  }
+}

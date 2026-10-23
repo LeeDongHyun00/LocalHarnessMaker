@@ -218,5 +218,45 @@
         "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
       }
     }
-  ]
+  ],
+  "republication": {
+    "artifacts": [
+      {
+        "path": "eval/reports/smoke-harness-3/bug-chunk-tail/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/smoke-harness-3/bug-chunk-tail/final-1.md",
+        "sha256": "44ec436aa9358c80cc136f332a928ce85bad2699bc836709435e6c9af37feb12",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/final-1.md",
+        "sha256": "2c64c2b7f8d2511ec0bf733764eb2b22e19daf7d849cdef1f50351f2f024e19e",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/final-2.md",
+        "sha256": "7e2787ecfca15e29e54770e7bb21ee65be707c882d376f5ece80b427d02417c9",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      }
+    ]
+  }
 }

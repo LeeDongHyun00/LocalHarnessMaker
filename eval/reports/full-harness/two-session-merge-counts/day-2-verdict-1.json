@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def\\s+merge\\s*\\(|def\\s+merge_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\n4: def merge(left: dict[str, int], right: dict[str, int]) -> dict[str, int]:\n12: def merge_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for c in tree.body if isinstance(c, ast.ClassDef) and any((isinstance(b, ast.Name) and b.id == \"TestCase\") or (isinstance(b, ast.Attribute) and b.attr == \"TestCase\") for b in c.bases) for n in c.body if isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\")]; assert len(methods) >= 3; assert any(\"many\" in n.name or \"batch\" in n.name for n in methods)'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_inputs (test_solution.MergeTests.test_empty_inputs) ... ok\ntest_inputs_unchanged_and_result_independent (test_solution.MergeTests.test_inputs_unchanged_and_result_independent) ... ok\ntest_many_empty (test_solution.MergeTests.test_many_empty) ... ok\ntest_many_preserves_order_inputs_and_result_independence (test_solution.MergeTests.test_many_preserves_order_inputs_and_result_independence) ... ok\ntest_many_propagates_first_exception_unchanged_and_stops (test_solution.MergeTests.test_many_propagates_first_exception_unchanged_and_stops) ... ok\ntest_preserves_zero_and_negative_totals (test_solution.MergeTests.test_preserves_zero_and_negative_totals) ... ok\ntest_same_dictionary_as_both_inputs (test_solution.MergeTests.test_same_dictionary_as_both_inputs) ... ok\ntest_union_and_shared_counts (test_solution.MergeTests.test_union_and_shared_counts) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.002s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(python\\s+-m\\s+unittest\\s+discover\\s+-v).*?(exit\\s*0|passed|OK)\n28: python -m unittest discover -v\n29: ```\n30: \n31: Observed result: exit 0; all 8 tests passed (`Ran 8 tests in 0.002s`, `OK`).",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, `windows(items: list[int], size: int) -> list[list[int]]` raises ValueError for `size <= 0`, then slices at each successive start in `range(len(items) - size + 1)`, producing overlapping windows and an empty list when size exceeds input length. Slicing creates fresh lists, so the input is not mutated.",
+      "reason": "solution.py implements the requested window behavior, has type hints, and does not mutate the input list."
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def test_\\w+\\s*\\(self[^)]*\\):.*?){3}\n9:     def test_overlapping_windows(self):\n10:         self.assertEqual(windows([1, 2, 3, 4], 2), [[1, 2], [2, 3], [3, 4]])\n11: \n12:     def test_size_one(self):\n13:         self.assertEqual(windows([1, 2, 3], 1), [[1], [2], [3]])\n14: \n15:     def test_size_equals_length(self):\n18:     def test_size_exceeds_length(self):\n19:         self.assertEqual(windows([1, 2], 3), [])\n20: ",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?s)(?=.*design decisions)(?=.*python -m unittest discover -v)\n1: # Day 1 handoff\n2: \n3: Implementation and design decisions:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.WindowsTests.test_empty_input) ... ok\ntest_input_preserved_and_windows_independent (test_solution.WindowsTests.test_input_preserved_and_windows_independent) ... ok\ntest_nonpositive_size (test_solution.WindowsTests.test_nonpositive_size) ... ok\ntest_overlapping_windows (test_solution.WindowsTests.test_overlapping_windows) ... ok\ntest_size_equals_length (test_solution.WindowsTests.test_size_equals_length) ... ok\ntest_size_exceeds_length (test_solution.WindowsTests.test_size_exceeds_length) ... ok\ntest_size_one (test_solution.WindowsTests.test_size_one) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)(?=.*^def strip_prefix\\b)(?=.*^def strip_prefix_legacy\\b)(?=.*^def _[A-Za-z_]\\w*\\b).*\n1: \"\"\"Public task implementation.\"\"\"\n2: \n3: \n4: def _strip_prefix(text: str, prefix: str) -> str:\n5:     return text[len(prefix):] if prefix and text.startswith(prefix) else text\n6: \n7: \n8: def strip_prefix(text: str, prefix: str) -> str:\n9:     return _strip_prefix(text, prefix)\n10: ",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?=.*^\\s+def test_[A-Za-z_]\\w*\\s*\\().*(?:(?=.*^\\s+def test_[A-Za-z_]\\w*\\s*\\().*)\n1: import unittest\n2: \n3: from solution import strip_prefix, strip_prefix_legacy\n4: \n5: \n6: class StripPrefixTests(unittest.TestCase):\n7:     def test_removes_exactly_one_whole_prefix(self) -> None:\n8:         for function in (strip_prefix, strip_prefix_legacy):\n9:             for text, prefix, expected in (\n10:                 (\"prefix-value\", \"prefix-\", \"value\"),",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_input_collections_are_not_mutated (test_solution.StripPrefixTests.test_input_collections_are_not_mutated) ... ok\ntest_preserves_runtime_error_and_short_circuit_behavior (test_solution.StripPrefixTests.test_preserves_runtime_error_and_short_circuit_behavior) ... ok\ntest_removes_exactly_one_whole_prefix (test_solution.StripPrefixTests.test_removes_exactly_one_whole_prefix) ... ok\ntest_unchanged_inputs (test_solution.StripPrefixTests.test_unchanged_inputs) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` defines `_strip_prefix(text: str, prefix: str) -> str` using `text.startswith(prefix)` and slices once by `len(prefix)` only when `prefix` is nonempty. Both `strip_prefix(text: str, prefix: str) -> str` and `strip_prefix_legacy(text: str, prefix: str) -> str` return `_strip_prefix(text, prefix)`. `test_solution.py` supplies visible examples for one removal from repeated prefixes and unchanged inputs, plus identity checks, collection immutability checks, and TypeError/AttributeError/empty-prefix short-circuit checks. No additional imports or public names appear in `solution.py`.",
+      "reason": "Both public functions delegate to the same private helper, which removes one whole matching nonempty prefix and otherwise returns the original text. The visible code preserves the public signatures, str type hints, and str return annotations; it does not mutate inputs or change imports/public names. Its conditional also preserves the shown short-circuit behavior for empty prefixes and the natural runtime errors for incompatible inputs."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_batch_invalid_arguments (test_solution.StripPrefixTests.test_batch_invalid_arguments) ... ok\ntest_batch_propagates_first_exception_unchanged (test_solution.StripPrefixTests.test_batch_propagates_first_exception_unchanged) ... ok\ntest_batch_results_in_order_without_mutation (test_solution.StripPrefixTests.test_batch_results_in_order_without_mutation) ... ok\ntest_empty_batch (test_solution.StripPrefixTests.test_empty_batch) ... ok\ntest_empty_prefix (test_solution.StripPrefixTests.test_empty_prefix) ... ok\ntest_empty_text_and_full_match (test_solution.StripPrefixTests.test_empty_text_and_full_match) ... ok\ntest_matching_prefix (test_solution.StripPrefixTests.test_matching_prefix) ... ok\ntest_nonmatching_prefix (test_solution.StripPrefixTests.test_nonmatching_prefix) ... ok\ntest_prefix_is_not_a_character_set (test_solution.StripPrefixTests.test_prefix_is_not_a_character_set) ... ok\ntest_repeated_prefix_removed_only_once (test_solution.StripPrefixTests.test_repeated_prefix_removed_only_once) ... ok\ntest_unicode_prefix (test_solution.StripPrefixTests.test_unicode_prefix) ... ok\n\n----------------------------------------------------------------------\nRan 11 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "llm_judge: [HANDOFF.md] states `python -m unittest discover -v` was run and reports exit code 0, 11 tests ran, and `OK`.",
+      "reason": "HANDOFF.md records the unittest command and an observed result."
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: [solution.py] defines strip_prefix_many as `[strip_prefix(*args) for args in cases]`, which preserves input order, returns [] for an empty list, and does not alter the cases or argument tuples. It does not catch exceptions, so the first exception propagates. [test_solution.py] verifies ordered results, unchanged cases and tuple identities, empty batches, and exception identity with later cases unprocessed; it also tests strip_prefix behavior. The public `strip_prefix(text: str, prefix: str) -> str` implementation remains present.",
+      "reason": "The implementation meets the criterion: strip_prefix_many expands each tuple as positional arguments, evaluates cases in order, returns an empty list for no cases, and propagates the first exception unchanged. The visible tests support ordering, nonmutation, exception identity, and preserved day-1 behavior."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,3 @@
+Refactored both functions to share private `_rotate` in [solution.py](/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-t1wzzda6/workspace/solution.py), preserving signatures, type hints, return types, errors, input immutability, and import compatibility.
+
+Added six public API test methods in [test_solution.py](/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-t1wzzda6/workspace/test_solution.py). All pass with `python -m unittest discover -v` on Python 3.13.5.

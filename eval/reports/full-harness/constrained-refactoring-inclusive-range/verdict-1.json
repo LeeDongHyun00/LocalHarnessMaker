@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree=ast.parse(Path(\"test_solution.py\").read_text()); classes=[n for n in tree.body if isinstance(n, ast.ClassDef)]; methods=[m for c in classes for m in c.body if isinstance(m, (ast.FunctionDef, ast.AsyncFunctionDef)) and m.name.startswith(\"test\")]; assert len(methods) >= 2'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_equal_endpoints (test_solution.InclusiveTests.test_equal_endpoints) ... ok\ntest_invalid_collections_are_not_mutated (test_solution.InclusiveTests.test_invalid_collections_are_not_mutated) ... ok\ntest_invalid_inputs_raise_type_error (test_solution.InclusiveTests.test_invalid_inputs_raise_type_error) ... ok\ntest_ranges_in_both_directions (test_solution.InclusiveTests.test_ranges_in_both_directions) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "unverifiable",
+      "evidence": "llm_judge: In `solution.py`, `_inclusive(start: int, stop: int) -> list[int]` is defined, and both `inclusive` and `inclusive_legacy` retain public definitions that return `_inclusive(start, stop)`. No original baseline file is present in the supplied artifact snapshot, so compatibility of signatures, imports, and public names cannot be compared.",
+      "reason": "The visible implementation defines both public functions and has them delegate to the same private helper. However, the criterion also requires checking compatibility against the original supplied implementation when available, and no baseline implementation is included in the snapshot."
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` chooses step 1 or -1 based on endpoint order and calls `range(start, stop + step, step)`, including equal endpoints. `test_solution.py` checks both directions, equal endpoints, and verifies list inputs remain unchanged after `TypeError`. It also checks `TypeError` for several invalid inputs, but without a baseline, preservation of prior error behavior cannot be compared.",
+      "reason": "The implementation and tests support inclusive ascending and descending ranges, equal endpoints, and non-mutation of invalid list inputs; no baseline is provided for comparison."
+    }
+  ],
+  "overall": "fail",
+  "reinstruct_message": null,
+  "attempt": 1
+}

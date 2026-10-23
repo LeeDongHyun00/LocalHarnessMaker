@@ -1,0 +1,44 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` defines `unique(items: Iterable[str]) -> list[str]`."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`python -m py_compile solution.py` exited 0."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`test_solution.py` contains at least three unittest methods; the count check exited 0."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`python -m unittest discover -v` passed all five tests."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "`HANDOFF.md` contains design decisions and the requested verification command; the content check exited 0."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Accept an iterable of strings and return a fresh list, using a set to track seen strings and a list to preserve first-occurrence order.",
+      "why": "Implements uniqueness while preserving order without mutating the input."
+    },
+    {
+      "what": "Use standard string equality and Python 3.11+ standard-library types.",
+      "why": "Preserves case-sensitive comparison and meets the stated runtime and dependency constraints."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py",
+    "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 3'",
+    "python -m unittest discover -v",
+    "python -c 'from pathlib import Path; text = Path(\"HANDOFF.md\").read_text(); assert \"design\" in text.lower() and \"python -m unittest discover -v\" in text'"
+  ],
+  "do_not_touch": [
+    "Parent repositories and external services"
+  ]
+}

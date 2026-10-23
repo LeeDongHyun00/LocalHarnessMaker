@@ -1,0 +1,91 @@
+{
+  "task_summary": "Implement Day 1 word counting in solution.py, add public unittest regression coverage, and document design decisions and the verification command in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Split input on arbitrary whitespace, casefold each token, and count tokens; punctuation remains part of each token.",
+    "Empty or whitespace-only text returns {}.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least 3 passing unittest test methods exercising the public API.",
+    "HANDOFF.md is an allowed output and must include design decisions and the verification command."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py contains the requested public word-count behavior, with type hints and no mutation of input collections.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether the public API splits text on arbitrary whitespace, casefolds each token before counting it, preserves punctuation as part of tokens, returns an empty mapping for empty or whitespace-only text, maintains type hints, and does not mutate input collections. Do not assess runtime or test outcomes."
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The solution module passes Python syntax compilation.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods exercising the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:.*?){3}"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The public unittest suite passes using the requested discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "HANDOFF.md records design decisions and the verification command.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read HANDOFF.md and assess whether it records design decisions and includes the verification command `python -m unittest discover -v`. Decide from file contents alone."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "All named files are relative to the supplied task workspace; solution.py, test_solution.py, and HANDOFF.md may not exist yet and may be created.",
+    "The public API name and signature are unspecified; implementation should follow any existing public interface in the task workspace, or define one if none exists.",
+    "The requested unittest discovery command is assumed to discover and run the public suite from the task workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=852; distinct_files=3; tests_requested=true; requirement_segments=16; score=7"
+  },
+  "cost_estimate": {
+    "input_tokens": 17404,
+    "output_tokens": 615,
+    "usd": 0.00070006
+  }
+}

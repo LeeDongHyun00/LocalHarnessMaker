@@ -1,0 +1,99 @@
+{
+  "task_summary": "Implement the select function in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "Return new dictionaries containing requested columns in column order for every row. Omit missing keys, preserve row order and values, and include repeated column names only once.",
+    "Cover ordinary, boundary, and empty inputs, or invalid numeric inputs if the API accepts no collection.",
+    "Retain all stated behavior and compatibility requirements."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s*def test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery run completes successfully, exercising the public API tests.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "select is defined in solution.py with type hints.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def select\\s*\\([^\\n]*\\)\\s*->\\s*[^:]+:"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; they may not exist yet and may be created.",
+    "The select function is expected to be defined in solution.py, based on the requested file and public API context.",
+    "The unittest suite is discoverable using python -m unittest discover -v, as specified by the request."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=908; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34929,
+    "output_tokens": 1127,
+    "usd": 0.00136072
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def\\s+\\w+\\s*\\([^)]*\\)\\s*->\\s*[^:]+:\n4: def prefix(items: list[int]) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\") for c in t.body if isinstance(c, ast.ClassDef) for n in c.body) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.PrefixTests.test_empty_input) ... ok\ntest_inclusive_sums_preserve_length (test_solution.PrefixTests.test_inclusive_sums_preserve_length) ... ok\ntest_input_is_unchanged_and_output_is_independent (test_solution.PrefixTests.test_input_is_unchanged_and_output_is_independent) ... ok\ntest_negative_numbers_and_zero (test_solution.PrefixTests.test_negative_numbers_and_zero) ... ok\ntest_single_item (test_solution.PrefixTests.test_single_item) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -c 'from pathlib import Path; s=Path(\"HANDOFF.md\").read_text(); assert \"python -m unittest discover -v\" in s; assert \"design\" in s.lower()'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

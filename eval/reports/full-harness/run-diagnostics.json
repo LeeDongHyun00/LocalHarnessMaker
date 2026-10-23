@@ -10081,5 +10081,1767 @@
         "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
       }
     }
-  ]
+  ],
+  "republication": {
+    "artifacts": [
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-interval-union/final-1.md",
+        "sha256": "5590274a57b6c9220a43f7dee7d674b2d03ad1aa2f16ae77155aa5bd861c0da0",
+        "task_id": "feature-plus-test-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-common-prefix/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-common-prefix/final-1.md",
+        "sha256": "ea7f1864d11cb0dc3b0d6bb87617a53de57002410bbf4a174b20893794f59aac",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-common-prefix/final-2.md",
+        "sha256": "36a053b2aee4db3f739d16d06dea402f1db9c611720501d771de3561a00f3b18",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-word-counts/final-1.md",
+        "sha256": "9c9b40749be3a0885499780900a2e33221d32fbe29f798cd892af0a52302192c",
+        "task_id": "multiple-requirements-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-clamp-values/final-1.md",
+        "sha256": "f2fd7ea9203ac8b7d48eee6611a558e6507b177bf1c4b27463048a6dfaa6173f",
+        "task_id": "bug-fix-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-merge-counts/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-merge-counts/final-1.md",
+        "sha256": "f0c59fb79481bf28421cf9cbd4083078a1e93730f0e4188bbf6ec775e9feead3",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-merge-counts/final-2.md",
+        "sha256": "e77d36208622fb5012d1911d984bd0a1009cb4bb063554c8c7eeb452f276b2d9",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-last-index/final-1.md",
+        "sha256": "c650b4d77c14598b7f7f6a39ec5b5757711ca5c02523018f0a9523f8ae811bf9",
+        "task_id": "feature-plus-test-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-window-slices/final-1.md",
+        "sha256": "a4e9b07e4331d780da6548f3098a67e2a38a78f985cc9bf5d835b38c1556ec2d",
+        "task_id": "feature-plus-test-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-unique-permutations/final-1.md",
+        "sha256": "d09e1624001764b86303a038e8a238553b45fee6c3fd8445aa500543ccf3f09e",
+        "task_id": "bug-fix-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-inclusive-range/final-1.md",
+        "sha256": "0c8f3e8730a9ca8229fcc0e041c30a5e5fc5e40d01cbd44f1be64518ba076b28",
+        "task_id": "constrained-refactoring-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-adjacent-runs/final-1.md",
+        "sha256": "a50f57f6c605ef2901b1cb0098ed0c2edde1de0701cad5d19b915e35bf548d62",
+        "task_id": "constrained-refactoring-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-unique-permutations/final-1.md",
+        "sha256": "3625389b593297439c4eba39b461309acc5e0e035c6e8805a24f9aad5a1beaa5",
+        "task_id": "constrained-refactoring-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-select-columns/final-1.md",
+        "sha256": "ab1407f2ede37a152767a1f578cb14fdb3b2d271eccc34a8a1538c0a7c72cac0",
+        "task_id": "feature-plus-test-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-window-slices/final-1.md",
+        "sha256": "8ea52e2fc668b6f252f31424ce15a6f3a3224a95de3d4ef96aee9fcf62e48a6d",
+        "task_id": "bug-fix-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-rotate-left/final-1.md",
+        "sha256": "65b55be93fffb97dde1f0dc3c6603a0e287b556f6b05f4aa3fc18c713881b0b9",
+        "task_id": "feature-plus-test-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-adjacent-runs/final-1.md",
+        "sha256": "77641441646385d382359b6b8c022ee75c78dc4dd22ba3ab85ecef0150dac78f",
+        "task_id": "multiple-requirements-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-prefix-sums/final-1.md",
+        "sha256": "942130ba4a136d33e0b727188af9b974930b08742c751a4e21fb1e99779347bd",
+        "task_id": "bug-fix-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-line-endings/final-1.md",
+        "sha256": "e166bfe5cd99adab46893e66fef201a0a7102db44a7df58e48e95d3a37104a19",
+        "task_id": "multiple-requirements-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-flatten-once/final-1.md",
+        "sha256": "d79dbaa97def9212d76a6bf8cb3f69bcc92c98520685552c9583e97285b002dc",
+        "task_id": "constrained-refactoring-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-balanced-brackets/final-1.md",
+        "sha256": "6ada739e737b9adf144d3925d2f3c850ffd962c94800943b13e6be671d418dfe",
+        "task_id": "bug-fix-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-balanced-brackets/final-1.md",
+        "sha256": "d97cf93a2e5f15f96ecaa438c6ef54498cf75739cd72654e0869408a6d01ad05",
+        "task_id": "multiple-requirements-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-interval-union/final-1.md",
+        "sha256": "31231b563fd58b4153989d2f9969ed3d436fff2b14e9300f23c4c6b1fc7c0f37",
+        "task_id": "bug-fix-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interval-union/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interval-union/final-1.md",
+        "sha256": "f316a296b9c77eb53ab904d8389b133c2c01c90fba7aebdaaaad1b3b569a01d4",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interval-union/final-2.md",
+        "sha256": "f131788539ff422ad04b2f59d0b81732e5c445b4f05060fe9c635f61df2bd7e6",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-round-robin/final-1.md",
+        "sha256": "b0e4d35f4ea1757d746ec0f922ca8dbcc4f0b85cb9b5ee1b87c50c36ee59bdf5",
+        "task_id": "constrained-refactoring-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-last-index/final-1.md",
+        "sha256": "1a4bac59d5daab7b7f34af021a4f77ffb8814d3aa2103f0ed97d8d1f74955898",
+        "task_id": "multiple-requirements-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-window-slices/final-1.md",
+        "sha256": "2f69348ed6e947eee3ec313886e34850eb5026e2336377355fb1237f6f2a4ca6",
+        "task_id": "multiple-requirements-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-select-columns/final-1.md",
+        "sha256": "d74e4b91bd74fe9d59df57e2e7828eeda47e31379da6ec696cf9c04bd4b30812",
+        "task_id": "constrained-refactoring-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-strip-prefix/final-1.md",
+        "sha256": "099817a83c58263ad9986485b95214d3eba7a789adab635f34bc8dd5dd3ce8b9",
+        "task_id": "constrained-refactoring-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-rotate-left/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-rotate-left/exec-3.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-rotate-left/final-1.md",
+        "sha256": "d4a420d58e74883eaa2e1521f21a54a7f294cfe1c271fdfbf123281cb37ac8c2",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-rotate-left/final-2.md",
+        "sha256": "d3a34726b49c832906c70c89d2a2f30761bbd21d9c0d779417d24dde6735083e",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-rotate-left/final-3.md",
+        "sha256": "c7694e3b4a9a837a7548c22cafb9e617ad7304e60d9d4ce4157e0b9760317491",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-inclusive-range/final-1.md",
+        "sha256": "e9b980c1f1efc71a9f5aa7a173dabfe3a6d608830db4e62ccc50a864d03c49a8",
+        "task_id": "multiple-requirements-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-ordinal-labels/final-1.md",
+        "sha256": "e9d063cb14350d56b13fa49458b6dc2a8ba08106dac2db419576bff277d2c2bf",
+        "task_id": "constrained-refactoring-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-last-index/final-1.md",
+        "sha256": "813bb5c9195fc32f6c14eff5daf5580960768f0048d756c8a57f475e8b912971",
+        "task_id": "bug-fix-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-word-counts/final-1.md",
+        "sha256": "2f6bfce47325d08c01d4b3af27cda9aa1d3f023b4e1048d67216c1fc763f93b0",
+        "task_id": "bug-fix-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-window-slices/final-1.md",
+        "sha256": "5da29728511440b05e13044bf10a190bff3ade3e620753c7a6b703c7b7cded7e",
+        "task_id": "constrained-refactoring-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-adjacent-runs/final-1.md",
+        "sha256": "7182f0cb967cede135a057a922ec38bae096f2869b2bb4fa39cd9c29240fcbcd",
+        "task_id": "feature-plus-test-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-flatten-once/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-flatten-once/final-1.md",
+        "sha256": "2b04b6322145dcc6604b628110e000ebac7fe45ee891ddedc61812fd6094c5a0",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-flatten-once/final-2.md",
+        "sha256": "499bd58864b830f09129169a0c4187ad6a112784a8303eee495ff27a40674d10",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-round-robin/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-round-robin/final-1.md",
+        "sha256": "20572df78d7d928201c256b2fa3b3f2296e42750ac03ecc93c615305abfd4fb7",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-round-robin/final-2.md",
+        "sha256": "443dbe7565e88d82ed23362fdedaa77d38e3cc8c17f19ad4a4d1df319a6214e7",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-pairwise-edges/final-1.md",
+        "sha256": "d789f766de963b48c927077ec85e8ff04ada0df4b42f61090c6c9130a00250e3",
+        "task_id": "bug-fix-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-clamp-values/final-1.md",
+        "sha256": "897782e36da85b492471f2c2345bcb25ec09a5647b329b7b179f09cad8d9532a",
+        "task_id": "feature-plus-test-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-strip-prefix/final-1.md",
+        "sha256": "35f71950880d03f0adc807a22f69c5ba193ea228947940a40a2e19fc3624688a",
+        "task_id": "bug-fix-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-pairwise-edges/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-pairwise-edges/final-1.md",
+        "sha256": "5f967d8103dde838c7d6eb1092245f6bfc175ac3cb4cfcef2cb95abb36bba7ee",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-pairwise-edges/final-2.md",
+        "sha256": "64357b19056e8463fd2b387a9e79bc9b037c9877ac9420519ec42a22e68009b3",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-unique-permutations/final-1.md",
+        "sha256": "3de41dd3bdcfa5a47080319edc5e9a743137ae119968cd0997d5979b34f2aa79",
+        "task_id": "feature-plus-test-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-prefix-sums/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-prefix-sums/exec-3.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-prefix-sums/final-1.md",
+        "sha256": "0e1395873fd3a62f9c1e0b3590dfff79fee044226f1db52ecdbbd059b53c65fa",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-prefix-sums/final-2.md",
+        "sha256": "d11659548020c31442b1e41131ae842facaf1533c5e88e90634b92c989b0223a",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-prefix-sums/final-3.md",
+        "sha256": "7fdb15b5166422ce50a686b1d20c42ad879bfb77f1e5c100d52765810cc6986a",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-line-endings/final-1.md",
+        "sha256": "eeaa584d981add681dff7b52dead6931ecbf2f378012fb4f68fc01feaecbb39d",
+        "task_id": "constrained-refactoring-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-select-columns/final-1.md",
+        "sha256": "f8bd60f6b4108dea7498facc448ee3543f251f5e123ae2af6660a7b603bee034",
+        "task_id": "bug-fix-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-inclusive-range/final-1.md",
+        "sha256": "bb11324637bf9de5d195783233999742465b92b99788be962ad41271eb33d147",
+        "task_id": "bug-fix-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-clamp-values/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-clamp-values/final-1.md",
+        "sha256": "944b6df42bc0d25d068f386c3aa736f2f90299c859281c8666c9861fd684b733",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-clamp-values/final-2.md",
+        "sha256": "3bc6398ff152a77d5fa6a62b966e8e09fcbdc7a2a3d6e42bd2c9639f998605df",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-stable-unique/final-1.md",
+        "sha256": "efd03b2f5f241aaab5fbc1c720011c368ea081755e2d0d0db551596ebcb9cb44",
+        "task_id": "bug-fix-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-window-slices/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-window-slices/final-1.md",
+        "sha256": "4af45f38e2ee4b2379fbdf8d6d8dece7338014ab7b4e7688e9dc596fa3b52706",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-window-slices/final-2.md",
+        "sha256": "21283725c85c55595ed5ca2323249481c230f103250e54a6704e8a41f5c38730",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-prefix-sums/exec-1.stderr",
+        "sha256": "4df12b39bc615ca79ecc03b5f3114c51261ebd745c8442ac4da301ce7c37c707",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-prefix-sums/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-prefix-sums/exec-3.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-prefix-sums/final-1.md",
+        "sha256": "cd9ad84db1968c604f21c4e38abbf2572d552eeceb19c5ad8f4634e16742b493",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-prefix-sums/final-2.md",
+        "sha256": "5fa1493c071e94ac5b0974d60e8b7a3e5bd8e20471db3c01084c2f5208398451",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-prefix-sums/final-3.md",
+        "sha256": "f22299f8dc1bcad82e4736b9ff810fb864b84d731a2c3d0567071231c364839e",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-common-prefix/final-1.md",
+        "sha256": "5af7451ea4dc14f0496d21a6898c65e4686be96e613026de988a4ae786893bcc",
+        "task_id": "constrained-refactoring-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-last-index/final-1.md",
+        "sha256": "61d5fc52f4855b407964b8c5a4d7d00079d73502f26f46a90549aa2b0942b1b8",
+        "task_id": "constrained-refactoring-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-flatten-once/final-1.md",
+        "sha256": "95328d4b131984d6022a8cf48ff7a438b1e9f4d48be9ce7e7120efecdcd38268",
+        "task_id": "feature-plus-test-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-pairwise-edges/final-1.md",
+        "sha256": "e9f306daabd38db32ad8a146f65516d12f7f5e7cbbf3cda0cc81c2cdb91d970b",
+        "task_id": "multiple-requirements-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-select-columns/final-1.md",
+        "sha256": "09989d59a7f877521a41b064ffb3d97035d0c51b1d2e160e8e52055e3533cfb1",
+        "task_id": "multiple-requirements-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-partition-sign/final-1.md",
+        "sha256": "757ee047c66316348af7a8d40b87cc23e63435143102a8c9c372069ced62ebed",
+        "task_id": "bug-fix-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-parse-pairs/final-1.md",
+        "sha256": "b922c247b9b3300e1ee2dc6bd8782b0d838560cd15019e24781b2ea613ef3d2a",
+        "task_id": "bug-fix-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-last-index/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-last-index/exec-3.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-last-index/final-2.md",
+        "sha256": "e6c4d30ca338ddd69ac1eeb7d3bbc9c90ddd388fced0ca7b28d72b61dab77214",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-last-index/final-3.md",
+        "sha256": "5eace53b62fcd8d21eae6224060c6681165de9ac0b55dc4f654683be9b685734",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-invert-groups/final-1.md",
+        "sha256": "6685e44ff5f3fabb801a923e7a8e9081be1e6fff7c7e2d15bc4481683bdb718b",
+        "task_id": "feature-plus-test-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-invert-groups/final-1.md",
+        "sha256": "7f56ff8faa5c22ec2ace19f695bcc3fe92fdc3f3c33a5c392720593fe52517a8",
+        "task_id": "multiple-requirements-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-common-prefix/final-1.md",
+        "sha256": "a8cd255725b249d552330006c4a5f6a08ee0afee7f4e6520b860ac9ae33e469e",
+        "task_id": "bug-fix-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-interleave/final-1.md",
+        "sha256": "c473bedd8b226aa783a3836aeefda5fa4f5a0fcd1eed1e0ad0c8de79512c97c4",
+        "task_id": "multiple-requirements-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-interval-union/final-1.md",
+        "sha256": "ec447cb757f559a0419a52219dfd5e7849f1fce09f937b50f641f2d225ce8a8d",
+        "task_id": "multiple-requirements-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-prefix-sums/final-1.md",
+        "sha256": "3ceb9cacc27176952bfa85524f9f2400777dcb49c40bf54ed2c7f0b981f4e291",
+        "task_id": "constrained-refactoring-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-interleave/final-1.md",
+        "sha256": "65696fe5bf89aceed9e1c7257e19d61deef3b774193264f906ae7c95c86b960b",
+        "task_id": "constrained-refactoring-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-merge-counts/final-1.md",
+        "sha256": "99d8fcc03efabbbc1b6c1a8c9980e85a736965f917b97f46b0fc41e2de0cbcea",
+        "task_id": "multiple-requirements-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-pairwise-edges/final-1.md",
+        "sha256": "c9a58051519b1935a3a2103f6f17e5cc9518b1ef88600e594a90b6e3643b13fc",
+        "task_id": "feature-plus-test-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-chunk-tail/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-chunk-tail/final-1.md",
+        "sha256": "40073e26c4f2f47acebd08f0652bea6befbdc373d4282f02aa13622d4e5e5d62",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-line-endings/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-line-endings/final-1.md",
+        "sha256": "9b47bebf18d4c04c992d19291b55095d71d5fe2b05fe827566be773ad9cfe384",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-line-endings/final-2.md",
+        "sha256": "9eb7a592e6294f382833e8d64d1e540bc99127ff614a6e3f10dd2178c44eab67",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-line-endings/final-1.md",
+        "sha256": "8f805c478076e25d3f63d495668a5b4150bce7cb7b367477d900ab9d073ca55b",
+        "task_id": "bug-fix-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-adjacent-runs/final-1.md",
+        "sha256": "b68d81996425a0cf0e6783f94a6c84e4a353908f50cecab9ef6d6edb154a939a",
+        "task_id": "bug-fix-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-rotate-left/final-1.md",
+        "sha256": "f35645b6b76ca7afff17fe98f014630bbc7e49892751fa8ff9309f74cf2728a9",
+        "task_id": "multiple-requirements-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-interleave/final-1.md",
+        "sha256": "0a5b62f09f3b284c9ea555c8a19b90e3c2912afb0d4b6329383e056e2cc967be",
+        "task_id": "bug-fix-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-stable-unique/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-stable-unique/final-1.md",
+        "sha256": "0c8a61411b694e6e1ca8fb56abb40b981be8bbde51c7b8b6adc73a2bcf0ec0e0",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-stable-unique/final-2.md",
+        "sha256": "875b350f8d0ec3f9547e58b7e501a43cfb2fa542eca9a57a9414a367bfad74d4",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-prefix-sums/final-1.md",
+        "sha256": "cf21317accad7517d0adb19bd6a18b0360d7906518d0da5b6c7dacc390e8a667",
+        "task_id": "feature-plus-test-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-interleave/final-1.md",
+        "sha256": "bceff40378a3498f33df3d2c5d149347f92a05c96a83c8d999c4f195e32cf01f",
+        "task_id": "feature-plus-test-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-word-counts/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-word-counts/final-1.md",
+        "sha256": "c3634867ac0f921f1d3380043de1ab92a190e5f95e450877db4d6687f6e44c5a",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-word-counts/final-2.md",
+        "sha256": "cef3398b59454630871282c35d573ff54dbd4ef0c9e866a52ada545a871b002f",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-stable-unique/final-1.md",
+        "sha256": "13b5cc4a064a1f376098f94999745bb833112cd71df33b142ae5c6d23b120b36",
+        "task_id": "feature-plus-test-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-balanced-brackets/final-1.md",
+        "sha256": "ac47eaff8f4bcafcb398a23189b933d4d2319f6c829927c0b58c7f32177abfe5",
+        "task_id": "constrained-refactoring-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-common-prefix/exec-1.stderr",
+        "sha256": "5be3cae083ebac6c595b303012729a2ba6b64dd647960f0a4daea3836f65a57c",
+        "task_id": "multiple-requirements-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-common-prefix/final-1.md",
+        "sha256": "77fbe4dede5e149698df9aea0e038f564e502b610b5b9d149f6c827832e5b91a",
+        "task_id": "multiple-requirements-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-partition-sign/final-1.md",
+        "sha256": "eae27a1a449f404fe78c9fa990433fd3d0797dc207db96a817bfe9c26d01b517",
+        "task_id": "constrained-refactoring-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-inclusive-range/final-1.md",
+        "sha256": "81e69682c08faee43cd84609e1a50d05281dae9fdb95d2ba445feb26aa94b3e6",
+        "task_id": "feature-plus-test-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-inclusive-range/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-inclusive-range/final-1.md",
+        "sha256": "fef7d92873e3e9ccb0d8b307edbed62aa3550f41eff134122bcf4796e3b6e785",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-inclusive-range/final-2.md",
+        "sha256": "a390871fc1dd17c0b49255d9e75562a1b6a119c3738cfbb94564adfcdc87c781",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-parse-pairs/final-1.md",
+        "sha256": "6df87745f108240f02fc5fbb61c8a16e5f49c89fdbe142c25a46e280499489e0",
+        "task_id": "multiple-requirements-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-strip-prefix/final-1.md",
+        "sha256": "110d1aa58876c58b9efee6bf95c8b9642d2ed64195b6070d85ec7e4f83ad53e2",
+        "task_id": "feature-plus-test-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-line-endings/final-1.md",
+        "sha256": "704e7978cf6f47bafbdc6ec930fceead6c03625399347fd9dd593b62dbc6478b",
+        "task_id": "feature-plus-test-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-rotate-left/final-1.md",
+        "sha256": "99cbd2b186739cd9109674560e99ad5a6fd2d08d853b238e3e35eabe8714010b",
+        "task_id": "constrained-refactoring-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-ordinal-labels/final-1.md",
+        "sha256": "b8d6d2d9df739f507f30a144c4943fe7dfa296ba55cfcaf86d57e95c67c188ea",
+        "task_id": "multiple-requirements-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-invert-groups/final-1.md",
+        "sha256": "7562a81430c870f0e1034512c443cc16e7ef929c473667f5daf8c8e992cf236c",
+        "task_id": "bug-fix-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-strip-prefix/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-strip-prefix/final-1.md",
+        "sha256": "c6d3aad85e82156f77e337b7497e555a295fd9d45e0a1e1ae7f0f89e6d00c398",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-strip-prefix/final-2.md",
+        "sha256": "eee9a81930133580c59f303283a56e73a518f0a883ab296b9bf5284b75467410",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-parse-pairs/final-1.md",
+        "sha256": "08dc704ce4ebb85ec7e02187ee2c439cee0efffe33004112dd5600910bbc5567",
+        "task_id": "constrained-refactoring-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-round-robin/final-1.md",
+        "sha256": "ee45ac35abb740a9a6e092a3c3c9317f342098b761bef318feef4d99be3f71b2",
+        "task_id": "bug-fix-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-clamp-values/final-1.md",
+        "sha256": "411c1f14a11e088eb80b7a4e4ea5cf25417fdba09fac98d203a65beb7cc0399f",
+        "task_id": "multiple-requirements-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-partition-sign/final-1.md",
+        "sha256": "e4b78cb2e6f686cba271c994d8ed22d902191f131d8c645df432a2c113c723b0",
+        "task_id": "multiple-requirements-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-round-robin/final-1.md",
+        "sha256": "c1cf956aa184bd540db01fb64fcde7906a41a4edf6ac50f4bbf67654656933fc",
+        "task_id": "feature-plus-test-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-interval-union/final-1.md",
+        "sha256": "9f91890797f8dcbf7729de93d155c3c55be58cfafd88cf135814bebde1db2ba4",
+        "task_id": "constrained-refactoring-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-flatten-once/final-1.md",
+        "sha256": "fe548e0c154153f42fdeee37ca2bbe2f952171f3461bea14bb1638ee0787802d",
+        "task_id": "multiple-requirements-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-merge-counts/final-1.md",
+        "sha256": "1dd7d31721a30569edd67085c234ecfbcda99732b3fa0465c01e1ffed0924fa7",
+        "task_id": "bug-fix-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-strip-prefix/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-strip-prefix/final-1.md",
+        "sha256": "9f6534db621c7b814959778c3fbb4d8fa574501792ed1294f73e34e7af7da299",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-strip-prefix/final-2.md",
+        "sha256": "968c01a219fb83ea8c7fb5bbab020b9eac8aa64951be43058e05181cc41b805a",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-balanced-brackets/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-balanced-brackets/final-1.md",
+        "sha256": "f50ad299fd16b666972d6a2d913c3d040c8c965276696b3b5233ca5a89f5d71b",
+        "task_id": "two-session-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-balanced-brackets/final-2.md",
+        "sha256": "76ccf52bfa8c182fccf9c16349cbfd422297767edc173f58ce7b44b75e0c5a21",
+        "task_id": "two-session-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-merge-counts/final-1.md",
+        "sha256": "5233341d7a19611362c97e3b55fad53169459f7538a808ca633f7fd6730fcf3f",
+        "task_id": "constrained-refactoring-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-rotate-left/final-1.md",
+        "sha256": "0f7874c678deb7f4334f962973226cab773e71ad1bc4c7c206a37ee5a7f81029",
+        "task_id": "bug-fix-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-parse-pairs/final-1.md",
+        "sha256": "31d268b541225bcacd7df523efea0540a90f5e730ed26da2f119fde29082e5a4",
+        "task_id": "feature-plus-test-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-clamp-values/final-1.md",
+        "sha256": "76bc9249c9b8a6eccfb1993593605cf1363b9b1fb7dccadb4f8bd792c91558ca",
+        "task_id": "constrained-refactoring-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-word-counts/final-1.md",
+        "sha256": "b360db6cbb897605318bee52b9f9ca5ba7ec0baffdb43d0a57d2811db7a4a0eb",
+        "task_id": "feature-plus-test-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-stable-unique/final-1.md",
+        "sha256": "63a7e747177d58f82cb2ac778c3f38d87af1cf0c36fa11c5e505f5c36362d864",
+        "task_id": "constrained-refactoring-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-merge-counts/final-1.md",
+        "sha256": "f109038b4b5a7562f1ffc91e3048f83e897bb771f613df5fb86a0c23c3079177",
+        "task_id": "feature-plus-test-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-pairwise-edges/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-pairwise-edges/final-1.md",
+        "sha256": "ffc5942e2561b055778707fa8c7dd5ffaa333fdc84fce099094add9a5ced9278",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-pairwise-edges/final-2.md",
+        "sha256": "df8f4bcac3de8c21afbc58e04f265707824ef35e8737102c93f67a0f9de832de",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interleave/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interleave/final-1.md",
+        "sha256": "a53010c00f929667e204a2273fb982444c5e853f7b7f9a79b8b48fba47091c56",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-interleave/final-2.md",
+        "sha256": "273f7d3ca2aa5f5396fe42ad1ed3b947ad3932379bfa846a9f0f30461446d009",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-adjacent-runs/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-adjacent-runs/final-1.md",
+        "sha256": "cf657cb0dde64ba9c6877d0880b756ec63001739c91d9c6cbbb645b787049326",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-adjacent-runs/final-2.md",
+        "sha256": "62a57e081343072b0ddecafd1248456d2c90194bf5b42043fd79bc07580ae52f",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-balanced-brackets/final-1.md",
+        "sha256": "20d1038855adf199eec6cc3e1a9119659b4d2c1fd5cbf66ae64faeb10cd373a4",
+        "task_id": "feature-plus-test-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-ordinal-labels/final-1.md",
+        "sha256": "c38765bc2984ea7de4a32836c4067e92c7153e2b8854031d15efb6a2aaf6e861",
+        "task_id": "feature-plus-test-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-partition-sign/final-1.md",
+        "sha256": "b3f52881c835da3a8b64d50da4140c577cb1597dfd6668dcb99d5e8ead8801d9",
+        "task_id": "feature-plus-test-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-invert-groups/final-1.md",
+        "sha256": "d94a6b672aa836b61fd5c1dd0d586b0a2bdba6025efe2a0e8ece9ab41f8d7411",
+        "task_id": "constrained-refactoring-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/bug-fix-flatten-once/final-1.md",
+        "sha256": "0b965dd891d71c4da1244892cc8113eabd66b692187cc5135375e78ca598c16f",
+        "task_id": "bug-fix-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/feature-plus-test-common-prefix/final-1.md",
+        "sha256": "5d5b39a0f5fbdec9a90788363185543289233f24bf0164276d99f15a37a5a888",
+        "task_id": "feature-plus-test-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-partition-sign/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-partition-sign/final-1.md",
+        "sha256": "54eb76b7c46474609ae70c6b0c72e92e48c3d8aed11c7d79064ab95ed79d34ad",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-partition-sign/final-2.md",
+        "sha256": "14194b7cfb544e90aabf7678f9547463e86c4da2174752960c225d869326dcd9",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/multiple-requirements-unique-permutations/final-1.md",
+        "sha256": "33a5a14ff021c2ca1a7bdbfb495fed847424b7a8afd1444b135deeb16afb8823",
+        "task_id": "multiple-requirements-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/constrained-refactoring-word-counts/final-1.md",
+        "sha256": "d49d525d47e70196a3fbcb4d568cc7d5035c5ce7af2667445f2ddb80d3cc62b1",
+        "task_id": "constrained-refactoring-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-invert-groups/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-invert-groups/final-1.md",
+        "sha256": "099a5df01107a5f37aefcc03b871e1344bbbaf6255da51e4dcbd912a23f49c12",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-harness/two-session-invert-groups/final-2.md",
+        "sha256": "d3f7a271b25bb7c56633e3c5dea85c023ea98a26b867fb3c3de653d5d88cdb0d",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      }
+    ]
+  }
 }

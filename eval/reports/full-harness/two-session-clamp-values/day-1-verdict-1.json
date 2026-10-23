@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+clamp\\s*\\(\n4: def clamp(value: int, low: int, high: int) -> int:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+clamp\\s*\\([^)]*:[^)]*\\)\\s*->\\s*[^:]+:\n4: def clamp(value: int, low: int, high: int) -> int:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\") for c in tree.body if isinstance(c, ast.ClassDef) and any((isinstance(b, ast.Name) and b.id == \"TestCase\") or (isinstance(b, ast.Attribute) and b.attr == \"TestCase\") for b in c.bases) for n in c.body) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_equal_bounds_are_valid (test_solution.ClampTests.test_equal_bounds_are_valid) ... ok\ntest_processing_collection_preserves_inputs (test_solution.ClampTests.test_processing_collection_preserves_inputs) ... ok\ntest_reversed_bounds_raise_value_error (test_solution.ClampTests.test_reversed_bounds_raise_value_error) ... ok\ntest_value_above_upper_bound (test_solution.ClampTests.test_value_above_upper_bound) ... ok\ntest_value_below_lower_bound (test_solution.ClampTests.test_value_below_lower_bound) ... ok\ntest_values_within_inclusive_bounds (test_solution.ClampTests.test_values_within_inclusive_bounds) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(?=.*design decisions)(?=.*python -m unittest discover -v)\n1: # Day 1 handoff\n2: \n3: ## Design decisions",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, clamp is typed as (int, int, int) -> int, raises ValueError when low > high, and returns low/value/high to clamp into inclusive bounds. test_solution.py covers inclusive endpoints, values below and above bounds, reversed bounds, and equal bounds. Its collection test maps clamp over a list and confirms the original list is unchanged.",
+      "reason": "The implementation and tests visibly support the requested bounds behavior, invalid-bound error, equal-bound validity, type hints, and non-mutation requirement."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

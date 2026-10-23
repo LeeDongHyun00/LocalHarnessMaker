@@ -9318,5 +9318,1677 @@
         "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
       }
     }
-  ]
+  ],
+  "republication": {
+    "artifacts": [
+      {
+        "path": "eval/reports/full-a/feature-plus-test-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-interval-union/final-1.md",
+        "sha256": "028a97ef1e688daf13a20dc20c7bd7bd9b3857fd7917c2ffddaed4bcd544b03c",
+        "task_id": "feature-plus-test-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-common-prefix/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-common-prefix/final-1.md",
+        "sha256": "b1c29882e3e376ebefd32e9002305a492a8f960ad7d3aa2d5b267b7cd7168553",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-common-prefix/final-2.md",
+        "sha256": "313476bba16ccffe83b39dbb8273388ffbd2ebb54a2bc1f6017e112bb0188f60",
+        "task_id": "two-session-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-word-counts/final-1.md",
+        "sha256": "0cf2ea508a4ca6e883c7f37d9e06af9022c1962352c238059bfc5723c824e931",
+        "task_id": "multiple-requirements-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-clamp-values/final-1.md",
+        "sha256": "4543ae4a0944045b52048558ea594f62565c6bae85d22f9b746bbdc8ac6e7b44",
+        "task_id": "bug-fix-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-merge-counts/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-merge-counts/final-1.md",
+        "sha256": "9db5c521c99db5db69bb9dd8784732e01422240cce93ff4287e8e531f8d7ba7e",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-merge-counts/final-2.md",
+        "sha256": "e7c5d9981c69a97d96f6e1766ced39a18177e4e504cc8b4c8f4becab5b6ac672",
+        "task_id": "two-session-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-last-index/final-1.md",
+        "sha256": "6278f5f0678c0cd66e08781bc916d4583976da783567d7c8638f0f4d0261188e",
+        "task_id": "feature-plus-test-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-window-slices/final-1.md",
+        "sha256": "52bcb3d518ab4226a74495daa08e27bc2b6bd165ac1b7996d07a832b051a75b6",
+        "task_id": "feature-plus-test-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-unique-permutations/final-1.md",
+        "sha256": "ad79ef5d5fa1e79fe1124c1b63c20e831a1ac3e509e36b06df200b9862c342ab",
+        "task_id": "bug-fix-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-inclusive-range/final-1.md",
+        "sha256": "a09a5fd197ec871afde3a46830db5cbd5901036b66be18e266cb038a9a75f103",
+        "task_id": "constrained-refactoring-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-adjacent-runs/final-1.md",
+        "sha256": "50fbb091955fb5f9d964412f58f6c17bad097dbee19fac8efcf6db8372d5efd3",
+        "task_id": "constrained-refactoring-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-unique-permutations/final-1.md",
+        "sha256": "2555f3d1a9211aa772059808de987d41ccfa94d40474b616756f9f62f23890d6",
+        "task_id": "constrained-refactoring-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-select-columns/final-1.md",
+        "sha256": "936e1699d536a14dc4fc30ad101c900c8134a1e1acfdc8814a6c60d723d1ada3",
+        "task_id": "feature-plus-test-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-window-slices/final-1.md",
+        "sha256": "652c9459afeeb6587ef199fc885ce8b4d81e04fa74564c442913904533dcdb48",
+        "task_id": "bug-fix-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-rotate-left/final-1.md",
+        "sha256": "a692f80015f13d7d5ff881eabfc1634cf5ec9254eefdad6c5186787725396497",
+        "task_id": "feature-plus-test-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-adjacent-runs/final-1.md",
+        "sha256": "9205af627ecf495bdc74b1e0402d3cfb50a5ecd49800857f411dbd3617e88d77",
+        "task_id": "multiple-requirements-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-prefix-sums/final-1.md",
+        "sha256": "a074f8676f34b7732e122501dfc9099d31f8d4e008c238122d7e87534ae4bca5",
+        "task_id": "bug-fix-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-line-endings/final-1.md",
+        "sha256": "4f7f40cd9cc6d27ccc0a8fe3b22a452ac6cfb7ebc9b40a096d16fa20b23b743d",
+        "task_id": "multiple-requirements-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-flatten-once/final-1.md",
+        "sha256": "8c68a494e71e12c6e4b2838d6778a98aac48269203f5b15910d2cb874f1a5961",
+        "task_id": "constrained-refactoring-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-balanced-brackets/final-1.md",
+        "sha256": "3c2b61c3cdf62c47825d08dcc2f526a8a4f8c32a3ee82f38b3889a425e21ad92",
+        "task_id": "bug-fix-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-balanced-brackets/final-1.md",
+        "sha256": "7c8a0f5f621dd2879f5d42c48f5198aca8242087cce16b33284fa630d8c21ec2",
+        "task_id": "multiple-requirements-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-interval-union/final-1.md",
+        "sha256": "71085979c272d3ffdc7d459294dda9e1458c95a75a263e06f8c34c2cb8f3b5ce",
+        "task_id": "bug-fix-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interval-union/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interval-union/final-1.md",
+        "sha256": "babef07d53a01a3d94d4dc19c2c0d242267dbd0813ad91b7f6e7c17ca279bfff",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interval-union/final-2.md",
+        "sha256": "91ac8af0edf5c685c6d8ae2a6cd54e3e2a75f9e8c4bc38736aebed16b7f06b75",
+        "task_id": "two-session-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-round-robin/final-1.md",
+        "sha256": "967eb8987dbd5d859904447f0886aa24d02b76d683667791bf28d8e981cd326f",
+        "task_id": "constrained-refactoring-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-last-index/final-1.md",
+        "sha256": "bbdfd5537bda8bc668e9d70ea77b3c4cbe69c21fb6770953b21d8596a0cc54b0",
+        "task_id": "multiple-requirements-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-window-slices/final-1.md",
+        "sha256": "cc9b2d4b2eb66c6dfbf72cb1d5c7c9e7d7ba12c241a582ca185af288df339b62",
+        "task_id": "multiple-requirements-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-select-columns/final-1.md",
+        "sha256": "3c345943cefd36202e4178f68bf7bcadaf5988f614ccaea9c14c8b19bdcba80b",
+        "task_id": "constrained-refactoring-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-strip-prefix/final-1.md",
+        "sha256": "bbe7b2f6e8162e5b70324d2d7fa8a3d7fe65c843983c606fdc767a168f322aea",
+        "task_id": "constrained-refactoring-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-rotate-left/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-rotate-left/final-1.md",
+        "sha256": "1f81fc98b6f0e3b4b08b5f8d7d814c40eefd875cd8462a057222b5b886ee5798",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-rotate-left/final-2.md",
+        "sha256": "a511e79b8fb7cf09c9ad257ef1352668fce2553942635922020071a8d0b1003f",
+        "task_id": "two-session-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-inclusive-range/final-1.md",
+        "sha256": "4cd952905bc3cc09ed4c224cc9afb98cb261ccd6f4090cb63d032cbff1191414",
+        "task_id": "multiple-requirements-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-ordinal-labels/final-1.md",
+        "sha256": "db06c89645679252cf0d1c34063bbe387156416c79f31de19aef74420f44e8b2",
+        "task_id": "constrained-refactoring-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-last-index/final-1.md",
+        "sha256": "5b2ae550e616a53e5c61ad63f35268832b419fd4e90abc9b61927dcd40cee80b",
+        "task_id": "bug-fix-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-word-counts/final-1.md",
+        "sha256": "38907a91273d6c104dcae32a0d6f5c036ac1642ddf89f7a38a9c5354b7db66a8",
+        "task_id": "bug-fix-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-window-slices/final-1.md",
+        "sha256": "275ce5295fe78a6a823f0ed6366a3fb55efc2403e37725836d77db94102bf97f",
+        "task_id": "constrained-refactoring-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-adjacent-runs/final-1.md",
+        "sha256": "a2679f5d5a4255952cf759b1a7bf96a2658bcc418703a5f4ec1ee785339b634b",
+        "task_id": "feature-plus-test-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-flatten-once/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-flatten-once/final-1.md",
+        "sha256": "44face22990a4e91e00aacbb9be39c03e39f999dae282d2217432a8f25aebbbb",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-flatten-once/final-2.md",
+        "sha256": "1bfdb3355c39d48b6625fd25335064c91b949525e2398f1f992d8b47d7d5cfd8",
+        "task_id": "two-session-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-round-robin/final-1.md",
+        "sha256": "f46edc5aa582f8f4cb5ab6f703501bcbd4dbb35b25fcafb31303c750aedd3e76",
+        "task_id": "multiple-requirements-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-pairwise-edges/final-1.md",
+        "sha256": "6869409084f9422df149ac40eef76675129b311818a4a58f75d626ca89f8931b",
+        "task_id": "bug-fix-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-clamp-values/final-1.md",
+        "sha256": "bdebc9d63e1628b9e82fa60b338faeeefc5d86aaf37ca872bd892228ecfc712e",
+        "task_id": "feature-plus-test-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-strip-prefix/final-1.md",
+        "sha256": "2ccda1e48e8c0bf42b058979b2aea904a7dcaa249a9f31fb32a20592097df522",
+        "task_id": "bug-fix-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-pairwise-edges/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-pairwise-edges/final-1.md",
+        "sha256": "be4375c9d717fcfc1b1e73a1ad70b2487d8dc3b1fff10694df897630b23d3569",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-pairwise-edges/final-2.md",
+        "sha256": "d7d0e0999d2357300fc5d1ded33486dc44742e8254607333b5d8cc27a1e74fb9",
+        "task_id": "two-session-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-unique-permutations/final-1.md",
+        "sha256": "64afc8b0f69066b8494a7d66c59b1512d37b701020fd347859d75c13c9ba2661",
+        "task_id": "feature-plus-test-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-prefix-sums/final-1.md",
+        "sha256": "e76860d0d7986eeedbd4260fc0cec0366fb32b9a36b5055977a7ff0e9550ad4a",
+        "task_id": "multiple-requirements-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-line-endings/final-1.md",
+        "sha256": "8d8e8181078bbc5bf00e01708e29895d3c4ad384b44b519c63aa733140ecbea4",
+        "task_id": "constrained-refactoring-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-select-columns/final-1.md",
+        "sha256": "0ee02fa3b03b65d9c2e733eead34de91b2b40e968d3169e2a5a60b3b2a8d7875",
+        "task_id": "bug-fix-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-inclusive-range/final-1.md",
+        "sha256": "75073c4cbd53aad5987c820b51cdfcf0bff3f0f761afc8ad7614533aaebbf4b1",
+        "task_id": "bug-fix-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-clamp-values/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-clamp-values/final-1.md",
+        "sha256": "0a1ffb16447c1495cceb93335564604a80b995e06756cb9bd59cf437f64f7fd4",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-clamp-values/final-2.md",
+        "sha256": "46d6118706174cfa15d357830e48d99a0cbbcc38ed30020aa4397badf259a8c3",
+        "task_id": "two-session-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-stable-unique/final-1.md",
+        "sha256": "93b20a61202f6ccd36447e42512713e62a26abf79c73065d0793676df06ba31f",
+        "task_id": "multiple-requirements-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-stable-unique/final-1.md",
+        "sha256": "6e9dd539b6e5ac4e45f33623483a55c14702bb4ef0f7ee0951b0845ad06e8dd1",
+        "task_id": "bug-fix-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-window-slices/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-window-slices/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-window-slices/final-1.md",
+        "sha256": "64f35b2796690acdc5dcacd8f93b0abb1b69059ff79ce31ac254fcf184f94e98",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-window-slices/final-2.md",
+        "sha256": "15f2f33a2a5ad645c7e9c0c65d7e65fe14f14acbf02e540420371c3e81db5cc7",
+        "task_id": "two-session-window-slices",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-prefix-sums/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-prefix-sums/final-1.md",
+        "sha256": "4b7347036c550f87a30aa837dcd891566753100b08c595a754238b7c4a19a557",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-prefix-sums/final-2.md",
+        "sha256": "22fa2833980145c4f0019450d3297ba48ecbce88fef0b8da1fc5ed1f20c7e2eb",
+        "task_id": "two-session-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-common-prefix/final-1.md",
+        "sha256": "9eb81833075f6c9ced89666701dd57f19b2392fcc872e4809ace452e0e28f273",
+        "task_id": "constrained-refactoring-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-last-index/final-1.md",
+        "sha256": "85f5970494b2da6af3f12df39c1842ef029fe0064e1912ea79bc76aba8699d24",
+        "task_id": "constrained-refactoring-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-flatten-once/final-1.md",
+        "sha256": "3a3fecdad4b54bab3f40d9bf68ba9981843f199c81456abf9feac4c0cd1101bf",
+        "task_id": "feature-plus-test-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-pairwise-edges/final-1.md",
+        "sha256": "cf4f18f20bffd81cfa8d3f1f395a8f36fcdf3249ff4884a899d2fa2c8a610a4b",
+        "task_id": "multiple-requirements-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-select-columns/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-select-columns/final-1.md",
+        "sha256": "6b0b4d6ccf08805d60d9d1fab7a89da7ef9b44fba058340385b91dc466716079",
+        "task_id": "multiple-requirements-select-columns",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-partition-sign/final-1.md",
+        "sha256": "bf7422523dd2b8577ba777b489aede9b07aacbb5da6c289a55910637dd5b7ecb",
+        "task_id": "bug-fix-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-parse-pairs/final-1.md",
+        "sha256": "399ed5cf695da8bd74cd6269a88ff5b1ea3a5a86b5db5ed397f7633250705e38",
+        "task_id": "bug-fix-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-last-index/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-last-index/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-last-index/final-1.md",
+        "sha256": "862b3103f1f0123b7159db790e3f6b2732a906b1e131995fb88a8df6c8b6cb4d",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-last-index/final-2.md",
+        "sha256": "612d91b4a62c861eef6c5d1c66caa04ce329409f4d4f1e68dc3e97c6eb27e79e",
+        "task_id": "two-session-last-index",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-invert-groups/final-1.md",
+        "sha256": "8164611867ee2d68463fcac3f04f32e4072e7a23ed68a4669793b0f93d74fd77",
+        "task_id": "feature-plus-test-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-invert-groups/final-1.md",
+        "sha256": "f4068ac6e70ca807faa576f37603061856322c6f704764c88bfa68fb326ab9c1",
+        "task_id": "multiple-requirements-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-common-prefix/final-1.md",
+        "sha256": "ea1b4323a3919d2834dced76fc5170c9b226df593bb5dc9b1aa7cae8318b5150",
+        "task_id": "bug-fix-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-interleave/final-1.md",
+        "sha256": "1ef8936412dea6c57c4a5961085ac68c287f771353a4f58d015ce7b36ec8c2d6",
+        "task_id": "multiple-requirements-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-interval-union/final-1.md",
+        "sha256": "a90ece15504efce730e03223125164c03c8b64d8b3fef6662517af66797c5091",
+        "task_id": "multiple-requirements-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-prefix-sums/final-1.md",
+        "sha256": "ced5c7caf5cfd52bd2e58eb61dcef227438d195203a830a8bd70f548f692588c",
+        "task_id": "constrained-refactoring-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-interleave/final-1.md",
+        "sha256": "727c0359bafbb47909f5670e39745ac4cc48120896825b50cd8dd4b144631fad",
+        "task_id": "constrained-refactoring-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-merge-counts/final-1.md",
+        "sha256": "76e58f8650176c5192c49facb5af648ffa82db8b87b6e083205ec6100428fb7f",
+        "task_id": "multiple-requirements-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-pairwise-edges/final-1.md",
+        "sha256": "45d2bf3bd0bb88ffc2af018f4793e50a97c6cbacab9da2dbc25e39a58ace707a",
+        "task_id": "feature-plus-test-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-chunk-tail/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-chunk-tail/final-1.md",
+        "sha256": "ae607201b4f6745f1f295f3252686fd9cc36f02078a85d9e1f0df052b06a393d",
+        "task_id": "bug-chunk-tail",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-line-endings/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-line-endings/final-1.md",
+        "sha256": "ccc2a811e69733c14e88b33877380f505b1b85963c732b1cf8c13d5a1b79c16d",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-line-endings/final-2.md",
+        "sha256": "57249ba8dbe5f4c2ed7d67c5c77d84dd8aff999bf03c5179d8e2805358c30b58",
+        "task_id": "two-session-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-line-endings/final-1.md",
+        "sha256": "84ef6aaabca494a8a2e7c384112fbfe765639a3e73bab576a87bea65ead006a7",
+        "task_id": "bug-fix-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-adjacent-runs/final-1.md",
+        "sha256": "910a468de4afb1d50f63919b2c04f5f94fea804d02a5c3dce9b0f06f3704d1ac",
+        "task_id": "bug-fix-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-rotate-left/final-1.md",
+        "sha256": "06c3fcf3301f12f204e563b77f40c49690fc021deda49008ee56afb902da7f85",
+        "task_id": "multiple-requirements-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-interleave/final-1.md",
+        "sha256": "9bc0aebbf839947abf8b331cca10a23bbcc63d011d0da3cfecb27b96cc5afa6a",
+        "task_id": "bug-fix-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-stable-unique/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-stable-unique/final-1.md",
+        "sha256": "df6b63d76b5662495b9eb30ab3416cc125d2e04fb6c1fafc90c40d7acab67120",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-stable-unique/final-2.md",
+        "sha256": "1ff1fcb24fa55d777ecffb6decd9f93e17dcb8295bee55eb12d61390ff6fb5eb",
+        "task_id": "two-session-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-prefix-sums/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-prefix-sums/final-1.md",
+        "sha256": "8df0404da79c4cd6956172d2c8c0b544fae95da154be1307211551f613a7634d",
+        "task_id": "feature-plus-test-prefix-sums",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-interleave/final-1.md",
+        "sha256": "e629bc8ec6553a3592d9dced9e48a7aa4c40e7087c234f358ef377786177703d",
+        "task_id": "feature-plus-test-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-word-counts/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-word-counts/final-1.md",
+        "sha256": "2bd44ea33b2a4e40c2ac534a3582dc386c4a9d0eae09483c7ba9c26ddeb270e7",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-word-counts/final-2.md",
+        "sha256": "a8dce2682405b17642aa10ee27254e6c29077fad9610cb4519089f42ef70e917",
+        "task_id": "two-session-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-stable-unique/final-1.md",
+        "sha256": "511befb5cb74182292bae64045a1b27b1ce427fcfa7bc303f6beb0010be0b86f",
+        "task_id": "feature-plus-test-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-balanced-brackets/final-1.md",
+        "sha256": "c25a2bd793c82aaa1008892a7e9935d6ac0ed4b43b89ec0d78dee00c95db394a",
+        "task_id": "constrained-refactoring-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-common-prefix/final-1.md",
+        "sha256": "563d87c5ed3c5d37f643d566e5c13f453b93a9eb09f59a5cae1565ce2134275b",
+        "task_id": "multiple-requirements-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-partition-sign/final-1.md",
+        "sha256": "63e509e8d9a8cf3e1bc1d59f4287726c4e595cce824c2143b7b81ac7867ef9e4",
+        "task_id": "constrained-refactoring-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-inclusive-range/final-1.md",
+        "sha256": "04ae3c2a5221cdae9655b2d122013452183239c59b8e2cf68a4d452776796916",
+        "task_id": "feature-plus-test-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-inclusive-range/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-inclusive-range/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-inclusive-range/final-1.md",
+        "sha256": "2411bd858eca1f34ac9356462da61888cd441c5fc640608d3e6a0963e2cf3493",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-inclusive-range/final-2.md",
+        "sha256": "036981bcdbabaeba711d0f950d092f63dc30d3ffdacc7233a1a5e4a89d949c2e",
+        "task_id": "two-session-inclusive-range",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-parse-pairs/final-1.md",
+        "sha256": "1e292862b1a53d85394bdce0d8e35dc616700fdf45c90ac2fd88870bba01c0c6",
+        "task_id": "multiple-requirements-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-strip-prefix/final-1.md",
+        "sha256": "4dbf8edbc6b1e07ab7914080f9ab9c3b4c76e38b62508b95726a5fb81f58e86d",
+        "task_id": "feature-plus-test-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-line-endings/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-line-endings/final-1.md",
+        "sha256": "16c482651c945d48d074730d497ddaa2d3ffc19a2d4dab93bcd862bfedb012fb",
+        "task_id": "feature-plus-test-line-endings",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-rotate-left/final-1.md",
+        "sha256": "88ad51e3367291fa25e73425b1a99b4011e00ec3c6a0288530f765b54ed9963f",
+        "task_id": "constrained-refactoring-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-ordinal-labels/final-1.md",
+        "sha256": "c93238ecc67bb533b77121d7ae1f639edeeaa57d47149fbe1c38bec1dc1d3ca6",
+        "task_id": "multiple-requirements-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-invert-groups/final-1.md",
+        "sha256": "030a5c41041237b7bab83fa75e8b725a62d778ab2c09b9102d4c2c2dba88549a",
+        "task_id": "bug-fix-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-strip-prefix/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-strip-prefix/final-1.md",
+        "sha256": "30e948baa5a38ad6bb6579c19b937e1ca1afba405af28165f94fbef10b341c6d",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-strip-prefix/final-2.md",
+        "sha256": "aae03277914338e3052a1fb30df4a1d1fdc292767e5f0a923d646cee3eed96af",
+        "task_id": "two-session-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-parse-pairs/final-1.md",
+        "sha256": "58f46df1aff7234510e438c3990b74211b05b0655fa66ae36b33e52a22df020c",
+        "task_id": "constrained-refactoring-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-round-robin/final-1.md",
+        "sha256": "e67cbe3d146e2705c4ea2c1fba45373abf3c2cceeca34e720a0a8d14fd2ddd00",
+        "task_id": "bug-fix-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-clamp-values/final-1.md",
+        "sha256": "55f63995d836df7c60f9847c2add52fcfdab3a1f8ef7eb4435fe8f1b36f66870",
+        "task_id": "multiple-requirements-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-partition-sign/final-1.md",
+        "sha256": "241e7b67160e75f092b85a75c1c66f531fe09561dccc9a16db0843c5640c9653",
+        "task_id": "multiple-requirements-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-round-robin/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-round-robin/final-1.md",
+        "sha256": "ec027f33a34b3090e7de8888ed230d673db7c7f23893f487cfff7379503d98e5",
+        "task_id": "feature-plus-test-round-robin",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-interval-union/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-interval-union/final-1.md",
+        "sha256": "9ffbd1d89ac1e8ef5897db523aeaf2af157efc460488b80864335897013ae27e",
+        "task_id": "constrained-refactoring-interval-union",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-flatten-once/final-1.md",
+        "sha256": "31176a242f6d4950c381c4fb3362de0eb08f3031d7d5afa72d77c54889263d79",
+        "task_id": "multiple-requirements-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-merge-counts/final-1.md",
+        "sha256": "82a90e3ec7f1e54e89c4ba568a7a3722721251cb034ecb40d70631c965c86404",
+        "task_id": "bug-fix-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-strip-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-strip-prefix/final-1.md",
+        "sha256": "ad9b00f5bb8816b44448b863d7269d904f3e48d58babc3db7c9815f8c76ef603",
+        "task_id": "multiple-requirements-strip-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-balanced-brackets/final-1.md",
+        "sha256": "d8fd52f0174ddd4467a84a3069e2bf1ef95d34b5e2cac06824cdd3c9875f3ca9",
+        "task_id": "two-session-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-merge-counts/final-1.md",
+        "sha256": "6d5e12a45c883864feb8b3b8f5e06d1498209b9c560d199631a4ce244c5eafe6",
+        "task_id": "constrained-refactoring-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-rotate-left/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-rotate-left/final-1.md",
+        "sha256": "36fbc8331535ffb59ca26f40efc8d07c3e7e7ccea91183ae61352ad44714688f",
+        "task_id": "bug-fix-rotate-left",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-parse-pairs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-parse-pairs/final-1.md",
+        "sha256": "fa3ad9160a8e7a5cb734aee3cee8ac4228a0f74e9dcdeb925656ca9d274307d6",
+        "task_id": "feature-plus-test-parse-pairs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-clamp-values/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-clamp-values/final-1.md",
+        "sha256": "25cef1c9c26309edf21a45136b250beac9ecc7f0ba6bc32f50d0a8235ac18d0d",
+        "task_id": "constrained-refactoring-clamp-values",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-word-counts/final-1.md",
+        "sha256": "3fe5017a1ce8677f6b2afacbb2e3d05f242951a977df83da2a2b63b01f5d31bf",
+        "task_id": "feature-plus-test-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-stable-unique/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-stable-unique/final-1.md",
+        "sha256": "6986b0b4599e60748d0b4875d844a915182f81bfabd5f391e20771ef6c256074",
+        "task_id": "constrained-refactoring-stable-unique",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-merge-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-merge-counts/final-1.md",
+        "sha256": "70cd6cb2e68d991e37702a16351bfe7ae562c2f591a1f6ab056924af501413f4",
+        "task_id": "feature-plus-test-merge-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-pairwise-edges/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-pairwise-edges/final-1.md",
+        "sha256": "c1ccd0307cf68e38fa214d532318310cf3d28140b7f463a7a971dcbe7868a4d6",
+        "task_id": "constrained-refactoring-pairwise-edges",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interleave/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interleave/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interleave/final-1.md",
+        "sha256": "721eebf5b4bace22256b7c74f9cd2221cbc67a563515f4fcd3b9564b0e6fd2b9",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-interleave/final-2.md",
+        "sha256": "98aaffd88c50a3a1a4f15b925eb248838c402166dd8d1e51d6cfe2ed4e5f60a5",
+        "task_id": "two-session-interleave",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-adjacent-runs/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-adjacent-runs/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-adjacent-runs/final-1.md",
+        "sha256": "2891bc41c768472a2a1790567c87acfee1a5d939ccc25662c78a7f01786759f3",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-adjacent-runs/final-2.md",
+        "sha256": "f6ab1a63d4b10c690602192a34bab1c2d29a499934d3ca111ce7184b8b2eb201",
+        "task_id": "two-session-adjacent-runs",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-balanced-brackets/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-balanced-brackets/final-1.md",
+        "sha256": "bd4b1f1524397e510efd763cd83862956af912c653a1a52f44b721db349ef865",
+        "task_id": "feature-plus-test-balanced-brackets",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-ordinal-labels/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-ordinal-labels/final-1.md",
+        "sha256": "05ea47f30eb160c146de119782e81e4e24c6987e6cc451079586b19274b3117a",
+        "task_id": "feature-plus-test-ordinal-labels",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-partition-sign/final-1.md",
+        "sha256": "ab31efbc2ace43f719e17c7efa78e6ab8313a9106cb123ff89406acb23e45e4a",
+        "task_id": "feature-plus-test-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-invert-groups/final-1.md",
+        "sha256": "a6b1ec808499ce54e0a62fc84f84e0fb7b80dcb1443be7b0dddcbe2754ca2408",
+        "task_id": "constrained-refactoring-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-flatten-once/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "bug-fix-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/bug-fix-flatten-once/final-1.md",
+        "sha256": "a7d0a0b3ae2f58aec9ad035c78aaa78eddc651630a085d35be374d7406ca3ff5",
+        "task_id": "bug-fix-flatten-once",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-common-prefix/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "feature-plus-test-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/feature-plus-test-common-prefix/final-1.md",
+        "sha256": "a3429ec4da20b2d2eff24f8bd32201141943287f602d6760ede76d9c0f047fa2",
+        "task_id": "feature-plus-test-common-prefix",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-partition-sign/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-partition-sign/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-partition-sign/final-1.md",
+        "sha256": "c1e80e990f00ee12ae55b67eb4fc3ec8fdd2acddce55182d451aff8482bfc04a",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-partition-sign/final-2.md",
+        "sha256": "9dd2ec027766f888bd5679dc3c2a39ddb718877425b25ee5fab2c6ef5e9a9a70",
+        "task_id": "two-session-partition-sign",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-unique-permutations/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "multiple-requirements-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/multiple-requirements-unique-permutations/final-1.md",
+        "sha256": "3094a399cf97dcab67254a6d3f654cc079b71dcfa9e959fb7a3d75bcb6b0bedf",
+        "task_id": "multiple-requirements-unique-permutations",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-word-counts/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "constrained-refactoring-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/constrained-refactoring-word-counts/final-1.md",
+        "sha256": "1e100dfb2ad7804c955cfa9683c42254b3160c639fcd0584c28e782b0be85c27",
+        "task_id": "constrained-refactoring-word-counts",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-invert-groups/exec-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-invert-groups/exec-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-invert-groups/final-1.md",
+        "sha256": "f8f8869813daee19e808de894cebb1a5ef759d00ff46371da23614e2741e0d28",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      },
+      {
+        "path": "eval/reports/full-a/two-session-invert-groups/final-2.md",
+        "sha256": "7b28142dc6e48cd8b2ec14ba39abcd0a027b40e2ece034fcc0d33ad8324fdad2",
+        "task_id": "two-session-invert-groups",
+        "provenance": "republished_unpinned"
+      }
+    ]
+  }
 }

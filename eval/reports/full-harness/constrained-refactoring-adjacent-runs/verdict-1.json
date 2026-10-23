@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)\\bdef\\s+runs\\s*\\(|\\bdef\\s+runs_legacy\\s*\\(\n14: def runs(items: list[str]) -> list[tuple[str, int]]:\n18: def runs_legacy(items: list[str]) -> list[tuple[str, int]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, private `_encode_runs` implements the shared loop and returns the encoded runs; both `runs` and `runs_legacy` return `_encode_runs(items)`.",
+      "reason": "Both public functions retain their definitions and delegate to the same private helper, which contains the run-length encoding algorithm."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\):.*?\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\):\n7:     def test_adjacent_and_nonadjacent_runs(self):\n8:         for encode in (runs, runs_legacy):\n9:             with self.subTest(function=encode.__name__):\n10:                 items = [\"a\", \"a\", \"b\", \"b\", \"b\", \"a\", \"\", \"\"]\n11:                 original = items.copy()\n12:                 self.assertEqual(\n13:                     encode(items),\n14:                     [(\"a\", 2), (\"b\", 3), (\"a\", 1), (\"\", 2)],\n15:                 )\n16:                 self.assertEqual(items, original)",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_adjacent_and_nonadjacent_runs (test_solution.RunsTests.test_adjacent_and_nonadjacent_runs) ... ok\ntest_empty_input (test_solution.RunsTests.test_empty_input) ... ok\ntest_noniterable_input_raises_type_error (test_solution.RunsTests.test_noniterable_input_raises_type_error) ... ok\ntest_results_are_independent (test_solution.RunsTests.test_results_are_independent) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: In test_solution.py, test_adjacent_and_nonadjacent_runs calls both runs and runs_legacy with adjacent repeated strings (\"a\", \"a\" and \"b\", \"b\", \"b\") and a later separate \"a\" run, asserting value/count pairs [(\"a\", 2), (\"b\", 3), (\"a\", 1), (\"\", 2)]. test_empty_input calls both APIs with [] and asserts the result is [].",
+      "reason": "The visible unittest methods exercise the public APIs for all three required cases."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

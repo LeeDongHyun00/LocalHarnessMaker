@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+normalize\\s*\\(\n4: def normalize(text: str) -> str:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: solution.py’s normalize docstring says it replaces CRLF and lone CR with LF, preserves existing LF and all other characters, preserves the number of line breaks, and includes trailing newlines.",
+      "reason": "The public normalize behavior is documented in its function docstring, covering every requirement in the rubric."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[^\\n]*\\n.*?){3}\n7:     def test_converts_crlf_and_lone_cr(self):\n8:         self.assertEqual(normalize(\"first\\r\\nsecond\\rthird\\nfourth\"),\n9:                          \"first\\nsecond\\nthird\\nfourth\")\n10: \n11:     def test_preserves_consecutive_and_trailing_line_breaks(self):\n12:         for text, expected in (\n13:             (\"\\r\\r\\n\\n\\r\", \"\\n\\n\\n\\n\"),\n14:             (\"text\\r\\n\\r\\n\", \"text\\n\\n\"),\n15:             (\"text\\r\", \"text\\n\"),\n16:             (\"text\\n\\n\", \"text\\n\\n\"),",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_converts_crlf_and_lone_cr (test_solution.NormalizeTests.test_converts_crlf_and_lone_cr) ... ok\ntest_preserves_consecutive_and_trailing_line_breaks (test_solution.NormalizeTests.test_preserves_consecutive_and_trailing_line_breaks) ... ok\ntest_preserves_input_values_and_collection_order (test_solution.NormalizeTests.test_preserves_input_values_and_collection_order) ... ok\ntest_preserves_other_characters_and_existing_lf (test_solution.NormalizeTests.test_preserves_other_characters_and_existing_lf) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, `normalize(text: str) -> str` is type-hinted and uses string replacement to return a normalized value. In test_solution.py, tests import `normalize` from `solution` and call it directly; `test_preserves_input_values_and_collection_order` compares the list to a copy after normalization.",
+      "reason": "The implementation retains a typed public function signature, and the tests exercise the imported public API while checking that input collection contents and order remain unchanged."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

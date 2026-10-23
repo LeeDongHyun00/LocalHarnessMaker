@@ -1,0 +1,110 @@
+{
+  "task_summary": "Extend the existing public API with prefix_many(cases: list[tuple]) -> list, preserving the day-1 API. Add unittest coverage and update HANDOFF.md with verification evidence.",
+  "constraints": [
+    "Keep the day-1 API compatible.",
+    "Each tuple supplies positional arguments for one call to prefix; return results in case order and [] for no cases.",
+    "Propagate the first exception unchanged.",
+    "Do not mutate cases or arguments.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result.",
+    "Work only in the supplied task workspace; do not access parent repositories or external services."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines the typed public function prefix_many(cases: list[tuple]) -> list.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+prefix_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\b"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The implementation returns the results of calling prefix with each tuple's positional arguments, in case order, returns an empty list for no cases, and propagates the first exception unchanged.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace source files. Assess whether prefix_many calls prefix once per case using that tuple as positional arguments, returns results in input order, returns [] for no cases, and lets the first exception propagate unchanged. Assess only behavior evident from the implementation."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The implementation preserves the day-1 prefix API and does not mutate cases or their argument tuples or contents.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace source files. Assess whether the day-1 public prefix API remains compatible and whether prefix_many avoids mutating cases or supplied arguments. Base the assessment only on source code."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least three unittest test methods, including batch coverage.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?=.*class\\s+\\w+\\s*\\(\\s*unittest\\.TestCase\\s*\\))(?=(?:.*?def\\s+test_){3,})(?=.*def\\s+test_\\w*.*(?:batch|many|cases))"
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest suite completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "HANDOFF.md records the verification command and its observed result.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?s)(?=.*python -m unittest discover -v)(?=.*(?:passed|OK|successfully|successful))"
+      }
+    },
+    {
+      "id": "SC-7",
+      "description": "solution.py and test_solution.py compile as Python modules.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The handoff's named files solution.py, test_solution.py, and HANDOFF.md are relative paths in the supplied workspace.",
+    "The file solution.py may not exist yet and may be created as needed; the same applies to test_solution.py and HANDOFF.md if absent.",
+    "The user-requested observed verification result in HANDOFF.md is to be recorded after running the unittest command; the proposed check only assesses whether the command and a success result are documented.",
+    "The runner-provided handoff accurately describes the day-1 API and its existing behavior; those claims remain subject to review in the workspace.",
+    "The function annotation list[tuple] is interpreted literally as requested, without specifying tuple element types."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=604; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17669,
+    "output_tokens": 867,
+    "usd": 0.00085256
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py",
+      "reason": "required file exists"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+invert\\s*\\([^)]*\\)\\s*->\n4: def invert(items: dict[str, str]) -> dict[str, list[str]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:[^\\n]*(?:\\n|$).*?def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:.*?def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:|def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:.*?def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:)\n6: class InvertTests(unittest.TestCase):\n7:     def test_groups_keys_in_insertion_order(self):\n8:         items = {\"z\": \"red\", \"b\": \"blue\", \"a\": \"red\", \"c\": \"blue\"}\n9:         original_items = list(items.items())\n10: \n11:         self.assertEqual(invert(items), {\"red\": [\"z\", \"a\"], \"blue\": [\"b\", \"c\"]})\n12:         self.assertEqual(list(items.items()), original_items)\n13: \n14:     def test_empty_input(self):\n20:     def test_single_entry_with_empty_key_and_value(self):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: `test_solution.py` calls `invert` with interleaved values in `test_groups_keys_in_insertion_order` and expects `{\"red\": [\"z\", \"a\"], \"blue\": [\"b\", \"c\"]}`; it also compares the input items before and after. `test_empty_input` checks `{}`; `test_single_entry_with_empty_key_and_value` covers empty key/value; `test_all_keys_share_one_value` checks grouping order and confirms mutating the result leaves the input items unchanged.",
+      "reason": "The tests exercise `invert` with ordinary, boundary, and empty inputs, verify grouped keys follow input insertion order, and check the input remains unchanged."
+    },
+    {
+      "id": "SC-7",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` annotates `items` as `dict[str, str]` and the return as `dict[str, list[str]]`. It iterates through `items.items()` and appends each key to `grouped[value]`, preserving input insertion order within each group. Since `grouped` starts empty, empty input returns `{}`. The function only reads `items` and builds a separate dictionary, so it does not mutate the input.",
+      "reason": "The visible `invert` implementation groups each key under its corresponding value in iteration order, returns an empty dictionary for empty input, does not mutate `items`, and uses type hints."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

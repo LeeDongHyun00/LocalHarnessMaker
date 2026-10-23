@@ -1,0 +1,98 @@
+{
+  "task_summary": "Refactor `union` and `union_legacy` in `solution.py` to use one private shared algorithm, and update public tests to cover the requested interval behavior and compatibility constraints.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve both public function signatures, return types, error behavior, input immutability, imports, public names, and type hints.",
+    "Merge overlapping or touching closed intervals, sorted by start; raise `ValueError` if any start is greater than its end; return `[]` for empty input; do not mutate input collections.",
+    "`test_solution.py` must contain at least two passing unittest test methods exercising the public API.",
+    "Run verification with `python -m unittest discover -v`."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "`solution.py` defines both public functions and a private helper for their shared algorithm.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)def union\\b.*?def union_legacy\\b|def union_legacy\\b.*?def union\\b"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "`solution.py` compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The unittest suite passes using the requested discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "`test_solution.py` contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def test_[A-Za-z0-9_]+\\s*\\([^)]*\\).*?:.*?){2}"
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The public tests exercise both public API functions and cover the specified interval behavior, invalid interval error, empty input, and input immutability.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read `solution.py` and `test_solution.py`. Assess whether the tests visibly exercise both `union` and `union_legacy` and cover merging overlapping and touching closed intervals in start-sorted output, `ValueError` for start greater than end, empty input returning an empty list, and preservation of input collections. Judge only from file contents."
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The implementation preserves the stated signatures, return types, error behavior, input immutability, imports, public names, type hints, and shared-algorithm requirement.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read `solution.py` and compare it against the request: `union` and `union_legacy` must delegate their shared algorithm to one private helper; retain their signatures, return types, error behavior, input immutability, imports and public names; preserve type hints; merge overlapping or touching closed intervals sorted by start; raise `ValueError` for any start greater than its end; and return an empty list for empty input. Assess only what is visible in the files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "Interpret all paths as relative to the supplied task workspace; `solution.py` and `test_solution.py` may not exist yet and may be created.",
+    "The request does not specify the exact public function signatures, return type annotations, or existing import surface; preserve the supplied versions when present, and review this assumption against the workspace before approval.",
+    "Assume unittest discovery from the workspace root discovers `test_solution.py` and the relevant public tests."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=884; distinct_files=2; tests_requested=true; requirement_segments=18; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 21170,
+    "output_tokens": 810,
+    "usd": 0.00087464
+  }
+}

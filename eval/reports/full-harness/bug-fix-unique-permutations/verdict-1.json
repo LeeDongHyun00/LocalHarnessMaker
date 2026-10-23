@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+permutations\\s*\\(\n4: \n5: \n6: def permutations(text: str) -> list[str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'from solution import permutations; assert permutations(\"\") == [\"\"]; assert permutations(\"aba\") == [\"aab\", \"aba\", \"baa\"]'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)class\\s+\\w+\\s*\\([^)]*TestCase[^)]*\\).*?def\\s+test\\w*\\s*\\([^)]*\\).*?permutations\n6: class PermutationsTests(unittest.TestCase):\n7:     def test_distinct_sorted_permutations(self) -> None:\n8:         self.assertEqual(permutations(\"aba\"), [\"aab\", \"aba\", \"baa\"])",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_distinct_sorted_permutations (test_solution.PermutationsTests.test_distinct_sorted_permutations) ... ok\ntest_empty_and_single_character (test_solution.PermutationsTests.test_empty_and_single_character) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

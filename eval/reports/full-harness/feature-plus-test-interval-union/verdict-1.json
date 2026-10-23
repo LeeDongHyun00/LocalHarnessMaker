@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.UnionTests.test_empty_input) ... ok\ntest_negative_endpoints_and_separate_points (test_solution.UnionTests.test_negative_endpoints_and_separate_points) ... ok\ntest_reversed_interval_raises_without_mutation (test_solution.UnionTests.test_reversed_interval_raises_without_mutation) ... ok\ntest_single_interval (test_solution.UnionTests.test_single_interval) ... ok\ntest_touching_nested_duplicate_and_point_intervals (test_solution.UnionTests.test_touching_nested_duplicate_and_point_intervals) ... ok\ntest_unsorted_overlapping_and_disjoint_intervals (test_solution.UnionTests.test_unsorted_overlapping_and_disjoint_intervals) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\(\n9:     def test_unsorted_overlapping_and_disjoint_intervals(self) -> None:\n14: \n15:     def test_touching_nested_duplicate_and_point_intervals(self) -> None:\n18: \n19:     def test_negative_endpoints_and_separate_points(self) -> None:\n24: \n25:     def test_empty_input(self) -> None:\n30: \n31:     def test_single_interval(self) -> None:\n34: ",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, `union` has explicit parameter and return type hints. It checks `start > end` and raises ValueError, iterates over `sorted(intervals)`, merges when `start <= merged[-1][1]`, and builds a separate `merged` list that it returns. These visible operations support all required behaviors.",
+      "reason": "solution.py exposes a callable public API named `union` with the typed signature `union(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]`. Its visible implementation validates reversed intervals and raises ValueError, sorts inputs, merges overlapping and touching intervals, returns an empty list for empty input, and does not mutate the input collection."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

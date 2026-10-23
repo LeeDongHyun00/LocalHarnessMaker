@@ -1,0 +1,95 @@
+{
+  "task_summary": "Fix the behavior of merge in solution.py without changing its signature, and add a small regression test in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve merge's signature and type hints.",
+    "Return the union of input keys, adding counts for shared keys; preserve zero and negative totals.",
+    "Do not change either input or mutate input collections.",
+    "Add at least one passing unittest test method in test_solution.py that exercises the public API.",
+    "Verify with unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The regression test suite is discoverable and passes using unittest discovery.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The tests in test_solution.py include at least one unittest test method exercising merge through its public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*TestCase[^)]*\\).*?def\\s+test_\\w+\\s*\\("
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [
+    "A required external prerequisite is unavailable.",
+    "The requested changes would require expanding scope beyond the supplied workspace or conflict with the stated constraints."
+  ],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; either may not exist yet and may be created.",
+    "The public API is the merge function in solution.py; its current signature and exact input/output types must be determined from the supplied workspace before editing.",
+    "The requested unittest discovery command is supported by the workspace's test layout; any existing tests are discoverable by python -m unittest discover -v.",
+    "Removed invalid criterion SC-5: llm_judge must be decidable from workspace files alone; use a command criterion for execution evidence. Its requirement remains unverified and needs user review."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=764; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 38648,
+    "output_tokens": 1210,
+    "usd": 0.00312196
+  }
+}

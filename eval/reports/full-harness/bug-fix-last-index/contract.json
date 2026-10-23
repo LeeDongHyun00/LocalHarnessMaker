@@ -1,0 +1,74 @@
+{
+  "task_summary": "Fix last_index in solution.py without changing its signature, add a regression test in test_solution.py, and verify public behavior using unittest discovery.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not change last_index's signature; maintain type hints and do not mutate input collections.",
+    "Return the last zero-based index equal to target, or None when absent. Empty input returns None; matching is case-sensitive.",
+    "test_solution.py must contain at least one passing unittest test method exercising the public API.",
+    "Run verification with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public API returns the last matching zero-based index, returns None for absent targets and empty input, and matches case-sensitively.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py includes at least one unittest test method that exercises the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:.*?def\\s+test_\\w+\\s*\\("
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py or test_solution.py may not exist yet and may be created.",
+    "python -m unittest discover -v is the requested verification command, and the tests are discoverable with that invocation.",
+    "The exact current last_index signature and surrounding module contents are unknown; preserve the existing signature when editing.",
+    "Removed invalid criterion SC-4: llm_judge must be decidable from workspace files alone; use a command criterion for execution evidence. Its requirement remains unverified and needs user review."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=772; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 38652,
+    "output_tokens": 1072,
+    "usd": 0.0044012
+  }
+}

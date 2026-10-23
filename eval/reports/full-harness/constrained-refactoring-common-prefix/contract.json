@@ -1,0 +1,92 @@
+{
+  "task_summary": "Refactor common and common_legacy in solution.py to delegate shared prefix logic to one private helper, preserving the specified public behavior and compatibility; add public unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; edit solution.py and public tests.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Preserve both public signatures, return types, error behavior, input immutability, imports, and public names.",
+    "Return the longest common character prefix with case-sensitive matching; empty input returns an empty string and one item returns that item.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The refactored solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The solution module contains the public functions common and common_legacy, plus a private shared helper; the exact location or spelling of the helper is unspecified.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)\\bdef\\s+common\\s*\\(|\\bdef\\s+common_legacy\\s*\\(|\\bdef\\s+_[A-Za-z_]\\w*\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public tests contain at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s+def\\s+test_[A-Za-z_]\\w*\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The implementation and tests preserve the requested public behavior, signatures, return types, error behavior, input immutability, import compatibility, type hints, and delegation of shared algorithm logic to one private helper.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether common and common_legacy retain compatible public signatures and names, delegate shared algorithm logic to one private helper, return the longest case-sensitive common character prefix, handle empty input and one-item input as specified, preserve error behavior and return types, maintain type hints, avoid mutating input collections, and include at least two unittest test methods exercising the public API. Judge only visible code and test content; do not infer runtime test outcomes."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The exact existing signatures, error behavior, imports, and public names are unknown until the workspace is reviewed; preserve the existing contract where present while meeting the supplied behavior.",
+    "The private helper's name and exact placement are unspecified; the regex check only checks for function definitions and does not prove delegation or behavior.",
+    "The requested unittest discovery command is assumed to discover the relevant tests from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=875; distinct_files=2; tests_requested=true; requirement_segments=18; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17404,
+    "output_tokens": 709,
+    "usd": 0.00074706
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py",
+      "reason": "required file exists"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^def\\s+\\w+\\s*\\([^\\n]*\\)\\s*->\\s*[^:]+:\n4: def prefix(items: list[int]) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'from solution import *; import solution; names = [name for name, value in vars(solution).items() if callable(value) and not name.startswith(\"_\")]; assert names; f = getattr(solution, names[0]); data = [2, -5, 4]; original = data.copy(); result = f(data); assert result == [2, -3, 1] and len(result) == len(data) and data == original; assert f([]) == []; assert f([-2, -3]) == [-2, -5]'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.PrefixTests.test_empty_input) ... ok\ntest_input_is_unchanged_and_result_is_independent (test_solution.PrefixTests.test_input_is_unchanged_and_result_is_independent) ... ok\ntest_mixed_numbers_and_zero (test_solution.PrefixTests.test_mixed_numbers_and_zero) ... ok\ntest_negative_numbers (test_solution.PrefixTests.test_negative_numbers) ... ok\ntest_positive_numbers (test_solution.PrefixTests.test_positive_numbers) ... ok\ntest_single_item (test_solution.PrefixTests.test_single_item) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "command: python -c 'from pathlib import Path; text = Path(\"HANDOFF.md\").read_text(); assert \"design\" in text.lower() and \"python -m unittest discover -v\" in text'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

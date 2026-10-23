@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def flatten\\b.*?def flatten_legacy\\b.*?def _[A-Za-z_]\\w*\\b\n4: def flatten(items: list[list[int]]) -> list[int]:\n5:     return _flatten(items)\n6: \n7: \n8: def flatten_legacy(items: list[list[int]]) -> list[int]:\n9:     return _flatten(items)\n10: \n11: \n12: def _flatten(items: list[list[int]]) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: test_solution.py",
+      "reason": "required file exists"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)def test_[A-Za-z_]\\w*\\s*\\(self[^)]*\\):.*?def test_[A-Za-z_]\\w*\\s*\\(self[^)]*\\):\n7:     def test_preserves_order_and_ignores_empty_groups(self):\n8:         for function in (flatten, flatten_legacy):\n9:             with self.subTest(function=function.__name__):\n10:                 self.assertEqual(function([[], [3, 1], [], [2, 3], []]), [3, 1, 2, 3])\n11:                 self.assertEqual(function([]), [])\n12:                 self.assertEqual(function([[], []]), [])\n13: \n14:     def test_returns_fresh_list_without_mutating_input(self):\n29:     def test_flattens_exactly_one_level(self):\n30:         for function in (flatten, flatten_legacy):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_flattens_exactly_one_level (test_solution.FlattenTests.test_flattens_exactly_one_level) ... ok\ntest_preserves_order_and_ignores_empty_groups (test_solution.FlattenTests.test_preserves_order_and_ignores_empty_groups) ... ok\ntest_preserves_type_errors_for_noniterable_inputs (test_solution.FlattenTests.test_preserves_type_errors_for_noniterable_inputs) ... ok\ntest_returns_fresh_list_without_mutating_input (test_solution.FlattenTests.test_returns_fresh_list_without_mutating_input) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

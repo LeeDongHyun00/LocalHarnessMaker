@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: chunking.py; pattern: (?m)^\\s*def\\s+chunked\\s*\\(\n2: \n3: \n4: def chunked(items: list[int], size: int) -> list[list[int]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile chunking.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: In `chunking.py`, `chunked` iterates `start` from 0 to `len(items)` in steps of `size` and returns `items[start:start + size]` slices. For positive `size`, these consecutive slices cover the input in order; the final slice can be shorter.",
+      "reason": "The implementation partitions a non-empty list into consecutive slices of the requested positive size, preserving item order and allowing a shorter final slice."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "llm_judge: In `chunking.py`, `chunked` builds its result by iterating `range(0, len(items), size)`. For an empty list, `len(items)` is 0, so the range has no iterations and the returned list is empty.",
+      "reason": "The visible implementation returns an empty list for empty input."
+    },
+    {
+      "id": "SC-5",
+      "status": "unverifiable",
+      "evidence": "llm_judge: `/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-8o5i6_nf/workspace/chunking.py` defines `chunked(items: list[int], size: int) -> list[list[int]]` and returns slices via a list comprehension. The snapshot contains no prior implementation for comparison.",
+      "reason": "The snapshot shows the current `chunked(items: list[int], size: int) -> list[list[int]]` signature and uses list slicing to construct the returned chunks, but provides no comparison material to verify that the signature was preserved from an earlier version. The visible code supports that it does not modify `items`; without the prior signature, the full criterion cannot be assessed."
+    }
+  ],
+  "overall": "fail",
+  "reinstruct_message": null,
+  "attempt": 1
+}

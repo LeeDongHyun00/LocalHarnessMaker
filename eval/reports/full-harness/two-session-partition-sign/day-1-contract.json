@@ -1,0 +1,101 @@
+{
+  "task_summary": "Implement the partition behavior in solution.py, add public unittest regression coverage, and document design decisions plus a verification command in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Return negative, zero, and positive values as three lists in that order, preserving relative order and duplicates within each partition.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least three passing unittest test methods exercising the public API.",
+    "HANDOFF.md is an allowed output and must include design decisions and the verification command."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines a partition function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+partition\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The implementation returns negative, zero, and positive values in three lists, preserving order and duplicates, and does not mutate the input.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether the typed public API partitions values into three lists in negative, zero, positive order; preserves relative order and duplicates within each list; and avoids mutating the input collection. Do not infer runtime behavior beyond what the code expresses."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "solution.py and test_solution.py compile successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least three unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s*def\\s+test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command succeeds.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "HANDOFF.md records design decisions and the verification command.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?si)(?=.*design decisions)(?=.*python -m unittest discover -v)"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative paths in the supplied task workspace; solution.py, test_solution.py, and HANDOFF.md may not exist yet and may be created.",
+    "The public API function name is inferred as partition from the task wording; no signature or input element type was specified, so those details remain for implementation review.",
+    "The regex check confirms presence of unittest test methods; the discovery command is intended to verify their execution, though discovery alone may not prove at least three tests were collected."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=832; distinct_files=3; tests_requested=true; requirement_segments=15; score=7"
+  },
+  "cost_estimate": {
+    "input_tokens": 17398,
+    "output_tokens": 637,
+    "usd": 0.0020583
+  }
+}

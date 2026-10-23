@@ -1,0 +1,110 @@
+{
+  "task_summary": "Correct clamp behavior in solution.py and add regression coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Keep clamp's signature and type hints.",
+    "Clamp values into the inclusive [low, high] range; raise ValueError when low > high; allow equal bounds.",
+    "Do not mutate input collections; no algorithmic complexity constraint applies.",
+    "Add at least one passing unittest test method in test_solution.py that exercises the public API.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The unittest discovery command completes successfully, including the regression test.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The clamp function definition remains present in solution.py.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+clamp\\s*\\("
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The regression test file contains at least one unittest test method.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s*def\\s+test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "Changes preserve the requested public behavior, type hints, signature, and non-mutation requirement.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files and determine whether the clamp implementation preserves its existing function signature and type hints, clamps values to the inclusive [low, high] interval, raises ValueError when low > high, accepts equal bounds, and does not mutate input collections. Consider whether the regression test exercises the public API and covers the requested behavior. Judge only content visible in workspace files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [
+    "Stop if the requested behavior conflicts with applicable workspace instructions or the requested files cannot be modified under the active execution environment."
+  ],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The public API is the clamp function in solution.py; the request does not provide its exact signature, so retain the signature found in the supplied code if present.",
+    "The requested unittest discovery command is expected to discover test_solution.py from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=747; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34897,
+    "output_tokens": 1244,
+    "usd": 0.00141602
+  }
+}

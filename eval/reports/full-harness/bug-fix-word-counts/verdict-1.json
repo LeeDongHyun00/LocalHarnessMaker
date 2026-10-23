@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, words(text: str) -> dict[str, int] uses text.split() to split on arbitrary whitespace, casefolds each token, and increments its count without removing punctuation. Empty or whitespace-only input produces no tokens and returns the initialized empty mapping.",
+      "reason": "The public function meets the stated tokenization, normalization, counting, punctuation, empty-input, and signature/type-hint requirements."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge evidence: test_solution.py imports words from solution and calls it in test_whitespace_casefold_and_punctuation, asserting mixed whitespace separates tokens, Straße/STRASSE casefold to \"strasse\", and \"Hello!\" retains its punctuation. test_empty_and_whitespace_only asserts empty results for empty and whitespace-only strings.",
+      "reason": "llm_judge: test_solution.py defines unittest methods that call the public words API and cover arbitrary whitespace, casefolded token counts, punctuation retained in tokens, and empty or whitespace-only input."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_and_whitespace_only (test_solution.WordsTests.test_empty_and_whitespace_only) ... ok\ntest_whitespace_casefold_and_punctuation (test_solution.WordsTests.test_whitespace_casefold_and_punctuation) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

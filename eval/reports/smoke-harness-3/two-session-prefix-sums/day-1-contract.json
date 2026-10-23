@@ -1,0 +1,120 @@
+{
+  "task_summary": "Implement inclusive prefix sums in solution.py, add unittest regression coverage in test_solution.py, and document design decisions and the verification command in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Edit solution.py and public tests.",
+    "Return inclusive prefix sums with the same length as the input; empty input returns []; support negative numbers.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least three passing unittest test methods exercising the public API.",
+    "HANDOFF.md is an allowed output and must include design decisions and the verification command.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py exists in the workspace.",
+      "check": {
+        "type": "file_exists",
+        "path": "solution.py"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py defines a typed public prefix-sum function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^def\\s+\\w+\\s*\\([^\\n]*\\)\\s*->\\s*[^:]+:"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public implementation returns inclusive prefix sums, preserves input length, handles empty and negative-valued input, and does not mutate the input collection.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from solution import *; import solution; names = [name for name, value in vars(solution).items() if callable(value) and not name.startswith(\"_\")]; assert names; f = getattr(solution, names[0]); data = [2, -5, 4]; original = data.copy(); result = f(data); assert result == [2, -3, 1] and len(result) == len(data) and data == original; assert f([]) == []; assert f([-2, -3]) == [-2, -5]'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py includes at least three unittest test methods that exercise the public API.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "HANDOFF.md records design decisions and the requested verification command.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from pathlib import Path; text = Path(\"HANDOFF.md\").read_text(); assert \"design\" in text.lower() and \"python -m unittest discover -v\" in text'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c 'from solution import *; import solution; names = [name for name, value in vars(solution).items() if callable(value) and not name.startswith(\"_\")]; assert names; f = getattr(solution, names[0]); data = [2, -5, 4]; original = data.copy(); result = f(data); assert result == [2, -3, 1] and len(result) == len(data) and data == original; assert f([]) == []; assert f([-2, -3]) == [-2, -5]'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'from pathlib import Path; text = Path(\"HANDOFF.md\").read_text(); assert \"design\" in text.lower() and \"python -m unittest discover -v\" in text'",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The workspace-relative files may not exist yet and may be created as requested.",
+    "The public API name and exact parameter name are not specified; the behavioral check treats the first public callable in solution.py as the API, an interpretation that must be reviewed.",
+    "The typed API check assumes the public function is defined directly in solution.py and has a return annotation.",
+    "The tests are assumed to be discoverable from the workspace root by python -m unittest discover -v.",
+    "The unittest test-method count check counts any test_ functions in test_solution.py; whether each exercises the public API is reviewed from the test content."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=817; distinct_files=3; tests_requested=true; requirement_segments=16; score=7"
+  },
+  "cost_estimate": {
+    "input_tokens": 38666,
+    "output_tokens": 1873,
+    "usd": 0.00345526
+  }
+}
