@@ -23,6 +23,28 @@ class HarnessError(RuntimeError):
     invalid_reason = "control_cli_error"
 
 
+class ControlTimeout(HarnessError):
+    """A control process or its model transport reached a deadline."""
+
+    invalid_reason = "control_timeout"
+
+
+def control_deadline(stderr: Path) -> bool:
+    """Recognize structured controller failure evidence, independent of config."""
+    if not stderr.is_file():
+        return False
+    for line in stderr.read_text(errors="replace").splitlines():
+        if not line.startswith("control_failure "):
+            continue
+        try:
+            failure = json.loads(line.removeprefix("control_failure "))
+        except ValueError:
+            continue
+        if isinstance(failure, dict) and failure.get("reason") == "deadline":
+            return True
+    return False
+
+
 class ControlFilePreexisting(HarnessError):
     """An output was present before its trusted producer ran."""
 
@@ -197,6 +219,8 @@ def _invoke_once(module: str, operation: str, arguments: list[str], destination:
         guard.archive_interruption([accounting, stdout, stderr, *([] if operation == "validate-handoff" else [destination])])
         raise (CapacityError if capacity else UsageLimitError)(limit)
     if process.returncode != 0 or process.timed_out:
+        if process.timed_out or control_deadline(stderr):
+            raise ControlTimeout(f"{module} {operation} reached a deadline")
         raise HarnessError(f"{module} {operation} failed")
     if stdout.read_text() != str(destination) + "\n":
         raise HarnessError("Control CLI returned an unexpected output path")

@@ -298,16 +298,26 @@ def test_rerun_refuses_noninfrastructure_before_any_call(setup: tuple[Path, Path
     assert not destination.exists()
 
 
-def test_rerun_prelaunch_control_failure_needs_no_exit_hash(setup: tuple[Path, Path, Path], tmp_path: Path) -> None:
+@pytest.mark.parametrize('deadline', [False, True])
+def test_rerun_prelaunch_control_failure_needs_no_exit_hash(setup: tuple[Path, Path, Path], tmp_path: Path,
+                                                          deadline: bool) -> None:
     root, config, source = setup
     harness_config(config)
     historical = HarnessExecutor(fail_contract=True)
-    report = json.loads(core.run(config, source, root, execute=historical, version=VERSION).read_text())
+
+    def failure(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = historical(argv, **kwargs)
+        if deadline:
+            kwargs['stderr'].write_text('control_failure {"reason":"deadline"}\n')
+        return result
+
+    report = json.loads(core.run(config, source, root, execute=failure, version=VERSION).read_text())
     assert historical.calls == 0 and report['tasks'][0]['outcome'] == 'invalid'
     state = json.loads((source / 'checkpoint.json').read_text())
     assert 'workspace_exit_sha256' not in state['tasks']['bug-chunk-tail']
     executor = HarnessExecutor()
-    new = json.loads(rerun_invalid.rerun_invalid(root, source, tmp_path / 'new', {'control_cli_error'},
+    reason = 'control_timeout' if deadline else 'control_cli_error'
+    new = json.loads(rerun_invalid.rerun_invalid(root, source, tmp_path / 'new', {reason},
                                                 execute=executor, version=VERSION).read_text())
     assert new['tasks'][0]['outcome'] == 'pass' and executor.calls == 2
     assert new['tasks'][0]['costs']['control_usd'] is None  # Unknown original spending stays unknown.

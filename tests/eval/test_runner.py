@@ -404,6 +404,37 @@ def test_null_reinstruction_stops_without_resuming(setup: tuple[Path, Path, Path
     assert executor.operations == ["contract", "check"]
 
 
+@pytest.mark.parametrize('backend', ['codex_cli', 'cheap_api', 'local'])
+@pytest.mark.parametrize('deadline', [False, True])
+def test_control_failure_deadline_classification(setup: tuple[Path, Path, Path],
+                                                 backend: str, deadline: bool) -> None:
+    root, config, out = setup
+    harness_config(config)
+    value = json.loads(config.read_text())
+    value['control_backend'] = backend
+    config.write_text(json.dumps(value))
+
+    def failure(argv: list[str], **kwargs: Any) -> ProcessResult:
+        assert '-m' in argv and argv[argv.index('-m') + 1] == 'controller'
+        assert argv[argv.index('--backend') + 1] == backend
+        kwargs['stdout'].write_text('')
+        kwargs['stderr'].write_text('other diagnostic\ncontrol_failure ' + json.dumps({
+            'reason': 'deadline' if deadline else 'transport', 'operation': 'contract'}) + '\n')
+        return ProcessResult(2)
+
+    report = json.loads(run(config, out, root, execute=failure,
+                            version='codex-cli 0.162.0-alpha.17.2').read_text())
+    task = report['tasks'][0]
+    assert task['outcome'] == 'invalid' and task['grading'] is None
+    assert report['validity']['status'] == 'invalid'
+    reason = 'control_timeout' if deadline else 'control_cli_error'
+    assert reason in task['invalid_reasons']
+    assert ('control_cli_error' if deadline else 'control_timeout') not in task['invalid_reasons']
+    entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+    assert entry['control_invalid_reason'] == reason
+    assert (out / 'bug-chunk-tail/contract.stderr').read_text().startswith('other diagnostic\n')
+
+
 def test_report_runtime_invariants_and_hashes(setup: tuple[Path, Path, Path]) -> None:
     import copy
     from eval.runner.report import build, validate

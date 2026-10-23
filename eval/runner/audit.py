@@ -551,8 +551,6 @@ def command_operands(command: str, cwd: Path | None, *,
         return [], True
     tokens, loop_unknown = literal_loop_tokens(tokens, command, data=spans, cwd=cwd, workspace=workspace)
     unresolved |= loop_unknown
-    if any("$" in raw or "`" in raw for _, raw in tokens):
-        unresolved = True
     if re.search(r"(?:base64|xxd|openssl).*\|.*(?:sh|bash|python|perl|ruby)\b", command):
         unresolved = True
     groups: list[list[tuple[str, str]]] = [[]]
@@ -566,6 +564,18 @@ def command_operands(command: str, cwd: Path | None, *,
         if not group:
             continue
         executable = Path(group[0][0]).name
+        process_patterns = executable in {"pkill", "pgrep", "killall"}
+        for _, raw in group:
+            # A quoted process regex's end anchor is data, not shell expansion.
+            if process_patterns and re.fullmatch(r"'[^']*'", raw, flags=re.DOTALL):
+                continue
+            if "$" in raw or "`" in raw:
+                unresolved = True
+        if process_patterns:
+            # These operands select processes, never files. Shell redirections
+            # still need the ordinary operand audit; do not exempt their paths.
+            if not any("<" in raw or ">" in raw for _, raw in group[1:]):
+                continue
         recursive = executable in {"find", "rg", "du", "tar", "rsync"} or (
             executable in {"grep", "ls", "cp"} and any(
                 arg.startswith("-") and ("r" in arg.lower() or "recursive" in arg)

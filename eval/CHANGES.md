@@ -1,3 +1,35 @@
+# Version 2 audit shapes and control deadline classification — 2026-10-24
+
+Add exact regressions for a code-mode apply_patch single string containing
+three absolute Add File headers. The existing literal decoder and patch-header
+extractor already resolve this shape; no additional JavaScript evaluation is
+introduced. Check all Add File, Update File, Delete File and Move to targets,
+including canonical private paths reached through a workspace alias. Patches
+built from a variable remain inconclusive.
+
+Treat static pkill, pgrep and killall operands as process-name patterns. A
+single-quoted regular expression's dollar anchor no longer makes the operand
+unresolved. Other commands retain their operand rules; shell expansions and
+redirections continue through the conservative audit.
+
+Classify a failed control CLI with a structured
+`control_failure {"reason":"deadline"}` stderr line as control_timeout,
+independently of backend configuration. Runner-enforced control process timeouts
+receive the same classification. Keep the task and aggregate invalid, retain
+pinned stderr/accounting, and preserve infrastructure-only rerun eligibility.
+Non-deadline and malformed failure records keep control_cli_error. No schema or
+CLI flag changes.
+
+Assumptions: Role 3 emits the line prefix control_failure followed by a JSON
+object with reason=deadline. Host records and the actual private grader root
+are unavailable here; all model transports are mocked. Host re-auditing and
+report recovery remain pending.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1722 passed in
+369.66s. `git diff --check -- eval tests/eval state/STATUS-eval.md` passes.
+Scope audit: 10 exact authorized paths, r5/v2, six STATUS headings, zero staged
+paths; frozen inputs, retained reports and shared interfaces are unchanged.
+
 # Recovery control costs and mixed-snapshot provenance — 2026-10-24
 
 Use the executor's tier resolver for pinned control_call records: explicit
