@@ -1,6 +1,7 @@
 """Audit observed grader access without publishing grader locations."""
 
 from dataclasses import dataclass
+from functools import lru_cache
 import ast
 import glob
 import hashlib
@@ -592,6 +593,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 for root in (private.root, *grading_roots):
                     if any(str(alias).casefold() in text.casefold() for alias in (root, root.resolve())):
                         hits.add("private_context_path")
+            @lru_cache(maxsize=8192)
             def protected(candidate: Path, recursive: bool = False) -> bool:
                 canonical = canonical_path(candidate)
                 for root in ((private.root, *grading_roots) if metadata else roots):

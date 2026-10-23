@@ -70,8 +70,18 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     invalid = list(result["invalid_reasons"])
     if len(segments) != len(result["segments"]):
         invalid.append("missing_executor_session_id")
+    handoff = None
     if meta["two_session"]:
-        invalid.append("missing_two_session_handoff_observation")
+        from eval.runner.core import valid_day2_observation, REPOSITORY
+        if not valid_day2_observation(entry, REPOSITORY / "eval/tasks" / result["task_id"]):
+            if "missing_two_session_handoff_observation" not in invalid:
+                invalid.append("missing_two_session_handoff_observation")
+        elif (out / "handoff-evidence.json").is_file():
+            handoff = {"day2_pass": result["outcome"] == "pass",
+                       "user_restated_day1_context": False,
+                       "evidence": artifact(out / "handoff-evidence.json")}
+        else:
+            invalid.append("missing_two_session_handoff_observation")
     grading = result["grading"]
     if invalid:
         grading = None
@@ -96,7 +106,56 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
             "grading": grading, "done_claims": claims, "calls": calls,
             "costs": {"executor_usd": executor_usd, "control_usd": control_usd,
                       "total_usd": total([executor_usd, control_usd])},
-            "artifacts": [artifact(p) for p in [*sorted(out.iterdir()), *sorted((runtime / "codex-home/sessions").rglob("*.jsonl"))] if p.is_file()], "handoff": None}
+            "artifacts": [artifact(p) for p in [*sorted(out.iterdir()), *sorted((runtime / "codex-home/sessions").rglob("*.jsonl"))] if p.is_file()], "handoff": handoff}
+
+
+def require_same_codex_version(reports: list[dict[str, Any]]) -> str:
+    """Refuse an evaluation comparison across native Codex versions."""
+    versions = {report["metadata"]["codex_version"] for report in reports}
+    if len(versions) != 1:
+        raise ValueError("Cannot compare reports with different codex_version values")
+    return versions.pop()
+
+
+def native_version_reasons(paths: list[Path], session_ids: list[str | None], version: str) -> list[str]:
+    """Return task-level failures without aborting other tasks' reports."""
+    expected = version.removeprefix("codex-cli ")
+    sessions: set[str] = set()
+    reasons: set[str] = set()
+    for path in paths:
+        for event in records(path):
+            if event.get("type") == "session_meta":
+                payload = event.get("payload", {})
+                if payload.get("id"):
+                    sessions.add(payload["id"])
+                observed = payload.get("cli_version")
+                if not observed:
+                    reasons.add("missing_cli_version_evidence")
+                elif observed != expected:
+                    reasons.add("mismatched_cli_version_evidence")
+    if any(sid and sid not in sessions for sid in session_ids):
+        reasons.add("missing_cli_version_evidence")
+    return sorted(reasons)
+
+
+def task_version_reasons(task: dict[str, Any], version: str) -> list[str]:
+    """Verify retained native hashes before interpreting per-session versions."""
+    paths = []
+    for item in task["artifacts"]:
+        path = Path(item["path"])
+        if "sessions" not in path.parts or path.suffix != ".jsonl":
+            continue
+        if artifact(path) != item:
+            raise ValueError("Native session log hash mismatch")
+        paths.append(path)
+    return native_version_reasons(paths, [s["session_id"] for s in task["executor_segments"]], version)
+
+
+def validate_session_versions(task: dict[str, Any], version: str) -> None:
+    """Missing/mismatched versions require explicit task invalidation."""
+    reasons = task_version_reasons(task, version)
+    if reasons and (task["outcome"] != "invalid" or not set(reasons) <= set(task["invalid_reasons"])):
+        raise ValueError("Native session cli_version evidence requires task invalidation: " + "; ".join(reasons))
 
 
 def validate(report: dict[str, Any], repository: Path) -> None:
@@ -110,6 +169,7 @@ def validate(report: dict[str, Any], repository: Path) -> None:
     if len({c["call_id"] for c in calls}) != len(calls):
         raise ValueError("Duplicate call identifiers")
     for task in tasks:
+        validate_session_versions(task, report["metadata"]["codex_version"])
         if task["attempts"] != len(task["executor_segments"]) and task["outcome"] != "invalid":
             raise ValueError("Attempt/segment count mismatch")
         previous = None
@@ -122,6 +182,16 @@ def validate(report: dict[str, Any], repository: Path) -> None:
                 raise ValueError("Executor log hash mismatch")
         if task["grading"] and previous is not None and datetime.fromisoformat(task["grading"]["copied_at"]) <= previous:
             raise ValueError("Grading must follow executor exit")
+        if task["handoff"]:
+            evidence = task["handoff"]["evidence"]
+            observation = json.loads(Path(evidence["path"]).read_text())
+            if (artifact(Path(evidence["path"])) != evidence or
+                    observation["delivered_sha256"] != observation["public_sha256"] or
+                    digest(Path(observation["prompt_path"]).read_bytes()) != observation["delivered_sha256"] or
+                    len({s["session_id"] for s in task["executor_segments"]}) < 2 or
+                    task["handoff"]["user_restated_day1_context"] or
+                    task["handoff"]["day2_pass"] != (task["outcome"] == "pass")):
+                raise ValueError("Invalid day-2 prompt observation")
         if task["done_claims"]["claimed_without_evidence"] > task["done_claims"]["claimed_items"]:
             raise ValueError("Claim counts mismatch")
         for call in task["calls"]:
@@ -152,6 +222,14 @@ def build(config: dict[str, Any], state: dict[str, Any], tasks: list[dict[str, A
     pricing = json.loads((repository / "eval/prices.yaml").read_text())
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repository, capture_output=True,
                             text=True, check=True, timeout=10).stdout.strip()
+    for task in tasks:
+        reasons = task_version_reasons(task, version)
+        if reasons:
+            task["invalid_reasons"] = list(dict.fromkeys([*task["invalid_reasons"], *reasons]))
+            task["outcome"] = "invalid"
+            task["grading"] = None
+            if task["handoff"]:
+                task["handoff"]["day2_pass"] = False
     invalid = [f'{t["task_id"]}: {reason}' for t in tasks for reason in t["invalid_reasons"]]
     report = {"metadata": {"run_id": state["run_id"], "created_at": state["created_at"],
         "config_name": config["name"], "config_sha256": state["config_sha256"],

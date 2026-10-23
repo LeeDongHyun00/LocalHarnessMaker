@@ -1,3 +1,62 @@
+# r5-full-001 and r5-full-002 — 2026-10-23
+
+The combined uncommitted change runs frozen two-session tasks as two fresh
+sessions in one public workspace. Day 2 receives exact day2.md bytes; harness
+contracts arrive separately through developer_instructions. Runner-owned
+handoff generation and validation use the frozen CLIs. Both days retain native
+and event audits, settings, distinct identities, delivered-prompt hashes and
+exit hashes before one trusted grade. Attempts and executor costs sum once.
+
+Evidence publishing uses the runner's hash manifest, excludes workspace files
+and refuses symlinks. Preexisting control outputs invalidate the task with
+runner_control_file_preexisting; modified pinned files remain control errors.
+Only manifest-pinned, numerically named verdicts can feed handoff generation.
+Forged verdict-99.json and verdict-final.json cannot replace verdict-1.json.
+
+Hard-crash recovery resumes the active session without repeating completed days.
+An audit-clean day-1 timeout/error can continue to day 2. Regrade preserves final
+executor timeout/error outcomes, retains invalid pre-day-2 tasks and grades the
+remaining eligible tasks without executor calls. Missing handoff observations
+invalidate rather than disappearing from quality denominators.
+
+Decision [0006](../docs/decisions/0006-codex-version-policy.md) governs version
+provenance. Full A/B and the two-session smoke select codex-cli
+0.163.0-alpha.11.1; historical 0.162 pilots are diagnostic planning inputs only.
+Every native session must supply matching cli_version evidence. Missing or
+mismatched evidence invalidates that task and retains costs while report.json
+still records every task. A pre-session version change still halts the run.
+The comparison helper refuses mixed codex_version reports. New versions require
+a hook probe and one-task audit smoke before a large run; the supplied 0.163
+host hook probe passed, while audit smoke/production verification remain pending.
+
+Full configurations select all 120 frozen tasks, seed 0 and pilot retry limits;
+two-session processes get 1200 seconds, others 600, grading 20. The published
+estimate budgets 140 sessions each, USD 4.0960136/6.0263112 and approximately
+56/84 plan percentage points. STOP-3 also budgets controller retries/fallbacks
+and judge criteria: one no-retry two-session harness task already bounds 11
+paid calls. The failing guard test now clears an obsolete task timeout when it
+changes task selection; loader validation is unchanged. No full run is approved.
+A bounded per-event audit cache preserves exhaustive detection while avoiding
+repeated identical protected-path resolution in large-call events.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 537 passed in
+46.12 seconds. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b`
+both exited 0.
+All calls are mocked except local synthetic grading subprocesses. No network,
+model calls, private-root lookup, staging or commits occurred. Host measurements
+and five manual pilot-A reviews remain pending.
+
+## Assumptions
+
+- Frozen task content and historical pilot artifacts remain unchanged.
+- Pilot session token/cost averages and supplied plan deltas are estimates for
+  both days; they are neither new quality evidence nor spending caps.
+- Host compatibility of contract delivery, real native capture and production
+  recovery remains unverified here. The supplied probe result is host evidence.
+- Complete control-call accounting, done-claim denominator and paired parity
+  remain unknown; absent accounting is never inferred as zero.
+
 # Evaluation changes — 2026-10-21 offline session
 
 New runner reports validate against the approved shared evaluation report

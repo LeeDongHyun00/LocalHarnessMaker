@@ -138,8 +138,8 @@ re-audit is observed cleanliness, not a new quality result or proof of isolation
 
 Harness configs select `harness=true`, an explicit `control_backend` and a
 `reinstruction_limit`. The runner calls `python -m controller contract` with
-an empty public case library and no handoff, validates the contract, injects
-its JSON into the executor prompt, then calls `python -m verifier check` with
+an empty public case library and no handoff for day 1, validates the contract,
+injects its JSON into the day-1 executor prompt, then calls `python -m verifier check` with
 native transcript evidence and the public workspace. Only its bounded non-null
 re-instruction resumes the same executor session. It supplies
 `HARNESS_BACKEND` and `HARNESS_MAX_ATTEMPTS` in the verifier's copied environment.
@@ -174,11 +174,101 @@ Only the freeze flag changed in public task files; historical review fields rema
 unchanged. Further task-content changes require a separate version 2.
 The runner rejects any selected task whose freeze flag is missing or not boolean
 true before external work, including when resuming a checkpoint.
-Claude must recompute the final digest on the host with
-`python -m eval.runner.validate_graders` and pass it to Role 1 for
-`docs/eval-freeze.md`; the previous digest predates the metadata freeze.
-Two-session tasks include a separate day-2 prompt; execution is rejected
-before model calls until handoff orchestration/observation is implemented.
+The published freeze record in `docs/eval-freeze.md` pins commit `7cdaf3b` and
+digest `b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f`.
+
+The combined r5-full-001/r5-full-002 implementation runs two-session tasks.
+Two-session tasks run day 1 with `prompt.md` in a fresh public workspace, then
+start a new executor session in that same workspace after day 1 exits. Day 2
+receives exactly the UTF-8 bytes of `day2.md` as stdin. Baselines add no context;
+executor-authored files such as `HANDOFF.md` are the only carry-over. Day 2
+never resumes day 1. Transport retries and verifier reinstructions may resume
+their own day's session.
+
+In harness mode the runner generates `handoff.json` after day 1 with the frozen
+controller handoff CLI, using the day-1 native transcript, contract and last
+verdict. It calls `verifier validate-handoff` without an `--out` flag, then
+passes the validated file to the day-2 controller contract. The day-2 contract
+is supplied separately through Codex's `developer_instructions` configuration;
+the user prompt remains exactly `day2.md`. All children receive
+`HARNESS_NESTED=1` in copied environments. Hooks do not own this loop.
+
+Control outputs are pinned in a runner-owned hash manifest. Evidence publishing
+never searches executor workspaces or follows symlinks. An output already
+present before its trusted producer runs invalidates the task with
+`runner_control_file_preexisting`; changed pinned inputs remain control errors.
+Handoffs choose only pinned `verdict-N.json` files with numeric N. Unowned files,
+including `verdict-99.json` and `verdict-final.json`, cannot become handoff input.
+
+Hard-crash recovery resumes the active session and preserves completed days.
+Audit-clean day-1 timeouts/errors can continue to day 2. Regrade preserves final
+executor timeout/error outcomes and invalid pre-day-2 tasks while grading other
+eligible tasks in fresh trusted copies.
+
+Both days' event and native logs are retained and audited. A missing native
+settings observation for either process invalidates the task. Private grading
+runs once, in a fresh trusted copy after day 2 exits. Checkpoints retain each
+segment's workspace exit hash and the final workspace hash. Regrade checks
+both days' recorded hashes, distinct session identities, retained prompt bytes
+and public prompt digest before grading the unchanged final workspace. Day-1
+hashes are historical runner observations; the changed final workspace cannot
+reconstruct a day-1 state. Regrading adds no executor attempts or usage.
+
+`handoff-evidence.json` records the delivered day-2 prompt SHA-256, public
+`day2.md` SHA-256, retained delivered prompt path and initial day-2 attempt.
+Missing, changed or unverifiable observations invalidate the task.
+`handoff.day2_pass` reflects final trusted grading, and
+`user_restated_day1_context=false` is backed by the exact prompt comparison.
+`handoff_success` uses valid observed two-session tasks, including grading
+failures, as its denominator; an empty denominator yields null. Both days'
+attempts and executor costs are summed once within the task cluster.
+
+`configs/full-a.yaml` (medium) and `configs/full-b.yaml` (max) contain all 120
+frozen tasks in the same lexicographic order and seed. Both preserve pilot
+limits, with the optional runner-owned `task_timeout_seconds` map overriding
+individual process deadlines (1200 seconds for two-session tasks, 600 for
+others). `grading_timeout_seconds` remains 20. These configuration fields do
+not change the frozen CLI flags or report schema.
+
+[Decision 0006](../docs/decisions/0006-codex-version-policy.md) requires matching
+version evidence: `full-a`, `full-b` and `smoke-two-session-a` select
+`codex-cli 0.163.0-alpha.11.1`. Historical pilots used `0.162.0-alpha.17.2` and
+supply diagnostic planning data only for these newer runs. The runner checks
+the installed version before each executor launch and halts if it changes.
+Missing/mismatched native per-session `cli_version` instead invalidates only
+that task (`missing_cli_version_evidence` / `mismatched_cli_version_evidence`),
+preserving its costs and the complete report. Compare only identical versions:
+`python -m eval.runner.compare_versions REPORT_A REPORT_B` refuses mixed versions.
+Every new version needs a hook compatibility probe and one-task audit smoke
+before large runs. The supplied 0.163 host hook probe passed; audit smoke and
+production behavior remain host checks.
+
+STOP-3 estimates include both executor days and up to three generations per
+controller/judge command across retries and fallback. A no-retry two-session
+harness task already bounds 11 calls before judge criteria; it requires the
+existing estimate/approval process. Per-task timeout overrides must still select
+configured tasks and lie in (0, 3600].
+
+Full runs remain **on hold**. The STOP-3 estimate is in
+[reports/full-estimate.md](reports/full-estimate.md): 140 sessions per
+configuration, about $4.10/$6.03 API-equivalent USD from pilot session averages,
+and approximately 56/84 plan percentage points using the user-supplied pilot
+deltas. These are planning proxies, not spending caps or quota guarantees.
+Claude must host-verify the smoke, review pilots and ask the user again before
+full execution. Exact bundled full/pilot configurations with published
+estimates pass configuration validation; that is not user approval.
+
+Claude's host smoke (one two-session task, harness off, medium; no run here):
+
+```sh
+.venv/bin/python -m eval run --config eval/configs/smoke-two-session-a.yaml --out eval/reports/smoke-two-session-a/
+```
+
+The smoke requires the existing host login and separately supplied private
+grader environment. It must confirm native evidence, two distinct sessions,
+exact day-2 prompt delivery, exit hashes and one post-day-2 grade. Harness
+`developer_instructions` delivery and boundary recovery still need host
+verification; mocked tests establish orchestration only.
 
 Offline verification:
 

@@ -67,7 +67,7 @@ def test_pinned_prices_feed_accounting_and_metrics(tmp_path: Path, model: str, e
     result = usage(events, 1, model, prices)
     assert result['usd'] == pytest.approx(expected)
     assert result['pricing_ref'] == prices['snapshot_id']
-    def cost_metric(cost: float | None) -> dict:
+    def cost_metric(cost: float | None) -> dict[str, object]:
         return compute([{'outcome': 'pass', 'attempts': 1, 'two_session': False,
                          'done_claims': {'claimed_items': 0, 'claimed_without_evidence': 0},
                          'costs': {'total_usd': total([cost, 0])}, 'handoff': None}],
@@ -82,3 +82,45 @@ def test_pinned_prices_feed_accounting_and_metrics(tmp_path: Path, model: str, e
     events.write_text(json.dumps({'type': 'turn.completed', 'usage': {
         'input_tokens': 272001, 'cached_input_tokens': 0, 'output_tokens': 524}}) + '\n')
     assert usage(events, 1, model, prices)['usd'] is None
+
+
+def test_full_configurations_cover_exact_frozen_inventory() -> None:
+    from eval.runner.core import load_config
+    inventory = sorted(p.parent.name for p in (REPOSITORY / 'eval/tasks').glob('*/meta.json'))
+    assert len(inventory) == 120
+    configs = [load_config(REPOSITORY / f'eval/configs/full-{letter}.yaml') for letter in 'ab']
+    for letter, effort, config in zip('ab', ['medium', 'max'], configs):
+        pilot = json.loads((REPOSITORY / f'eval/configs/pilot-{letter}.yaml').read_text())
+        assert config['codex_version'] == 'codex-cli 0.163.0-alpha.11.1'
+        assert config['tasks'] == inventory
+        assert config['reasoning_effort'] == effort and config['harness'] is False
+        for key in ('seed', 'retry_limit', 'reinstruction_limit', 'model',
+                    'grading_timeout_seconds', 'timeout_seconds', 'control_backend'):
+            assert config[key] == pilot[key]
+        assert set(config['task_timeout_seconds']) == set(inventory)
+        assert sum(2 if json.loads((REPOSITORY / 'eval/tasks' / task / 'meta.json').read_text())['two_session'] else 1
+                   for task in config['tasks']) == 140
+    assert configs[0]['tasks'] == configs[1]['tasks']
+    smoke = load_config(REPOSITORY / 'eval/configs/smoke-two-session-a.yaml')
+    assert smoke['tasks'] == ['two-session-prefix-sums']
+    assert smoke['model'] == 'gpt-6.1-sol' and smoke['reasoning_effort'] == 'medium'
+    assert smoke['harness'] is False
+    assert smoke['codex_version'] == 'codex-cli 0.163.0-alpha.11.1'
+
+
+def test_handoff_success_arithmetic_and_zero_denominators() -> None:
+    from eval.metrics import compute
+    def task(outcome: str, *, two: bool = True, restated: bool = False) -> dict[str, object]:
+        return {'outcome': outcome, 'two_session': two, 'attempts': 2 if two else 1,
+                'done_claims': {'claimed_items': 0, 'claimed_without_evidence': 0},
+                'costs': {'total_usd': 1},
+                'handoff': {'day2_pass': outcome == 'pass', 'user_restated_day1_context': restated} if two else None}
+    tasks = [task('pass'), task('fail'), task('pass', restated=True), task('invalid'), task('pass', two=False)]
+    metrics = compute(tasks, seed=0, resamples=1000)
+    assert metrics['handoff_success']['value'] == pytest.approx(1 / 3)
+    assert metrics['handoff_success']['sample_size'] == 3
+    assert metrics['avg_attempts']['value'] == 1.75
+    for sample in ([], [task('invalid')], [task('pass', two=False)]):
+        m = compute(sample, seed=0, resamples=1000)['handoff_success']
+        assert m['value'] is m['ci95']['lower'] is m['ci95']['upper'] is None
+        assert m['sample_size'] == 0 and m['undefined_reason']

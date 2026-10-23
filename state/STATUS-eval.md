@@ -1,56 +1,59 @@
 ## Done
 
-- Replaced code-mode source allowlisting with lexical extraction of every direct tools call; synthetic Promise/allSettled, arrays, loops, display spreads and local helper glue pass, while nonliteral operands, unknown tools, aliases, eval/Function and unresolved callables stay inconclusive (.venv/bin/python -m pytest tests/eval -q: 487 passed).
-- Covered the supplied nested-quoting rg wrapper and exec file_change list shape, including workspace/protected targets; canonical path checks and private-root redaction recognize /var and /private/var (.venv/bin/python -m pytest tests/eval -q: 487 passed).
-- Added runner-recorded configuration and workspace content manifests immediately after executor exit, plus all-task eval.runner.regrade using retained logs, hash-checked workspaces and the existing fresh-copy grade() path; schema-valid synthetic regrades match current runner outcomes without executor calls or source/runtime writes (.venv/bin/python -m pytest tests/eval -q: 487 passed).
-- Added refusal tests for missing/mismatched exit hashes and source/nested output destinations, all-task recovery from old inconclusive audits, fresh grading copies and CLI success/refusal output; retained every earlier detection regression (.venv/bin/python -m pytest tests/eval -q: 487 passed).
-- Updated eval/README.md and eval/CHANGES.md with the regrade command, provenance, hash semantics and historical-run restrictions; frozen tasks and both pilot directories are unchanged (git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0; git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b: exit 0).
+- Completed combined r5-full-001/r5-full-002 two-session orchestration: fresh day-2 session, exact day2.md, runner-owned handoff/contract delivery, per-day audits/settings/exit hashes, one final grade, handoff observations and summed costs (.venv/bin/python -m pytest tests/eval -q: 537 passed in 46.12s).
+- Hardened control evidence publishing and inputs: manifest-only files, no workspace/symlink adoption, specific runner_control_file_preexisting reason and numeric pinned verdict selection; forged verdict-99.json/verdict-final.json cannot replace verdict-1.json (.venv/bin/python -m pytest tests/eval -q: 537 passed).
+- Preserved active-session crash recovery, audit-clean day-1 timeout/error continuation and regrade timeout/error/invalid-task behavior (.venv/bin/python -m pytest tests/eval -q: 537 passed).
+- Applied decision 0006: native missing/mismatched cli_version invalidates only its task, retains costs and permits report.json; pre-session installed-version changes still halt; comparison helper rejects mixed versions (.venv/bin/python -m pytest tests/eval -q: 537 passed).
+- Fixed STOP-3 test's stale timeout override without changing loader validation; the guard budgets 11 calls for one two-session harness task including controller retries/fallbacks (.venv/bin/python -m pytest tests/eval -q: 537 passed).
+- Prepared full-a/full-b and smoke-two-session-a on codex-cli 0.163.0-alpha.11.1, 120 frozen tasks/140 sessions per full configuration, shared seed/pilot limits and published USD 4.10/6.03 estimate; updated combined README/CHANGES (.venv/bin/python -m pytest tests/eval -q: 537 passed, including configuration inventory checks).
+- Preserved frozen public tasks and retained pilots; checked whitespace for all owned changes (git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0; git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b: exit 0).
 
 ## Remaining
 
-- Claude re-audits both retained host pilots with the matching private root: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-a/ and the corresponding pilot-b directory. Review every error kind and access match before interpreting quality. This session cannot establish real-log cleanliness.
-- Claude reruns pilot B once on the host in a fresh output directory with the new exit hashes. Historical runs lacking hashes cannot be regraded; never reconstruct hashes from current workspaces. Inspect the new full capture and hash evidence.
-- On a hash-bearing finished run, use .venv/bin/python -m eval.runner.regrade --private-root "$LHM_PRIVATE_GRADERS" --from SOURCE --out NEWDIR as needed; review its complete report and run-diagnostics provenance. Keep SOURCE immutable.
-- Manually re-check five valid pilot-A samples, then compare A/B selected-task hashes, seed, CLI, executor settings and costs; obtain explicit approval before full measurement.
-- Host-verify executor/controller/verifier/resume compatibility, nested guards, retries, termination and production sandbox behavior. Missing true before/after plan observations remain null.
+- Claude host-runs eval/configs/smoke-two-session-a.yaml in a fresh directory using the existing login/private grader environment; confirm native/event audits, distinct sessions, exact day2.md, exit hashes and one post-day-2 grade. No live calls were made here.
+- Host-verify harness controller/verifier compatibility, developer_instructions delivery, retries, nested guards, termination, crash recovery and production sandbox behavior. New CLI versions require a hook probe and audit smoke under decision 0006.
+- Re-audit retained pilots with the matching private root; inspect every error/access match and rerun pilot B in a fresh directory if exit hashes are missing. Compare quality only across identical Codex versions; historical 0.162 pilots are diagnostic for 0.163 runs.
+- Manually review five valid pilot-A samples and A/B provenance/costs, then have Claude ask the user again before full runs. Configurations and estimate are not authorization.
 - Review structural helper extraction and submitted regression quality manually; behavioral graders do not certify those properties.
-- Implement and host-verify two-session handoff execution before including those tasks; complete control accounting, the done-claim denominator and hash-pinned paired local-minus-cheap_api parity. D-3 through D-5 remain pending.
-- Run the full repository suite once before a future merge. This session runs only tests/eval and does not stage or commit.
+- Complete control per-call accounting, full done-claim denominator and hash-pinned paired local-minus-cheap_api parity; D-3 through D-5 measurements remain pending.
+- Run the full repository suite once before a future merge. Only tests/eval ran here; no staging or commits.
 
 ## Decisions
 
-- Extract direct tools calls independently of JavaScript control flow: parallel Promise calls use literal operands even when the surrounding glue is complex.
-- Preserve fail-closed indirect/unresolved callable handling and command-object spreads: static evidence cannot resolve a tool alias or an operand that may be overridden.
-- Preserve the existing shlex wrapper decoding and list-form target extraction, with exact host-shape regressions: the observed shape must be proven without interpreting glue or authored content as shell.
-- Canonicalize both path sides and redact macOS aliases: /var and /private/var identify the same temporary paths on the host.
-- Hash every retained relative entry, type, mode, file content and symlink target at executor exit, including caches: regrading must reject any changed retained workspace and must not invent historical integrity.
-- Save hash/config fields only in runner checkpoints and segment diagnostics: no shared report schema or frozen eval run interface changes are needed.
-- Regrade the complete task set through grade() in fresh copies, with separate grading-output runtimes: no executor/controller/judge call or source run/runtime write is necessary.
-- Preserve source executor/control calls, costs, metadata provenance and observations; regenerate audits, grades and quality metrics: offline regrading adds no executor measurement.
-- Record source report SHA-256, audit implementation file hashes and all workspace checks in run-diagnostics.json: current uncommitted parser code must be identifiable independently of the source executor commit.
+- Preserve r5-full-001/r5-full-002 changes and finish their regressions/documentation together: the interrupted session's work remains uncommitted and was not redone.
+- Start day 2 fresh in the same public workspace and preserve exact prompt bytes: the benchmark measures workspace/handoff continuity without runner restatement of day 1.
+- Pin control bytes in a persisted runner manifest and select only numeric pinned verdicts: executor-created inputs cannot be adopted or published as trusted evidence.
+- Record runner_control_file_preexisting in addition to control_cli_error for fresh-output collisions: F2 now has a specific diagnostic without relaxing existing checks.
+- Invalidate native version-evidence failures per task before grading and again during report building: bad evidence must not suppress the whole report, while installed-version changes still halt the run.
+- Keep unknown control costs, done-claim denominator and parity unknown: frozen CLIs lack complete per-call accounting; missing usage is never free usage.
+- Use identical full task ordering/seed and pilot retry limits, with 600/1200-second process and 20-second grading deadlines: A/B share population and limits.
+- Retain bounded per-event protected-path caching: every call, match and unresolved operand remains audited.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
 - git diff --check -- eval tests/eval state/STATUS-eval.md
 - git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b
+- Host only: .venv/bin/python -m eval run --config eval/configs/smoke-two-session-a.yaml --out eval/reports/smoke-two-session-a/
 - Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-a/
 - Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-b/
-- Host only, hash-bearing source and fresh destination: .venv/bin/python -m eval.runner.regrade --private-root "$LHM_PRIVATE_GRADERS" --from SOURCE --out NEWDIR
-- Before a future merge only: full repository suite once.
+- Host only, hash-bearing source/fresh destination: .venv/bin/python -m eval.runner.regrade --private-root "$LHM_PRIVATE_GRADERS" --from SOURCE --out NEWDIR
+- Before comparison: .venv/bin/python -m eval.runner.compare_versions REPORT_A REPORT_B
+- Before future merge only: full repository suite once.
 
 ## Do not touch
 
-- Frozen eval/tasks/, existing reports including eval/reports/pilot-a/ and pilot-b/, docs/eval-freeze.md, controller/, verifier/, plugin/, shared schemas/configuration and other roles' tests/STATUS files. Never share tasks with Role 3.
-- .git: no staging, commits, history rewrites or file deletion in this session. Commit only eval/CHANGES.md, eval/README.md, eval/runner/audit.py, eval/runner/core.py, eval/runner/javascript.py, eval/runner/regrade.py, tests/eval/test_access_audit.py, tests/eval/test_runner.py and state/STATUS-eval.md.
-- No executor, controller, judge, nested Codex, live model/API, network, macOS sandbox-exec or private-root lookup in this session.
-- Never publish private graders/locations or reference/mutation rationales. Tests use synthetic graders under pytest temporary storage only.
-- Never backfill exit hashes, write into a source regrade run, launch Codex in a grading copy or expose a grading copy to later executor turns.
+- Frozen eval/tasks/, retained pilot reports, docs/eval-freeze.md, controller/, verifier/, plugin/, shared schemas/configuration and other roles' tests/STATUS files. Never share tasks with Role 3.
+- .git is read-only: no staging, commits, history rewrites or file deletion. The final commit plan lists all 15 uncommitted owned paths, including eval/runner/compare_versions.py.
+- No full measurement until Claude asks the user again and receives approval; configuration validation and estimates do not authorize calls.
+- No executor/controller/judge model calls, network, nested Codex, macOS sandbox-exec or private-root lookup in this sandbox. Tests use synthetic graders only.
+- Never backfill historical exit hashes, mutate source regrade runs, run Codex in grading copies or expose grader output to executor/controller context.
 
 ## Assumptions
 
-- The supplied host results at commit 96583d3 are authoritative user evidence: pilot A has 10/10 valid/clean, pass_rate 1.0 and cost_per_pass USD 0.029; pilot B has 9/10 invalid/inconclusive with unresolved_custom_input 11 and unresolved_operand 4. These are not measurements made in this session.
-- Claude owns host re-audit and the new pilot-B run. Synthetic offline test success does not establish pilot-B cleanliness, host isolation or a new quality result.
-- Retained checkpoints/reports are trusted runner output; exact exit hashes, matching task inputs and log/grader manifests are required for regrading. Runs without hashes remain diagnostic-only until a fresh host run.
-- Immediate task graders and public inputs are immutable during one invocation; the existing invocation-scoped fingerprint cache remains unchanged.
-- Earlier pinned pricing and task-freeze provenance remain authoritative: openai-standard-short-2026-10-22-v1, freeze commit 7cdaf3b and full-set digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f.
+- Freeze commit 7cdaf3b and digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f remain authoritative; no public task content changed.
+- The offline price snapshot openai-standard-short-2026-10-22-v1 and retained pilot tokens/costs are planning inputs, not new measurements. Historical pilots use 0.162.0-alpha.17.2; full/smoke configurations select 0.163.0-alpha.11.1 under decision 0006.
+- Full estimates multiply ten-session pilot totals by 14 and budget each fresh day as one session. Supplied 0.4/0.6 plan percentage-point deltas ignore quota resets and concurrent usage; absent before/after observations remain null.
+- The previously recorded 0.163 host hook probe result is supplied evidence; one-task audit smoke and production compatibility remain host work.
+- Checkpoints are trusted runner evidence. Day-1 exit hashes are historical observations and cannot be reconstructed from the changed final workspace; regrade checks final workspace and retained day/log/prompt provenance.
+- Claude owns host verification, pilot review and renewed full-run approval. Mocked success establishes orchestration behavior only.

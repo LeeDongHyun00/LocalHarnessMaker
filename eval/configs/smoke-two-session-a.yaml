@@ -1,0 +1,19 @@
+{
+  "name": "smoke-two-session-a",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "harness": false,
+  "control_backend": "none",
+  "reinstruction_limit": 0,
+  "retry_limit": 0,
+  "seed": 0,
+  "codex_version": "codex-cli 0.163.0-alpha.11.1",
+  "tasks": [
+    "two-session-prefix-sums"
+  ],
+  "timeout_seconds": 600,
+  "grading_timeout_seconds": 20,
+  "task_timeout_seconds": {
+    "two-session-prefix-sums": 1200
+  }
+}

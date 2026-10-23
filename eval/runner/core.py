@@ -16,7 +16,7 @@ from typing import Any, Callable
 import uuid
 
 from eval.runner import harness
-from eval.runner.report import build, build_task
+from eval.runner.report import build, build_task, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.telemetry import collect, collect_runs, records, session_id
@@ -53,12 +53,33 @@ def workspace_digest(workspace: Path) -> str:
     return digest(json.dumps(manifest, ensure_ascii=True, separators=(",", ":")).encode())
 
 
+def valid_day2_observation(entry: dict[str, Any], public: Path) -> bool:
+    """Require retained bytes of the exact initial day-2 prompt and both exits."""
+    observation = entry.get("day2_observation")
+    if not isinstance(observation, dict):
+        return False
+    try:
+        segment = next(s for s in entry["segments"] if s["attempt"] == observation["attempt"])
+        day1 = [s for s in entry["segments"] if s.get("day", 1) == 1]
+        return (bool(day1) and segment.get("day") == 2 and
+                session_id([Path(entry["runtime"]) / segment["events"]]) is not None and
+                session_id([Path(entry["runtime"]) / segment["events"]]) not in
+                {session_id([Path(entry["runtime"]) / s["events"]]) for s in day1} and
+                all(re.fullmatch(r"[0-9a-f]{64}", s.get("workspace_exit_sha256", ""))
+                    for s in [*day1, segment]) and
+                digest(Path(observation["prompt_path"]).read_bytes()) ==
+                observation["delivered_sha256"] == observation["public_sha256"] ==
+                digest((public / "day2.md").read_bytes()))
+    except (KeyError, OSError, StopIteration, TypeError):
+        return False
+
+
 def load_config(path: Path) -> dict[str, Any]:
     """Accept the JSON subset of YAML without changing root dependencies."""
     config = json.loads(path.read_text())
     required = {"name", "model", "reasoning_effort", "harness", "control_backend", "reinstruction_limit",
                 "retry_limit", "seed", "codex_version", "tasks", "timeout_seconds", "grading_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) != required:
+    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds"} != required:
         raise ValueError("Config must contain exactly the documented baseline fields")
     if type(config["harness"]) is not bool:
         raise ValueError("harness must be boolean")
@@ -79,19 +100,52 @@ def load_config(path: Path) -> dict[str, Any]:
         raise ValueError("Task identifiers must be a nonempty unique list")
     if any(not isinstance(task, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", task) for task in config["tasks"]):
         raise ValueError("Unsafe task identifier")
-    if len(config["tasks"]) * ((config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) + (3 if config["harness"] else 0)) >= 10:
-        # Only the exact bundled pilot configurations have a published estimate.
-        pilots = [REPOSITORY / f"eval/configs/pilot-{letter}.yaml" for letter in ("a", "b")]
-        estimate = REPOSITORY / "eval/reports/pilot-estimate.md"
-        if not estimate.is_file() or not any(p.is_file() and json.loads(p.read_text()) == config for p in pilots):
-            raise ValueError("STOP-3: batches of 10 or more executor calls require a reported estimate first")
-        print("STOP-3 estimate: eval/reports/pilot-estimate.md; 10 executor calls, no retries; "
-              "A $0.178896; B illustrative 2x output $0.231296 API-equivalent USD. "
-              "Host operator must obtain pilot approval before execution.", file=sys.stderr)
+    timeouts = config.get("task_timeout_seconds", {})
+    if (not isinstance(timeouts, dict) or set(timeouts) - set(config["tasks"]) or
+            any(type(v) not in {int, float} or not 0 < v <= 3600 for v in timeouts.values())):
+        raise ValueError("Per-task timeouts must select configured tasks and be in (0, 3600]")
+    require_call_estimate(config)
     for key in ("name", "model", "codex_version"):
         if not isinstance(config[key], str) or not config[key]:
             raise ValueError(f"{key} must be a nonempty string")
     return config
+
+
+def paid_call_bound(config: dict[str, Any], judges: dict[str, int] | None = None) -> int:
+    """Count both days, transport retries, three-call control budgets and handoffs."""
+    two = sum((REPOSITORY / "eval/tasks" / task / "day2.md").is_file() for task in config["tasks"])
+    sessions = len(config["tasks"]) + two
+    turns = config["reinstruction_limit"] + 1
+    executor = sessions * (config["retry_limit"] + 1) * turns
+    return executor + (3 * (sessions + two + sum((judges or {}).values()) * turns)
+                       if config["harness"] else 0)
+
+
+def require_call_estimate(config: dict[str, Any], judges: dict[str, int] | None = None) -> None:
+    """Refuse unestimated paid batches before calls, and report small harness bounds."""
+    maximum = paid_call_bound(config, judges)
+    if config["harness"]:
+        print(f"Paid-call estimate: at most {maximum} calls with currently known judge criteria; "
+              "includes both days, contracts, handoff, retries and fallbacks. "
+              "New judge criteria require a revised bound; USD remains unknown.", file=sys.stderr)
+    if maximum < 10:
+        return
+    estimated = [(REPOSITORY / f"eval/configs/{kind}-{letter}.yaml",
+                  REPOSITORY / f"eval/reports/{kind}-estimate.md")
+                 for kind in ("pilot", "full") for letter in ("a", "b")]
+    match = next((estimate for candidate, estimate in estimated
+                  if candidate.is_file() and estimate.is_file() and
+                  json.loads(candidate.read_text()) == config), None)
+    if match is None:
+        raise ValueError(f"STOP-3: batch upper bound {maximum} paid calls requires a reported cost estimate")
+    print(f"STOP-3 estimate: {match.relative_to(REPOSITORY)}; "
+          "host operator must obtain user approval before execution.", file=sys.stderr)
+
+
+def installed_version() -> str:
+    """Read the installed CLI before every executor session; never launch a model."""
+    return subprocess.run(["codex", "--version"], capture_output=True, text=True,
+                          check=True, timeout=10).stdout.strip()
 
 
 def public_files(task: str) -> list[Path]:
@@ -120,7 +174,7 @@ def taskset_digest(private_by_task: dict[str, PrivateGraders]) -> str:
 
 def publish(source: Path, destination: Path, private: PrivateGraders) -> None:
     """Retain original logs externally and publish a redacted review copy."""
-    if source.is_file():
+    if source.is_file() and not any(p.is_symlink() for p in (source, *source.parents)):
         destination.write_text(private.redact(source.read_text(errors="replace")))
 
 
@@ -187,7 +241,7 @@ class ReportError(RuntimeError):
 def run(
     config_path: Path, out: Path, private_root: Path, *,
     execute: Callable[..., ProcessResult] = run_process,
-    version: str | None = None,
+    version: str | Callable[[], str] | None = None,
 ) -> Path:
     """Run or recover baseline tasks without relying on plugin hooks."""
     config = load_config(config_path)
@@ -197,15 +251,13 @@ def run(
     }
     if any(meta.get("frozen") is not True for meta in metadata.values()):
         raise ValueError("Evaluation requires every selected task to be frozen")
-    # Public two-session candidates must not consume a single-session executor run.
-    if any(meta["two_session"] for meta in metadata.values()):
-        raise ValueError("Two-session execution is pending host-verified handoff orchestration")
     out = out.resolve()
     config_hash = digest(config_path.read_bytes())
-    actual_version = version or subprocess.run(
-        ["codex", "--version"], capture_output=True, text=True, check=True, timeout=10,
-    ).stdout.strip()
+    version_reader = version if callable(version) else (lambda: version) if version else installed_version
+    actual_version = version_reader()
     if actual_version != config["codex_version"]:
+        if (out / "checkpoint.json").exists():
+            raise IncompleteRun("Codex version changed; run is resumable only with its recorded version")
         raise ValueError("Installed Codex version differs from pinned configuration")
     private_by_task = {task: PrivateGraders.load(private_root, task, REPOSITORY) for task in config["tasks"]}
     fingerprint_cache = FingerprintCache()
@@ -261,6 +313,8 @@ def run(
             write_json(checkpoint, state)
         runtime = Path(entry["runtime"])
         workspace, codex_home = runtime / "workspace", runtime / "codex-home"
+        guard = harness.ControlFiles(runtime, entry.setdefault("control_files", {}),
+                                     lambda: write_json(checkpoint, state))
         if entry.get("pid"):
             try:
                 os.kill(entry["pid"], 0)
@@ -274,8 +328,15 @@ def run(
         if prior and entry["phase"] == "running":
             entry["phase"] = "interrupted"
             entry.pop("pid", None)
-        if entry["phase"] == "interrupted" and not resumed_id:
-            raise ValueError("Interrupted executor did not emit a resumable session id")
+        if entry["phase"] == "interrupted":
+            # A hard runner crash may leave only the pre-launch checkpoint. Preserve
+            # the incomplete stream and do not invent a successful historical exit.
+            for segment in entry["segments"]:
+                if "exit_code" not in segment:
+                    segment.update(exit_code=-2, exited_at=now(), interrupted=True)
+            write_json(checkpoint, state)
+            if not resumed_id:
+                raise IncompleteRun("Interrupted executor has no resumable session id; retained evidence requires host review")
         execution_finished = entry["phase"] in {"executed", "grading"}
         if not execution_finished and list(runtime.glob("grading-*")):
             raise ValueError("A grading copy already exists; executor resume is prohibited")
@@ -286,102 +347,199 @@ def run(
         interrupted = False
         prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if prior else None
         blocked = prior_audit is not None and prior_audit["status"] != "clean"
+        two_session = metadata[task_id]["two_session"]
         control_error = entry.get("control_error")
-        if config["harness"] and not blocked and not execution_finished and not (runtime / "contract.json").exists():
-            try:
-                harness.contract(public, runtime, config, repository=REPOSITORY, execute=execute)
-            except harness.HarnessError as exc:
-                control_error = str(exc)
-                entry["control_error"] = control_error
-        if config["harness"] and not control_error and (runtime / "contract.json").exists():
-            generated = json.loads((runtime / "contract.json").read_text())
-            judges = sum(c["check"]["type"] == "llm_judge" for c in generated["success_criteria"])
-            maximum_calls = len(config["tasks"]) * (3 + (config["retry_limit"] + 1) *
-                (config["reinstruction_limit"] + 1) + 3 * judges * (config["reinstruction_limit"] + 1))
-            if maximum_calls >= 10:
-                raise ValueError("STOP-3: generated judge criteria require a reported batch cost estimate")
-        remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - len(entry["segments"])
-        if not config["harness"]:
-            remaining = config["retry_limit"] + 1
-        transport_retries = entry.get("transport_retries", 0)
-        for retry in range(0 if blocked or execution_finished or control_error else remaining):
-            index = len(entry["segments"]) + 1
-            event_path, stderr_path = runtime / f"exec-{index}.jsonl", runtime / f"exec-{index}.stderr"
-            argv = ["codex", "--no-daemon", "-a", "never", "exec"]
-            if resumed_id:
-                argv.append("resume")
-            argv += ["--ignore-user-config", "--skip-git-repo-check", "--json", "-m", config["model"],
-                     "-c", f'model_reasoning_effort="{config["reasoning_effort"]}"',
-                     "-c", "features.hooks=false", "-c", "features.plugins=false",
-                     "-c", "features.remote_plugin=false", "-c", "mcp_servers={}",
-                     "-o", str(runtime / f"final-{index}.md")]
-            if resumed_id:
-                argv += ["-c", 'sandbox_mode="workspace-write"', resumed_id, "-"]
-                prompt = entry.get("reinstruction") or "Continue the original task from the current workspace."
-            else:
-                argv += ["--sandbox", "workspace-write", "-C", str(workspace), "-"]
-                prompt = (public / "prompt.md").read_text()
-                if config["harness"]:
-                    prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + (runtime / "contract.json").read_text()
-            segment = {"attempt": index, "started_at": now(), "events": event_path.name, "stderr": stderr_path.name}
-            entry["segments"].append(segment)
-            entry["phase"] = "running"
-            write_json(checkpoint, state)
-
-            def started(pid: int) -> None:
-                entry["pid"] = pid
-                write_json(checkpoint, state)
-
-            start = time.monotonic()
-            try:
-                final_process = execute(
-                    argv, cwd=workspace, env=executor_environment(private, codex_home), stdin=prompt,
-                    stdout=event_path, stderr=stderr_path, timeout=config["timeout_seconds"], on_start=started,
-                )
-            except KeyboardInterrupt:
-                interrupted = True
-                entry["phase"] = "interrupted"
-                final_process = ProcessResult(-2)
-            segment.update({"exited_at": now(), "exit_code": final_process.returncode,
-                            "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
-            entry.pop("pid", None)
-            if not interrupted:
-                entry["workspace_exit_sha256"] = workspace_digest(workspace)
-                segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
-            write_json(checkpoint, state)
-            current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
-            if interrupted or current_audit["status"] != "clean":
+        for day in range(entry.get("active_day", 1), (2 if two_session else 1) + 1):
+            entry["active_day"] = day
+            control_runtime = runtime / f"day-{day}" if two_session else runtime
+            if not guard.safe(control_runtime):
+                entry["control_invalid_reason"] = "runner_control_file_preexisting"
+                entry["control_error"] = "Control directory is a symlink"
+                control_error = entry["control_error"]
                 break
-            resumed_id = session_id([event_path]) or resumed_id
-            if final_process.returncode == 0:
-                transport_retries = 0
-                entry["transport_retries"] = 0
-                if not config["harness"]:
-                    break
+            control_runtime.mkdir(exist_ok=True)
+            day_segments = [s for s in entry["segments"] if s.get("day", 1) == day]
+            day_paths = [runtime / s["events"] for s in day_segments]
+            resumed_id = session_id(day_paths)
+            current_audit = audit_logs(day_paths, private, workspace=workspace, repository=REPOSITORY,
+                                       grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if day_paths else None
+            day_finished = execution_finished or day in entry.get("completed_days", [])
+            if day_segments:
+                last = day_segments[-1]
+                final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
+            control_error = entry.get("control_error")
+            if config["harness"] and not blocked and not execution_finished:
                 try:
-                    native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                    native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
-                    if native_audit["status"] != "clean":
-                        break
-                    attempt = len(entry.get("verdicts", [])) + 1
-                    verdict = harness.verify(runtime, workspace, native, attempt, config,
-                                             repository=REPOSITORY, execute=execute)
-                    entry.setdefault("verdicts", []).append(verdict)
-                    entry["reinstruction"] = verdict["reinstruct_message"]
-                    write_json(checkpoint, state)
-                    if verdict["overall"] == "pass" or attempt > config["reinstruction_limit"] or not verdict["reinstruct_message"]:
-                        break
-                    if not resumed_id:
-                        raise harness.HarnessError("Verifier continuation needs an executor session ID")
+                    guard.verify()
                 except harness.HarnessError as exc:
+                    entry["control_invalid_reason"] = exc.invalid_reason
+                    control_error = entry["control_error"] = str(exc)
+            contract_name = str((control_runtime / "contract.json").relative_to(runtime))
+            if config["harness"] and not blocked and not control_error and not execution_finished and contract_name not in guard.hashes:
+                try:
+                    harness.contract(public, control_runtime, config, repository=REPOSITORY, execute=execute,
+                                     prompt_name="day2.md" if day == 2 else "prompt.md",
+                                     handoff=runtime / "handoff.json" if day == 2 else None, guard=guard)
+                    write_json(checkpoint, state)
+                except harness.HarnessError as exc:
+                    entry["control_invalid_reason"] = exc.invalid_reason
                     control_error = str(exc)
                     entry["control_error"] = control_error
+            if config["harness"] and not control_error and (control_runtime / "contract.json").exists():
+                generated = json.loads((control_runtime / "contract.json").read_text())
+                judges = sum(c["check"]["type"] == "llm_judge" for c in generated["success_criteria"])
+                entry.setdefault("judge_counts", {})[f"{task_id}:{day}"] = judges
+                require_call_estimate(config, {key: count for task in state["tasks"].values()
+                                               for key, count in task.get("judge_counts", {}).items()})
+            remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - len(day_segments)
+            if not config["harness"]:
+                remaining = config["retry_limit"] + 1 - len(day_segments)
+            if entry["phase"] == "interrupted":
+                remaining = max(1, remaining)
+            transport_retries = entry.get("transport_retries", 0)
+            for retry in range(0 if blocked or day_finished or control_error else remaining):
+                observed_version = version_reader()
+                if observed_version != actual_version:
+                    write_json(checkpoint, state)
+                    write_json(out / "run-diagnostics.json", {
+                        "stop_reason": "Codex version changed before executor session",
+                        "recorded_version": actual_version, "observed_version": observed_version})
+                    raise IncompleteRun("Codex version changed before executor session; run halted and remains resumable")
+                if config["harness"]:
+                    try:
+                        guard.verify()
+                    except harness.HarnessError as exc:
+                        entry["control_invalid_reason"] = exc.invalid_reason
+                        control_error = entry["control_error"] = str(exc)
+                        break
+                index = len(entry["segments"]) + 1
+                event_path, stderr_path = runtime / f"exec-{index}.jsonl", runtime / f"exec-{index}.stderr"
+                argv = ["codex", "--no-daemon", "-a", "never", "exec"]
+                if resumed_id:
+                    argv.append("resume")
+                argv += ["--ignore-user-config", "--skip-git-repo-check", "--json", "-m", config["model"],
+                         "-c", f'model_reasoning_effort="{config["reasoning_effort"]}"',
+                         "-c", "features.hooks=false", "-c", "features.plugins=false",
+                         "-c", "features.remote_plugin=false", "-c", "mcp_servers={}",
+                         "-o", str(runtime / f"final-{index}.md")]
+                if resumed_id:
+                    argv += ["-c", 'sandbox_mode="workspace-write"', resumed_id, "-"]
+                    prompt = entry.get("reinstruction") or "Continue the original task from the current workspace."
+                else:
+                    argv += ["--sandbox", "workspace-write", "-C", str(workspace), "-"]
+                    prompt = (public / ("day2.md" if day == 2 else "prompt.md")).read_bytes().decode("utf-8")
+                    if config["harness"] and day == 2:
+                        argv += ["-c", "developer_instructions=" + json.dumps(
+                            "Approved evaluation contract (benchmark runner authorization):\n" +
+                            (control_runtime / "contract.json").read_text())]
+                    elif config["harness"]:
+                        prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + (control_runtime / "contract.json").read_text()
+                segment = {"attempt": index, "started_at": now(), "events": event_path.name, "stderr": stderr_path.name, "day": day, "cli_version": observed_version}
+                if day == 2 and not resumed_id:
+                    delivered = runtime / "day2-delivered.md"
+                    delivered.write_bytes(prompt.encode("utf-8"))
+                    entry["day2_observation"] = {
+                        "delivered_sha256": digest(prompt.encode("utf-8")),
+                        "public_sha256": digest((public / "day2.md").read_bytes()),
+                        "prompt_path": str(delivered), "attempt": index}
+                entry["segments"].append(segment)
+                entry["phase"] = "running"
+                write_json(checkpoint, state)
+
+                def started(pid: int) -> None:
+                    entry["pid"] = pid
+                    write_json(checkpoint, state)
+
+                native_before = {p: digest(p.read_bytes()) for p in (codex_home / "sessions").rglob("*.jsonl")}
+                start = time.monotonic()
+                try:
+                    final_process = execute(
+                        argv, cwd=workspace, env=executor_environment(private, codex_home), stdin=prompt,
+                        stdout=event_path, stderr=stderr_path, timeout=config.get("task_timeout_seconds", {}).get(task_id, config["timeout_seconds"]), on_start=started,
+                    )
+                except KeyboardInterrupt:
+                    interrupted = True
+                    entry["phase"] = "interrupted"
+                    final_process = ProcessResult(-2)
+                segment.update({"exited_at": now(), "exit_code": final_process.returncode,
+                                "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
+                entry.pop("pid", None)
+                native_changed = [p for p in (codex_home / "sessions").rglob("*.jsonl")
+                                  if native_before.get(p) != digest(p.read_bytes())]
+                segment["native_logs"] = [str(p) for p in native_changed]
+                segment["settings_verified"] = collect([event_path], native_changed,
+                                                       config["model"], config["reasoning_effort"])["settings_evidence"]["verified"]
+                if not interrupted:
+                    entry["workspace_exit_sha256"] = workspace_digest(workspace)
+                    segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
+                write_json(checkpoint, state)
+                current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                if interrupted or current_audit["status"] != "clean":
                     break
-            else:
-                if transport_retries >= config["retry_limit"]:
+                resumed_id = session_id([event_path]) or resumed_id
+                if final_process.returncode == 0 and not final_process.timed_out:
+                    transport_retries = 0
+                    entry["transport_retries"] = 0
+                    if not config["harness"]:
+                        break
+                    try:
+                        native = sorted((codex_home / "sessions").rglob("*.jsonl"))
+                        native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                        if native_audit["status"] != "clean":
+                            break
+                        attempt = len(entry.get(f"verdicts_day{day}", [])) + 1
+                        verdict = harness.verify(control_runtime, workspace, native, attempt, config,
+                                                 repository=REPOSITORY, execute=execute, guard=guard)
+                        entry.setdefault("verdicts", []).append(verdict)
+                        entry.setdefault(f"verdicts_day{day}", []).append(verdict)
+                        entry["reinstruction"] = verdict["reinstruct_message"]
+                        write_json(checkpoint, state)
+                        if verdict["overall"] == "pass" or attempt > config["reinstruction_limit"] or not verdict["reinstruct_message"]:
+                            break
+                        if not resumed_id:
+                            raise harness.HarnessError("Verifier continuation needs an executor session ID")
+                    except harness.HarnessError as exc:
+                        entry["control_invalid_reason"] = exc.invalid_reason
+                        control_error = str(exc)
+                        entry["control_error"] = control_error
+                        break
+                else:
+                    if transport_retries >= config["retry_limit"]:
+                        break
+                    transport_retries += 1
+                    entry["transport_retries"] = transport_retries
+                    write_json(checkpoint, state)
+            if (interrupted or blocked or control_error or not final_process or
+                    current_audit is None or current_audit["status"] != "clean"):
+                break
+            if day not in entry.setdefault("completed_days", []):
+                entry["completed_days"].append(day)
+                write_json(checkpoint, state)
+            if two_session and day == 1 and not execution_finished:
+                native = sorted((codex_home / "sessions").rglob("*.jsonl"))
+                day1_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY,
+                                        grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                if day1_audit["status"] != "clean":
                     break
-                transport_retries += 1
-                entry["transport_retries"] = transport_retries
+                if config["harness"]:
+                    try:
+                        if not entry.get(f"verdicts_day{day}"):
+                            verdict = harness.verify(control_runtime, workspace, native, 1, config,
+                                                     repository=REPOSITORY, execute=execute, guard=guard)
+                            entry.setdefault("verdicts", []).append(verdict)
+                            entry.setdefault(f"verdicts_day{day}", []).append(verdict)
+                            write_json(checkpoint, state)
+                        harness.handoff(control_runtime, runtime, native, config,
+                                        repository=REPOSITORY, execute=execute, guard=guard)
+                        write_json(checkpoint, state)
+                    except harness.HarnessError as exc:
+                        entry["control_invalid_reason"] = exc.invalid_reason
+                        control_error = entry["control_error"] = str(exc)
+                        break
+                entry["active_day"] = 2
+                entry.pop("reinstruction", None)
+                entry["transport_retries"] = 0
+                entry["phase"] = "ready"
                 write_json(checkpoint, state)
         if not interrupted:
             entry["phase"] = "executed"
@@ -403,24 +561,44 @@ def run(
             final = runtime / f'final-{segment["attempt"]}.md'
             if final.exists():
                 publish(final, task_out / final.name, private)
-        for evidence in runtime.glob("*.json"):
-            if evidence.name == "contract.json" or evidence.name.startswith("verdict-"):
-                publish(evidence, task_out / evidence.name, private)
-        for evidence in [*runtime.glob("contract.std*"), *runtime.glob("verdict-*.std*")]:
-            publish(evidence, task_out / evidence.name, private)
+        # Only the explicit runner manifest is eligible. Never search workspace.
+        for name, expected_hash in guard.hashes.items():
+            evidence = runtime / name
+            if (guard.safe(evidence) and evidence.is_file() and
+                    digest(evidence.read_bytes()) == expected_hash and
+                    (evidence.name in {"contract.json", "handoff.json"} or
+                     re.fullmatch(r"verdict-[0-9]+\.json", evidence.name) or
+                     re.fullmatch(r"(?:contract|verdict-[0-9]+|handoff|handoff-validation)\.std(?:out|err)", evidence.name))):
+                publish(evidence, task_out / (evidence.parent.name + "-" + evidence.name
+                        if evidence.parent != runtime else evidence.name), private)
+        if config["harness"]:
+            try:
+                guard.verify()
+            except harness.HarnessError as exc:
+                entry["control_invalid_reason"] = exc.invalid_reason
+                control_error = entry["control_error"] = str(exc)
         invalid = []
         if control_error:
             invalid.append("control_cli_error")
-        if json.loads((public / "meta.json").read_text()).get("two_session"):
-            invalid.append("two_session_orchestration_pending")
+            specific = entry.get("control_invalid_reason")
+            if specific and specific not in invalid:
+                invalid.append(specific)
+        observation = entry.get("day2_observation")
+        if two_session and not valid_day2_observation(entry, public):
+            invalid.append("missing_two_session_handoff_observation")
+        if two_session and observation:
+            write_json(task_out / "handoff-evidence.json", observation)
         if audit["status"] != "clean":
             invalid.append("grader_access_detected" if audit["status"] == "access_detected" else "incomplete_access_audit")
-        if not telemetry["settings_evidence"]["verified"]:
+        if not telemetry["settings_evidence"]["verified"] or (two_session and
+                any(not s.get("settings_verified") for s in entry["segments"])):
             invalid.append("executor_settings_unverified")
         if interrupted:
             invalid.append("execution_interrupted")
+        invalid.extend(native_version_reasons(native_paths,
+            [session_id([path]) for path in event_paths], actual_version))
         grading = None
-        if final_process and final_process.returncode == 0 and not invalid:
+        if final_process and final_process.returncode == 0 and not final_process.timed_out and not invalid:
             entry["phase"] = "grading"
             write_json(checkpoint, state)
             grading = grade(workspace, private, runtime, task_out / "grading.log",
@@ -433,16 +611,17 @@ def run(
         result = {"task_id": task_id, "task_type": meta["type"], "outcome": outcome,
                   "invalid_reasons": invalid, "attempts": max(1, len(entry["segments"])),
                   "session_id": session_id(event_paths), "segments": entry["segments"],
+                  "two_session": two_session, "day2_observation": observation,
                   "grader_access_audit": audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
         write_json(task_out / "result.json", json.loads(private.redact(json.dumps(result))))
         # Preserve completed source only; no private grader or grading copy is published.
-        if grading and not (task_out / "workspace").exists():
+        if grading and grading.get("executor_already_exited") and not (task_out / "workspace").exists():
             shutil.copytree(workspace, task_out / "workspace", ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
         entry["phase"] = "interrupted" if interrupted else "finished"
         if not interrupted:
             entry["result"] = json.loads(private.redact(json.dumps(result)))
         write_json(checkpoint, state)
-        if interrupted or (final_process and final_process.returncode != 0):
+        if interrupted or (final_process and (final_process.returncode != 0 or final_process.timed_out)):
             stop_reason = "STOP-E1: executor interrupted or could not complete non-interactively; inspect retained logs before another live call."
             break
     tasks = [json.loads((out / task / "result.json").read_text()) for task in order if (out / task / "result.json").exists()]

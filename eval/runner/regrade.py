@@ -61,12 +61,18 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     if out.is_relative_to(private_root.resolve()) or private_root.resolve().is_relative_to(out):
         raise ValueError("Regrade output must be separate from private grader storage")
     checks = []
+    old_by_id = {t['task_id']: t for t in original['tasks']}
     for task, entry in entries.items():
         runtime = Path(entry['runtime'])
         if (not runtime.is_absolute() or out.is_relative_to(runtime.resolve()) or
                 runtime.resolve().is_relative_to(out) or not entry['segments'] or any(
                     Path(s['events']).name != s['events'] for s in entry['segments'])):
             raise ValueError("Invalid retained runtime manifest or output location")
+        if old_by_id[task]['two_session'] and not (
+                old_by_id[task]['outcome'] == 'invalid' and not entry.get('day2_observation') and
+                not any(s.get('day') == 2 for s in entry['segments'])):
+            if not core.valid_day2_observation(entry, core.REPOSITORY / 'eval/tasks' / task):
+                raise ValueError("Regrade refused: two-session exit hashes or day-2 observation missing")
         observed = core.workspace_digest(runtime / 'workspace')
         expected = entry['workspace_exit_sha256']
         if observed != expected:
@@ -116,7 +122,9 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         core.write_json(task_out / 'access-audit.json', json.loads(private.redact(json.dumps(audit))))
         result['grading'] = None
         last = entry['segments'][-1]
-        if audit['status'] == 'clean':
+        if (audit['status'] == 'clean' and not result['invalid_reasons'] and
+                last['exit_code'] == 0 and not last.get('timed_out') and
+                old_task['outcome'] not in {'timeout', 'error'}):
             if core.workspace_digest(workspace) != entry['workspace_exit_sha256']:
                 raise ValueError(f"Regrade refused: workspace exit hash mismatch for {task}")
             scratch = Path(tempfile.mkdtemp(prefix='lhm-eval-regrade-'))
@@ -126,14 +134,16 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                 config['grading_timeout_seconds'], execute)
             if core.workspace_digest(workspace) != entry['workspace_exit_sha256']:
                 raise ValueError(f"Regrade refused: workspace changed during grading for {task}")
-        result['outcome'] = ('invalid' if result['invalid_reasons'] else result['grading']['result']
-                             if result['grading'] else 'timeout' if last.get('timed_out') else 'error')
+        result['outcome'] = ('invalid' if result['invalid_reasons'] else
+                             old_task['outcome'] if old_task['outcome'] in {'timeout', 'error'} else
+                             'timeout' if last.get('timed_out') else 'error' if last['exit_code'] != 0 else
+                             result['grading']['result'] if result['grading'] else 'error')
         sanitized = json.loads(private.redact(json.dumps(result)))
         core.write_json(task_out / 'result.json', sanitized)
         new_state['tasks'][task]['result'] = sanitized
         shared = build_task(result, entry, task_out, config, original['metadata']['pricing'], old_task)
         # Regrading does not change executor/control accounting or observations.
-        for key in ('calls', 'costs', 'done_claims', 'handoff'):
+        for key in ('calls', 'costs', 'done_claims'):
             shared[key] = copy.deepcopy(old_task[key])
         tasks.append(shared)
     report['tasks'] = tasks
