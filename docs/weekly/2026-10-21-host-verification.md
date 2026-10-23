@@ -315,3 +315,17 @@ Controller measurement for prompt v3 (controller/evidence/2026-10-23-d4-v3.json)
 - There were 35 generations, with the repair step firing 3 times, for 0.024 USD.
 
 Leak scans: smoke-harness-attempt2 and smoke-harness-3 are clean. full-harness-v1-partial has one cross-task coincidental match. A 35-character line appears in the verifier evidence for two-session-common-prefix; it also appears in that task's executor-written test_solution.py and its event streams, but not in that task's prompt or grader. It equals a line of bug-chunk-tail's grader, which the executor never had access to. This is the same class as the known pilot false positive, and it is not grader content.
+
+## GitHub CI failures from f844d27 to 698c746, fixed in 1550267
+
+The "Shared interfaces" workflow (ubuntu-latest, Python 3.11 and 3.14, `make test`) failed on every push from f844d27 (03:06 UTC) onward. The 3.11 job failed and fail-fast cancelled the 3.14 job, so GitHub sent "Run failed" each time.
+- From f844d27, 1 test failed. It came from the two-session demo test added in 53cb8a9.
+- From bcd3e17, 5 tests failed. The 4 additional ones came from the handoff-failure demo tests added in 8308435.
+
+Cause: the demo checkers compared each hook's cwd with the recorded workspace via Path.resolve(). The committed macOS evidence records the workspace as /var/folders/... in experiment.json and the hook cwd as /private/var/folders/... in hooks.jsonl. They are equal only where /var links to /private/var, on macOS. Claude had run the suite only on the macOS host and did not check CI after pushes; from now on Claude checks CI after every push.
+
+r2-cont-008 compares recorded paths in a canonical form without filesystem access, with the macOS /private aliases folded and placeholders compared exactly. Claude's independent check forced Path.resolve and realpath to the identity, as on Linux:
+- On the old code, the original CI failure reproduced.
+- On the new code, all 5 tests pass and all 5 committed evidence checkers pass.
+- A copy whose hook cwd points to another workspace is rejected.
+CI on 1550267: validate (3.11) success and validate (3.14) success.
