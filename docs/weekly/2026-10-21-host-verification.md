@@ -329,3 +329,49 @@ r2-cont-008 compares recorded paths in a canonical form without filesystem acces
 - On the new code, all 5 tests pass and all 5 committed evidence checkers pass.
 - A copy whose hook cwd points to another workspace is rejected.
 CI on 1550267: validate (3.11) success and validate (3.14) success.
+
+## 2026-10-23 afternoon: task set v2 approved, Fast tier, two new audit patterns
+
+- The user approved task set v2 and allowed the Codex Fast tier, with usage not a constraint and completeness of results as the goal. Decision 0008 is c0e7d39 (CI green).
+  - Codex "Fast" is service_tier "priority": "2x speed, increased usage" for gpt-6.1-sol, and the default tier for gpt-6-luna. A host probe showed `-c service_tier="priority"` is accepted, and the native thread_settings_applied record carries service_tier, so runs can verify it.
+  - Because Luna defaults to priority, control calls already ran at that tier while costs used Standard rates. The evaluation will state this.
+- r5-v2-001 runs in the worktree (branch r5/v2) in private-write mode on the Fast tier. It covers runner support for task_root and service_tier, eval/tasks-v2/DESIGN.md, and a pilot of 4 families (20 tasks) with private graders.
+- Two new inconclusive audits, both single-session and both recoverable by regrade after the fixes. Neither is an access attempt:
+  - full-b multiple-requirements-line-endings: malformed_event. The audit splits JSONL with str.splitlines(), which also breaks on \x85,   and   inside JSON strings. The stream has 21 lines by "\n" and 26 by splitlines(); every "\n" line parses. Fix: split JSONL on "\n" only, in every runner reader.
+  - full-harness multiple-requirements-round-robin, attempt 2: unresolved_operand on a quoted heredoc Python script whose regex mixes quotes and backslashes.
+
+## Tech-lead review and reinforcement (2026-10-23, 07:00 UTC)
+
+Incident: the Claude session restarted at about 06:50 UTC and killed every attached background process: full B (94 of 100 done), harness v2 (46 of 120) and the Role 5 v2 job. Both runs resumed from their checkpoints with the same --out; B resumed its interrupted session as attempt 2. The Role 5 thread was resumed. Codex is still 0.163.0-alpha.11.1 although the Sparkle updater is active. From now on long host runs start through codex-bridge/detach.sh (setsid, nohup) so a session restart cannot kill them.
+
+Review of what is weak, and the reinforcement dispatched for each:
+1. false_done_rate is undefined in every report, although it is the project's central claim. The verifier exposes only negative claim evidence, and baselines have no verifier at all. Role 4 (r4-cont-009) adds a per-criterion claims sidecar and a measured claim extractor. Role 1 (r1-cont-007) defines a task-level false-done metric from the final message and hidden grading, usable for A, B, C and the harness alike. Role 5 implements it after v2.
+2. The llm_judge produced false fails and unnecessary unverifiable results. Role 3 (r3-cont-009) writes judge prompt v2 with per-requirement evidence and a 24-case calibration set with an approval-gated live accuracy measurement; Claude measures before and after.
+3. Plugin host checks for persisted trust, bundled-binary discovery and unrelated-project silence had no procedure. Role 2 (r2-cont-009) scripts them with checkers and adds a once-per-session SessionStart warning for unverified CLI versions.
+4. SC-6 human review had not started. Claude drew docs/evaluation/human-review-sample-full-a.md: 22 valid full-A tasks (5 per type plus every failure) for the user to check against the workspaces and prompts.
+5. Audit precision: two new inconclusive patterns (JSONL splitting on Unicode separators, a heredoc with a quoted regex) are queued for Role 5 after the v2 pilot. The runtime-evidence idea of checking grader atime was tested and rejected: APFS does not update atime on reads.
+6. The runner leaves no diagnostics on SIGINT; queued for Role 5.
+7. Still open and not fixable by a job: the v1 ceiling (addressed by v2), single-run variance (no repeats planned), the C templates (user), and the concurrency of B and harness runs (latency only).
+
+## Full baseline B (2026-10-23, 05:04 to 07:05 UTC, d44feda, report 71397cb)
+
+eval/configs/full-b.yaml: the 100 single-session tasks, Sol max, codex-cli 0.163.0-alpha.11.1, resumed once after the 06:50 UTC session restart. Leak scan: 596 files, 0 private markers, 0 grader lines, 0 tracebacks, 0 user paths.
+- 98 pass, 0 fail, 2 invalid (multiple-requirements-line-endings: the JSONL splitting bug; feature-plus-test-partition-sign: the restart-interrupted session). pass_rate 1.0 on 98 valid tasks, avg_attempts 1.0.
+- Cost: 4.428 USD over the 99 tasks with accounting, 0.0447 USD per task. Full A on the same 100 tasks: 100 pass, 2.54 USD, 0.0254 USD per task. Max effort costs about 1.76 times medium for the same outcome on this set. The report's total_cost_usd is null because the interrupted task has no usage.
+- The report is invalid under the approved rule until the two tasks are recovered (r5-recovery-001).
+
+## Reinforcement jobs verified (2026-10-23, 07:00 to 07:40 UTC)
+
+All four ran on the Fast tier and passed host verification, ownership and secret scans.
+- Role 5 r5-v2-002 (branch r5/v2, aa41a35): task_root and verified service_tier support, eval/tasks-v2/DESIGN.md, 4 pilot families with 20 tasks. tests/eval 1058 passed. Host checks: the public v2 files have 0 private markers and 0 grader lines; the validation report says 20 references pass, 20 starters fail, 252 of 252 requirements covered, 1090 mutants killed and 0 survivors. Two findings went back to Role 5 (r5-v2-003): in each family the bug_fix and multiple_requirements tasks share one grader and one reference, so they test the same final specification; and the runner refuses the calibration pilot because the tasks are unfrozen, which conflicts with decision 0008.
+- Role 3 r3-cont-009 (branch dev/reinforce, 1057374): judge prompt v2 with per-requirement evidence, v1 kept, 24 calibration cases and the approval-gated controller.measure_judge. tests/controller 312 passed.
+- Role 4 r4-cont-009 (dev/reinforce, 6cf8674): per-criterion claims sidecars (verdict-N.claims.json), a wider claim extractor with precision and recall 1.0 on 56 synthetic reports. tests/verifier 564 passed on the host, Seatbelt included.
+- Role 2 r2-cont-009 (main, 96c47b3): scripted host checks for persisted trust, bundled-binary discovery and unrelated-project silence, plus a once-per-session SessionStart advisory for unverified CLI versions. tests/plugin 272 passed. CI green.
+- Role 1 r1-cont-007 (main, 52896cb): decision 0009 defines task_false_done_rate and stops: the report schema's metrics object is closed, so the new metric needs a schema revision approved by the user. D-6 deferred.
+- Fast mode pricing (developers.openai.com/api/docs/pricing, read 2026-10-23): exactly 2x Standard for input, cached input and output: gpt-6.1-sol 4.00 / 0.20 / 20.00 and gpt-6-luna 0.20 / 0.02 / 1.00 USD per 1M tokens. "Priority processing was renamed Fast mode on July 30, 2026." Since gpt-6-luna's CLI default tier is priority, version 1 control calls ran at priority but were priced at Standard; the final evaluation discloses this, and r5-v2-003 adds a Fast price snapshot keyed on the observed tier.
+- The dev/reinforce branch (controller and verifier changes) waits until harness v2 finishes, because that run launches controller and verifier from main.
+
+## Schema version 2 and judge calibration (2026-10-23, about 08:00 UTC)
+
+- The user approved the report-schema revision for task_false_done_rate, with numerator and denominator over valid tasks. Role 1 (r1-cont-008) published it: schemas/VERSION 2, the metric required in the metrics object, sample unit claimed_complete_task, decision 0009 finalized, interfaces and the Role 5 prompt updated. Host: 104 lead tests passed and all schemas and examples validate. Because the new metric is required, version 1 reports no longer validate against the current schema, and the running harness v2 reads the schema from main when it builds its report. Claude therefore moved the change off main into the dev/reinforce branch (5697ae5) until the run ends. Role 5's implementation brief requires every report reader to validate against the version a report declares.
+- Judge calibration on Role 3's 24 synthetic cases, live through codex_cli with gpt-6-luna: prompt v1 23 of 24 correct (one fail judged unverifiable), 0.0228 USD; prompt v2 24 of 24, 0.0107 USD; mean latency 8.9 and 8.7 s. The set does not reproduce the live false fails seen in harness v1, so it is too easy; cases drawn from the real failure modes follow once harness v2 is complete.

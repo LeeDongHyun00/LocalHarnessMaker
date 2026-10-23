@@ -10,9 +10,11 @@ Codex versions may change: record every run/session version, compare same-versio
 
 [Decision 0007](decisions/0007-scope-cuts.md) supersedes conflicting scope and
 measurement dates in the original milestones and weekly role plan below.
+[Decision 0008](decisions/0008-task-set-v2.md) adds the version 2 schedule
+below and takes precedence over conflicting measurement timing for that set.
 Local Gemma 4 12B (Controller D-3) and QLoRA (Controller D-5) are dropped;
 parity is reported as not measured, retaining its version 1 definition/field.
-Usage limits are no longer a concern. Continue the remaining work to completion
+Usage is not a constraint; completeness of the results is the goal. Continue the remaining work to completion
 up to, but not including, the local LLM stage. An OPENAI_API_KEY for executor
 codex exec is only a fallback if the subscription cap blocks a run.
 
@@ -22,7 +24,31 @@ codex exec is only a fallback if the subscription cap blocks a run.
 | W2, through 11/06 | Full harness and C on a stratified 20-task subset: 5 per task type, 20 different families. The user fills the 20 templates once; Claude does not, preserving evaluator independence. Compare harness and C on the same 20 tasks, paired. |
 | W3, through 11/13 | B on the 100 single-session tasks only and final analysis. Compare handoff_success between harness and A. |
 
-## Milestones (original dates; decision 0007 takes precedence)
+## Version 2 evaluation schedule (approved 2026-10-23)
+
+Version 1 stays frozen and its results remain reported. The user-supplied
+full A result (`eval/reports/full-a`, commit `a21eda2`, codex-cli
+`0.163.0-alpha.11.1`) passed 115/120, including 100/100 single-session tasks;
+this motivates a harder, separate set rather than changing version 1.
+The execution windows below use decision 0007's W2/W3 deadlines, rather
+than the historical weekly headings that follow.
+
+| Window | Work and gate |
+|---|---|
+| W2, through 11/06 | Role 5 builds `eval/tasks-v2/` with `v2-` IDs and separate private graders; validates that every hidden test follows from the public prompt; calibrates on A only toward roughly 30–70% pass rate. Adjust difficulty at the design level, never select/drop tasks based on individual pilot outcomes. Then freeze with a separate record and digest before any full run. Role 1 publishes the supplied freeze evidence. |
+| W2 and W3, through 11/13 | Run A, B and the harness fresh on frozen version 2, retaining decision 0007's comparison scopes. No harness change after the freeze may use version 2 results. |
+| By 11/13 | Finish final analysis; report version 1 and version 2 separately, disclose which version 1 runs informed the 10/23 harness fixes, and retain tier evidence and pinned Standard-rate API-equivalent costs. |
+
+Version 2 uses multi-file packages, explicit requirements/constraints and
+two-session work that depends on day-1 decisions without user restatement
+on day 2. Task count and exact freeze date await Role 5's evidence.
+Codex development jobs and every version 2 evaluation configuration use
+`service_tier = "priority"` (Fast). Record and verify the effective tier
+from native session settings and state it in reports for like-for-like
+comparisons. Pinned Standard rates remain the API-equivalent cost basis.
+This plan records policy, not completed tier configuration or evaluation.
+
+## Milestones (original dates; decisions 0007–0008 take precedence)
 
 | Date | Notion milestone | Role deliverables / dependencies |
 |---|---|---|
