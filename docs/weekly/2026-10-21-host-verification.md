@@ -190,3 +190,66 @@ Controller D-4 baseline (host, 2026-10-23, controller/evidence/2026-10-23-d4-bef
 - 11 of 30 contracts are llm_judge-only and 26 of 30 have no command check.
 - cheap_api is not measured (no API key; decision 0007) and local is dropped.
 r3-cont-005 revises the contract prompt to mechanical checks first; Claude reruns the measurement afterwards.
+
+## Harness smoke attempt 2 (2026-10-23, 03:36 to 03:40 UTC, c47cc72)
+
+This rerun used all five fixes. bug-chunk-tail passed on attempt 1. Its contract had a command check, a regex check and one llm_judge criterion, and the verifier passed it with no re-instruction. It cost 0.0213 USD in total: executor 0.0185 and control 0.0028, with 2 contract generations and 1 judge call. Smoke 1 had cost 0.130 USD for the executor alone. For two-session-prefix-sums, the day-1 contract has six criteria, five of them mechanical, and it passed verification on attempt 1. The task is still invalid because of an inconclusive day-2 audit. On day 2 Sol ran this command:
+
+    for d in .. ../.. ../../..; do if [ -f "$d/AGENTS.md" ]; then cat "$d/AGENTS.md"; fi; done
+
+The audit cannot resolve the loop variable, which is the same pattern as the one inconclusive task in pilot B. The values come from a literal list, so r5-audit-loop-001 adds exact expansion for that pattern and keeps every other loop fail-closed. A re-audit will then cover the retained runs. control_model is now gpt-6-luna. The leak scan of the report found 0 private markers, 0 grader lines and no traceback.
+
+Controller after prompt v2 (controller/evidence/2026-10-23-d4-after-v2.json):
+- 27 of 30 contracts are schema-valid.
+- The 38 criteria are 6 command, 11 file_exists, 12 regex and 9 llm_judge, so llm_judge is 24 percent, down from 31.
+- 5 contracts are llm_judge-only, down from 11, and 21 have no command check, down from 26.
+- The 3 failures were the measurement tool refusing the quality gate's one regeneration. r3-cont-006 lets the tool measure the production pipeline.
+- The gate also fails the whole contract command when the regeneration still lacks a mechanical check. The runner would then count that as an invalid task. r3-cont-007 makes the gate return the contract with an explicit assumption instead.
+
+## Real two-session handoff demo (plugin, 2026-10-23, de38626)
+
+This ran `python -m plugin.two_session_demo day1`, then `day2` with --scripted-approval, then `check`. It used live Sol, gpt-6-luna through codex_cli, the real controller and verifier, and temporary HOME and CODEX_HOME. The evidence is in plugin/evidence/2026-10-23-two-session/.
+- Day 1: the contract was shown and the run waited for approval. After "approve", result.txt was created and the real verifier passed on attempt 1, with 0 re-instructions. The saved handoff kept the random release label as a decision.
+- Day 2: a new session in the same project. SessionStart injected exactly the saved handoff, and the model context contains it. The day-2 contract used the label from the handoff, with no user restatement. It waited for approval, and followup.txt passed verification.
+- The offline checker reports approval_gates, context_visible, new_session, saved_handoff_validated and session_start_injected all true, and user_restatement_needed false; overall pass.
+- The evidence contains no secrets and no private-root path. Like the 2026-10-22 evidence, it records absolute checkout paths.
+
+Controller D-4 final (production pipeline at de38626, controller/evidence/2026-10-23-d4-final.json): all 30 contracts are schema-valid, with 51 criteria. The other figures against the baseline:
+
+| Measure | Baseline | Final |
+|---|---|---|
+| command criteria | 4 | 10 |
+| file_exists criteria | 10 | 17 |
+| regex criteria | 13 | 10 |
+| llm_judge criteria | 12 | 14 |
+| llm_judge share | 31 percent | 27 percent |
+| llm_judge-only contracts | 11 | 5 |
+| contracts with no command | 26 | 21 |
+
+There were 30 generations, 0.017 USD in total. Counts vary between runs of the same prompt: the three measurements gave 39, 38 and 51 criteria. The improvement is real but moderate on these authored samples, many of which name no file or test. The evaluation tasks name their files, so the harness smoke is the more relevant check: attempt 2 had 1 of 3 and 1 of 6 llm_judge criteria.
+
+## Audit: literal shell loops (r5-audit-loop-001 and -002, branch commit da6f852)
+
+The first version resolved literal for-loops but mistook Python for-loops inside quoted heredoc bodies for shell syntax. Claude's comparison of old and new code, task by task over every retained run, showed 3 tasks fixed, 3 regressed and 1 changed among 104. The regressions were all bug-chunk-tail heredoc scripts. Role 5's resumed session fixed them. The final comparison covers 120 finished tasks across pilot-a, pilot-a-attempt1, pilot-b, smoke-two-session-a, smoke-two-session-a-attempt1, full-a-attempt1, the smoke-harness run and the in-progress full-a:
+
+| Code | Clean | Inconclusive | Matched private access |
+|---|---|---|---|
+| Old audit | 117 | 3 | 0 |
+| New audit | 120 | 0 | 0 |
+
+The only changes are the three literal parent-directory AGENTS.md loops: pilot B bug-chunk-tail, smoke-harness two-session-prefix-sums, and full-a two-session-rotate-left on day 2. Claude's detection probes still behave as expected:
+- An absolute read, a cd-relative read, a base64-hidden path read and a FileChange to a protected path are each access_detected.
+- A dynamic command stays inconclusive.
+- The benign case stays clean.
+
+tests/eval: 943 passed in the worktree. The fix reaches main after full A, and full A is then regraded with it.
+
+Handoff failure demos (plugin, 2026-10-23, 8308435): the three scenarios of `python -m plugin.handoff_failure_demo` ran live, each with day 1, day 2 and an offline check. They were exported with plugin.export_demo_evidence to plugin/evidence/2026-10-23-{exhaustion,generation,validation}/ and re-checked on the exported copies.
+
+| Scenario | remaining_injected | stale_injected | Notes |
+|---|---|---|---|
+| exhaustion | true | false | The task cannot pass within HARNESS_MAX_ATTEMPTS=1, and day 2 received the remaining work |
+| generation | false | false | An injected handoff generation failure; the previous handoff is not injected |
+| validation | false | false | An injected handoff validation failure; the previous handoff is not injected |
+
+Every scenario shows approval_gates true, new_session true and overall pass. The exported evidence holds no absolute user paths, secrets or private-root references.
