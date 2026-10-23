@@ -253,3 +253,29 @@ Handoff failure demos (plugin, 2026-10-23, 8308435): the three scenarios of `pyt
 | validation | false | false | An injected handoff validation failure; the previous handoff is not injected |
 
 Every scenario shows approval_gates true, new_session true and overall pass. The exported evidence holds no absolute user paths, secrets or private-root references.
+
+Fresh-clone checklist (docs/demo.md), run by Claude on the host on 2026-10-23 from GitHub at bcd3e17 with codex-cli 0.163.0-alpha.11.1:
+- `pip install '.[dev]'` into a new venv succeeded.
+- plugin/install.sh into temporary HOME, CODEX_HOME and project exited 0, and `--check` printed "LocalHarnessMaker installation OK".
+- check_probe_evidence passed for 0.162 (exec and tui) and 0.163 (exec).
+- check_demo_evidence passed for 2026-10-22-real, and the checks for two-session, exhaustion, generation and validation passed, all with the documented fields.
+- The full suite in the clone gave 1566 passed and 1 skipped (the opt-in live Codex test).
+
+## Full baseline A (2026-10-23, 03:31 to 05:00 UTC, c47cc72, report a21eda2)
+
+eval/configs/full-a.yaml ran 120 tasks and 139 executor sessions on codex-cli 0.163.0-alpha.11.1. No capacity refusal occurred. The total cost was 3.82 USD. The leak scan of the 753 published files found 0 private markers, 0 grader lines, 0 tracebacks and 0 absolute user paths.
+
+| Metric | Value | n | 95% CI |
+|---|---|---|---|
+| pass_rate | 0.975 | 118 valid | 0.941 to 1.0 |
+| cost_per_pass | 0.0332 USD | 120 | 0.0299 to 0.0368 |
+| avg_attempts | 1.15 | 118 | 1.09 to 1.22 |
+| handoff_success | 0.833 | 18 | 0.667 to 1.0 |
+
+- All 100 single-session tasks passed. All 3 failures are two-session tasks: common-prefix, line-endings and adjacent-runs.
+- The report is invalid under the approved rule because 2 tasks are invalid:
+  - two-session-rotate-left: day-2 audit inconclusive on the literal AGENTS.md loop. The fixed audit (d44feda) finds it clean, so a regrade grades it.
+  - two-session-balanced-brackets: day-1 audit inconclusive with unresolved_custom_input. Sol wrote `tools.apply_patch("...".replace('X',''))`, a patch literal with one stray character removed at runtime. The runner correctly stopped before day 2, so a regrade cannot recover the task. r5-continue-001 adds narrow resolution of literal JS string expressions and a continue_day2 command. That command runs the missing day 2 from a copy of the retained day-1 workspace into a fresh run directory and leaves the source run untouched.
+- Implication for the comparison: A sits at a ceiling on single-session tasks. The harness can match but not exceed A's pass rate there, and its control calls add cost. Any harness gain has to come from the two-session tasks or from cost.
+
+Full harness and full B (100 single-session tasks) started at 05:06 UTC from d44feda, concurrently, with the fixed audit.
