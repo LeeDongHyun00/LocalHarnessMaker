@@ -1,4 +1,4 @@
-"""Opt-in host measurement of authored contract samples, one generation each."""
+"""Opt-in host measurement of the production contract pipeline without HTTP."""
 
 import argparse
 import io
@@ -12,30 +12,24 @@ from typing import Any
 
 from controller.__main__ import main as controller_main, write_json
 from controller.analyze import calculate_cost
-from controller.backends.base import Message, configured_prices
-from controller.backends.codex_cli import CodexCLIBackend
-from controller.errors import BackendError, InputError
+from controller.backends.base import configured_prices
+from controller.backends.routing import RoutedBackend
+from controller.errors import InputError
 from controller.generation import schema_validator
 from controller.settings import PACKAGE_DIR, load_object
 
 ROOT = PACKAGE_DIR.parent
 CHECK_TYPES = ("command", "file_exists", "regex", "llm_judge")
+MAX_GENERATIONS = 3
 
 
-class SingleCallBackend(CodexCLIBackend):
-    """Keep the ordinary CLI implementation but refuse any regeneration."""
-
-    def __init__(self, selected: str) -> None:
-        if selected != "codex_cli":
-            raise InputError("Measurement supports codex_cli only")
-        super().__init__()
-        self.called = False
-
-    def generate(self, schema: dict[str, Any], messages: list[Message]) -> dict[str, Any]:
-        if self.called:
-            raise BackendError("Measurement permits one generation per sample; no retry")
-        self.called = True
-        return super().generate(schema, messages)
+def measurement_backend(selected: str) -> RoutedBackend:
+    """Use production routing and its shared budget, with HTTP disabled in memory."""
+    if selected != "codex_cli":
+        raise InputError("Measurement supports codex_cli only")
+    config = load_object(PACKAGE_DIR / "config.yaml")
+    config["fallback"]["enabled"] = False
+    return RoutedBackend(selected, config=config)
 
 
 def measure_sample(sample: dict[str, Any], directory: Path) -> dict[str, Any]:
@@ -55,7 +49,7 @@ def measure_sample(sample: dict[str, Any], directory: Path) -> dict[str, Any]:
                 "contract", "--prompt", str(prompt), "--handoff", "none",
                 "--cases", str(PACKAGE_DIR / "case_library/seed"),
                 "--backend", "codex_cli", "--out", str(output),
-            ], backend_factory=SingleCallBackend)
+            ], backend_factory=measurement_backend)
     finally:
         root.handlers, root.level = previous_handlers, previous_level
     calls = [json.loads(line.removeprefix("control_call "))
@@ -68,16 +62,21 @@ def measure_sample(sample: dict[str, Any], directory: Path) -> dict[str, Any]:
             assumptions = len(value["assumptions"])
             counts = {kind: sum(item["check"]["type"] == kind
                                for item in value["success_criteria"]) for kind in CHECK_TYPES}
-    accounting = len(calls) == 1 and calls[0].get("backend") == "codex_cli"
+    accounting = bool(calls) and all(call.get("backend") == "codex_cli" for call in calls)
+    gate_fired = any(line.startswith("contract_quality_gate ")
+                     for line in logs.getvalue().splitlines())
     return {
         "id": sample["id"], "ambiguous": sample["ambiguous"], "exit_code": code,
         "schema_valid": valid, "assumptions_count": assumptions, "criteria_by_type": counts,
+        "quality_gate_fired": gate_fired, "generations": len(calls),
         "errors": [line for line in logs.getvalue().splitlines()
                    if line.startswith("controller:")],
-        "latency_seconds": calls[0]["latency_seconds"] if accounting else None,
-        "usd": calls[0]["usd"] if accounting else None,
+        "latency_seconds": (sum(call["latency_seconds"] for call in calls)
+                            if accounting else None),
+        "usd": (sum(call["usd"] for call in calls)
+                if accounting and all(call.get("usd") is not None for call in calls) else None),
         "control_calls": calls,
-        "accounting_complete": accounting and calls[0].get("usd") is not None,
+        "accounting_complete": accounting and all(call.get("usd") is not None for call in calls),
     }
 
 
@@ -89,6 +88,8 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     complete = all(row["accounting_complete"] for row in rows)
     return {
         "samples": len(rows), "schema_valid": sum(row["schema_valid"] for row in rows),
+        "quality_gate_firings": sum(row["quality_gate_fired"] for row in rows),
+        "generations": sum(row["generations"] for row in rows),
         "schema_pass_rate": sum(row["schema_valid"] for row in rows) / len(rows),
         "assumptions_count": sum(row["assumptions_count"] for row in rows if row["schema_valid"]),
         "criteria_by_type": counts, "criteria_count": criteria,
@@ -123,14 +124,16 @@ def main(argv: list[str] | None = None) -> int:
         prices, ref = configured_prices(config)
         if prices is None:
             raise InputError("No price snapshot for estimate")
-        estimate = len(samples) * calculate_cost(
+        max_calls = len(samples) * MAX_GENERATIONS
+        estimate = max_calls * calculate_cost(
             args.estimated_input_tokens, args.estimated_output_tokens, prices)
         if not math.isfinite(estimate):
             raise InputError("Non-finite estimate")
-        print(f"Planned calls: {len(samples)} maximum, one codex_cli generation per sample; "
+        print(f"Planned calls: {max_calls} maximum, up to {MAX_GENERATIONS} codex_cli "
+              "generations per sample, no HTTP fallback; "
               f"estimated API-equivalent USD: {estimate:.6f} "
               f"({args.estimated_input_tokens} input/{args.estimated_output_tokens} output "
-              "tokens per sample, no cache discount; planning estimate, not a cap).", flush=True)
+              "tokens per generation, no cache discount; planning estimate, not a cap).", flush=True)
         if not args.i_have_approval:
             print("Refusing to start without --i-have-approval.")
             return 1
@@ -144,7 +147,8 @@ def main(argv: list[str] | None = None) -> int:
             "backend": "codex_cli", "model": config["model"],
             "sample_source": str(source.relative_to(ROOT)),
             "estimated_usd": estimate, "estimate_pricing_ref": ref,
-            "cheap_api": {"status": "not measured", "reason": "HTTP fallback requires an API key"},
+            "maximum_generations": max_calls,
+            "cheap_api": {"status": "not measured", "reason": "HTTP fallback disabled for measurement"},
             "local": {"status": "not measured", "reason": "Dropped by decision 0007"},
             "samples": rows, "totals": summarize(rows),
         })

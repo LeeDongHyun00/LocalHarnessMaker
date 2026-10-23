@@ -2,6 +2,7 @@
 
 import copy
 import json
+import logging
 import re
 from decimal import Decimal
 from pathlib import Path
@@ -13,6 +14,8 @@ from controller.analyze import reasoning_effort
 from controller.backends.base import Backend, Message
 from controller.errors import BackendError, InputError, InvalidGeneration
 from controller.settings import PACKAGE_DIR, SCHEMA_DIR, load_object
+
+logger = logging.getLogger(__name__)
 
 
 def data_block(name: str, value: Any) -> str:
@@ -109,6 +112,10 @@ def generate_contract(
                              for item in contract["success_criteria"])
             if not hints or mechanical:
                 return contract
+            logger.info("contract_quality_gate %s", json.dumps({
+                "attempt": attempt + 1,
+                "action": "reject" if quality_regenerated or attempt == 2 else "regenerate",
+            }))
             if quality_regenerated or attempt == 2:
                 raise InvalidGeneration(
                     "Contract quality gate: no mechanical success criteria for "

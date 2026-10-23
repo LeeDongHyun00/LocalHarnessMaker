@@ -24,13 +24,18 @@ Updated existing golden responses to contain mechanical checks where required
 and translate the direct script check into python -c. The original 30 measurement
 request texts/IDs are unchanged; these mock responses do not measure model quality.
 
-Claude's supplied before-measurement is 30/30 schema-valid, 39 criteria (4 command,
-10 file_exists, 13 regex, 12 llm_judge), 11 contracts containing only llm_judge and
-26 without command checks. The host evidence file was not edited. The after-run
-is pending host verification: compare llm_judge share and contracts without
-mechanical criteria, including quality-gate failures. The unchanged measurement
-adapter allows one call per sample, so it records requests needing a quality
-retry as failures rather than measuring production regeneration recovery.
+D-4 host measurements are recorded in LOCAL.md and STATUS. Before v2:
+30/30 schema-valid, 39 criteria (4 command, 10 file_exists, 13 regex,
+12 llm_judge; share 0.307692), 11 judge-only contracts and 26 without command
+checks; 51 assumptions, USD 0.03600314 and 237.186616 s summed call latency.
+After v2 with the old single-call adapter: 27/30 schema-valid, 38 criteria
+(6 command, 11 file_exists, 12 regex, 9 llm_judge; share 0.236842), 5 judge-only
+contracts and 21 without command checks; 51 assumptions, USD 0.01779202 and
+295.212116 s. ambiguous-tests, scoped and data-csv failed because SingleCallBackend
+refused the quality gate's targeted regeneration. These supplied host results
+are not production recovery measurements; valid-output shares have different
+populations. The evidence files remain untouched. Claude's revised host rerun
+is pending.
 
 Applied approved decision 0007: D-3 local Gemma 4 12B and D-5 QLoRA are
 dropped. LOCAL.md and STATUS no longer describe them as pending work. The
@@ -41,14 +46,19 @@ Added `python -m controller.measure_contracts` for Claude's pending host D-4
 measurement of the 30 authored requests. It prints call count and estimated
 API-equivalent cost before any calls and refuses execution without
 `--i-have-approval`. With the current snapshot and default planning allowances,
-the estimate is USD 0.066000 for at most 30 calls. Each sample invokes the
+the estimate is USD 0.198000 for at most 90 calls. Each sample invokes the
 existing contract CLI implementation using codex_cli and an internal injected
-single-generation adapter, without HTTP fallback or regeneration. Production
-routing and public CLI flags remain unchanged.
+production RoutedBackend with HTTP fallback disabled in memory. Schema retries
+and one targeted quality regeneration share production's three-generation
+command budget; transport failures stop the sample. Production routing and public CLI flags remain unchanged.
 
 The JSON summary records per-sample schema validity, assumptions count, counts
 by check type, log-derived latency and cost, and totals including llm_judge
-share. Failed samples retain their exit code and controller errors; absent
+share, gate firings (one per affected sample), generations and USD. A code-owned
+production gate log records detection even when the remaining budget prevents
+regeneration. Per-sample costs and latency sum every logged generation, including
+failed/rejected results. Failed samples retain their exit code and controller
+errors; absent
 contracts have null counts. Costs include measured failures and remain null
 when accounting is incomplete. cheap_api is explicitly not measured. LOCAL.md
 documents the preview, approved host command and interpretation.
@@ -66,10 +76,12 @@ review 1. Unknown costs are never fabricated as zero.
 
 ## Verification
 
-`.venv/bin/python -m pytest tests/controller -q`: 176 passed in 1.98s.
+`.venv/bin/python -m pytest tests/controller -q`: 183 passed in 2.18s.
 The new mocked tests exercise approval refusal, all 30 samples, log accounting,
-single-generation failures, no fallback even with an API key, and null costs
-when CLI usage is absent. No live call, network, nested Codex or macOS
+quality/schema regeneration sequences, persistent quality rejection, final-slot
+gate detection, three-call exhaustion, no fallback even with an API key, and
+null costs when any CLI generation has unknown usage. No live call, network,
+nested Codex or macOS
 sandbox-exec check ran. The full suite is reserved for coordinated host
 verification before merge. No staging or commit was performed.
 
@@ -79,11 +91,12 @@ verification before merge. No staging or commit was performed.
   dependency-free default for user review, not a verified project convention.
 - The quality gate requires at least one mechanical criterion, as requested;
   it does not impose a check-type quota or rewrite generated criteria itself.
-- The supplied before-run is host evidence. The after-run must preserve the
+- Both recorded runs are host evidence. The revised host rerun preserves the
   original 30 prompts; new unittest samples exercise offline regressions only.
 - The authored requests-v1 set is the D-4 population; the original ten samples
   overlap it and are not duplicated. Only request text is sent to the model.
-- The estimate uses 17,000 input and 1,000 output tokens per sample without cache
+- The estimate uses 17,000 input and 1,000 output tokens per generation
+  without cache
   discounts. These are overridable planning allowances, not hard spending caps;
   price snapshot rates are the existing API-equivalent planning rates.
 - The summary is an internal controller artifact, not a shared evaluation
