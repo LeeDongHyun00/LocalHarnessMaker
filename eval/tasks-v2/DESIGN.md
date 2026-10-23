@@ -2,14 +2,15 @@
 
 Written before pilot task construction, 2026-10-23. Version 1 remains frozen.
 The user approved the separate version under decision 0008, being recorded by
-Role 1. This pilot has 4 families and 20 tasks; all metadata stays frozen=false
+Role 1. The pilot has 4 families and 20 tasks; the full candidate has 20 families and
+100 tasks. All metadata stays frozen=false
 until design calibration and a separate freeze. No baseline outcome was used to
 select these tasks.
 
 The design targets incomplete requirement coverage, broken constraints, claims
 without verification, and context lost between sessions. Every task contains a
 small Python package with 3–8 production modules and public unittest regressions.
-Each task has 12 numbered requirements (15 across two sessions), including interacting validation,
+Pilot tasks have 12 numbered requirements (15 across two sessions), including interacting validation,
 ordering, boundary and copying rules. Public API names/signatures, protected
 files, standard-library-only implementation, unchanged caller inputs, and exact
 exception types/messages are explicit. Import, facade, batch and rendering call
@@ -32,7 +33,22 @@ and are globally unique. The pilot uses the first four planned families:
 | reservations | half-open intervals, resource conflicts and deterministic order |
 | routing | canonical paths, duplicate-rule priority and deterministic ordering |
 | inventory | stock deltas, aggregate validation and atomic batches |
-| Planned expansion | dependency graph, layered settings, event replay, access policy, job queues, calendar windows, CSV import, text indexing, schema migration, filesystem manifests, rate budgets, workflow state, search facets, document patches, command dispatch, cache invalidation |
+| dependency-graph | canonical edges, missing prerequisites, cycles and topological waves |
+| layered-settings | layer priority, negative layers and deterministic tie selection |
+| event-replay | per-stream prefix validation, zero retention and encounter history |
+| access-policy | absolute priorities, deny precedence and resource grouping |
+| job-queues | priority order, stable ties and queue isolation |
+| calendar-windows | hour boundaries, overlapping slots and error precedence |
+| csv-import | column order, unequal columns and row-to-id alignment |
+| text-indexing | nonnegative counts, zero documents and token aggregation |
+| schema-migration | version bounds, predecessor resolution and strict edge order |
+| filesystem-manifests | relative path segments, size validation and sorted manifests |
+| rate-budgets | per-row bounds, aggregate exhaustion and exact boundaries |
+| workflow-state | state vocabulary, idempotence and ordered transitions |
+| search-facets | counts, scores, multi-key ordering and document identity |
+| document-patches | original offsets, collisions and reverse application order |
+| command-dispatch | handler priority, opposite tie policy and shadow reporting |
+| cache-invalidation | dependency cycles, generation bounds and transitive dirtiness |
 
 Each family uses one domain package with distinct target specifications as well
 as distinct starting defects. The multiple_requirements variant now changes the
@@ -88,6 +104,61 @@ reproducible verification counts. Final-response honesty still needs retained
 executor-event observation; an artifact alone cannot prove when a command ran.
 
 ## Calibration rule
+
+### Approved expansion after calibration
+
+Decision 0008 calibration rerun, supplied by the user: baseline A passed
+15/19 valid tasks (0.789, 95% interval 0.579–0.947). By type: bug_fix 3/3,
+constrained_refactoring 3/4, feature_plus_test 3/4, multiple_requirements 6/8;
+two-session tasks passed 3/4. This exceeds the 30–70% target. The user approved
+building all 20 families. All 20 pilot tasks remain in the population unchanged;
+no task is dropped, selected or rewritten because of its outcome.
+
+The remaining 16 families use 16 numbered requirements per single-session task
+and 18 across both days for two-session tasks. Their specifications combine at
+least four interacting pairs: full-input validation with domain error precedence;
+canonicalization with duplicate/conflict resolution; resolution with deterministic
+ordering; and independent copying with atomic multi-input processing. Domain
+rules add further interactions (for example graph cycles after canonicalization,
+or transitive cache dirtiness after revision selection). At least two naive-implementation traps
+are mandatory: exact exception types/messages and input immutability, alongside
+protected bytes, public API compatibility and mapping insertion order. The same
+policy must hold at computation, facade, rendering and batch call sites (at least
+three). Refactoring variants start with duplicated implementations and require
+one shared domain-policy path. Feature variants add a genuinely absent API;
+multiple-requirements variants change domain resolution rather than only tests.
+
+In the new tasks, explicit requirement pairs are R2/R3 (validate all shapes before
+selection), R4/R5 (canonical identity and conflict/revision handling), R5/R6
+(selection determines the domain graph/aggregate/transition inputs), R8/R11
+(nested copying and atomic batches), and R9/R12 (serialization through the shared
+policy path). Normal variants collapse identical IDs and reject conflicts;
+feature variants select highest-value revisions with immediate ambiguity errors;
+multiple-requirements variants select final revisions in first-ID position,
+including target changes and lower values. Those choices can change graph edges,
+prefix histories, collisions, transition order and report membership. The variants therefore define different target behavior. Bug-fix starters combine a
+domain edge defect with divergent facade paths and broken naming; refactoring
+starters have successful behavior copied across three paths. Feature and
+two-session starters leave composition absent; new day-1 work includes domain
+boundary corrections as well as policy preservation.
+
+Day 1 of every new two-session task fixes three independent decisions: Unicode
+canonical naming, domain conflict/ordering policy, and exact error namespace.
+It requires these to be recorded in HANDOFF.md. Day 2 requests composition and
+serialization against all three decisions, without restating their values.
+New tasks specify a JSON record inside workspace HANDOFF.md, containing the
+exact public naming recipe, selection rules, domain rules, error prefix and
+observed verification report. This task artifact is independent of the shared
+controller handoff schema. Its checks are mechanical and fully specified on
+day 1; day 2 retains it without repeating its policy values.
+The final grader checks day-1 behavior through every new call site. Public
+day-1 artifacts remain available, as in the pilot protocol. Every private check
+must follow a numbered public requirement; no reference algorithm or private
+input is needed to infer the required behavior.
+
+The full configs use calibration=false and remain blocked by frozen=false until
+Claude's host validation and the separate freeze. Offline construction and
+mutation validation are not a new quality calibration or a freeze.
 
 Run baseline A first on the complete 20-task pilot with full A's model/effort.
 Set calibration=true for this pre-freeze procedure. The runner pins candidate

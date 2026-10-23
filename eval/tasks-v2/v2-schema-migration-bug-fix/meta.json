@@ -1,0 +1,10 @@
+{
+  "id": "v2-schema-migration-bug-fix",
+  "type": "bug_fix",
+  "family": "schema-migration",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

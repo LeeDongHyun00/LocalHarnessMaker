@@ -1,0 +1,10 @@
+{
+  "id": "v2-calendar-windows-constrained-refactoring",
+  "type": "constrained_refactoring",
+  "family": "calendar-windows",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

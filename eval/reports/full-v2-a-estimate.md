@@ -1,0 +1,42 @@
+# Full v2 a STOP-3 estimate — 2026-10-23
+
+Offline preparation only; no model calls or run authorization. Config:
+[full-v2-a.yaml](../configs/full-v2-a.yaml). The population is 100 tasks;
+this selection has 100 tasks and 120 required executor sessions.
+Sol uses medium effort, priority (Fast), seed 0, Codex
+0.163.0-alpha.11.1. calibration=false; frozen=false metadata intentionally blocks
+execution until host validation and a separate freeze. Obtain spending approval
+on the host before launching this batch.
+
+## Call accounting
+
+retry_limit=0. The executor bound is 120 calls; the control bound is
+0 generation calls; the combined bound is 120 calls.
+There are no control/judge calls or quality reinstructions. Recovery or operator continuation requires a revised bound.
+
+## Fast pricing scenarios
+
+Use the existing openai-fast-short-2026-10-23-v1 snapshot in eval/prices.yaml.
+USD per million tokens: Sol input 4, cached input 0.2, output 20;
+Luna input 0.2, cached input 0.02, output 1. Cached input is a subset of total
+input. Reasoning tokens count once in output. The snapshot is the existing
+user-supplied official-page/host observation; no network fetch occurred here.
+
+Per executor planning workload: 20,000 uncached input + 10,000 cached input
++ 4,000 output tokens, costing $0.162000 per call.
+Per control generation: 20,000 uncached + 2,000 cached + 4,000 output,
+costing $0.008040 per slot. This gives $19.440000 at the stated
+call bound; 2× and 5× token workload scenarios give $38.880000 and
+$97.200000. These are planning scenarios, not measurements, hard token
+limits or spending caps. Deadlines are 900 seconds per single-session process
+and 1800 per process of a two-session task; grading deadline is 30 seconds.
+
+## Assumptions
+
+- Output/token budgets are workload assumptions, not calibration-derived
+  forecasts. Max effort can spend more output/reasoning tokens than medium.
+- Every actual process must retain native applied-tier evidence; an absent or
+  different observed tier cannot be priced from this requested config.
+- All failed, invalid, retry and fallback usage belongs in actual accounting;
+  unknown usage/prices stay null. Host validation and separate freeze remain
+  pending. No live evaluation is run in this worktree.

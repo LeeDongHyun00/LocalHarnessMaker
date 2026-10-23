@@ -8,10 +8,10 @@ shared schema. Historical reports in `reports/baseline-a-first-task/` remain
 unaltered provisional evidence; they have not been reclassified as approved
 reports or rerun.
 
-## Version 2 candidate pilot
+## Version 2 candidate population
 
 [DESIGN.md](tasks-v2/DESIGN.md) specifies the separate harder population before
-construction: 20 planned families × 5 task variants. The unfrozen pilot contains
+construction: 20 families × 5 task variants. The unchanged pilot contains
 ledger, reservations, routing and inventory, with four single-session types and
 one two-session task per family (20 tasks, 24 executor sessions). Each task has
 seven production modules, public regressions, 12 numbered requirements (15 over
@@ -19,6 +19,43 @@ two sessions), explicit constraints and a protected verification command.
 Final graders and references remain external. No version 1 public task or grader
 is changed. [Validation counts](reports/pilot-v2-validation.md) contain task IDs
 and numbers only.
+
+The user-supplied decision 0008 rerun passed 15/19 valid tasks (0.789,
+95% interval 0.579–0.947), above the 30–70% target. The approved full candidate
+keeps every pilot task and adds 16 complete families / 80 tasks. New tasks use
+16 numbered requirements (18 across two sessions), at least four interacting
+requirement pairs, protected files, exact errors, independent inputs/results,
+and shared computation across facade, rendering and batch call sites. Day 2
+depends on three day-1 policy decisions without restating their values.
+No task was selected or dropped on its calibration outcome.
+
+[Full validation counts](reports/full-v2-validation.md) publish task IDs and
+numbers only. Graders, coverage manifests, references and mutation review
+material remain external. Grader assertions cannot share a line with public
+inputs. Executor-written corpus overlap is warning-only; validation reports the
+number of corpus files actually examined and warnings per task. References must
+pass, starters must fail and every requirement must have executed coverage.
+Mutation runs exhaust the generated AST population, retaining hash-bound private
+reviews for equivalents rather than treating them as killed.
+For host validation, pass the complete task list from full-v2-a.yaml to
+`eval.runner.validate_graders`, both normally and with `--mutants 100000`.
+The literal `--tasks all` selects v1, so it must not be used for this population.
+Require zero surviving mutants and zero errors for every task; the tool's
+generic 90% mutation exit threshold alone is insufficient for this candidate.
+
+[Full A](configs/full-v2-a.yaml) and [full harness](configs/full-v2-harness.yaml)
+select all 100 tasks in lexicographic order (120 required sessions).
+[Full B](configs/full-v2-b.yaml) selects the 80 single-session tasks at Sol max;
+its task_population pins all 100 tasks. A and harness use Sol medium. All request
+Fast priority, Codex 0.163.0-alpha.11.1, seed 0 and calibration=false. Harness
+selects codex_cli with reinstruction_limit=2; all have retry_limit=0.
+STOP-3 estimates: [A](reports/full-v2-a-estimate.md),
+[B](reports/full-v2-b-estimate.md), [harness](reports/full-v2-harness-estimate.md).
+These are workload scenarios priced at the existing Fast snapshot, not caps or
+measurements. Dynamic judge criteria require a revised harness estimate.
+All metadata remains frozen=false: the runner refuses full execution before
+Claude's host validation and the separate freeze. No live evaluation was run in
+this worktree; the calibration results above were supplied by the user.
 
 `task_root` is an optional config field, default `eval/tasks`; v2 selects
 `eval/tasks-v2`. It is a canonical repository-relative public directory under

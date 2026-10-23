@@ -1,0 +1,10 @@
+{
+  "id": "v2-schema-migration-multiple-requirements",
+  "type": "multiple_requirements",
+  "family": "schema-migration",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "v2-layered-settings-feature-plus-test",
+  "type": "feature_plus_test",
+  "family": "layered-settings",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

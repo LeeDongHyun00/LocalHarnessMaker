@@ -1,0 +1,10 @@
+{
+  "id": "v2-document-patches-constrained-refactoring",
+  "type": "constrained_refactoring",
+  "family": "document-patches",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

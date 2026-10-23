@@ -1,0 +1,10 @@
+{
+  "id": "v2-job-queues-bug-fix",
+  "type": "bug_fix",
+  "family": "job-queues",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

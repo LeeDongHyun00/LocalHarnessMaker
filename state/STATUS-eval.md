@@ -1,5 +1,10 @@
 ## Done
 
+- Verified the final evaluation package and authorized scope after all candidate changes; preserved all twenty pilot tasks, v1 inputs/pricing/retained reports, shared interfaces and other roles' files, with no private path in changed repository files and no staging (`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest tests/eval -q`: 1611 passed in 233.65s; `.venv/bin/python "$LHM_PRIVATE_GRADERS/scope_expansion.py"`: changed_file_count=1068, scope_error_count=0, protected_change_count=0, private_path_count=0, staged_change_count=0; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0).
+- Built the remaining sixteen v2 families / eighty tasks with public constraints and records of the three day-1 decisions, retaining every pilot task and leaving all metadata unfrozen; recorded the user-supplied calibration and expanded design (`.venv/bin/python "$LHM_PRIVATE_GRADERS/build_expansion.py"`: family_count=16, task_count=80; final scope audit: task_count=100, family_count=20, pilot_task_count=20).
+- Validated the complete candidate and published numbers/task IDs only: 100 reference passes, 100 starter failures, 1,564 covered requirements, 100 distinct graders and zero public assertion overlap; retained 20 task warnings / 224 shared assertion-line occurrences against 376 actual corpus files (`.venv/bin/python "$LHM_PRIVATE_GRADERS/finalize_expansion.py"`: valid_count=100, invalid_count=0, uncovered_requirement_count=0, shared_grader_count=0, shared_assertion_line_count=0).
+- Exhausted the complete generated AST mutation population and independently checked every candidate identity, source/specification binding and unchanged final input pins; retained equivalence rationales privately (`.venv/bin/python "$LHM_PRIVATE_GRADERS/finalize_expansion.py"`: mutants_killed=6092, mutants_equivalent=49, mutants_survived=0; final mutation driver: 100 tasks, error_count=0).
+- Added lexicographic full-v2 A/B/harness configs and Fast STOP-3 estimates, including B's complete population pin and explicit pre-freeze refusal; updated README and CHANGES (`.venv/bin/python -m pytest tests/eval/test_v2_support.py -q`: 35 passed in 19.81s; call bounds A=120, B=80, harness=780 before dynamic judges).
 - Verified the complete eval package after the three recovery/audit fixes and updated README/CHANGES; preserved frozen tasks/reports, shared interfaces and other roles' files (`.venv/bin/python -m pytest tests/eval -q`: 1608 passed in 176.19s; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; authorized-path/frozen-file/branch/STATUS-heading check: passed, r5/v2).
 - Verified the new regressions and existing regrade provenance assertion after pinning the new verifier implementation; continuation artifact recovery now distinguishes its observed copy digest from the unmatched historical pin (`.venv/bin/python -m pytest tests/eval/test_recovery_boundaries.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 58 passed in 29.35s).
 - Updated README and CHANGES and checked authorized paths, frozen files, branch and STATUS headings (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; protected-path `git diff --exit-code`: exit 0; scope/branch/STATUS-heading check: passed, r5/v2).
@@ -41,6 +46,8 @@
 
 ## Remaining
 
+- Host/Claude: validate the full unfrozen v2 candidate and its private companion files, review per-task corpus warnings, then perform the separate freeze through Role 1. Keep all 100 meta.json files frozen=false until that step.
+- Host only, after validation/freeze and spending approval: transfer the full-v2 A/B/harness configs and matched Fast estimates to the main checkout. This worktree must not run executor/controller/judge models. Re-estimate dynamic judge slots before a harness batch.
 - Host/Claude: transfer these three fixes, re-audit full-a's two-session-balanced-brackets continuation and the v2 pilot reservations task using the original pinned inputs, and rerun the continuation on the host as requested. This worktree produced synthetic regression evidence only; no actual task was re-audited or rerun here.
 - Host/Claude: retry legacy harness recovery only with the source report's original workspace artifact pins. Review `workspace_verification: published_artifact_hashes` and compared counts in regrade/rerun/continuation provenance. Missing pins, modified source or late source mtimes remain refusals; never replace a historical digest.
 - Host/Claude: review and transfer the unaccounted-cost replacement operation, then use `.venv/bin/python -m eval.runner.rerun_unaccounted --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW` on the completed valid full-B regrade. Recover the full-harness invalid restart casualty through the existing flow first, then apply the sibling operation to any eligible valid interruption-only accounting gap. This worktree did not access those runtimes or run live calls.
@@ -49,10 +56,7 @@
 - Host/Claude: review and transfer this opt-in republication follow-up, then restore historical stderr/finals using `.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN --allow-unpinned` for the intended retained runs. Review run-diagnostics.json.republication.artifacts and published_unpinned counts. This sandbox did not access host backups/private storage or repair retained reports.
 - Host/Claude: review each republication's remaining unpinned counts for missing captures. The default still skips unpinned files; the explicit flag restores only stderr/finals and labels their current published-content hashes. Never backfill historical checkpoint pins. Any later task_false_done_rate/classification refresh remains separate retained-evidence work, with no new models or grading of invalid tasks.
 - Host/Claude: review and transfer this first-occurrence follow-up at a safe boundary, then re-audit retained calibration evidence using the original hash-pinned graders. Earlier public/generic-only changes are committed according to the user; this session claims no host re-audit result.
-- Host/Claude: supply executor-written Python tests under private .corpus/ storage, run ordinary grader validation and review warning counts by task ID. The actual corpus is pending; synthetic tests are not a measurement of its contents.
-- Review repository changes through the final Commit plan. Do not stage or commit here, modify private storage, or run live models. Corpus warnings must never waive public-input validation failures or access-audit evidence.
-- Host: finish/recover baseline-A/Fast calibration as needed, retain every outcome/cost and review diagnostic results before freeze. Final calibration outcomes have not been observed in this worktree.
-- After calibration: revise only at whole-family/type level if needed, build the remaining sixteen planned families, validate the whole population and publish its separate freeze through Role 1.
+- Review repository changes and the authorized private companion changes through the final Commit plan. Do not stage or commit here or run live models. Corpus warnings must never waive public-input validation failures or access-audit evidence.
 - Host recovery remains pending: regrade full B's interrupted terminal/Unicode framing, full harness's quoted heredoc and the retained const-array full-harness record with updated code. Use retained evidence first; other checkouts were not modified here.
 - Host: use the existing infrastructure-only rerun flow for eligible completed harness invalidities; checkpoint-only interrupted/capacity-limited runs resume their original command first. Never rerun a quality failure to improve the score.
 - Preserve C skeletons for the user's authorship, paired comparison scope, five pilot-A reviews and twenty-sample reporting. Disclose historical v1 Luna control underpricing in the final evaluation; do not rewrite retained v1 reports or treat absent task-level metrics as zero.
@@ -60,6 +64,9 @@
 
 ## Decisions
 
+- Keep every pilot task unchanged after the user-reported 15/19 calibration: difficulty increases across the remaining sixteen families, without selecting or dropping tasks by outcome.
+- Make shared-engine instrumentation and structured task handoffs explicit public requirements: every mechanical grading restriction must be derivable from the supplied prompts. Allow absolute imports of the task's own project package.
+- Keep full configs calibration=false while metadata stays frozen=false: host validation and a separate Role 1 freeze must precede full execution.
 - Resolve runtime/root aliases before comparing them and filter saved historical self roots: system temp aliases must not turn a continuation's own workspace or native metadata into protected access.
 - Limit artifact-hash recovery to legacy entries after both digest algorithms fail: source report hashes and exit-bounded mtimes supply independent retained evidence without reconstructing cache history or fabricating a pin. Reject links and incomplete/ambiguous evidence.
 - Preserve original workspace artifact references across regrades and verification counts in per-task provenance: later recovery needs the original pins and reviewers need to distinguish this path from a digest match.
@@ -105,6 +112,10 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/eval/test_v2_support.py -q
+- Worktree validation certification: .venv/bin/python "$LHM_PRIVATE_GRADERS/finalize_expansion.py"
+- Worktree scope check: .venv/bin/python "$LHM_PRIVATE_GRADERS/scope_expansion.py"
+- Host: validate the complete task list from eval/configs/full-v2-a.yaml with eval.runner.validate_graders, normally and with --mutants 100000; require zero survivors/errors per task. Literal --tasks all selects v1.
 - .venv/bin/python -m pytest tests/eval/test_recovery_boundaries.py -q
 - .venv/bin/python -m pytest tests/eval/test_partial_usage.py tests/eval/test_unaccounted_recovery.py tests/eval/test_restart_recovery.py -q
 - Host/completed valid report only: .venv/bin/python -m eval.runner.rerun_unaccounted --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW
@@ -115,13 +126,13 @@
 - .venv/bin/python -m pytest tests/eval -q
 - Host after corpus supply: .venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_GRADERS" --tasks TASK_IDS
 - git diff --check -- eval tests/eval state/STATUS-eval.md
-- git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md
+- git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/reports schemas controller verifier plugin prompts AGENTS.md
 - Host/retained evidence only: python -m eval.runner.regrade --private-root P --from SOURCE --out NEW
 - Host/approved spending only: python -m eval run --config eval/configs/pilot-v2-a.yaml --out eval/reports/pilot-v2-a/
 
 ## Do not touch
 
-- Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. Do not modify private storage in this session; preserve archived originals, other checkouts and other roles' paths.
+- Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. The current user instruction authorizes new private v2 companion files and validation records; preserve v1 graders, archived originals, other checkouts and other roles' paths.
 - Frozen v1 public tasks/graders, retained v1 reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or project-file deletion.
 - No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Model and executor integration checks must use mocks.
@@ -131,6 +142,10 @@
 
 ## Assumptions
 
+- Current expansion: the calibration figures and approval to build all families are supplied by the user, not measured here. Earlier unavailable-private-storage statements below describe prior recovery sessions; this session explicitly permits private writes.
+- The higher requirement count and interaction design are not a measured pass-rate prediction. Final-response timing/honesty still requires retained host executor evidence; offline checks establish report reproducibility only.
+- STOP-3 workload assumptions per Sol call: 20,000 uncached plus 10,000 cached input tokens, with 4,000 output tokens for A/harness or 12,000 for B; per Luna generation: 20,000 uncached plus 2,000 cached input and 4,000 output. These are scenarios, not limits or measured usage.
+- Full B selects the 80 single-session tasks and pins the complete 100-task population; A and harness select all 100. Full configs intentionally refuse unfrozen inputs. Fast costs are workload scenarios from the existing snapshot, with no network fetch or live calls.
 - The reported full-a continuation self-matches and v2 reservations unresolved loop records are user-supplied host observations. The private grader root and host runtimes are unavailable here; synthetic alias/metadata/log fixtures and mocked executors/controllers verify the fixes without claiming host recovery.
 - Historical workspace artifact pins are source-report evidence supplied by the host run. Their presence is never inferred from today's published files; absent pins cause refusal. The fallback checks file bytes, file sets and mtimes, and does not claim reconstruction of historical modes or directory metadata.
 - Full B's 100/100 pass and its interrupted feature-plus-test-partition-sign accounting gap, plus the analogous full-harness gap after casualty recovery, are user-supplied host observations. This offline worktree claims no repaired host metrics and uses synthetic private graders plus mocked executors/controllers/judges only.

@@ -1,3 +1,39 @@
+# Full unfrozen version 2 population — 2026-10-24
+
+Record the user-supplied calibration result (15/19 valid tasks, 0.789,
+95% interval 0.579–0.947) and retain all twenty pilot tasks unchanged. Add the
+remaining sixteen families / eighty tasks with sixteen numbered requirements
+per single-session task and eighteen across two days. Make interacting policies,
+shared call paths, exact constraints and structured day-1 records explicit in
+the public prompts. Keep graders, coverage, references and mutation material
+external; publish task IDs and numbers in reports/full-v2-validation.md.
+
+Offline validation: 100 references pass, 100 starters fail, 1,564 requirements
+have executed mappings, and all 100 graders are distinct. Public assertion
+line overlap is zero. Exhaustive AST mutation validation records 6,092 killed,
+49 explicitly reviewed/hash-bound equivalents and zero survivors. Input pins
+and candidate enumeration are checked independently after all mutation runs.
+Against 376 actual corpus files, retain 20 task warnings / 224 assertion-line
+occurrences; these diagnostics do not waive public-input overlap failures.
+
+Add lexicographic full-v2 A and harness selections over 100 tasks / 120 sessions,
+and B over 80 single-session tasks at Sol max with the 100-task population pin.
+A/harness use Sol medium; all request Fast priority and Codex
+0.163.0-alpha.11.1. Harness uses codex_cli and reinstruction_limit=2. Matched
+STOP-3 estimates use the existing Fast snapshot with 120/80/780 call bounds
+before dynamic judges. New config tests verify population parity and refusal
+before any external call while unfrozen.
+
+Validation: `PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest tests/eval -q`
+— 1611 passed in 233.65s. `git diff --check -- eval tests/eval state/STATUS-eval.md`
+— exit 0. Scope checks: 1,068 changed files, zero protected/pilot changes,
+zero private-root occurrences and zero staged changes.
+
+All metadata remains frozen=false and full configs use calibration=false.
+Claude's host validation, separate freeze and approved benchmark execution remain
+pending. No live model, nested Codex, network, staging or commit operation was
+performed; v1 tasks/graders, retained reports and shared interfaces are unchanged.
+
 # Continuation roots, legacy workspace recovery and literal loops — 2026-10-23
 
 Resolve temp roots, runtime roots and grading roots before comparison. Exclude

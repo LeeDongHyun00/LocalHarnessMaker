@@ -1,0 +1,10 @@
+{
+  "id": "v2-command-dispatch-constrained-refactoring",
+  "type": "constrained_refactoring",
+  "family": "command-dispatch",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}
