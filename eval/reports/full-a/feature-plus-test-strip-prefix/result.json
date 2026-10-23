@@ -1,0 +1,325 @@
+{
+  "task_id": "feature-plus-test-strip-prefix",
+  "task_type": "feature_plus_test",
+  "outcome": "pass",
+  "invalid_reasons": [],
+  "attempts": 1,
+  "session_id": "01a16709-9377-7583-a119-94ac654a1235",
+  "segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T04:34:03.100441+00:00",
+      "events": "exec-1.jsonl",
+      "stderr": "exec-1.stderr",
+      "day": 1,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T04:34:29.688606+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 26.57367451800019,
+      "native_usage": {
+        "input_tokens": 58800,
+        "cached_input_tokens": 52864,
+        "output_tokens": 837
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-xkryy4ia/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-34-05-01a16709-9377-7583-a119-94ac654a1235.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "0c3e7b07dbb7b3f4cc9f3035874ed88ecce0ca1577a2e1f8feca3c0b8f069d36"
+    }
+  ],
+  "two_session": false,
+  "day2_observation": null,
+  "grader_access_audit": {
+    "method": "access_audit",
+    "status": "clean",
+    "root_fingerprint": "9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a",
+    "grader_fingerprints": [
+      "6a801946345e15a1a77c25f2b2fd9f3c23a36193cffc826b7711c901c3d5111d"
+    ],
+    "line_fingerprints": [
+      "0048c51e1ec1efa860500f19ff18c7972944bbf312850082e703c8fe1e3e371d",
+      "0092cd218c95e12887634a9a6cff9252ab7b9ebcc41f75448dcb805c906decc5",
+      "037d468d83d54cd8667b9a6e4b99997f0cdab164c6dcff2c8202be4ba0eb0153",
+      "097dc88adcd223b44e0dca00392fe700074b94a9842b58e4bf48c131c47225de",
+      "10125b721080de432f39c94ce03fa29f429937f39d2b020c2d19f9bae1d5d605",
+      "13da8201a04dd988472071dfafe421ba3edd88c3f2ffdf459590b3d74d8b1c9e",
+      "179498b8aa0b7874b0e17a6442d5aabda94dd44b674f5467e2e521edb3d9d5f4",
+      "1dd7f836067ba24b1522ee05047963b49b5a98df141af52604da28a3a67becf9",
+      "20e2aac1bf3cd97b36f97eb0e68548209ca977dcda8f0826cca34f72dfce2005",
+      "247dba064e9fb8782c29f7c0e78278e1abbe2de64b3cfd3f6d1326324ea1bdf5",
+      "24f072eac29efcdfd46d7797d2879a7c112a7ace3bf19ec50ab5f1211c267c3b",
+      "2aec93a620f366d7f1ba48061fd09f89fcbce0716ec666a19c705f543590baa7",
+      "2cb3e84c03d15c9862c51d64bba5ffe08edafa66c815fb331ac5321f8aeb20db",
+      "3014960e9feaa28b21306af1395999614fdf2a03fbb26a8939099738f1ee05a9",
+      "33110429c1e4fbaedf92df36a2d840bd5b4bcfe2660422f0a660f507279ec350",
+      "347ad76bc9b78d6fea945f685a0ccf53dc00debe8bc865807f37c451086ae148",
+      "3e280b2fd5b22c7f55860376406b1cffe002b47b47fdf7f7e5008e7236388fce",
+      "4a5c4477af82bab077076ec05739f44456633daabebc65407dc9e0cac2cfb843",
+      "4abc6d081e40371e3c9edab67f6127f81b64b9c49b94c9724b5031c25e11239d",
+      "4b1977cf2657454b4711db3c3f7bd7ab70f64769cc18cca688292481586bab8d",
+      "4b82f2af03117228130f5a73d0d4d21d135cc830b8d2fe621101a8d631ffe8bb",
+      "4ca013c5b46f9b5e217bacfa5a65e01046b1c2674af2ac330bc74dbd1ff9d22f",
+      "5423e637c1a6ad390f4ec96e3a1812e36492c3264d1ea77669e296e0986483ae",
+      "5811ce42190c8c5699992bc88e9f223ecdc128bdb661c178c5d602ca9e67b7c6",
+      "6806f415c5914586d129d3f9950fd57a56eceddefd5a09913814064394abbe59",
+      "68e767b85c03cee9313df944026d29666f9e95ac76743ba864d9991ff9c32f00",
+      "6b3e1ff9287b37c4fcc2925a370fa7a17ebe3fab6f890397aa98c61b548ac207",
+      "6c969e3c75df140a5cfef2d849ce397ecef4a177b62fe69a5ce3459a0c5a4188",
+      "6eb564538980b4bc58751edb955ec4407307dabff9e4408cc1dd97be37ee4af0",
+      "70b951faecb2a60651d97a6fcf5ca743fbc3aa0ac626a6d200f92bf9d616a684",
+      "73ea69f8feb19cafcdacce1cd65e281c3b03c92375bb0dd7cbb2998a4d056a4e",
+      "772fcfa050950f286d2ab2f80e869843ed04f6a64ebd1b0f8f8b960843c3a835",
+      "7a1841fe5645eb61cd26cb0a9a66827f48033363cef9d6dea260189bd3de2b83",
+      "7d2bb93833f57376fd45d4d9d5b81a49064182dbf3f08d48963ece5737585d95",
+      "7e0f060013d4289a6b942ef9c410b4b98f262a0926a3f4e1f7d08a656cf0672e",
+      "7e9fd7fc24aa23a1a073ac3954ad4fb3a323451db969ba20df49a7326335e3bc",
+      "7f38c526ebe9ff7fafbeb9959f8826fe43f67991fed36f410f0baad0338bb9e4",
+      "84aad23556b6536c21c8242a80a3844210fea9f41bbca8d331e62a2519d64ca9",
+      "9028ef26e0d021602104ea046bc0d3d973815cf57face8331d261cfde647f2db",
+      "98a4c9067b72bca2b25e490f2598b7029cad5d55eb3f6a0b88dff7bc7d6c7ad6",
+      "9b54079cf246b0ea0f513a924e212b3cd2afeb41580d3171773963e195ee6837",
+      "9def9842bc9dc1f24ce19a0f439d8e6a60ee77cca17b84d275865ea5bd3eb9dc",
+      "a0444898bc97b4fcdafccf8c38d72ca967291b0e37321bd87b38d55588f4c186",
+      "a7eb2f1cb690f44b169e1f19667ddf58cef53588d01e15c7e3bf37e81e552104",
+      "a9e83dbf885db332dc63585c823fcb3d449ccd395676237e5bbdd911cda56ad0",
+      "ab38fbff69aaabb6b6126136da26a165a1ec0375db22e22837323f8e18c2866d",
+      "abae5faa2e8188ee10504dbf04ed71ad0cdb52064c3fd6db7771dd0a34d42962",
+      "b02a9aa9be5ea929c31fb36d372e73ee0c141e26dac396ec4cbc092c248935a3",
+      "bcf3dbf51448a2e620461d7ea48032f1a41051e1c4dbdf14967fa2fb38b9cc21",
+      "bf6ef0f856d3e8521fbf0feab1a535c61433db1a42aeca272889b64580316350",
+      "bfdc1cfa08991846df86b3d3f343ee9171f45b0c42041033abd3ee09dbdc6a65",
+      "c9bbc3df5372d5b4763fa6315d975b3dbee242e56dd62d06c8335cb10213af5b",
+      "cc45c9ff8ec0c5110750377636b49924500b49a195f99fe5104f3cc961bf35d0",
+      "d0fffd212b1ecca72c3701ab58ca376ace28b7076901240a2c1300f0d2aedeb2",
+      "de3e7649f61d25cb9290dac2b45b711b36821b94b6e003cfb17a207a51765870",
+      "e433c4d3cd282d2340c2f47a49af2d4aa3cb68df0cc05f52dbfc42133454d891",
+      "e65f65aa83bcaeb99f1367bd0fd2ccd512ae6bb5eb43e2cac900b493ebf221da",
+      "e722634993cc3f535416f7f984ba2de28244f10a9398c79c618e3cbdaffdeaf8",
+      "f0c9529e5d106022327779a07875353c47d09bb63ca23a0358cf856501a5ce6a",
+      "f1a0ccbf594090d32ed419241a00e8333b00b8050e9286fb34d640f206ba0631",
+      "f387f147fb9df8b45a98f8ffa9cfb64e23e1ab9afac4d229ef305983ff62cf49"
+    ],
+    "logs": [
+      {
+        "name": "exec-1.jsonl",
+        "sha256": "bb88b03e6889de23492fc985462637cdd5961604533e2a2edc1daa9f18df3f39",
+        "bytes": 3668
+      },
+      {
+        "name": "rollout-2026-10-23T13-34-05-01a16709-9377-7583-a119-94ac654a1235.jsonl",
+        "sha256": "86166a56b7ae10a7483d1722e32190e8d4e6d03de763b7deddb151be3492988f",
+        "bytes": 67495
+      }
+    ],
+    "matches": [],
+    "errors": [],
+    "scope": "Observed tool events and native metadata; a clean audit does not prove isolation."
+  },
+  "grading": {
+    "result": "pass",
+    "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-b02d9387869047bab591577dfb17ce97",
+    "copied_at": "2026-10-23T04:34:30.922389+00:00",
+    "executor_already_exited": true,
+    "grader_source_outside_repository": true,
+    "exit_code": 0,
+    "timed_out": false,
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "total_tests": 5,
+    "log": "grading.log"
+  },
+  "verdicts": [],
+  "pricing_evidence": {
+    "tier": "standard",
+    "basis": "native turn_context when present; otherwise Standard baseline assumption"
+  },
+  "settings_evidence": {
+    "verified": true,
+    "source": "native_session_jsonl.turn_context + native_session_jsonl.event_msg.thread_settings_applied",
+    "observed": [
+      {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      }
+    ],
+    "exec_json_exposes_effort": false
+  },
+  "usage": {
+    "billing_basis": "chatgpt_subscription",
+    "tokens": {
+      "input_tokens": 58800,
+      "cached_input_tokens": 52864,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 837,
+      "reasoning_output_tokens": 0
+    },
+    "billed_usd": null,
+    "plan_usage": {
+      "availability": "account_snapshots",
+      "snapshots": [
+        {
+          "timestamp": "2026-10-23T04:34:12.327Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T04:34:14.964Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T04:34:25.831Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T04:34:28.243Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        }
+      ],
+      "exact_task_consumption": null,
+      "limitation": "Account-wide, rounded snapshots; first observation may follow usage. Concurrent sessions prevent exact task attribution."
+    }
+  },
+  "executor_runs": [
+    {
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-23T04:34:03.100441+00:00",
+      "exited_at": "2026-10-23T04:34:29.688606+00:00",
+      "tokens": {
+        "input_tokens": 58800,
+        "cached_input_tokens": 52864,
+        "output_tokens": 837
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-23T04:34:28.243Z",
+          "primary_used_percent": 9.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-23T04:34:12.327Z",
+          "primary_used_percent": 9.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    }
+  ]
+}
