@@ -405,6 +405,17 @@ def run(
                  "pricing_snapshot_id": json.loads((REPOSITORY / "eval/prices.yaml").read_text())["snapshot_id"],
                  "pricing_catalog_sha256": digest((REPOSITORY / "eval/prices.yaml").read_bytes())}
         write_json(checkpoint, state)
+    # A recovery wrapper may have just regraded completed tasks. Keep their
+    # accounting and artifacts intact while the normal loop runs fresh tasks;
+    # rebuilding them would reprice history and overwrite hash-pinned evidence.
+    retained_tasks: dict[str, Any] = {}
+    if (out / "report.json").is_file():
+        prior_report = json.loads((out / "report.json").read_text())
+        retained_tasks = {task["task_id"]: task for task in prior_report["tasks"]
+                          if state["tasks"].get(task["task_id"], {}).get("result")}
+        from eval.runner.pricing import retained_provenance
+        for task in retained_tasks.values():
+            retained_provenance(task, prior_report["metadata"]["pricing"])
     order = list(config["tasks"])
     random.Random(config["seed"]).shuffle(order)
     stop_reason: str | None = None
@@ -896,7 +907,8 @@ def run(
                             f"attempted={attempted}, configured={configured}")
     pricing = json.loads((REPOSITORY / "eval/prices.yaml").read_text())
     try:
-        shared_tasks = [build_task(t, state["tasks"][t["task_id"]], out / t["task_id"], config, pricing,
+        shared_tasks = [retained_tasks[t["task_id"]] if t["task_id"] in retained_tasks else
+                       build_task(t, state["tasks"][t["task_id"]], out / t["task_id"], config, pricing,
                                   json.loads((task_directory(config) / t["task_id"] / "meta.json").read_text())) for t in tasks]
         report = build(config, state, shared_tasks, actual_version, REPOSITORY)
     except ValueError as exc:

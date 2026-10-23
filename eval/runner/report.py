@@ -14,7 +14,7 @@ from eval.metrics import METHOD, compute, metric, total
 from eval.runner.audit import digest
 from eval.runner.control_accounting import control_calls
 from eval.runner.telemetry import records, session_id
-from eval.runner.pricing import select, report_pricing
+from eval.runner.pricing import select, report_pricing, pin_provenance, retained_provenance, snapshots
 from eval.runner.schema_compat import validate_schema
 from eval.runner.limits import capacity_message, capacity_refusal_without_items
 
@@ -124,7 +124,7 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
         control_usd = (None if history["control_usd"] is None or control_usd is None else
                        total([c["usage"]["usd"] for c in calls if c["purpose"] != "executor"]))
         executor_usd = total([c["usage"]["usd"] for c in calls if c["purpose"] == "executor"])
-    (out / "pricing-provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    (out / "pricing-provenance.json").write_text(json.dumps(pin_provenance(provenance, pricing), indent=2) + "\n")
     # Offline regrade has a fresh output directory; reuse only hash-pinned
     # published final messages, never an unpinned workspace file.
     for ref in meta.get("artifacts", []):
@@ -213,6 +213,7 @@ def validate(report: dict[str, Any], repository: Path) -> None:
         raise ValueError("Duplicate call identifiers")
     for task in tasks:
         validate_session_versions(task, report["metadata"]["codex_version"])
+        retained_provenance(task, report["metadata"]["pricing"])
         if task["attempts"] != max(1, sum(not capacity_message([evidence_path(s["events"]["path"])]) for s in task["executor_segments"])) and task["outcome"] != "invalid":
             raise ValueError("Attempt/segment count mismatch")
         previous = None
@@ -239,6 +240,10 @@ def validate(report: dict[str, Any], repository: Path) -> None:
             raise ValueError("Claim counts mismatch")
         for call in task["calls"]:
             u = call["usage"]
+            if u["pricing_ref"] is not None and not any(
+                    s["snapshot_id"] == u["pricing_ref"] and any(r["model"] == call["model"] for r in s["rates"])
+                    for s in snapshots(report["metadata"]["pricing"])):
+                raise ValueError("Call pricing snapshot unavailable")
             if u["cached_input_tokens"] is not None and u["input_tokens"] is not None and u["cached_input_tokens"] > u["input_tokens"]:
                 raise ValueError("Cached tokens exceed input tokens")
         executor = total([c["usage"]["usd"] for c in task["calls"] if c["purpose"] == "executor"])

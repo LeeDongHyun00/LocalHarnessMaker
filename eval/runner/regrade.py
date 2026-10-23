@@ -192,7 +192,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         for key in ('calls', 'costs', 'done_claims'):
             shared[key] = copy.deepcopy(old_task[key])
         from eval.runner.pricing import preserve_provenance
-        preserve_provenance(shared, task_out, prior=old_task)
+        preserve_provenance(shared, task_out, prior=old_task, pricing=original['metadata']['pricing'])
         tasks.append(shared)
     report['tasks'] = tasks
     report['metrics'] = compute(tasks, seed=original['metadata']['confidence']['seed'],

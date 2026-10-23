@@ -1,3 +1,38 @@
+# Recovery control costs and mixed-snapshot provenance — 2026-10-24
+
+Use the executor's tier resolver for pinned control_call records: explicit
+service_tier first, then the known model default when omitted/null. Record the
+inference in pricing_evidence; unknown models, unsupported tiers and incomplete
+usage remain unknown. rerun_invalid, rerun_unaccounted and continue_day2 reuse
+the normal runner's hash-pinned fresh stderr and control accounting.
+
+Preserve completed tasks' calls, costs and provenance artifacts when the normal
+runner builds a recovery report. Rebuilding those files previously changed
+their bytes while the recovery wrapper kept the earlier artifact hashes. The
+read-only recovered3 copy has 119 such stale pricing-provenance hashes; its
+fresh selected task's hash matches. No retained report was modified here.
+
+Pin each referenced snapshot's complete-content SHA-256 in call provenance,
+and verify it against the metadata catalog independently of the top-level
+snapshot_id. Validate call pricing_ref/model membership across all catalog
+snapshots. Accept legacy evidence without the new per-snapshot pins, preserve
+historical accounting, and continue rejecting altered artifacts or snapshots.
+All changes use eval-owned artifact content; schemas and CLI flags are unchanged.
+
+Regression coverage includes retained v1 reports with Standard calls plus fresh
+Fast controls, a one-task invalid/unaccounted rerun followed by checkpoint reuse
+and two regrades, day-2 control stream pins, explicit/default/unknown tiers and
+provenance tampering.
+
+Assumptions: reported host outcomes remain host observations. This session uses
+this worktree's .venv, synthetic graders and mocked model transports only; host
+regeneration from the original pinned source remains pending.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1690 passed in
+313.94s. `git diff --check` passes. Scope audit: 11 exact authorized paths,
+six STATUS headings, zero staged paths and no report-copy path in changed files.
+Frozen tasks, retained reports and shared interfaces remain unchanged.
+
 # Version 2 baseline B population regression — 2026-10-24
 
 Confirm full-v2-b.yaml already lists all 100 tasks in task_population, in

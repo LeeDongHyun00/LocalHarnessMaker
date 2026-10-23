@@ -10,6 +10,7 @@ from eval.runner.pricing import select
 from eval.runner.audit import digest
 from eval.runner.limits import capacity_refusal_without_items
 from eval.runner.publication import safe_source
+from eval.runner.telemetry import _pricing_tier
 
 
 def control_calls(entry: dict[str, Any], task_id: str,
@@ -124,7 +125,11 @@ def control_calls(entry: dict[str, Any], task_id: str,
             i, c, o = counts.values()
             if i is not None and c is not None and c > i:
                 counts["cached_input_tokens"] = c = None
-            tier = value.get("service_tier")
+            observed_tier = value.get("service_tier")
+            tier, inferred = _pricing_tier([observed_tier], model, None)
+            pricing_evidence = {"tier": tier, "basis": (
+                "Tier inferred from the model default; control_call.service_tier omitted/null"
+                if inferred else "controller control_call.service_tier only")}
             rate, pricing_ref = select(pricing, model, tier)
             if i is not None and i > 272000:
                 rate, pricing_ref = None, None
@@ -142,8 +147,9 @@ def control_calls(entry: dict[str, Any], task_id: str,
                                     "cost_basis": "api_equivalent_usd",
                                     "pricing_ref": pricing_ref}})
             if provenance is not None:
-                provenance.append({"call_id": calls[-1]["call_id"], "observed_service_tier": tier,
-                    "basis": "controller control_call.service_tier only", "pricing_ref": pricing_ref,
+                provenance.append({"call_id": calls[-1]["call_id"], "observed_service_tier": observed_tier,
+                    "pricing_evidence": pricing_evidence, "basis": pricing_evidence["basis"],
+                    "pricing_ref": pricing_ref,
                     "stderr_sha256": pinned[name],
                     "record_sha256": digest(json.dumps(value, sort_keys=True).encode())})
         exit_code = process.get("exit_code")
