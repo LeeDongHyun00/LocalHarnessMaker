@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 
+from verifier.causes import Cause
 from verifier.rules import command_rule, evaluate, file_rule, regex_rule
 from verifier.sandbox import Execution
 
@@ -117,6 +118,45 @@ def test_mechanical_unverifiable_causes(
     result = evaluate(check, workspace)
     assert result.status == "unverifiable" and result.cause.value == cause
     assert reason in result.reason
+
+
+@pytest.mark.parametrize("kind", ["file_exists", "regex"])
+@pytest.mark.parametrize("path", [
+    "X and Y contain a docstring and at least three test methods; verify them",
+    "X and Y contain a docstring", "report.txt other.txt", "report.txt;other.txt",
+    "report.txt,other.txt", "report.txt|other.txt", "report.txt&other.txt",
+    "/tmp/report.txt", "C:\\work\\report.txt", "\\\\host\\share\\report.txt",
+    "../report.txt", "nested/../report.txt", "nested\\..\\report.txt",
+    "*.py", "tests/test_?.py", "tests/test_[ab].py", "{app,tests}/test.py",
+    "", "report.txt\n", "report\x00.txt",
+])
+def test_invalid_criterion_paths_are_contract_caused_before_filesystem_access(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch, kind: str, path: str,
+) -> None:
+    def forbidden(*args: Any, **kwargs: Any) -> Any:
+        pytest.fail("invalid contract paths must not reach filesystem resolution")
+
+    monkeypatch.setattr(Path, "resolve", forbidden)
+    check = {"type": kind, "path": path}
+    if kind == "regex":
+        check["pattern"] = "ok"
+    result = evaluate(check, workspace)
+    assert result.status == "unverifiable" and result.cause == Cause.CONTRACT
+    assert result.reason.startswith("contract path rejected:")
+    assert f"path: {path}" in result.evidence
+
+
+@pytest.mark.parametrize("kind", ["file_exists", "regex"])
+@pytest.mark.parametrize("path", ["missing", "tests/test_example.py", "./nested/result.txt", "..report.txt"])
+def test_plausible_missing_criterion_paths_remain_workspace_caused(
+    workspace: Path, kind: str, path: str,
+) -> None:
+    check = {"type": kind, "path": path}
+    if kind == "regex":
+        check["pattern"] = "ok"
+    result = evaluate(check, workspace)
+    assert result.status == ("fail" if kind == "file_exists" else "unverifiable")
+    assert result.cause == Cause.WORKSPACE
 
 
 @pytest.mark.parametrize("execution,cause", [

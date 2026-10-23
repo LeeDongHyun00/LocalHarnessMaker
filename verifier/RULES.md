@@ -35,18 +35,36 @@ Invalid options are contract defects. Missing local command input is a workspace
 defect and can be repaired by the executor. Arbitrary project test code still
 runs under Seatbelt; the command parser is defense in depth.
 
+## File and regex paths
+
+`file_exists` and `regex` require one relative literal workspace path. Validation
+rejects whitespace/control characters, prose or operand separators (`;`, `,`,
+`|`, `&`), glob/expansion characters (`*`, `?`, `[`, `]`, `{`, `}`), absolute or
+drive/root-qualified paths (including Windows spellings), and any `..` component.
+These are contract-caused unverifiable items, rejected before filesystem access.
+Symlink escapes remain rejected. Whitespace-containing filenames are outside
+this conservative single-token criterion path policy.
+
+A plausible missing path such as `tests/test_app.py` remains workspace-caused:
+`file_exists` reports fail and `regex` reports unverifiable, so the executor can
+create the required file. A malformed path is never repaired by asking the
+executor to create a file named after contract prose.
+
 ## Actionable re-instruction
 
 Every status=fail item is actionable, including claimed_without_evidence.
-Unverifiable items retry only when explicitly classified as workspace-caused.
+An llm_judge item retries only with status=fail; status=unverifiable never
+retries, even when the judge inspected the workspace. Mechanical unverifiable
+items retry only when explicitly classified as workspace-caused.
 `verifier/causes.py` defines the internal categories; Result/Execution carry
 these to verdict assembly, which passes them to reinstruct without adding
 schema fields. Selection never guesses a cause from model-generated reason text.
 
 | Unverifiable cause | Examples | Re-instruct |
 | --- | --- | --- |
-| workspace | Missing local command input, missing dependency/path or denied resource reported by executed workspace code, unreadable/missing regex input, valid judge result unable to confirm the workspace criterion | Yes |
-| contract | No mechanical criteria/empty criteria, rejected or unsupported commands/options, external paths, invalid regex | No |
+| workspace (mechanical) | Missing local command input, missing dependency/path or denied resource reported by executed workspace code, unreadable/missing plausible regex input | Yes |
+| workspace (judge review) | Schema-valid judge response unable to confirm the criterion, including requests for test execution evidence absent from the snapshot | No |
+| contract | No mechanical criteria/empty criteria, rejected or unsupported commands/options, malformed/external/traversing/glob criterion paths, invalid regex | No |
 | verifier | Sandbox unavailable/setup failure, command launch/capture failure, no exit code, command deadline or signal termination | No |
 | transport | Judge launch failure, nonzero exit, malformed/invalid output, delegation timeout | No |
 | budget | Verification budget exhausted before dispatch | No |
@@ -57,7 +75,9 @@ conservatively non-actionable. Unknown causes are also non-actionable.
 
 A successfully delegated, schema-valid judge response keeps its status, reason
 and evidence unchanged, including an unverifiable response. Such a response is
-classified as workspace review, unlike transport or validation failures. Other
+classified as workspace review, unlike transport or validation failures, but
+uncertainty does not establish a repair the executor can make. The item retains
+the judge's reason even when feedback is null. Other
 unverifiable reasons identify the specific rejection, missing input, verifier
 failure, timeout or budget cutoff. Contract quality warnings skip delegation.
 

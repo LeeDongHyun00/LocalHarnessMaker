@@ -217,3 +217,28 @@ def test_mixed_verdict_retries_only_workspace_failure(
     message = verdict["reinstruct_message"]
     assert message is not None and message.startswith("Items 2 are not done.")
     assert "Unsupported command" not in message and "SC-4" not in message
+
+
+@pytest.mark.parametrize("kind", ["file_exists", "regex"])
+@pytest.mark.parametrize("path", [
+    "X and Y contain a docstring and at least three test methods; verify them",
+    "X and Y contain a docstring", "app.py;test_app.py", "/tmp/app.py",
+    "nested/../app.py", "tests/test_*.py", "tests/test_app.py",
+])
+@pytest.mark.parametrize("attempt", [1, 2, 3])
+def test_criterion_path_actionability_in_verdict(
+    contract: dict[str, Any], workspace: Path, transcript: Path, kind: str, path: str, attempt: int,
+) -> None:
+    check = {"type": kind, "path": path}
+    if kind == "regex":
+        check["pattern"] = "ok"
+    contract["success_criteria"] = [{"id": "SC-1", "description": "Check output", "check": check}]
+    verdict = check_contract(contract, workspace, transcript, attempt)
+    plausible = path == "tests/test_app.py"
+    item = verdict["items"][0]
+    assert verdict["overall"] == "fail"
+    assert item["status"] == ("fail" if plausible and kind == "file_exists" else "unverifiable")
+    assert (verdict["reinstruct_message"] is not None) == (plausible and attempt < 3)
+    if not plausible:
+        assert item["reason"].startswith("contract path rejected:")
+    validate(verdict, "verdict.schema.json")

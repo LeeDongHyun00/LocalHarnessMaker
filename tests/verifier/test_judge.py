@@ -144,21 +144,38 @@ def test_input_validation_before_subprocess(criterion: dict[str, Any], workspace
 
 
 @pytest.mark.parametrize("status", ["pass", "fail", "unverifiable"])
+@pytest.mark.parametrize("attempt", [1, 2, 3])
 def test_mixed_contract_delegates_only_judge(contract: dict[str, Any], criterion: dict[str, Any],
                                             judgment: dict[str, Any], workspace: Path, transcript: Path,
-                                            monkeypatch: pytest.MonkeyPatch, status: str) -> None:
+                                            monkeypatch: pytest.MonkeyPatch, status: str, attempt: int) -> None:
     contract["success_criteria"] = [{"id": "SC-1", "description": "File exists", "check": {
         "type": "file_exists", "path": "report.txt"}}, copy.deepcopy(criterion)]
     monkeypatch.setenv("HARNESS_BACKEND", "local")
     judgment["status"] = status
     calls = mock_judge(monkeypatch, judgment)
-    verdict = check_contract(contract, workspace, transcript, 1)
+    verdict = check_contract(contract, workspace, transcript, attempt)
     assert verdict["overall"] == ("pass" if status == "pass" else "fail")
     assert verdict["items"][1] == {"id": "SC-4", "status": status, "reason": judgment["reason"],
                                      "evidence": judgment["evidence"]}
-    assert (verdict["reinstruct_message"] is not None) == (status != "pass")
+    assert (verdict["reinstruct_message"] is not None) == (status == "fail" and attempt < 3)
     assert len(calls) == 1
     assert calls[0][0][calls[0][0].index("--backend") + 1] == "local"
+
+
+def test_judge_uncertainty_preserved_while_missing_workspace_input_retries(
+    contract: dict[str, Any], criterion: dict[str, Any], judgment: dict[str, Any],
+    workspace: Path, transcript: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    contract["success_criteria"] = [criterion, {"id": "SC-2", "description": "Report content", "check": {
+        "type": "regex", "path": "missing.txt", "pattern": "ok"}}]
+    judgment.update(status="unverifiable", reason="the snapshot does not show any test execution result",
+                    evidence="llm_judge: examined workspace; code meets the criterion")
+    calls = mock_judge(monkeypatch, judgment)
+    verdict = check_contract(contract, workspace, transcript, 1)
+    assert len(calls) == 1 and verdict["overall"] == "fail"
+    assert verdict["items"][0] == {"id": criterion["id"], "status": judgment["status"],
+                                   "reason": judgment["reason"], "evidence": judgment["evidence"]}
+    assert verdict["reinstruct_message"].startswith("Items 2 are not done.")
 
 
 def test_all_judge_quality_warning_does_not_delegate(contract: dict[str, Any], criterion: dict[str, Any],

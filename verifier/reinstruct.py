@@ -19,12 +19,15 @@ def reinstruct(
     if attempt >= limit:
         return None
     descriptions = {c["id"]: c["description"] for c in criteria}
+    judged = {c["id"] for c in criteria if c.get("check", {}).get("type") == "llm_judge"}
     # Unknown unverifiable causes fail closed: do not spend executor attempts on
-    # infrastructure. Only checks explicitly classified as workspace can retry.
+    # infrastructure. Only mechanical checks explicitly classified as workspace
+    # can retry; judge uncertainty cannot establish an actionable repair.
     causes = causes or {}
     failed = [(n, item) for n, item in enumerate(items, 1)
               if item["status"] == "fail" or (
-                  item["status"] == "unverifiable" and causes.get(item["id"]) == Cause.WORKSPACE)]
+                  item["status"] == "unverifiable" and item["id"] not in judged
+                  and causes.get(item["id"]) == Cause.WORKSPACE)]
     if not failed:
         return None
     # At most three detailed entries fit; further failed items are counted.

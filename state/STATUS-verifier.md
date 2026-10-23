@@ -1,5 +1,9 @@
 ## Done
 
+- Restricted judged-item re-instruction to status=fail; unverifiable judge reasons/evidence remain exact, overall=fail remains, and uncertainty uses no feedback detail/overflow slots, including mixed workspace failures (.venv/bin/python -m pytest tests/verifier -q: 476 passed, 8 skipped in 11.54s; mocked judge and direct feedback regressions at attempts 1–3).
+- Classified malformed file_exists/regex paths as contract-caused before filesystem access: prose/whitespace, separators, absolute/drive-qualified paths, any parent traversal and globs do not retry; plausible missing paths remain workspace-caused/actionable (.venv/bin/python -m pytest tests/verifier -q: 476 passed, 8 skipped in 11.54s; lexical-validation and assembled-verdict regressions).
+- Updated verifier/RULES.md and verifier/CHANGES.md with the measured futile-retry corrections, verification and explicit path-policy assumptions (.venv/bin/python -m pytest tests/verifier -q: 476 passed, 8 skipped; all eight skips are pending host Seatbelt verification).
+- Reviewed the owned-path diff and confirmed no whitespace errors; concurrent Role 3 controller/test changes were left untouched (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output; git status --short: nine modified owned files plus concurrent Role 3 changes).
 - Added unittest discover (-s/-p/-t, -v/-q/-b/-f/-k), local module/dotted/file targets and pytest -x/-k/-rA/--tb=short/-p no:cacheprovider with option-aware operands, path/symlink containment, shell rejection and unchanged -c AST checks/Seatbelt isolation (.venv/bin/python -m pytest tests/verifier -q: 369 passed, 8 skipped in 4.74s).
 - Restricted feedback to fail and explicitly workspace-caused unverifiable items using internal workspace/contract/verifier/transport/budget categories; no actionable item yields null feedback with overall=fail preserved and no schema changes (.venv/bin/python -m pytest tests/verifier -q: 369 passed, 8 skipped; cause-category, mixed-status, missing-input, quality, budget and judge-result/delegation regressions).
 - Documented command support and retry causes in verifier/RULES.md, linked README, and wrote the change summary/Assumptions in verifier/CHANGES.md; added host passing/failing unittest discover tests (.venv/bin/python -m pytest tests/verifier -q: 369 passed, 8 skipped; all eight Seatbelt cases pending Claude's host run for this change).
@@ -45,7 +49,7 @@
 ## Remaining
 
 - First priority, pending Claude's host run: all six existing Seatbelt tests and the two new passing/failing unittest discover cases. Host command: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. Historical host passes below do not verify this change; no sandbox-exec ran here.
-- Pending host integration: rerun the two-task proposed-system smoke and confirm unittest criteria execute and non-actionable unverifiable verdicts stop without spending remaining executor attempts. No network, nested Codex or live model calls ran here.
+- Pending host integration for this change: rerun the proposed-system smoke and confirm judged unverifiable items and contract-invalid file/regex paths stop without spending remaining executor attempts, judge fail items still retry, and plausible missing paths remain actionable. Also confirm unittest criteria execute. No network, nested Codex, live model calls or sandbox-exec ran here.
 - Pending host verification for this change: exercise the new judge_delegation/control_call/control_cli_events stderr protocol with the real controller and Role 5's parser, including failed/retried calls and timeout/budget paths. No network, nested Codex or live model calls ran here.
 - Pending host verification: observe real controller/Codex descendants and the 450-second verifier budget within Role 2's 480-second hook deadline, including children creating their own sessions. Claude's completed macOS EPERM/pipe-holding process-tree checks are recorded in Done; those specific checks are no longer pending.
 - Pending host verification: sample a completed proposed-system evaluation report after Role 5 writes it; synthetic schema-valid reports cover D-3 locally. Do not touch the host's in-progress evaluation.
@@ -57,7 +61,9 @@
 
 ## Decisions
 
-- Supersede the earlier blanket H3 retry policy: the user's live-smoke refinement retries fail items and workspace-caused unverifiable items only; contract/verifier/transport/budget defects cannot be repaired in an executor turn.
+- Supersede the earlier workspace-judge retry rule: the user's first live measurement shows judge uncertainty can request evidence the workspace cannot contain; judged items retry only on fail and preserve unverifiable reasons without feedback.
+- Validate file/regex paths lexically before resolving them: malformed contract prose, multiple operands, absolute paths, parent traversal and globs cannot be repaired by executor workspace edits; plausible missing paths remain workspace causes.
+- Refine the earlier blanket H3 retry policy: retry fail items and explicitly workspace-caused mechanical unverifiable items only; contract/verifier/transport/budget defects and judge uncertainty do not justify executor retries.
 - Carry explicit internal cause metadata through Execution/Result into reinstruct without serialized fields: preserve the verdict schema and valid judge reason/evidence while avoiding classification based on generated text.
 - Retain conservative non-actionable command timeouts and unknown causes: a deadline alone cannot prove a workspace defect, especially when capped by the remaining verification budget.
 - Parse selection expressions, discovery patterns and plugin disabling separately from paths: common test options must not be mistaken for workspace filenames, and arbitrary pytest plugins remain rejected.
@@ -113,8 +119,11 @@
 
 ## Assumptions
 
+- Criterion paths use conservative single-token literal syntax: whitespace-containing filenames, prose/operand separators (; , | &), glob/expansion characters (* ? [ ] { }) and Windows drive/root spellings are rejected even if the filesystem could store such names. Safe ./ prefixes and names such as ..report.txt remain plausible.
+- The user's futile-retry corrections take priority over Remaining's host checks and supersede the earlier workspace-judge retry rule and role-prompt rule 6. No shared schema, CLI or hook interface changes are needed.
+- This session is confined to the separate worktree and its .venv; only owned verifier implementation/docs/tests/STATUS paths are edited. .git is read-only, with no staging or commits; no main-checkout or live-evaluation work is performed.
 - Short option operands accept attached/separate spelling; unittest positional discovery START/PATTERN/TOP is also supported with the same path checks. Discovery patterns are filename globs, not directory operands.
-- Schema-valid judge uncertainty is treated as workspace review and retains the supplied reason/evidence. Delegation errors/timeouts are transport failures. A command timeout or unclassified failure is conservatively non-actionable.
+- Schema-valid judge uncertainty retains the supplied reason/evidence as workspace review, but is never re-instructed. Delegation errors/timeouts are transport failures. A command timeout or unclassified failure is conservatively non-actionable.
 - Current host verification remains pending for all eight Seatbelt cases regardless of historical host results. Only .venv/bin/python -m pytest tests/verifier -q ran in this session; other roles' concurrent files and .git were not modified.
 - This session follows the user's unittest/pytest command support, actionable retry and host-pending STATUS priority order. This instruction supersedes role-prompt rule 6 and earlier H3 decisions; shared schemas, CLI flags and hook interfaces remain unchanged.
 - The role prompt does not specify sample filename, seed, review format or handling of small pools: use verifier-sample.json, seed 42, documented review JSON and up to n verdicts (including an explicit empty result). These choices are recorded in verifier/README.md and verifier/CHANGES.md for review.
@@ -123,7 +132,7 @@
 - Supplied host results are evidence from Claude reported by the user, not commands rerun here. They complete the specific Seatbelt, macOS EPERM/pipe-holding cleanup and live handoff acceptance items, but do not verify this session's new accounting protocol or live sampling.
 - The post-exit drain bound is 200 ms; any output still unavailable after that bound is omitted while preserving the completed child's own exit code. Actual same-group descendants are killed before this drain.
 - Same-state handoff entries may represent multiple artifacts or remaining steps; only contradictory done/remaining membership is rejected beyond the schema, without adding an unspecified uniqueness requirement.
-- Re-instruction includes status=fail and explicitly workspace-caused unverifiable only. Up to three actionable items receive details and further actionable items are counted; no actionable items ends feedback before exhaustion.
+- Re-instruction includes status=fail and explicitly workspace-caused mechanical unverifiable only. Judged unverifiable items never retry. Up to three actionable items receive details and further actionable items are counted; no actionable items ends feedback before exhaustion.
 - Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
 - HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. Verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS defaults to 120 and HARNESS_VERIFY_BUDGET_SECONDS to 450; both must be finite and positive.
 - The two-second reserve covers graceful group termination. Post-KILL reaping uses at most two 0.1-second waits per direct child; verdict serialization and scheduling use the margin before the 480-second outer deadline.

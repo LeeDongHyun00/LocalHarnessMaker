@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 from typing import Any, Literal
 
@@ -57,11 +57,20 @@ def command_rule(
 
 
 def workspace_path(workspace: Path, value: str) -> Path:
-    """Reject external paths, including symlink escapes."""
-    root = workspace.resolve()
+    """Require one relative literal path before checking symlink containment."""
+    if not value or any(character.isspace() or ord(character) < 32 for character in value):
+        raise ValueError("expected a single nonempty path without whitespace or control characters")
+    if any(character in value for character in ";,|&"):
+        raise ValueError("path separators for prose or multiple operands are not allowed")
+    if any(character in value for character in "*?[]{}"):
+        raise ValueError("path globs are not allowed")
     relative = Path(value)
-    if relative.is_absolute():
+    windows = PureWindowsPath(value)
+    if relative.is_absolute() or windows.drive or windows.root:
         raise ValueError("absolute paths are not allowed")
+    if ".." in relative.parts or ".." in windows.parts:
+        raise ValueError("parent traversal is not allowed")
+    root = workspace.resolve()
     path = (root / relative).resolve()
     if not path.is_relative_to(root):
         raise ValueError("path escapes workspace")
@@ -73,7 +82,7 @@ def file_rule(check: dict[str, Any], workspace: Path) -> Result:
     try:
         path = workspace_path(workspace, check["path"])
         if not path.exists():
-            return Result("fail", evidence, "required file is missing")
+            return Result("fail", evidence, "required file is missing", cause=Cause.WORKSPACE)
         if not path.is_file():
             return Result("fail", evidence, "required path is not a regular file")
         return Result("pass", evidence, "required file exists")

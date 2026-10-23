@@ -1,4 +1,40 @@
-# Verifier live-smoke fixes — 2026-10-23
+# Verifier futile-retry fixes — 2026-10-23
+
+Judged items now receive re-instruction only for status=fail. An unverifiable
+judge response keeps its exact status, reason and evidence, leaves overall=fail,
+and consumes no feedback slot or overflow count, even with a workspace cause.
+This supersedes the judge-uncertainty retry policy in the earlier live-smoke
+change below. Mechanical workspace-caused uncertainty remains actionable.
+
+File/regex criteria reject prose, separators, absolute/drive-qualified paths,
+parent traversal and globs before filesystem resolution. Rejected paths are
+contract-caused unverifiable items with no retry. Plausible missing paths remain
+workspace-caused and actionable; file_exists retains fail and regex retains
+unverifiable. Shared schemas, CLIs and hook interfaces are unchanged.
+
+## Verification
+
+`.venv/bin/python -m pytest tests/verifier -q`: 476 passed, 8 skipped in 11.54s.
+Regressions cover all three judge statuses at attempts 1–3, exact uncertainty
+reason/evidence preservation, mixed feedback numbering/counts, invalid path
+classification before filesystem access, and plausible missing path retries.
+
+## Pending
+
+Host verification must rerun the live proposed-system smoke with the real
+controller/plugin/evaluation runner and all eight Seatbelt cases. Network,
+nested Codex, live model calls and sandbox-exec were not run. Full-suite
+verification remains pending before merge; no staging or commits were attempted.
+
+## Assumptions
+
+- Use a conservative single-token literal criterion path policy: filenames with whitespace, prose/operand separators or glob/expansion characters are rejected even if a filesystem could store them. Windows drive/root spellings are rejected as non-relative workspace paths.
+- The user's measured futile-retry corrections supersede the earlier workspace-judge retry rule and role-prompt rule 6. Existing mechanical workspace retry behavior remains in place.
+- This session uses only this worktree and its .venv. Other roles' paths and the main checkout remain outside the authorized edit scope.
+
+---
+
+# Verifier live-smoke fixes — 2026-10-23 (judge uncertainty policy superseded above)
 
 Unittest discovery and local module/dotted/file targets now run through the same
 Seatbelt dispatch as pytest. Discovery accepts -s/-p/-t and -v/-q/-b/-f/-k;

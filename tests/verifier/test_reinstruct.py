@@ -118,6 +118,30 @@ def test_unverifiable_cause_categories(cause: Cause | None) -> None:
     assert (message is not None) == (cause == Cause.WORKSPACE)
 
 
+@pytest.mark.parametrize("status", ["pass", "fail", "unverifiable"])
+@pytest.mark.parametrize("attempt", [1, 2, 3])
+def test_judged_items_retry_only_fail_even_with_workspace_cause(status: str, attempt: int) -> None:
+    criteria = [{"id": "SC-1", "description": "Review code", "check": {
+        "type": "llm_judge", "rubric": "Review the workspace"}}]
+    items = [{"id": "SC-1", "status": status, "reason": "snapshot has no test execution result",
+              "evidence": "llm_judge: workspace code meets the criterion"}]
+    message = reinstruct(criteria, items, attempt, 3, causes={"SC-1": Cause.WORKSPACE})
+    assert (message is not None) == (status == "fail" and attempt < 3)
+
+
+def test_judge_uncertainty_uses_neither_feedback_slots_nor_overflow_count() -> None:
+    criteria, items = inputs()
+    for criterion, item in zip(criteria, items):
+        criterion["check"] = {"type": "llm_judge", "rubric": "Review workspace"}
+        item["status"] = "unverifiable"
+    items[3]["status"] = "fail"
+    criteria[4]["check"] = {"type": "regex", "path": "missing.txt", "pattern": "ok"}
+    message = reinstruct(criteria, items, 1, 3, causes={i["id"]: Cause.WORKSPACE for i in items})
+    assert message is not None and message.startswith("Items 4 and 5 are not done.")
+    assert all(f"description {n}" not in message for n in (1, 2, 3))
+    assert "more failed" not in message
+
+
 def test_mixed_causes_only_actionable_items_are_numbered_and_counted() -> None:
     criteria, items = inputs()
     for item in items:
