@@ -1,3 +1,48 @@
+# Control deadline capacity update — 2026-10-24
+
+`HARNESS_CONTROL_TIMEOUT_SECONDS` overrides the configured per-call deadline
+for codex_cli and cheap_api. Each backend reads it when constructed; unset uses
+that backend's existing `timeout_seconds` (35 seconds in config.yaml). Finite
+positive numbers, including fractional seconds, are accepted. Empty, malformed,
+nonpositive and nonfinite overrides are input errors before any call. For
+example, the evaluation runner can supply `HARNESS_CONTROL_TIMEOUT_SECONDS=120`
+in the environment of its control commands without changing CLI flags or files.
+This is an example capacity setting, not a measured recommendation.
+
+Every cloud `control_call` JSON record now includes the effective
+`timeout_seconds`. Each timed-out call also emits exactly one stderr line
+`control_failure {"backend": "codex_cli", "model": "gpt-6-luna", "reason": "deadline", "timeout_seconds": 120.0}`
+(with the actual backend/model/deadline). HTTP socket timeouts, including those
+wrapped by urllib, receive the same diagnosis. This survives a later missing-key
+fallback error. Missing token counts/cost remain null and contract generation
+still exits 2 when accounting is unknown, including after successful HTTP
+fallback. Non-timeout model/transport failures receive no deadline diagnosis.
+
+Prompts, generation/repair logic, models, routing, call budgets, schema/output
+artifacts and CLI flags are unchanged. Plugin hook budgets and persistent
+controller configuration are untouched. No evaluation tasks were read. This
+implements only the user's authorized capacity parameter and diagnostics under
+decision 0008, with no contract-generation tuning from version 2 results.
+
+Validation: offline controller tests cover transport deadlines, construction-time
+snapshots, invalid overrides, config preservation, local exclusion, stderr
+diagnostics, unchanged exit/artifact behavior, partial usage, successful fallback
+with unknown accounting and non-timeout classification. Live CLI/HTTP and plugin
+integration remain pending host verification. `.venv/bin/python -m pytest
+tests/controller -q`: 344 passed in 14.15s.
+
+## Assumptions
+
+- An explicitly set invalid override is an input error (exit 1), rather than
+  silently selecting the configured deadline; an unset variable uses config.
+- Diagnostics are one `control_failure` prefix plus a JSON object per timed-out
+  call, matching the existing `control_call` log convention. The diagnostic is
+  emitted even if partial usage exists or a later fallback succeeds.
+- Hook budgets remain independently enforced by the plugin. This session uses
+  only mocked transports and this worktree's .venv; no network, nested Codex,
+  live models or macOS sandbox-exec were attempted. Host callers choose the
+  capacity value and retain it for reproducible runs.
+
 # Judge calibration update — 2026-10-23
 
 Judge prompt v2 checks each rubric requirement against artifact paths and lines

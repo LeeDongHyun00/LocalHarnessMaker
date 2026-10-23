@@ -15,7 +15,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 
 from controller.analyze import Prices, calculate_cost
-from controller.backends.base import Message, Usage, configured_prices
+from controller.backends.base import Message, Usage, configured_prices, control_timeout, log_control_timeout
 from controller.backends.cheap_api import structured_schema
 from controller.errors import BackendError, InputError, InvalidGeneration, TransportError
 from controller.settings import PACKAGE_DIR, load_object
@@ -84,17 +84,15 @@ class CodexCLIBackend:
     ) -> None:
         root = load_object(PACKAGE_DIR / "config.yaml")
         self.config = config if config is not None else root["codex_cli"]
+        self.timeout = control_timeout(self.config)
         try:
             self.prices, self.pricing_ref = configured_prices(self.config, prices)
             self.model = str(self.config["model"])
             self.reasoning_effort = str(self.config["reasoning_effort"])
             self.sandbox = str(self.config["sandbox"])
-            self.timeout = float(self.config["timeout_seconds"])
             cli = executable or str(self.config["executable"])
             if not self.model or self.reasoning_effort != "low" or self.sandbox != "read-only":
                 raise ValueError("Unexpected Codex model execution policy")
-            if self.timeout <= 0:
-                raise ValueError("Timeout must be positive")
         except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
             raise InputError("Invalid Codex CLI configuration or prices") from exc
         self.executable = shutil.which(cli) if os.path.sep not in cli else cli
@@ -140,6 +138,7 @@ class CodexCLIBackend:
                     raw = exc.stdout or ""
                     events = raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else raw
                     self._usage = _read_usage(events, self.prices)
+                    log_control_timeout(logger, "codex_cli", self.model, self.timeout)
                     raise TransportError("Codex CLI timed out; consult its JSONL usage log") from exc
                 except OSError as exc:
                     # Spawn failed before a process existed; no inference was run.
@@ -175,6 +174,7 @@ class CodexCLIBackend:
                 )
                 logger.info("control_call %s", json.dumps({
                     "backend": "codex_cli", "model": self.model,
+                    "timeout_seconds": self.timeout,
                     "reasoning_effort": self.reasoning_effort, "status": status,
                     "pricing_ref": self.pricing_ref,
                     **asdict(self._usage),

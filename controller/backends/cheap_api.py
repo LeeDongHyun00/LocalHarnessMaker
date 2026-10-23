@@ -14,8 +14,8 @@ from urllib.request import Request, urlopen
 from jsonschema import Draft202012Validator
 
 from controller.analyze import Prices, calculate_cost
-from controller.backends.base import Message, Usage, configured_prices
-from controller.errors import BackendError, InputError, InvalidGeneration
+from controller.backends.base import Message, Usage, configured_prices, control_timeout, log_control_timeout
+from controller.errors import BackendError, ControlTimeoutError, InputError, InvalidGeneration
 from controller.settings import PACKAGE_DIR, load_object
 
 logger = logging.getLogger(__name__)
@@ -34,6 +34,10 @@ def post_json(
     except HTTPError as exc:
         raise BackendError(f"Control API returned HTTP {exc.code}") from exc
     except (URLError, OSError, ValueError) as exc:
+        if isinstance(exc, TimeoutError) or (
+            isinstance(exc, URLError) and isinstance(exc.reason, TimeoutError)
+        ):
+            raise ControlTimeoutError("Control API timed out") from exc
         raise BackendError("Control API transport failed") from exc
     if not isinstance(value, dict):
         raise BackendError("Control API returned a non-object response")
@@ -84,14 +88,14 @@ class CheapAPIBackend:
         prices: Prices | None = None, clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.config = config if config is not None else load_object(PACKAGE_DIR / "config.yaml")["cheap_api"]
+        self.timeout = control_timeout(self.config)
         try:
             self.prices, self.pricing_ref = configured_prices(self.config, prices)
             self.model = str(self.config["model"])
             self.endpoint = str(self.config["endpoint"])
-            self.timeout = float(self.config["timeout_seconds"])
             self.max_output = int(self.config["max_output_tokens"])
             self.api_key_env = str(self.config["api_key_env"])
-            if self.timeout <= 0 or self.max_output <= 0 or not self.model:
+            if self.max_output <= 0 or not self.model:
                 raise ValueError("Invalid API settings")
         except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
             raise InputError("Invalid controller configuration or prices") from exc
@@ -159,6 +163,9 @@ class CheapAPIBackend:
                 raise InvalidGeneration("Control API output failed schema validation")
             status = "success"
             return result
+        except (ControlTimeoutError, TimeoutError) as exc:
+            log_control_timeout(logger, "cheap_api", self.model, self.timeout)
+            raise ControlTimeoutError("Control API timed out") from exc
         finally:
             self._usage = Usage(
                 self._usage.input_tokens, self._usage.output_tokens, self._usage.usd,
@@ -166,6 +173,7 @@ class CheapAPIBackend:
             )
             logger.info("control_call %s", json.dumps({
                 "backend": "cheap_api", "model": self.model, "status": status,
+                "timeout_seconds": self.timeout,
                 "pricing_ref": self.pricing_ref,
                 **asdict(self._usage),
             }, sort_keys=True))

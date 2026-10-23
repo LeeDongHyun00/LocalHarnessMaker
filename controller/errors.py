@@ -15,3 +15,7 @@ class InvalidGeneration(BackendError):
 
 class TransportError(BackendError):
     """CLI transport unavailable; the approved HTTP fallback may be used."""
+
+
+class ControlTimeoutError(BackendError):
+    """The HTTP transport reached its configured control deadline."""
