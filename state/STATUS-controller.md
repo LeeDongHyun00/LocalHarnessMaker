@@ -1,5 +1,9 @@
 ## Done
 
+- Changed persistent judge-only quality regeneration to return the regenerated contract with one appended judgment-only assumption and contract_quality_gate action accept_degraded; preserved one targeted regeneration, schema/transport errors and the shared three-call budget (.venv/bin/python -m pytest tests/controller -q: 188 passed in 2.14s).
+- Added regressions for exact gate logs, regenerated content/assumption preservation, summed usage, successful contract CLI measurement, schema retry combinations, degraded HTTP fallback, transport failure and final-slot rejection; updated controller/CHANGES.md (.venv/bin/python -m pytest tests/controller -q: 188 passed in 2.14s).
+- Verified the patch touches only the five owned files listed in the commit plan; no staging or commit was performed (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0; git status --short: only controller/CHANGES.md, controller/contract_gen.py, tests/controller/test_contract_quality.py, tests/controller/test_measure_contracts.py and state/STATUS-controller.md modified).
+
 - Replaced the measurement-only single-call adapter with production RoutedBackend and an in-memory disabled HTTP fallback; schema retries and the one targeted quality regeneration share the production three-generation budget (.venv/bin/python -m pytest tests/controller -q: 183 passed in 2.18s).
 - Added per-sample quality_gate_fired and generations, gate observations before retry/rejection, and summed generation/USD/latency totals including failed calls; unknown call costs propagate to null (.venv/bin/python -m pytest tests/controller -q: 183 passed in 2.18s).
 - Retained the approval flag and increased the pre-call preview to 90 maximum generations / estimated API-equivalent USD 0.198000; tests cover refusal before calls and production regeneration/failure paths (.venv/bin/python -m pytest tests/controller -q: 183 passed in 2.18s).
@@ -38,6 +42,7 @@
 
 ## Remaining
 
+- Pending host verification of degraded acceptance with live models and plugin/evaluation integration; network, nested codex exec and macOS sandbox-exec are unavailable here and were not attempted.
 - Pending revised production-pipeline measurement, D-4: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production.json --i-have-approval` on the host. The preview prints 90 maximum CLI generations and estimated API-equivalent USD 0.198000 before any calls. Compare both preserved evidence files above; the old post-v2 adapter failures are not evidence of production retry failure. Inspect per-sample quality_gate_fired/generations and total quality_gate_firings/generations/usd. HTTP is deliberately disabled even with a key; local comparison is dropped. Live prompt v2 quality, SC-1/SC-2, SC-4 targets and SC-5 semantic injection resistance remain pending.
 - Pending host verification: configured HTTP fallback with an environment key, production hook guard and retry-budget integration under the 35 s deadlines, and Role 2's 120 s handoff budget. The three primary codex_cli commands and live contract/handoff demo are already completed host checks, as recorded in Done. Network, nested Codex, live model calls and macOS sandbox-exec are unavailable here and were not attempted.
 - Pending host verification, D-1: measure API-equivalent control cost against an executor baseline and empirically calibrate effort v1 from task outcomes. Existing thresholds have only synthetic/fixture calibration; no exact tokenizer dependency is presently needed.
@@ -47,7 +52,7 @@
 ## Decisions
 
 - Supersede the prior record-only criterion observation with the user's contract-quality priority: prompt v2 proposes objective checks from request facts and records inferred choices for review instead of treating unknown workspace details as grounds for judge-only contracts.
-- Limit quality repair to one regeneration within the existing three-call budget: persistent judge-only contracts fail explicitly; schema retries and fallback cannot create additional paid slots.
+- Limit quality repair to one regeneration within the existing three-call budget: per the current user instruction, accept a schema-valid judge-only regeneration with one explicit assumption and accept_degraded log; schema-invalid output, transport failure and budget exhaustion still fail. A first judge-only result in the final slot still fails because no quality regeneration is available.
 - Supersede single-call measurement per user priority: preserve the original 30 prompts, measure production schema/quality regeneration within the shared three-call budget, and disable HTTP fallback only in the measurement process.
 - Apply decision 0007: D-3 local Gemma 4 12B and D-5 QLoRA are dropped, not deferred; retain version 1 local selector and fail-closed behavior without local-control measurements.
 - Keep the current honest contract exit 2 with unknown started-CLI usage: integration review 1 and the user's instruction settle this policy; no interface revision is planned or pending.
@@ -84,6 +89,8 @@
 - Keep local.enabled=false and retain version 1 fail-closed behavior; D-3/D-5 are dropped and local must never become a hidden fallback.
 
 ## Assumptions
+
+- Degraded acceptance applies only after the targeted quality regeneration has been requested and a schema-valid response is available; intervening schema retries may consume the remaining third slot. No available quality-regeneration slot remains an error, preserving the requested budget-exhaustion behavior.
 
 - Unspecified Python test runners may be proposed as standard unittest discovery for review, without asserting the project uses unittest or that discovery collects tests; explicit unittest/pytest facts take precedence.
 - Mechanical sufficiency means at least one command/file_exists/regex criterion for this gate; lexical hints are deliberately limited and do not prove semantic coverage, verifier acceptance or test collection.

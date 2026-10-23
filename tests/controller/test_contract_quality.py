@@ -1,6 +1,7 @@
 """Authored offline quality regressions; no live model quality claims."""
 
 import json
+import logging
 from typing import Any
 
 import pytest
@@ -56,11 +57,28 @@ def test_quality_retry_uses_original_request_and_accounts_for_both_calls(sample:
     'Fix the tests.', 'Repair module parser.', 'Create .editorconfig.',
     'Update Dockerfile.', 'Create file `READY`.', 'Repair functions `normalize` and `parse`.',
 ])
-def test_quality_gate_retries_only_once_then_fails(prompt_text: str) -> None:
-    transport = RecordingTransport([response(judge_only()) for _ in range(3)])
-    with pytest.raises(InvalidGeneration, match='no mechanical success criteria'):
-        generate_contract(prompt_text, CheapAPIBackend(transport=transport))
+def test_quality_gate_retries_only_once_then_accepts_degraded(
+    prompt_text: str, caplog: pytest.LogCaptureFixture,
+) -> None:
+    regenerated = judge_only()
+    regenerated['task_summary'] = 'Regenerated contract for review.'
+    regenerated['assumptions'] = ['Keep the regenerated assumption.']
+    transport = RecordingTransport([response(judge_only()), response(regenerated)])
+    with caplog.at_level(logging.INFO, logger='controller.contract_gen'):
+        result = generate_contract(prompt_text, CheapAPIBackend(transport=transport))
     assert len(transport.calls) == 2
+    assert result['task_summary'] == regenerated['task_summary']
+    assert result['success_criteria'] == regenerated['success_criteria']
+    assert result['verification'] == regenerated['verification']
+    assert result['assumptions'] == regenerated['assumptions'] + [
+        'No mechanical check could be derived from the request, so every '
+        'success criterion requires judgment.'
+    ]
+    assert result['cost_estimate'] == {'input_tokens': 2000, 'output_tokens': 400, 'usd': .000382}
+    events = [json.loads(record.message.split(' ', 1)[1]) for record in caplog.records
+              if record.message.startswith('contract_quality_gate ')]
+    assert events == [{'attempt': 1, 'action': 'regenerate'},
+                      {'attempt': 2, 'action': 'accept_degraded'}]
 
 
 def test_genuinely_unknown_target_can_remain_judged() -> None:
@@ -97,21 +115,42 @@ def test_no_quality_slot_after_two_schema_retries() -> None:
     assert len(transport.calls) == 3
 
 
-@pytest.mark.parametrize('repair', [True, False])
-def test_quality_retry_shares_fallback_budget(repair: bool) -> None:
+@pytest.mark.parametrize('repair', ['mechanical', 'degraded', 'invalid'])
+def test_quality_retry_shares_fallback_budget(repair: str) -> None:
     cli = MockRunner(returncode=1)
-    transport = RecordingTransport([response(judge_only()), response() if repair else response({})])
+    repaired = {'mechanical': model_contract(), 'degraded': judge_only(), 'invalid': {}}
+    transport = RecordingTransport([response(judge_only()), response(repaired[repair])])
     backend = RoutedBackend('codex_cli', factories={
         'codex_cli': lambda: CodexCLIBackend(runner=cli, executable='/mock/codex'),
         'cheap_api': lambda: CheapAPIBackend(transport=transport),
     })
-    if repair:
+    if repair != 'invalid':
         result = generate_contract('Fix parser.py and tests.', backend)
         assert result['cost_estimate']['input_tokens'] == 3200
+        if repair == 'degraded':
+            assert len(result['assumptions']) == len(judge_only()['assumptions']) + 1
     else:
         with pytest.raises(BackendError, match='three-generation budget'):
             generate_contract('Fix parser.py and tests.', backend)
     assert backend.count == 3 and len(cli.calls) == 1 and len(transport.calls) == 2
+
+
+def test_quality_retry_transport_failure_still_fails() -> None:
+    transport = RecordingTransport([response(judge_only())])
+    calls = 0
+
+    def fail_second(
+        endpoint: str, headers: dict[str, str], payload: dict[str, Any], timeout: float,
+    ) -> dict[str, Any]:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise BackendError('Control API transport failed')
+        return transport(endpoint, headers, payload, timeout)
+
+    with pytest.raises(BackendError, match='transport failed'):
+        generate_contract('Fix parser.py.', CheapAPIBackend(transport=fail_second))
+    assert calls == 2
 
 
 def test_feedback_cannot_promote_request_instructions() -> None:

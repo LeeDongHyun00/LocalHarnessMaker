@@ -111,7 +111,10 @@ class SequenceRunner(MockRunner):
     (["judge", "valid"], True, True),
     (["invalid", "judge", "valid"], True, True),
     (["judge", "invalid", "valid"], True, True),
-    (["judge", "judge"], False, True),
+    (["judge", "judge"], True, True),
+    (["invalid", "judge", "judge"], True, True),
+    (["judge", "invalid", "judge"], True, True),
+    (["judge", "invalid", "invalid"], False, True),
     (["invalid", "invalid", "judge"], False, True),
     (["invalid", "invalid", "valid"], True, False),
 ])
@@ -138,6 +141,9 @@ def test_measurement_runs_production_quality_and_schema_regenerations(
     assert totals["quality_gate_firings"] == int(gate)
     assert totals["generations"] == len(sequence)
     assert totals["usd"] == row["usd"]
+    if valid and sequence[-1] == "judge":
+        assert row["assumptions_count"] == len(judge["assumptions"]) + 1
+        assert row["criteria_by_type"]["llm_judge"] == 1
     if sequence[:2] == ["judge", "valid"]:
         assert "preceding contract contained no mechanical" in runner.calls[1]["kwargs"]["input"]
 

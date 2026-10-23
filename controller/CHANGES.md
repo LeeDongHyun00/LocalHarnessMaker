@@ -11,14 +11,19 @@ unittest and read-only python -c command forms.
 
 Generation now checks schema-valid contracts for mechanical success criteria
 when lexical request hints identify files/modules, functions or tests. A
-judge-only result gets one targeted regeneration; a repeated deficiency fails
-explicitly. Schema retries and CLI-to-HTTP fallback continue sharing the existing
-three-generation budget and usage accounting. The gate checks criterion types;
+judge-only result gets one targeted regeneration. If the regenerated contract
+is schema-valid but still judge-only, return it with one appended assumption:
+"No mechanical check could be derived from the request, so every success
+criterion requires judgment." Preserve its existing assumptions and criteria,
+and log contract_quality_gate with action accept_degraded. Schema retries and CLI-to-HTTP fallback continue sharing the existing
+three-generation budget and usage accounting. Schema-invalid output, transport
+failures and exhausted budgets still fail; a first judge-only result on the
+final slot still fails because no targeted regeneration can run. The gate checks criterion types;
 it does not prove command acceptance, meaningful test collection or behavioral
 coverage. Its lexical recognition is not a complete natural-language parser.
 Schemas, public CLI flags, analyze.py metadata and escaped data blocks are unchanged.
 
-Added authored unittest/discovery fixtures and regressions for quality failure,
+Added authored unittest/discovery fixtures and regressions for degraded quality acceptance,
 schema retries, fallback budget exhaustion, accounting and injection boundaries.
 Updated existing golden responses to contain mechanical checks where required
 and translate the direct script check into python -c. The original 30 measurement
@@ -76,10 +81,12 @@ review 1. Unknown costs are never fabricated as zero.
 
 ## Verification
 
-`.venv/bin/python -m pytest tests/controller -q`: 183 passed in 2.18s.
+`.venv/bin/python -m pytest tests/controller -q`: 188 passed in 2.14s.
 The new mocked tests exercise approval refusal, all 30 samples, log accounting,
-quality/schema regeneration sequences, persistent quality rejection, final-slot
-gate detection, three-call exhaustion, no fallback even with an API key, and
+quality/schema regeneration sequences, persistent judge-only acceptance with
+exact gate logs and one appended assumption, CLI success/path output via the
+measurement pipeline, final-slot rejection, transport failure after a quality
+retry, three-call exhaustion, no fallback even with an API key, and
 null costs when any CLI generation has unknown usage. No live call, network,
 nested Codex or macOS
 sandbox-exec check ran. The full suite is reserved for coordinated host
@@ -89,8 +96,10 @@ verification before merge. No staging or commit was performed.
 
 - When tests are mentioned without a runner, unittest discovery is a proposed
   dependency-free default for user review, not a verified project convention.
-- The quality gate requires at least one mechanical criterion, as requested;
-  it does not impose a check-type quota or rewrite generated criteria itself.
+- The quality gate attempts to obtain at least one mechanical criterion; a
+  schema-valid judge-only regeneration remains reviewable with an explicit
+  assumption. Acceptance does not establish mechanical verifiability or quality.
+  It does not impose a check-type quota or rewrite generated criteria itself.
 - Both recorded runs are host evidence. The revised host rerun preserves the
   original 30 prompts; new unittest samples exercise offline regressions only.
 - The authored requests-v1 set is the D-4 population; the original ten samples

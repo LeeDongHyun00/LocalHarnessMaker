@@ -114,9 +114,16 @@ def generate_contract(
                 return contract
             logger.info("contract_quality_gate %s", json.dumps({
                 "attempt": attempt + 1,
-                "action": "reject" if quality_regenerated or attempt == 2 else "regenerate",
+                "action": ("accept_degraded" if quality_regenerated else
+                           "reject" if attempt == 2 else "regenerate"),
             }))
-            if quality_regenerated or attempt == 2:
+            if quality_regenerated:
+                contract["assumptions"].append(
+                    "No mechanical check could be derived from the request, so every "
+                    "success criterion requires judgment."
+                )
+                return contract
+            if attempt == 2:
                 raise InvalidGeneration(
                     "Contract quality gate: no mechanical success criteria for "
                     + ", ".join(hints)
