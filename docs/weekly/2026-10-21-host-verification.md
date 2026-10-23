@@ -168,3 +168,25 @@ Full A attempt 1 halted at 03:00 UTC after 40 of 120 tasks. Task two-session-pai
 The runner recorded the task as outcome "error", an audit-clean valid failure, and stopped with STOP-E1. 39 of the 40 finished tasks passed. A capacity error is a service condition, not a model outcome, and the runner has no rule for it yet. Counting it would understate A, so the attempt is kept as diagnostic evidence only: eval/reports/full-a-attempt1/, with no report.json. Full A restarts from scratch after the Role 5 fix (r5-capacity-001). Claude's leak scan of the attempt found 0 private markers and 0 distinctive grader lines, with 717 lines indexed at family-level sharing.
 
 After the held commits (879245e, 53cb8a9, 605b970, 4f23d59) and the cherry-picked Role 5 commits (f2e8d9e, 1b945de), the full suite on main gives 1396 passed and 1 skipped (the opt-in live Codex test).
+
+## Harness smoke attempt 1 (2026-10-23, 03:07 to 03:15 UTC)
+
+This was the first live run of the proposed system in the runner: eval/configs/smoke-harness.yaml at f844d27, Sol medium, gpt-6-luna through codex_cli, 3 attempts per day. The report is valid and the audits are clean. Results:
+- bug-chunk-tail passed after 3 attempts. Executor cost was 0.130 USD, about 4.5 times A's per-session average.
+- two-session-prefix-sums failed after 3 attempts on each day. Hidden test test_variant_contract failed. Baseline A passed this task in its 0.163 smoke.
+
+Defects found, each fixed by its owner without any interface change:
+1. Contract quality (Role 3). Luna wrote 4 of 4 llm_judge criteria and no verification command for bug-chunk-tail; the two-session task got 3 of 4 on day 1 and 2 of 3 on day 2. The controller's principle is mechanical checks first and llm_judge as a last resort. Before the fix, Claude measures the llm_judge share on Role 3's own 30 authored samples (D-4), never on eval tasks.
+2. Unittest commands rejected (Role 4). The contract's `python -m unittest discover -v` was rejected as "unsupported Python invocation", so that item stayed unverifiable on every attempt. The verifier accepted only py_compile, pytest with four flags, and AST-checked `python -c`.
+3. Re-instruction on items the executor cannot fix (Role 4). Every non-pass item was re-instructed, including "contract quality warning" and rejected-command items. All 6 re-instructions in the smoke were of this kind. The new rule re-instructs only actionable items.
+4. Control costs null (Role 5). The accounting reader rejected files with any symlinked ancestor, and macOS /var links to /private/var, so no control stream was read. Total cost and cost_per_pass were null. The tests missed it because pytest's tmp_path is resolved.
+5. Grader content in a published grading log (Role 5). The failing task's grading.log carried the private assertion's source line and its message. Nothing was committed: no committed report contains a traceback, because every committed grading log comes from a passing run. The smoke report was moved out of the repository to codex-bridge/outbox/run-smoke-harness/report/, and that log to the private root's quarantine. The runner will publish test ids, outcomes and summary lines only.
+
+Generalization caution: the two smoke tasks belong to the frozen evaluation set. The fixes target generic behavior that the design already required, and no controller change uses eval task content. The final evaluation will state this.
+
+Controller D-4 baseline (host, 2026-10-23, controller/evidence/2026-10-23-d4-before.json): `python -m controller.measure_contracts` ran 30 codex_cli calls on Role 3's authored samples (tests/controller/fixtures/requests-v1.json, not eval tasks). It cost 0.036 USD, with median latency 7.6 s (6.6 to 11.8 s). Results:
+- All 30 contracts are schema-valid, and every ambiguous sample has assumptions.
+- The 39 criteria are 4 command, 10 file_exists, 13 regex and 12 llm_judge, so llm_judge is 31 percent.
+- 11 of 30 contracts are llm_judge-only and 26 of 30 have no command check.
+- cheap_api is not measured (no API key; decision 0007) and local is dropped.
+r3-cont-005 revises the contract prompt to mechanical checks first; Claude reruns the measurement afterwards.
