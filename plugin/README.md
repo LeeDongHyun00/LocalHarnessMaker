@@ -253,3 +253,14 @@ Offline tests cover these cases with fake trees/signals and temporary homes.
 - A real demonstration may pass on its first check; a synthetic forced failure is not appropriate in real mode.
 - No PR was requested. Use this change summary and these assumptions in a future PR description.
 - Live model execution, macOS isolation, persisted trust, real latency and two-session handoff behavior require host verification. Only plugin tests were run here; the full suite remains a pre-merge check for the coordinating role.
+
+### Two-session host capture
+
+[DEMO-SCENARIO.md](DEMO-SCENARIO.md#real-two-session-handoff-demonstration-d-4d-5)
+provides separate `plugin.two_session_demo day1`, `day2` and offline `check`
+commands. This preparation adds a real pass-path handoff scenario with a random
+day-1 decision and a follow-up that omits it. The checker requires validated
+saved context, SessionStart injection visible in the new session, approval gates,
+passing real verdicts and exact follow-up bytes. Offline synthetic tests do not
+establish live two-session success. Assumption: Claude runs both days on the host
+with the same retained temporary workspace/home and a working CLI login.

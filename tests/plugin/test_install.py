@@ -178,11 +178,19 @@ def test_version_probe_failure_writes_nothing(installer: dict[str, Any], monkeyp
 
 def test_unverified_version_installs_but_check_requires_evidence(installer: dict[str, Any], monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     def version(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
-        return subprocess.CompletedProcess(command, 0, 'codex-cli 0.163.0-alpha.11.1\n', '')
+        return subprocess.CompletedProcess(command, 0, 'codex-cli 9.0.0\n', '')
     monkeypatch.setattr(_process, 'run_group', version)
     assert installer['run']() == 0
     assert installer['run'](True) == 1
     errors = capsys.readouterr().err
-    assert 'Codex version unverified: codex-cli 0.163.0-alpha.11.1' in errors
+    assert 'Codex version unverified: codex-cli 9.0.0' in errors
     assert 'plugin.probe' in errors and 'then add the version' in errors
     assert 'Hooks not registered' not in errors and 'Skill missing' not in errors
+
+
+def test_new_host_verified_version_passes_check(installer: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
+    def version(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(command, 0, 'codex-cli 0.163.0-alpha.11.1\n', '')
+    monkeypatch.setattr(_process, 'run_group', version)
+    assert installer['run']() == 0
+    assert installer['run'](True) == 0

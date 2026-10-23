@@ -1,5 +1,13 @@
 ## Done
 
+- Prepared plugin.two_session_demo day1/day2/check with isolated real-mode sessions, a random day-1 decision, fixed follow-up without restatement, retained CLI-validation output/hash and an offline injection/context/artifact checker; documented host steps in plugin/DEMO-SCENARIO.md and README. Synthetic positive/negative fixtures and injected launch tests cover new-thread then approval routing; no live demo was run (.venv/bin/python -m pytest tests/plugin -q: 200 passed, 1 opt-in live test skipped in 14.35s).
+- Verified --check accepts the newly registered 0.163.0-alpha.11.1 using an isolated installer and injected version probe; unverified-version diagnostics remain covered with a separate fake version (.venv/bin/python -m pytest tests/plugin -q: 200 passed, 1 skipped in 14.35s).
+
+- Registered codex-cli 0.163.0-alpha.11.1 with plugin/evidence/2026-10-22-exec-0.163 from host commit 55f2b1d; the supplied probe passes offline with SessionStart/UserPromptSubmit/Stop/Stop, visible context and one continuation (.venv/bin/python -m plugin.check_probe_evidence --expected-version "codex-cli 0.163.0-alpha.11.1" plugin/evidence/2026-10-22-exec-0.163: context_visible=true, continued_once=true, exit_code=0).
+- Recorded Claude's completed macOS EPERM/pipe-holding-grandchild verification, supplied by the user rather than run here: five host suite runs included 100 real process-tree repetitions; real Stop-hook SIGTERM, group SIGHUP and child-exit trees left zero processes in all three runs (host commit aa3c709; tests/plugin: 5/5 host runs passed, 100 repetitions; real Stop-hook tree checks: 3/3 runs, 0 survivors).
+- Recorded Claude's passing live real-mode demo from host commit 232f23d and re-audited its retained evidence offline (.venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real: approval_gate=true, real_task_verified=true, overall=pass, max_hook_overhead_seconds=0.18847).
+- Recorded completed host README installation checks supplied by the user: temporary HOME/CODEX_HOME installation and --check work, repeat installation is idempotent, timeout JSON values are integers and real ~/.codex is unchanged (Claude host report of README install/--check: passed, idempotent, integer timeouts, real ~/.codex unchanged; exact host shell log not supplied).
+
 - Replaced active single-pin checks with plugin/VERIFIED_VERSIONS.json and its validated reader; the first entry retains 0.162.0-alpha.17.2 exec/TUI evidence. Probe/demo accept unlisted versions and save the exact installed identity; offline probe audit validates identity and optional expected version, and tests audit every registry entry against passing evidence (.venv/bin/python -m pytest tests/plugin -q: 185 passed, 1 opt-in live Codex test skipped in 14.66s).
 - Allowed installation on unverified versions while --check returns 1 with a distinct Codex version unverified diagnostic and instructions to probe/audit/add evidence; hooks and skill checks remain independent and installed snapshots include the registry/reader (.venv/bin/python -m pytest tests/plugin -q: 185 passed, 1 skipped in 14.66s; fake CLI and isolated-home tests cover verified/unverified installation and diagnostics).
 - Silenced ESRCH group warnings after leader exit while retaining bounded retry, member inspection, unexpected-error and unresolved-survivor diagnostics; corrected process fakes to keep returncode consistent with poll (.venv/bin/python -m pytest tests/plugin -q: 185 passed, 1 skipped in 14.66s; quiet ESRCH, EPERM/ESRCH cleanup paths and twenty real inherited-pipe trees passed).
@@ -40,16 +48,15 @@
 
 ## Remaining
 
-- First priority: Claude runs a fresh host exec compatibility probe for codex-cli 0.163.0-alpha.11.1, retains its evidence, and audits it with .venv/bin/python -m plugin.check_probe_evidence --expected-version "codex-cli 0.163.0-alpha.11.1" plugin/evidence/NEW-exec. Add that version/evidence to plugin/VERIFIED_VERSIONS.json only after passing host evidence is supplied. No new version was declared verified here; host audit compatibility smoke remains necessary before large evaluation runs.
-
-- Pending Claude host verification: repeatedly exercise macOS EPERM cleanup with SIGTERM, group SIGHUP and child exit with a pipe-holding grandchild; the sandbox suite passed all twenty direct trees but cannot exercise real ps enumeration. Rerun the previously hanging child-exits-3/pipe-holding-grandchild case through plugin/hooks/stop.py with HARNESS_PYTHON pointing to the fake child. The direct real-tree runner regression passes in this sandbox. The user reports prior host SIGTERM and group SIGHUP cases had zero survivors and unmarked UserPromptSubmit produced no output/state; repeat those to confirm no regression, plus SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants. Coordinate with the concurrent Role 4 implementation; its owned judge/sandbox sessions must receive grace through the verifier. SIGKILL cannot be caught; this protocol cannot guarantee cleanup when an owner itself is killed with SIGKILL.
-- Pending host verification: measure revised Stop 660s / check 480s / handoff 120s / validation 5s behavior and Role 4's internal 450s verifier budget. Confirm contract cutoff at 30s inside 40s despite the controller's 35s per-call deadline, including the documented lack of deadline-triggered fallback on that path.
-- Pending host verification: install/repair from a fresh clone in temporary homes, confirm the installed CLI accepts generated integer timeouts, test bundled-binary discovery and persisted hook trust, and verify unrelated project prompts remain silent without creating .harness.
-- Pending host verification: capture a fresh real-mode demo with all three pre-approval workspace inventories, then test real two-session handoff injection after both pass and exhaustion. Also check failed handoff generation/validation prevents stale-context injection. No real demo was run here.
-- Pending host verification: record plugin/DEMO-SCENARIO.md and retain new evidence under plugin/evidence/DATE-real/ without overwriting prior evidence; macOS sandbox isolation remains untested here.
-- Before merge: coordinating role runs the full suite once. This job ran only tests/plugin as requested; .git remains read-only and all work is unstaged/uncommitted.
+- Claude runs the prepared real two-session pass-path demo on the host using plugin/DEMO-SCENARIO.md, retaining plugin/evidence/DATE-two-session/ and requiring the offline checker to pass. Preparation and offline fixtures do not establish live D-4/D-5 success.
+- Separate host checks remain for exhaustion handoff injection, failed generation/validation preventing stale injection, persisted hook trust, bundled-binary discovery, unrelated-project silence and macOS sandbox isolation. The completed README temporary-home install/--check and real-mode demo are no longer pending.
+- Pending host measurement: revised Stop 660s / check 480s / handoff 120s / validation 5s budgets and Role 4's internal 450s verifier budget, plus contract cutoff at 30s inside 40s despite the controller's 35s deadline. SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants remains separate from the completed host SIGTERM/SIGHUP/child-exit checks.
+- Before merge: coordinating role runs the full suite once. This job runs only tests/plugin; .git is read-only and all work remains unstaged/uncommitted. Do not disturb the in-progress host evaluation or edit eval/, controller/ or verifier/.
 
 ## Decisions
+
+- Prepare the two real sessions as separate host commands with a random day-1 release-label decision and a fixed day-2 prompt omitting that label: this makes approval and recovery reviewable before further live calls.
+- Require real saved-handoff CLI validation plus local schema validation, exact SessionStart/model-context matching, distinct threads, both approval gates, passing verdicts and exact follow-up bytes: offline fixtures validate the checker without claiming live D-4/D-5 success.
 
 - Follow the 2026-10-22 user-approved changing-version policy: no hold, rollback or STOP-P2 single-pin refusal; CODEX_VERSION stays as the historical first identity, and VERIFIED_VERSIONS.json is the compatibility history.
 - Treat unlisted versions as unverified rather than incompatible: installation warns and proceeds, --check reports failure until evidence is listed, and probes can collect the evidence needed for promotion.
@@ -75,7 +82,12 @@
 
 ## Verify commands
 
-- .venv/bin/python -m pytest tests/plugin -q (latest: 185 passed, 1 skipped in 14.66s)
+- Host only: .venv/bin/python -m plugin.two_session_demo day1 --out plugin/evidence/DATE-two-session
+- Host only: .venv/bin/python -m plugin.two_session_demo day2 --out plugin/evidence/DATE-two-session
+- Offline after host capture: .venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/DATE-two-session
+- .venv/bin/python -m plugin.check_probe_evidence --expected-version "codex-cli 0.163.0-alpha.11.1" plugin/evidence/2026-10-22-exec-0.163
+
+- .venv/bin/python -m pytest tests/plugin -q (latest: 200 passed, 1 skipped in 14.35s)
 
 - .venv/bin/python -m pytest tests/plugin -q
 - bash -n plugin/install.sh plugin/demo.sh
@@ -95,8 +107,11 @@
 
 ## Assumptions
 
+- The user's supplied host results and commits are accepted as host evidence; only the probe/demo evidence audits and plugin tests were rerun here. No live Codex, model, network, sandbox-exec or real-home installation ran.
+- The requested two-session preparation covers the pass path. Exhaustion, stale-context rejection and persisted trust retain separate host checks; the demo proves receipt and success without user restatement, not exclusive causal reliance on the handoff.
+
 - This job's explicit changing-version instructions supersede the role prompt pin and STOP-P2 text. No shared schema, production CLI or hook interface changes are needed.
-- The observed 0.163.0-alpha.11.1 update is user-supplied information; this session never invoked Codex, live models, sandbox-exec or the real-home installer. New-version compatibility remains pending host evidence.
+- The observed 0.163.0-alpha.11.1 update is user-supplied information; this session never invoked Codex, live models, sandbox-exec or the real-home installer. Passing host probe evidence was supplied by the user and re-audited offline in this session.
 - No PR, stage or commit was performed. Copy these assumptions and the README change summary into any future PR; the final report supplies an exact unstaged commit plan.
 
 - The latest STOP-P3 decision changes the prototype's synchronous deadline and logging only; no fresh paid benchmark, asynchronous implementation, shared interface edit or model substitution is requested. Tests simulate elapsed time without waiting or calling a model.
@@ -119,4 +134,4 @@
 - The user reports host verification of the previous 131-passed/1-skipped revision and successful SIGTERM/SIGHUP/unmarked-directory checks. Those host claims are supplied evidence, not commands run here; only the new direct process-tree regression and plugin suite were executed in this turn.
 - The sandbox forbids ps. The regression therefore checks PID liveness directly and, on Linux, treats an orphan zombie as exited pending init reaping. It requires no live descendant; collection of orphan exit records belongs to init/launchd.
 
-- This session assumes host ps enumeration is available for the macOS fallback. The workspace sandbox denies ps; transient/persistent EPERM/ESRCH member enumeration is injected in unit tests, while actual trees verify no live grandchildren via PID probes. Claude's repeated macOS process-tree checks remain pending.
+- This session assumes host ps enumeration is available for the macOS fallback. The workspace sandbox denies ps; transient/persistent EPERM/ESRCH member enumeration is injected in unit tests, while actual trees verify no live grandchildren via PID probes. Claude's repeated macOS process-tree checks were subsequently completed on the host, as recorded above.
