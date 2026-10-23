@@ -169,11 +169,25 @@ provider version/date. Unknown models/tiers, long-context turns and incomplete
 tokens retain null costs; null propagates to accounting and cost_per_pass.
 Standard is the CLI baseline assumption when no tier evidence is present;
 observed non-Standard tiers override it. Subscription usage is not zero-dollar
-API usage. Historical reports are preserved. Control CLI artifacts do not expose a complete
-per-call accounting ledger; actual fallback transport/model and costs remain
-unobserved. `control_model` and control costs stay null. Full done-claim
-extraction and hash-pinned paired parity are pending; false_done_rate and parity
-are undefined with reasons rather than incomplete headline measurements.
+API usage. Historical reports are preserved. The runner prices each retained
+`control_call` stderr line (including internal retries and HTTP fallback) with
+`prices.yaml`, ignoring controller USD. Calls retain actual backend/model,
+latency and success/error status; runner deadlines mark timeout. Judge children
+are counted only through forwarded lines, with `judge_delegation` completeness
+checks. Missing tokens/pricing, incomplete delegations, interrupted/deadline
+operations or successful contract/handoff commands without successful generation
+records keep control and total costs null. Mechanical verification and handoff
+validation add no model calls. Invalid tasks retain every observed call's cost.
+`metadata.control_model` contains the sole observed control model; no model or
+multiple models produces null and a stderr warning. Full done-claim extraction
+remains pending; false_done_rate stays undefined. Under decision 0007, local
+Gemma and QLoRA are dropped and parity is reported as not measured.
+
+New checkpoints record the starting `git_commit` and `pricing_snapshot_id`.
+Reports use that commit and warn on stderr with both values if build-time HEAD
+or the price snapshot changed. Pricing metadata continues to describe the
+snapshot actually used to price calls. Older checkpoints retain build-time
+provenance behavior.
 
 Task set version 1 contains 100 single-session and 20 two-session public tasks
 across four types, all marked `frozen=true`. The user authorized freezing after
@@ -233,12 +247,15 @@ Missing, changed or unverifiable observations invalidate the task.
 failures, as its denominator; an empty denominator yields null. Both days'
 attempts and executor costs are summed once within the task cluster.
 
-`configs/full-a.yaml` (medium) and `configs/full-b.yaml` (max) contain all 120
-frozen tasks in the same lexicographic order and seed. Both preserve pilot
-limits, with the optional runner-owned `task_timeout_seconds` map overriding
-individual process deadlines (1200 seconds for two-session tasks, 600 for
-others). `grading_timeout_seconds` remains 20. These configuration fields do
-not change the frozen CLI flags or report schema.
+`configs/full-a.yaml` (medium) and `configs/full-harness.yaml` contain the same
+120 ordered frozen tasks. `configs/full-b.yaml` (max) contains their 100
+single-session tasks in the same order; B has never run. Harness configs use
+codex_cli control and reinstruction_limit=2, matching three attempts per day.
+`configs/smoke-harness.yaml` selects bug-chunk-tail and two-session-prefix-sums.
+Timeouts are 600 seconds normally, 1200 for two-session processes, and 20 for
+grading. No frozen CLI flags or schemas changed. Decision 0007's user-approved
+scope sets C to a stratified 20-task subset with user-filled templates and
+compares harness handoff_success with A; C templates/measurement remain pending.
 
 [Decision 0006](../docs/decisions/0006-codex-version-policy.md) requires matching
 version evidence: `full-a`, `full-b` and `smoke-two-session-a` select
@@ -262,14 +279,20 @@ harness task already bounds 11 calls before judge criteria; it requires the
 existing estimate/approval process. Per-task timeout overrides must still select
 configured tasks and lie in (0, 3600].
 
-Full runs remain **on hold**. The STOP-3 estimate is in
-[reports/full-estimate.md](reports/full-estimate.md): 140 sessions per
-configuration, about $4.10/$6.03 API-equivalent USD from pilot session averages,
-and approximately 56/84 plan percentage points using the user-supplied pilot
-deltas. These are planning proxies, not spending caps or quota guarantees.
-Claude must host-verify the smoke, review pilots and ask the user again before
-full execution. Exact bundled full/pilot configurations with published
-estimates pass configuration validation; that is not user approval.
+Full A is running in the main checkout; this worktree does not change that run.
+[Baseline estimates](reports/full-estimate.md) now budget 140 A sessions
+($4.0960136) and 100 B sessions ($2.9257240 using the requested A-session
+proxy; historical max-effort pilot B gives $4.3045080). Harness estimates are
+[smoke](reports/smoke-harness-estimate.md) and
+[full](reports/full-harness-estimate.md): bounds before generated judges are
+21 and 900 calls. Luna planning assumes 5,000 uncached input and 1,000 output
+tokens per generation ($0.001); executor planning uses pilot A's session average.
+These are planning figures, not measurements. Usage limits are no longer a
+planning concern. The harness has never run live; Claude runs the host smoke
+next. Any exact bundled `configs/NAME.yaml` with `reports/NAME-estimate.md`
+passes the estimate guard; historical pilot/full mappings still work. Changing
+a config requires its own matching published estimate. Estimates do not grant
+execution approval.
 
 Claude's host smoke (one two-session task, harness off, medium; no run here):
 
@@ -304,8 +327,8 @@ quality/cost comparison is claimed.
   metadata freeze; private validation is not rerun in this sandbox.
 - A reference-only compatibility schema retires the provisional definition
   without deleting a file or changing the shared interface.
-- Model accounting absent from the frozen CLI output remains unknown; the
-  runner does not infer actual fallback transport or model identity.
+- Missing control accounting remains unknown; actual transport/model comes
+  from retained generation records, with Role 4 forwarding required for judges.
 
 Incomplete runs halt without publishing a report and retain checkpoints for
 recovery. A report requires the complete configured task set; this preserves the

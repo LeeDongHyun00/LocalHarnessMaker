@@ -456,6 +456,7 @@ def two_task_config(root: Path, config: Path, monkeypatch: pytest.MonkeyPatch, t
     config.write_text(json.dumps(value))
     monkeypatch.setattr(core, 'REPOSITORY', repository)
     monkeypatch.setattr(core, 'public_files', lambda task: sorted(p for p in (repository / 'eval/tasks' / task).rglob('*') if p.is_file()))
+    monkeypatch.setattr(core, "current_commit", lambda _: __import__("eval.runner.report", fromlist=["current_commit"]).current_commit(REPOSITORY))
     # Report git provenance is read from the original repository, never a model.
     original_build = core.build
     monkeypatch.setattr(core, 'build', lambda c, s, t, v, r, **kw: original_build(c, s, t, v, REPOSITORY, **kw))
@@ -638,8 +639,8 @@ def test_repeated_control_limits_retain_logs_then_resume_verifier_reinstruction(
     assert report['tasks'][0]['outcome'] == 'pass' and executor.calls == 2
     assert executor.operations == ['contract', 'check', 'check']
     entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
-    assert len([name for name in entry['control_files'] if name.startswith('control-interruptions/')]) == 4
-    assert len([a for a in report['tasks'][0]['artifacts'] if 'control-interruptions' in a['path']]) == 4
+    assert len([name for name in entry['control_files'] if name.startswith('control-interruptions/')]) == 6
+    assert len([a for a in report['tasks'][0]['artifacts'] if 'control-interruptions' in a['path']]) == 6
 
 
 def test_taskset_hash_ignores_generated_and_untracked_files(setup: tuple[Path, Path, Path], tmp_path: Path,
@@ -1047,7 +1048,7 @@ def test_control_usage_limit_retries_pending_operation_without_reexecuting_days(
     assert entry['phase'] == 'usage_limited'
     assert 'result' not in entry and 'control_error' not in entry
     archived = {name: value for name, value in entry['control_files'].items() if name.startswith('control-interruptions/')}
-    assert len(archived) == (2 if stage == 'validate-handoff' else 3)
+    assert len(archived) == (3 if stage == 'validate-handoff' else 4)
     from eval.runner.audit import digest
     for name, expected in archived.items():
         assert digest((Path(entry['runtime']) / name).read_bytes()) == expected
@@ -1550,3 +1551,78 @@ def test_handoff_ignores_nonnumeric_verdict_even_in_manifest(tmp_path: Path) -> 
                         repository=REPOSITORY,
                         execute=lambda *a, **kw: ProcessResult(0), guard=guard)
     assert selected == ['verdict-1.json']
+
+
+@pytest.mark.parametrize('two', [False, True])
+def test_control_costs_survive_days_and_reinstructions(setup: tuple[Path, Path, Path],
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path, two: bool) -> None:
+    from tests.eval.test_control_accounting import generation, delegation
+    root, config, out = two_session_config(setup, monkeypatch, tmp_path, harness_on=True) if two else setup
+    if not two:
+        harness_config(config)
+    executor = TwoSessionExecutor() if two else HarnessExecutor()
+
+    def logged(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = executor(argv, **kwargs)
+        if '-m' in argv and argv[argv.index('-m') + 1] in {'controller', 'verifier'}:
+            operation = argv[argv.index('-m') + 2]
+            text = '' if operation == 'validate-handoff' else generation()
+            if operation == 'check':
+                text += delegation()
+            kwargs['stderr'].write_text(text)
+        return result
+
+    report = json.loads(run(config, out, root, execute=logged, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    task = report['tasks'][0]
+    controls = [c for c in task['calls'] if c['purpose'] != 'executor']
+    assert len(controls) == (5 if two else 3)
+    assert task['costs']['control_usd'] == pytest.approx(len(controls) * .000132)
+    assert task['costs']['total_usd'] == pytest.approx(task['costs']['executor_usd'] + len(controls) * .000132)
+    assert report['metadata']['control_model'] == 'gpt-6-luna'
+    assert report['metrics']['cost_per_pass']['value'] == task['costs']['total_usd']
+    assert task['attempts'] == 2
+
+
+def test_checkpoint_records_start_provenance_and_warns_on_drift(setup: tuple[Path, Path, Path],
+        monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    from eval.runner import core, report as reports
+    root, config, out = setup
+    monkeypatch.setattr(core, 'current_commit', lambda _: 'a' * 40)
+    monkeypatch.setattr(reports, 'current_commit', lambda _: 'b' * 40)
+    report = json.loads(run(config, out, root, execute=Executor(), version='codex-cli 0.162.0-alpha.17.2').read_text())
+    state = json.loads((out / 'checkpoint.json').read_text())
+    assert state['git_commit'] == report['metadata']['git_commit'] == 'a' * 40
+    assert state['pricing_snapshot_id'] == report['metadata']['pricing']['snapshot_id']
+    assert 'a' * 40 in capsys.readouterr().err
+    state['pricing_snapshot_id'] = 'starting-snapshot'
+    reports.build(json.loads(config.read_text()), state, report['tasks'], report['metadata']['codex_version'], REPOSITORY)
+    warning = capsys.readouterr().err
+    assert 'starting-snapshot' in warning and state['pricing_snapshot_id'] != report['metadata']['pricing']['snapshot_id']
+    assert report['metadata']['pricing']['snapshot_id'] in warning
+    state.pop('git_commit')
+    state.pop('pricing_snapshot_id')
+    legacy = reports.build(json.loads(config.read_text()), state, report['tasks'], report['metadata']['codex_version'], REPOSITORY)
+    assert legacy['metadata']['git_commit'] == 'b' * 40
+    assert 'differs from build' not in capsys.readouterr().err
+
+
+def test_multiple_control_models_warn_and_keep_metadata_null(setup: tuple[Path, Path, Path],
+        capsys: pytest.CaptureFixture[str]) -> None:
+    from tests.eval.test_control_accounting import generation, delegation
+    root, config, out = setup
+    harness_config(config)
+    executor = HarnessExecutor()
+
+    def logged(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = executor(argv, **kwargs)
+        if '-m' in argv and argv[argv.index('-m') + 1] in {'controller', 'verifier'}:
+            operation = argv[argv.index('-m') + 2]
+            kwargs['stderr'].write_text(generation(model='gpt-6-luna' if operation == 'contract' else 'another-model') +
+                                        (delegation() if operation == 'check' else ''))
+        return result
+
+    report = json.loads(run(config, out, root, execute=logged, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert report['metadata']['control_model'] is None
+    assert report['tasks'][0]['costs']['total_usd'] is None
+    warning = capsys.readouterr().err
+    assert 'another-model' in warning and 'gpt-6-luna' in warning

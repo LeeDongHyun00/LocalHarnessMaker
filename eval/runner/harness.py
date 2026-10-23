@@ -108,15 +108,31 @@ def invoke(module: str, operation: str, arguments: list[str], destination: Path,
     guard.verify()
     for path in [stdout, stderr, *([] if operation == "validate-handoff" else [destination])]:
         guard.fresh(path)
-    process = execute([sys.executable, "-m", module, operation, *arguments, *output_args],
-                      cwd=repository, env=env, stdin="", stdout=stdout, stderr=stderr, timeout=timeout)
+    accounting = streams.with_suffix(".control.json")
+    guard.fresh(accounting)
+    record = {"operation": operation, "exit_code": None, "timed_out": False}
+    accounting.write_text(json.dumps(record) + "\n")
+    guard.remember(accounting)
+    try:
+        process = execute([sys.executable, "-m", module, operation, *arguments, *output_args],
+                          cwd=repository, env=env, stdin="", stdout=stdout, stderr=stderr, timeout=timeout)
+    except (KeyboardInterrupt, OSError):
+        interrupted = [stdout, stderr, *([] if operation == "validate-handoff" else [destination])]
+        for path in interrupted:
+            if path.exists() or path.is_symlink():
+                guard.remember(path)
+        guard.archive_interruption([accounting, *interrupted])
+        raise
+    record.update(exit_code=process.returncode, timed_out=process.timed_out)
+    accounting.write_text(json.dumps(record) + "\n")
+    guard.remember(accounting)
     for path in [stdout, stderr, *([] if operation == "validate-handoff" else [destination])]:
         if path.exists() or path.is_symlink():
             guard.remember(path)
     guard.verify()
     limit = usage_limit_message([stdout, stderr])
     if limit:
-        guard.archive_interruption([stdout, stderr, *([] if operation == "validate-handoff" else [destination])])
+        guard.archive_interruption([accounting, stdout, stderr, *([] if operation == "validate-handoff" else [destination])])
         raise UsageLimitError(limit)
     if process.returncode != 0 or process.timed_out:
         raise HarnessError(f"{module} {operation} failed")

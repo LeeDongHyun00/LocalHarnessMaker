@@ -4,12 +4,14 @@ from datetime import datetime
 import json
 from pathlib import Path
 import subprocess
+import sys
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
 
 from eval.metrics import METHOD, compute, metric, total
 from eval.runner.audit import digest
+from eval.runner.control_accounting import control_calls
 from eval.runner.telemetry import records, session_id
 
 
@@ -93,9 +95,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     else:
         grading = None
     executor_usd = total([c["usage"]["usd"] for c in calls])
-    # Frozen contract/verdict CLIs do not expose per-call fallback accounting.
-    # Retain their logs; do not infer transport, actual model, or token cost.
-    control_usd = None if config["harness"] else 0
+    controls, control_usd = control_calls(entry, result["task_id"], pricing) if config["harness"] else ([], 0)
+    calls.extend(controls)
     # The verdict exposes negative done claims, but not the complete claim denominator.
     # Until a full claim observation is available, emit no measured claims and keep
     # false_done_rate undefined rather than treating unobserved claims as zero errors.
@@ -200,6 +201,9 @@ def validate(report: dict[str, Any], repository: Path) -> None:
             if u["cached_input_tokens"] is not None and u["input_tokens"] is not None and u["cached_input_tokens"] > u["input_tokens"]:
                 raise ValueError("Cached tokens exceed input tokens")
         executor = total([c["usage"]["usd"] for c in task["calls"] if c["purpose"] == "executor"])
+        control = total([c["usage"]["usd"] for c in task["calls"] if c["purpose"] != "executor"])
+        if task["costs"]["control_usd"] is not None and task["costs"]["control_usd"] != control:
+            raise ValueError("Control cost mismatch")
         if task["costs"]["executor_usd"] != executor or task["costs"]["total_usd"] != total([executor, task["costs"]["control_usd"]]):
             raise ValueError("Task cost mismatch")
     expected = {"attempted_tasks": len(tasks), "valid_tasks": sum(t["outcome"] != "invalid" for t in tasks),
@@ -217,12 +221,27 @@ def validate(report: dict[str, Any], repository: Path) -> None:
             raise ValueError("Reversed confidence bounds")
 
 
+def current_commit(repository: Path) -> str:
+    """Read local checkout provenance without launching an executor."""
+    return subprocess.run(["git", "rev-parse", "HEAD"], cwd=repository, capture_output=True,
+                          text=True, check=True, timeout=10).stdout.strip()
+
+
 def build(config: dict[str, Any], state: dict[str, Any], tasks: list[dict[str, Any]],
           version: str, repository: Path) -> dict[str, Any]:
     """Build a report using the versioned offline pricing provenance."""
     pricing = json.loads((repository / "eval/prices.yaml").read_text())
-    commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repository, capture_output=True,
-                            text=True, check=True, timeout=10).stdout.strip()
+    commit = current_commit(repository)
+    recorded_commit = state.get("git_commit", commit)
+    recorded_snapshot = state.get("pricing_snapshot_id", pricing["snapshot_id"])
+    if recorded_commit != commit:
+        print(f"Warning: run git_commit {recorded_commit} differs from build HEAD {commit}", file=sys.stderr)
+    if recorded_snapshot != pricing["snapshot_id"]:
+        print(f'Warning: run pricing snapshot {recorded_snapshot} differs from build snapshot {pricing["snapshot_id"]}', file=sys.stderr)
+    models = {c["model"] for t in tasks for c in t["calls"] if c["purpose"] != "executor"}
+    control_model = next(iter(models)) if len(models) == 1 and "unknown" not in models else None
+    if control_model is None:
+        print(f"Warning: control_model is null; observed control models: {sorted(models)}", file=sys.stderr)
     for task in tasks:
         reasons = task_version_reasons(task, version)
         if reasons:
@@ -234,9 +253,9 @@ def build(config: dict[str, Any], state: dict[str, Any], tasks: list[dict[str, A
     invalid = [f'{t["task_id"]}: {reason}' for t in tasks for reason in t["invalid_reasons"]]
     report = {"metadata": {"run_id": state["run_id"], "created_at": state["created_at"],
         "config_name": config["name"], "config_sha256": state["config_sha256"],
-        "task_set_sha256": state["task_set_sha256"], "git_commit": commit, "codex_version": version,
+        "task_set_sha256": state["task_set_sha256"], "git_commit": recorded_commit, "codex_version": version,
         "executor_model": config["model"], "reasoning_effort": config["reasoning_effort"],
-        "control_backend": config["control_backend"], "control_model": None,
+        "control_backend": config["control_backend"], "control_model": control_model,
         "seed": config["seed"], "reinstruction_limit": config["reinstruction_limit"],
         "cost_basis": "api_equivalent_usd", "pricing": pricing,
         "confidence": {"level": .95, "method": METHOD, "resamples": 10000, "seed": config["seed"]},

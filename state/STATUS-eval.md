@@ -1,56 +1,53 @@
 ## Done
 
-- Added 0.163.0-alpha.11.1 thread_settings_applied metadata validation and full-record private-marker scanning; unknown kinds remain inconclusive. Added the synthetic 34-record native fixture with the exact line-9 settings structure (.venv/bin/python -m pytest tests/eval -q: 596 passed in 56.24s).
-- Added applied-thread model/effort telemetry beside turn_context, conflict rejection, retained session evidence and a two-session 0.163 regression that reaches day 2 and grades once (.venv/bin/python -m pytest tests/eval -q: 596 passed).
-- Added resumable STOP-E1 usage-limit handling for executor error/turn.failed events and control_cli_events stderr envelopes; stderr preserves the supplied limit/reset text, and the interrupted task gets no outcome/report (.venv/bin/python -m pytest tests/eval -q: 596 passed, including exact event-pair, CLI stderr, no-thread recovery and whole-loop halt tests).
-- Preserved pending verifier/control operations, completed days and hash-pinned interrupted control streams/partial outputs across same-output recovery; eventual reports include archived evidence and retain unknown costs (.venv/bin/python -m pytest tests/eval -q: 596 passed, including all six two-session control stages, repeated limits and verifier reinstruction recovery).
-- Updated eval/README.md and eval/CHANGES.md; preserved frozen tasks and retained pilots, with no staging or commits (git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0; git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b: exit 0).
+- Added per-generation control accounting from hash-pinned stderr, actual backend/model and pinned eval rates, including retry/fallback and delegated judge calls; invalid task costs remain included (.venv/bin/python -m pytest tests/eval -q: 621 passed in 57.81s).
+- Added null propagation for incomplete delegations, missing success records, interrupted/failed/deadline operations without complete accounting, and unpriceable models/tokens; metadata observes a single control model and warns otherwise (.venv/bin/python -m pytest tests/eval -q: 621 passed, including fallback, null cases, days, reinstructions and mixed models).
+- Retained per-operation exit/deadline sidecars, archived interruption evidence and usage-limit recovery without rerunning completed executor work (.venv/bin/python -m pytest tests/eval -q: 621 passed, including existing usage-limit halt/recovery and interrupted handoff tests).
+- Added smoke/full harness configs with reinstruction_limit 2; reduced B to 100 single-session tasks in A order; generalized exact-config estimate matching and published planning estimates (.venv/bin/python -m pytest tests/eval -q: 621 passed, including config population, 21/900 pre-judge call bounds and changed-config rejection).
+- Recorded starting commit/pricing snapshot in new checkpoints; reports use starting commit, warn on drift and preserve legacy checkpoint behavior (.venv/bin/python -m pytest tests/eval -q: 621 passed, including start provenance, HEAD/pricing drift and legacy behavior).
+- Updated eval/README.md and eval/CHANGES.md; only this worktree was edited, without staging or committing (git symbolic-ref --short HEAD: r5/harness-smoke; git rev-parse --short HEAD: b9ac131; git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0; git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b: exit 0).
 
 ## Remaining
 
-- Claude reruns eval/configs/smoke-two-session-a.yaml on the host in a fresh output directory. Confirm both days' native/event audits, settings, distinct sessions, exact day2.md, exit hashes and one post-day-2 grade. The attempt1 invalid report remains unchanged and uncommitted.
-- Host-verify harness controller/verifier compatibility, developer_instructions delivery, retries, nested guards, termination, usage-limit recovery and production sandbox behavior. New CLI versions require a hook probe and audit smoke under decision 0006.
-- Re-audit retained pilots with the matching private root; inspect every error/access match and rerun pilot B in a fresh directory if exit hashes are missing. Compare only identical Codex versions; historical 0.162 pilots are diagnostic for 0.163 runs.
-- Manually review five valid pilot-A samples and A/B provenance/costs, then have Claude ask the user again before full runs. Configurations and estimates are not authorization.
-- Review structural helper extraction and submitted regression quality manually; behavioral graders do not certify those properties.
-- Complete control per-call accounting, full done-claim denominator and hash-pinned paired local-minus-cheap_api parity; D-3 through D-5 measurements remain pending.
+- Integrate Role 4's verifier forwarding/delegation implementation outside this session; it is absent from this worktree. Claude runs smoke-harness on the host next, with the real private root and a fresh output directory.
+- Confirm live accounting for contract/day-2 contract, judge retries/fallback, handoff, reinstruction, applied model/effort, audit evidence, termination, nested guards and developer_instructions delivery. Harness has never run live; mocked results do not establish compatibility.
+- Complete the user-filled stratified 20-task C subset and baseline C measurement; run reduced B and full harness under the approved host workflow. Main checkout's full A run is already in progress and must remain isolated.
+- Compare harness handoff_success with A. Keep local Gemma/QLoRA dropped and parity not measured; do not pursue the old local-comparator backlog.
+- Complete the done-claim denominator, five valid pilot-A human reviews and 20-sample review/reporting; inspect historical pilot audit/version/cost evidence on the host before using it for comparison.
 - Run the full repository suite once before a future merge. Only tests/eval ran here; no staging or commits.
 
 ## Decisions
 
-- Continue from committed b04f9b0: the two-session implementation was already complete; this session changes compatibility and infrastructure recovery only.
-- Treat thread_settings_applied as metadata: its full record receives private-path checks without interpreting ordinary settings as shell operands; malformed shapes and other unknown kinds remain inconclusive.
-- Require model/effort agreement across turn_context and thread_settings_applied: neither source can erase conflicting applied evidence.
-- Classify structured usage-limit failures as resumable infrastructure stops: halt the task loop before runner retries, grading or another task, without recording the interrupted task's outcome.
-- Archive interrupted control outputs and persist pending verification separately from executor transport: retries preserve evidence and avoid rerunning completed executor work.
-- Detect control limits after the bounded CLI returns: existing nested control_cli_events logs supply evidence without changing frozen interfaces or other-role paths.
-- Keep missing accounting unknown and reset text verbatim: quota stops do not establish zero cost or a reset timezone.
+- Consume controller/verifier stderr without changing their CLIs or shared schemas: user supplied the exact generation/delegation envelopes and Role 4 owns forwarding.
+- Pin operation sidecars with control evidence: process exit/deadline state is needed to distinguish complete accounting from a killed or interrupted command, and must survive recovery.
+- Reprice every observed generation with eval/prices.yaml: controller USD/pricing references are not the evaluation price snapshot; cache stays an input subset and reasoning stays inside output.
+- Keep incomplete accounting null while retaining known per-call costs: invalid tasks and interrupted operations cannot silently disappear from costs.
+- Preserve legacy checkpoint behavior and record provenance for new runs: a run's originating commit must not be replaced by end-of-run HEAD; pricing drift is reported with both snapshot IDs.
+- Apply user-approved decision 0007 scope as supplied: C uses 20 stratified user-filled templates, B uses 100 singles, handoff compares with A, local/QLoRA are dropped and parity is not measured.
+- Use pilot A session averages for requested executor planning estimates: full B additionally shows its historical max-effort pilot alternative; all figures are planning numbers, not measurements.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
 - git diff --check -- eval tests/eval state/STATUS-eval.md
 - git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b
-- Host only, fresh destination: .venv/bin/python -m eval run --config eval/configs/smoke-two-session-a.yaml --out eval/reports/smoke-two-session-a-attempt2/
-- Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-a/
-- Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-b/
-- Host only, hash-bearing source/fresh destination: .venv/bin/python -m eval.runner.regrade --private-root "$LHM_PRIVATE_GRADERS" --from SOURCE --out NEWDIR
-- Before comparison: .venv/bin/python -m eval.runner.compare_versions REPORT_A REPORT_B
+- Host only after Role 4 integration, fresh destination: .venv/bin/python -m eval run --config eval/configs/smoke-harness.yaml --out eval/reports/smoke-harness/
 - Before future merge only: full repository suite once.
 
 ## Do not touch
 
-- Frozen eval/tasks/, retained reports including eval/reports/smoke-two-session-a-attempt1/, docs/eval-freeze.md, controller/, verifier/, plugin/, shared schemas/configuration and other roles' tests/STATUS files. Never share tasks with Role 3.
-- .git is read-only: no staging, commits, history rewrites or file deletion. Exclude the uncommitted host smoke report from the commit plan.
-- No full measurement until Claude asks the user again and receives approval; configuration validation and estimates do not authorize calls.
-- No executor/controller/judge model calls, network, nested Codex, macOS sandbox-exec or private-root lookup in this sandbox. Tests use synthetic graders only.
+- Main checkout or its running baseline A; edit only eval/, tests/eval/ and state/STATUS-eval.md in this worktree.
+- Frozen eval/tasks/, retained measurements/pilots, controller/, verifier/, plugin/, shared schemas, CLI flags, root configuration and other roles' files. Never share tasks with Role 3.
+- .git is read-only: no staging, commits, history rewrites or file deletion.
+- No executor/controller/judge model calls, network, nested Codex, macOS sandbox-exec or real private-root lookup in this sandbox. Tests use synthetic graders only.
 - Never backfill historical exit hashes, mutate source regrade runs, run Codex in grading copies or expose grader output to executor/controller context.
 
 ## Assumptions
 
-- b04f9b0 contains the completed two-session work. The user's supplied host smoke stopped before day 2 and is invalid solely because line 9 was unsupported; this session inspected only the authorized native rollout and made no host/private-grader measurement.
-- Freeze commit 7cdaf3b and digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f remain authoritative. Frozen task content and historical pilots are unchanged.
-- The supplied usage-limit error and turn.failed events carry the same message; both nested error.message and direct message are supported. Reset text is relayed without inferring a timezone.
-- Control commands may finish existing internal retries/fallbacks before returning their retained structured events; eval halts on return and issues no subsequent call. No other-role implementation was changed.
-- The offline price snapshot and retained pilot totals remain planning inputs, not new measurements; unobserved accounting stays null. Historical pilots use 0.162.0-alpha.17.2 and full/smoke configurations select 0.163.0-alpha.11.1.
-- Checkpoints and runner manifests remain trusted evidence. Mocked regression success establishes orchestration only; Claude owns host verification, pilot review and renewed full-run approval.
+- This session starts on r5/harness-smoke at b9ac131 with its own .venv. Decision 0007 is supplied by the user but not yet present here; no decision record or shared interface was edited.
+- Role 4 will forward judge control_call/control_cli_events and exact judge_delegation records as specified; the runner treats missing/incomplete judge accounting as unknown. Live integration remains unverified.
+- Failed commands with complete retained generation accounting can retain known costs; deadlines, negative/missing exits and incomplete streams remain unknown. Successful contract/handoff requires a success record.
+- Planning Luna generations use 5,000 uncached input and 1,000 output tokens ($0.001 at the pinned rates); every day uses one pilot-A average session, with up to three attempts and three generations per control command.
+- Starting snapshot ID is recorded for drift detection; report pricing still describes the snapshot actually used at report build. Old checkpoints are not migrated or backfilled.
+- Freeze commit 7cdaf3b and population digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f remain authoritative. Historical pilots use 0.162; new configurations pin 0.163.0-alpha.11.1.
+- Usage limits are no longer a planning constraint; the existing resumable halt remains necessary infrastructure behavior. No live measurement or spending approval is implied by config validation.

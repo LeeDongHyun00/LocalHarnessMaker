@@ -1,3 +1,44 @@
+# Harness accounting, configurations and run provenance — 2026-10-23
+
+Price each hash-pinned controller/verifier `control_call` stderr record with the
+eval price snapshot, including retries and codex_cli-to-cheap_api fallback.
+Retain actual model/backend/status/latency and ignore controller USD. Delegation
+completeness/count checks and missing model/tokens propagate unknown control
+and total costs. Invalid tasks retain costs. Mechanical verification and
+validate-handoff add no calls. Single observed control model fills metadata;
+none or multiple models produces a warning and null. Operation sidecars retain
+exit/deadline evidence and survive usage-limit and interrupt recovery.
+
+Add smoke/full harness configurations with two reinstructions (three attempts
+per day), reduce full B to 100 single-session tasks, and publish planning
+estimates. The estimate guard accepts exact bundled NAME configurations with
+NAME-estimate.md while retaining historical pilot/full mappings. Headline
+harness cost comparison remains pending live measurement. Decision 0007 drops
+local Gemma/QLoRA and parity measurement, assigns C a user-filled stratified
+20-task subset, and compares handoff with A. No frozen tasks changed.
+
+New checkpoints capture starting git commit and pricing snapshot ID. Reports
+use the recorded commit, warn with both values on HEAD/snapshot drift, and
+preserve build-time behavior for older checkpoints. Prices in report metadata
+still identify the snapshot actually used to price the retained calls.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 621 passed in 57.81s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b`
+both exited 0. Tests use mocked models and synthetic local graders only.
+
+## Assumptions
+
+- Role 4 will supply the exact judge forwarding/delegation records described by
+  the user. This worktree does not include or modify that implementation.
+- Mocked tests establish accounting/orchestration, not live compatibility;
+  Claude runs the host smoke next. No model/network/private-root lookup occurs.
+- Luna planning uses 5,000 uncached input and 1,000 output tokens per generation;
+  executor planning uses pilot A's session average. Full B also shows its
+  historical max-effort pilot alternative. Planning estimates are not measurements.
+- Only eval-owned paths change in r5/harness-smoke at b9ac131. Main's running
+  full-A process and worktree are untouched. No staging or commits.
+
 # 0.163 audit compatibility and usage-limit recovery — 2026-10-23
 
 Support the host smoke's line-9 `event_msg.thread_settings_applied` as non-tool

@@ -92,15 +92,16 @@ def test_full_configurations_cover_exact_frozen_inventory() -> None:
     for letter, effort, config in zip('ab', ['medium', 'max'], configs):
         pilot = json.loads((REPOSITORY / f'eval/configs/pilot-{letter}.yaml').read_text())
         assert config['codex_version'] == 'codex-cli 0.163.0-alpha.11.1'
-        assert config['tasks'] == inventory
+        selected = inventory if letter == 'a' else [t for t in inventory if not t.startswith('two-session-')]
+        assert config['tasks'] == selected
         assert config['reasoning_effort'] == effort and config['harness'] is False
         for key in ('seed', 'retry_limit', 'reinstruction_limit', 'model',
                     'grading_timeout_seconds', 'timeout_seconds', 'control_backend'):
             assert config[key] == pilot[key]
-        assert set(config['task_timeout_seconds']) == set(inventory)
+        assert set(config['task_timeout_seconds']) == set(selected)
         assert sum(2 if json.loads((REPOSITORY / 'eval/tasks' / task / 'meta.json').read_text())['two_session'] else 1
-                   for task in config['tasks']) == 140
-    assert configs[0]['tasks'] == configs[1]['tasks']
+                   for task in config['tasks']) == (140 if letter == 'a' else 100)
+    assert configs[0]['tasks'][:100] == configs[1]['tasks']
     smoke = load_config(REPOSITORY / 'eval/configs/smoke-two-session-a.yaml')
     assert smoke['tasks'] == ['two-session-prefix-sums']
     assert smoke['model'] == 'gpt-6.1-sol' and smoke['reasoning_effort'] == 'medium'

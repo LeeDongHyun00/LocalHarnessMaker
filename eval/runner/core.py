@@ -16,7 +16,7 @@ from typing import Any, Callable
 import uuid
 
 from eval.runner import harness
-from eval.runner.report import build, build_task, native_version_reasons
+from eval.runner.report import build, build_task, current_commit, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
 from eval.runner.limits import UsageLimitError, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
@@ -128,12 +128,16 @@ def require_call_estimate(config: dict[str, Any], judges: dict[str, int] | None 
     if config["harness"]:
         print(f"Paid-call estimate: at most {maximum} calls with currently known judge criteria; "
               "includes both days, contracts, handoff, retries and fallbacks. "
-              "New judge criteria require a revised bound; USD remains unknown.", file=sys.stderr)
+              "New judge criteria require a revised bound; planning USD is in the matched estimate, measured USD requires complete accounting.", file=sys.stderr)
     if maximum < 10:
         return
     estimated = [(REPOSITORY / f"eval/configs/{kind}-{letter}.yaml",
                   REPOSITORY / f"eval/reports/{kind}-estimate.md")
                  for kind in ("pilot", "full") for letter in ("a", "b")]
+    name = config.get("name", "")
+    if isinstance(name, str) and re.fullmatch(r"[a-z0-9][a-z0-9-]*", name):
+        estimated.insert(0, (REPOSITORY / f"eval/configs/{name}.yaml",
+                             REPOSITORY / f"eval/reports/{name}-estimate.md"))
     match = next((estimate for candidate, estimate in estimated
                   if candidate.is_file() and estimate.is_file() and
                   json.loads(candidate.read_text()) == config), None)
@@ -283,7 +287,9 @@ def run(
             raise ValueError("Resume task set differs from checkpoint")
     else:
         state = {"report_schema": "evaluation-report-v1", "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
-                 "task_set_sha256": task_set_hash, "config": config, "tasks": {}}
+                 "task_set_sha256": task_set_hash, "config": config, "tasks": {},
+                 "git_commit": current_commit(REPOSITORY),
+                 "pricing_snapshot_id": json.loads((REPOSITORY / "eval/prices.yaml").read_text())["snapshot_id"]}
         write_json(checkpoint, state)
     order = list(config["tasks"])
     random.Random(config["seed"]).shuffle(order)
@@ -613,7 +619,7 @@ def run(
             if (guard.safe(evidence) and evidence.is_file() and
                     digest(evidence.read_bytes()) == expected_hash and
                     (evidence.name in {"contract.json", "handoff.json"} or
-                     re.fullmatch(r"verdict-[0-9]+\.json", evidence.name) or
+                     re.fullmatch(r"verdict-[0-9]+\.json", evidence.name) or evidence.name.endswith(".control.json") or
                      re.fullmatch(r"(?:contract|verdict-[0-9]+|handoff|handoff-validation)\.std(?:out|err)", evidence.name))):
                 target = (task_out / evidence.relative_to(runtime) if evidence.is_relative_to(runtime / "control-interruptions")
                           else task_out / (evidence.parent.name + "-" + evidence.name
