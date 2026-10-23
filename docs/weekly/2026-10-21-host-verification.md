@@ -469,3 +469,10 @@ Spot-check of two new v2 prompts (calendar-windows multiple_requirements, rate-b
 ## Version 2 frozen (2026-10-24, main 9097281)
 
 r5-freeze-002 set frozen=true on all 100 meta.json files (only that field changed); tests/eval 1664 passed. Claude computed the digest on the host with eval.freeze_v2 over public inputs plus external grader contents: 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, 100 tasks, 20 families of 5, 20 two-session tasks. full-v2-a and full-v2-harness select that digest; full-v2-b selected its own 80-task digest, so r5-v2-005 adds the task_population declaration before any v2 run. Role 1 publishes docs/eval-freeze-v2.md (r1-cont-009). After this point no harness change may use version 2 results.
+
+## Interim version 1 comparison and the start of the version 2 runs (2026-10-24)
+
+- Recovery chain 2 made full-b complete: full-b-recovered2 is valid, 100 of 100 pass, 4.465 USD, cost_per_pass 0.0447 USD. full-harness-recovered3 is valid (119 pass, 1 fail) but its fresh rerun has unpriced control calls; full-a-continued2 is valid (117 pass, 3 fail) with one unpriced day-2 session. r5-fixes-005 (merged 336c072, 1690 tests) prices control calls in every recovery path and keeps mixed pricing provenance; recovery chain 3 reruns the harness casualty and re-prices A.
+- Interim paired comparison (docs/evaluation/interim-v1/): harness vs A pass rate +0.017 (CI -0.017 to 0.050); per-type cost_per_pass ratio 1.37 (bug_fix) and 1.42 (constrained_refactoring), harness more expensive; handoff 0.95 vs 0.85. Harness vs B: equal pass rate 1.0; cost ratio 0.81 and 0.75, harness cheaper, intervals below 1. Overall cost ratios wait for the re-pricing.
+- Version 2 full runs started at 11:35 UTC from the pinned checkout 51d2e52 (the freeze commit plus the population test), three configurations concurrently on the Fast tier, detached. Concurrency affects latency only.
+- Reports committed: the recovered version 1 reports and both v2 calibration pilots (b659815; leak scans 0 private markers, 0 user paths).
