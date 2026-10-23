@@ -1,13 +1,23 @@
-# Shared interfaces, version 1
+# Shared interfaces, version 2
 
-Status: approved by the user on 2026-10-21. schemas/VERSION is 1. Decisions
+Status: version 2 approved by the user on 2026-10-23 in
+[0009 task-level false done](decisions/0009-task-level-false-done.md).
+schemas/VERSION is 2. Version 1 was approved on 2026-10-21. Decisions
 [0002 judgment](decisions/0002-judgment-schema-proposal.md),
 [0003 evaluation report](decisions/0003-evaluation-report-schema-proposal.md) and
 [0004 backend/guard](decisions/0004-codex-cli-backend-and-nested-guard-proposal.md)
-are the approved change records. Version 1 is published ahead of the planned
+are the original approved change records. Version 1 was published ahead of the planned
 2026-10-24 freeze; later revisions require approval, a record and a version
 increment. Published contracts do not establish implemented or measured runtime
 behavior. Each owning role's STATUS records implementation evidence.
+
+Version 2 adds only the required `metrics.task_false_done_rate` entry and the
+`claimed_complete_task` sample unit. Reports with that entry are version 2;
+version 1 reports omit it and validate against the original schema preserved in
+decision 0003. No report version field is added. Previously produced full-a,
+full-b, smoke reports and pilots remain valid version 1 documents; compare them
+only through tools that accept both versions. Report-interface version and
+task-set version are separate identities. Publication does not migrate reports.
 
 ## Setup and checks
 
@@ -109,7 +119,7 @@ only exit status while retaining evidence.
 | handoff.schema.json | handoff.json | Resume the failing first attempt |
 | judgment-input.schema.json | criterion.json | Exactly one full llm_judge contract criterion; locally references the existing definition |
 | judgment.schema.json | judgment.json | criterion_id, status, reason, evidence, model and usage |
-| evaluation-report.schema.json | evaluation_report.json | Run metadata, audited task results, six metrics, accounting and aggregate validity |
+| evaluation-report.schema.json | evaluation_report.json | Run metadata, audited task results, seven metrics, accounting and aggregate validity |
 
 Schema filenames are under schemas/ and example filenames under
 schemas/examples/. make validate-schemas validates all six schema definitions
@@ -161,10 +171,26 @@ missing observation invalidates rather than silently dropping a task.
 | --- | --- | --- |
 | pass_rate | Passing valid tasks / valid tasks | valid_task |
 | false_done_rate | claimed_without_evidence / claimed items from valid tasks | claimed_criterion |
+| task_false_done_rate | Claimed-complete valid tasks failing hidden grading / claimed-complete valid tasks | claimed_complete_task |
 | cost_per_pass | All attempted tasks' executor + control API-equivalent USD / passing valid tasks | attempted_task |
 | avg_attempts | Mean executor attempts per valid task | valid_task |
 | handoff_success | Eligible valid two-session tasks passing without restated context / eligible valid two-session tasks | eligible_two_session_task |
 | parity | Local pass_rate minus cheap_api pass_rate on matched valid tasks | matched_task |
+
+For `task_false_done_rate`, both numerator and denominator exclude invalid
+tasks, which remain visible through existing `invalid_reasons` and `validity`
+fields. Apply the claim extractor rules from `verifier/claims.py` to the retained
+final message of the last session, identically for A, B, C and every harness
+configuration. Earlier messages, tool output and controller/verifier messages
+cannot substitute. A task with no retained final message is undefined and
+excluded from both populations with a reason; do not infer an absent claim.
+`sample_size` counts claimed-complete valid tasks with retained final evidence.
+Retain source segment/hash, claim evidence and exclusion reasons in existing
+artifact references; add no per-task fields. Role 5 owns implementation in
+`eval/metrics.py` and the report builder. Existing criterion-level
+`false_done_rate` stays unchanged. Use retained evidence only, with no new
+executor/judge calls or grading of invalid tasks. The synthetic report example
+has no retained final message, so its new metric is null with an explicit reason.
 
 Each metric has value, sample_size, sample_unit, ci95 and undefined_reason.
 ci95 specifies level=0.95, lower, upper and

@@ -14,6 +14,9 @@ Forbidden: editing controller/ or verifier/. Sharing task set contents with Role
 ## Interfaces
 
 Version 1 is approved in AGENTS.md section 3 and decisions 0002–0004.
+Version 2, approved on 2026-10-23 in decision 0009, adds task_false_done_rate
+and the claimed_complete_task unit. Existing version 1 reports remain valid
+version 1 documents; compare versions only through tools accepting both.
 
 1. Call other roles only through their CLIs. The runner owns contract injection, verification, re-instruction and handoff independently of hooks. Primary control backend is codex_cli with gpt-6-luna; cheap_api HTTP fallback uses the same model, and local Gemma implementation and measurement are dropped by decision 0007 without removing the selector. Pass the explicit backend selection and account for actual fallback transport.
 2. Executor calls retain codex exec "PROMPT" --sandbox workspace-write --json -o FILE and codex exec resume SESSION_ID "REINSTRUCT_MESSAGE". Every executor/resume child inherits HARNESS_NESTED=1 from a copied child environment so plugin hooks exit before any work. Do not mutate the parent environment. Confirm applied model/effort from installed-version evidence; retain complete events and hashes from all attempts/resumes.
@@ -37,6 +40,7 @@ Decision 0007 sets the run schedule: W1 through 2026-10-30, harness-mode smoke a
 
 - pass_rate: passing valid tasks divided by valid tasks; sample_size counts valid tasks.
 - false_done_rate: claimed_without_evidence items divided by claimed items from valid tasks; sample_size counts claimed criterion items.
+- task_false_done_rate: claimed-complete valid tasks failing hidden grading divided by claimed-complete valid tasks; both numerator and denominator exclude invalid tasks. sample_size counts claimed-complete valid tasks with retained final evidence; sample_unit is claimed_complete_task. Invalid tasks remain visible through existing invalid_reasons and validity fields. Implement in eval/metrics.py and the report builder using the claim extractor rules from verifier/claims.py on the retained final message of the last session, identically for A, B, C and every harness configuration. A task with no retained final message is undefined and excluded from both populations with a reason, never inferred to have made no claim. Retain source segment/hash, claim evidence and exclusion reasons in existing artifact references without adding per-task fields. Use retained evidence only, with no new executor/judge calls or grading of invalid tasks; preserve the criterion-level metric unchanged.
 - cost_per_pass: executor plus all control API-equivalent USD for all attempted tasks, including invalid/failed/retried/fallback calls, divided by passing valid tasks; sample_size counts all attempted tasks.
 - avg_attempts: mean executor attempts per valid task; controller regenerations affect costs, not executor attempt counts.
 - handoff_success: eligible valid two-session tasks passing without restated day-1 context divided by eligible valid two-session tasks; retain observation evidence.
