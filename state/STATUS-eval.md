@@ -1,5 +1,7 @@
 ## Done
 
+- Resolved substitution-free command templates and immutable const/let string arrays through map, for-of and direct tool arguments; audited every element and verified native synthetic private-path detection plus fail-closed near misses (`.venv/bin/python -m pytest tests/eval -q`: 1218 passed in 114.77s)
+- Recorded this parser correction in eval/CHANGES.md and preserved frozen task files, retained reports and schemas (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas`: exit 0)
 - Enabled boolean calibration (default false) before freeze, with checkpoint/diagnostic/report-artifact labeling, stderr notice and compare refusal; enabled the v2 A pilot and revised its Fast planning estimate (`.venv/bin/python -m pytest tests/eval -q`: 1126 passed in 113.59s)
 - Preserved the original Standard snapshot, pinned user-supplied Fast rates plus the Standard Sol 6 supplement, captured newly observed executor tiers per process, required control-call tier evidence and retained per-call pricing provenance across recovery; unknown tiers remain null (`.venv/bin/python -m pytest tests/eval -q`: 1126 passed in 113.59s)
 - Implemented task_false_done_rate using retained last-session final messages and the verifier extractor's clause semantics, valid-task numerator/denominator, explicit missing-message exclusions, source hashes and seeded task-cluster bootstrap; retained criterion-level false_done_rate and added v1/v2 report-reader compatibility (`.venv/bin/python -m pytest tests/eval -q`: 1126 passed in 113.59s)
@@ -8,6 +10,7 @@
 
 ## Remaining
 
+- Host: transfer the template/immutable-array parser correction at a safe boundary and re-audit the affected full-harness two-session retained streams. Host streams and the actual private grader root are unavailable here; no recovery outcome is claimed.
 - Review and transfer repository changes and the matching private v2 candidate artifacts at a safe boundary for other checkouts. Do not stage or commit here; use the final Commit plan on the host.
 - Host: obtain spending approval for the 24-session baseline-A calibration using calibration=true. Run with the approved Codex version and observed priority tiers; retain candidate hashes and all outcomes. Calibration precedes freeze and is never headline evidence.
 - After calibration: revise only at whole-family/type level if needed, build the remaining sixteen planned families, validate the whole population and publish its separate freeze through Role 1.
@@ -18,6 +21,7 @@
 
 ## Decisions
 
+- Decode substitution-free templates and one-use literal command arrays without executing JavaScript: expand every array element into an independently audited command, and retain inconclusive outcomes for interpolation, nonliterals, rebinding, mutation, aliases, extra uses or unsupported binding identity/scope.
 - Permit an explicit calibration procedure before freeze: the default freeze rule remains, candidate bytes remain hash-pinned, and calibration status is persisted through recovery and refused by compare.
 - Keep the original Standard snapshot intact and add dated tier snapshots: schema-compatible metadata serializes their complete pins in the existing source field; per-call artifacts retain tier/source/pricing_ref evidence.
 - Capture newly emitted native applied settings at process exit: later resumes cannot reprice earlier calls. Control calls without an observed tier remain unknown, including existing controller versions without that field.
@@ -30,15 +34,15 @@
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
-- .venv/bin/python "$LHM_PRIVATE_GRADERS/validate_distinct_pilot.py"
+- Host/private validation only: .venv/bin/python "$LHM_PRIVATE_GRADERS/validate_distinct_pilot.py"
 - git diff --check -- eval tests/eval state/STATUS-eval.md
-- git diff --exit-code -- eval/tasks schemas
+- git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas
 - Host/retained evidence only: python -m eval.runner.regrade --private-root P --from SOURCE --out NEW
 - Host/approved spending only: python -m eval run --config eval/configs/pilot-v2-a.yaml --out eval/reports/pilot-v2-a/
 
 ## Do not touch
 
-- Work only in r5/v2 with this worktree's .venv; edit only eval/, tests/eval/, this status file and the authorized private v2 candidate artifacts. Preserve other checkouts and roles' paths.
+- Work only in r5/v2 with this worktree's .venv; edit only eval/, tests/eval/ and this status file. Preserve other checkouts, private companion artifacts and other roles' paths.
 - Frozen v1 public tasks/graders, retained v1 reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or project-file deletion.
 - No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Model and executor integration checks must use mocks.
@@ -48,6 +52,7 @@
 
 ## Assumptions
 
+- The two supplied full-harness input shapes describe the host failures; synthetic native custom_tool_call regressions verify parser behavior here. The unavailable host streams/private root require retained-evidence re-audit on the host before changing any task outcome.
 - The Fast prices, 2026-07-30 naming change and Luna CLI priority default are user-supplied official-page/host observations; network verification is unavailable. No live cost or quality measurement is claimed.
 - The existing verifier exposes criterion extraction only. Binding task-scoped prose to one synthetic task ID applies its completion vocabulary, negation, exceptions and quote/code rules without treating criterion counts or test-only statements as whole-task completion.
 - Only the retained final output of the final process in the last required session supplies completion evidence; absent evidence is explicitly undefined, with no earlier-session or intermediate-message substitution.

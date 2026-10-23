@@ -9,9 +9,15 @@ TOKEN = re.compile(r'''//[^\n]*|/\*[\s\S]*?\*/|"(?:[^"\\]|\\[\s\S])*"|'(?:[^'\\]
 
 
 def literal(token: str) -> str | None:
-    """Decode modern JavaScript quoted strings, never evaluate source code."""
-    if len(token) < 2 or token[0] not in {'"', "'"} or token[-1] != token[0]:
+    """Decode strings and substitution-free templates, never evaluate code."""
+    if len(token) < 2 or token[0] not in {'"', "'", '`'} or token[-1] != token[0]:
         return None
+    template = token[0] == '`'
+    if template and '${' in token:
+        return None
+    # JavaScript normalizes raw CR/CRLF in templates, before escape decoding.
+    if template:
+        token = token.replace('\r\n', '\n').replace('\r', '\n')
     result: list[str] = []
     cursor = 1
     escapes = {"n": "\n", "r": "\r", "t": "\t", "b": "\b", "f": "\f", "v": "\v",
@@ -19,7 +25,7 @@ def literal(token: str) -> str | None:
     while cursor < len(token) - 1:
         char = token[cursor]
         cursor += 1
-        if char in {"\n", "\r", token[0]}:
+        if char == token[0] or (not template and char in {"\n", "\r"}):
             return None
         if char != "\\":
             result.append(char)
@@ -124,6 +130,125 @@ def string_expression(tokens: list[str]) -> str | None:
         return None
 
 
+def command_fields(tokens: list[str], pairs: dict[int, int], tool: int) -> list[tuple[str, int, int, int]] | None:
+    """Return direct command-object fields as key/position/value-span tuples."""
+    if tokens[tool:tool + 5] != ['tools', '.', 'exec_command', '(', '{']:
+        return None
+    end = pairs.get(tool + 3, -1)
+    if pairs.get(tool + 4) != end - 1:
+        return None
+    fields: list[tuple[str, int, int, int]] = []
+    cursor = tool + 5
+    while cursor < end - 1:
+        position = cursor
+        key = literal(tokens[cursor]) or tokens[cursor]
+        if not re.fullmatch(r'[A-Za-z_]\w*', key) or tokens[cursor].startswith('`'):
+            return None
+        if key == 'cmd' and tokens[cursor] == key and tokens[cursor + 1] in {',', '}'}:
+            fields.append((key, position, cursor, cursor + 1))
+            cursor += 2
+            continue
+        if tokens[cursor + 1] != ':':
+            return None
+        start = cursor + 2
+        cursor = start
+        while cursor < end - 1 and tokens[cursor] != ',':
+            cursor = pairs[cursor] + 1 if cursor in pairs else cursor + 1
+        fields.append((key, position, start, cursor))
+        cursor += 1
+    return fields
+
+
+def collection_commands(tokens: list[str], pairs: dict[int, int],
+                        fields: dict[int, list[tuple[str, int, int, int]]]) -> dict[int, list[str]]:
+    """Resolve one-use literal arrays only at direct tool command operands.
+
+    Match all identifier occurrences across the input, including after the call.
+    Extra bindings, aliases, mutations, escapes and element transformations thus
+    cannot be hidden by an otherwise recognized map or for-of loop.
+    """
+    # Escaped identifiers and dynamic scope defeat textual binding identity.
+    if any(token in {'\\', 'with'} for token in tokens):
+        return {}
+    slots = {start for entries in fields.values() for key, _, start, end in entries
+             if key == 'cmd' and end == start + 1}
+    keys = {position for entries in fields.values() for _, position, start, _ in entries
+            if position != start}
+    positions: dict[str, set[int]] = {}
+    for i, token in enumerate(tokens):
+        if i not in keys:
+            positions.setdefault(token, set()).add(i)
+    resolved: dict[int, list[str]] = {}
+    for i, token in enumerate(tokens[:-4]):
+        if (token not in {'const', 'let'} or tokens[i + 2:i + 4] != ['=', '['] or
+                (i and tokens[i - 1] not in {';', '{', '}'})):
+            continue
+        name = tokens[i + 1]
+        end = pairs.get(i + 3, -1)
+        if end < 0 or (end + 1 < len(tokens) and tokens[end + 1] != ';'):
+            continue
+        values: list[str] = []
+        cursor = i + 4
+        while cursor < end:
+            value = literal(tokens[cursor])
+            if value is None or (cursor + 1 < end and tokens[cursor + 1] != ','):
+                break
+            values.append(value)
+            cursor += 2 if cursor + 1 < end else 1
+        if cursor != end or not values:
+            continue
+        uses = positions.get(name, set()) - {i + 1}
+        if len(uses) != 1:
+            continue
+        use = next(iter(uses))
+        if use <= end or any(opening < i < closing < use for opening, closing in pairs.items()
+                             if tokens[opening] == '{'):
+            continue
+        if use in slots:
+            resolved[use] = values
+            continue
+        # commands.map(cmd => tools.exec_command({cmd})), optionally with a
+        # parenthesized single parameter or a braced callback body.
+        if tokens[use + 1:use + 4] == ['.', 'map', '('] and use + 3 in pairs:
+            body_end = pairs[use + 3]
+            binding = use + 4
+            arrow = binding + 1
+            if tokens[binding:binding + 1] == ['('] and pairs.get(binding) == binding + 2:
+                binding += 1
+                arrow += 2
+            if tokens[arrow:arrow + 2] != ['=', '>']:
+                continue
+            body_start = arrow + 2
+            cursor = body_start
+            while cursor < body_end and tokens[cursor] != ',':
+                cursor = pairs[cursor] + 1 if cursor in pairs else cursor + 1
+            if cursor != body_end:
+                continue
+        # for (const cmd of commands) { ... }, or a single unbraced statement.
+        elif (use >= 5 and tokens[use - 5:use - 3] == ['for', '('] and
+              tokens[use - 3] in {'const', 'let'} and tokens[use - 1] == 'of' and
+              tokens[use + 1:use + 2] == [')'] and pairs.get(use - 4) == use + 1):
+            binding = use - 2
+            body_start = use + 2
+            body_end = body_start
+            if tokens[body_start:body_start + 1] == ['{']:
+                body_end = pairs.get(body_start, body_start)
+            else:
+                while body_end < len(tokens) and tokens[body_end] != ';':
+                    body_end = pairs[body_end] + 1 if body_end in pairs else body_end + 1
+        else:
+            continue
+        element = tokens[binding]
+        if element == name or not re.fullmatch(r'[A-Za-z_$][\w$]*', element):
+            continue
+        references = positions.get(element, set()) - {binding}
+        if not references or any(ref not in slots or not body_start <= ref < body_end for ref in references):
+            continue
+        for ref in references:
+            resolved[ref] = values
+    return resolved
+
+
 def tool_calls(source: str) -> tuple[list[dict[str, Any]], list[str], bool]:
     """Find every tools.name(...) call, independently of surrounding control flow."""
     tokens = [m[0] for m in TOKEN.finditer(source) if not m[0].startswith(('//', '/*'))]
@@ -154,6 +279,9 @@ def tool_calls(source: str) -> tuple[list[dict[str, Any]], list[str], bool]:
             unknown = True
     commands: list[dict[str, Any]] = []
     patches: list[str] = []
+    fields = {i: entries for i, token in enumerate(tokens) if token == 'tools'
+              and (entries := command_fields(tokens, pairs, i)) is not None}
+    collections = collection_commands(tokens, pairs, fields)
     for i, token in enumerate(tokens):
         if token != 'tools':
             continue
@@ -177,23 +305,24 @@ def tool_calls(source: str) -> tuple[list[dict[str, Any]], list[str], bool]:
             unknown = True
             continue
         arguments: dict[str, Any] = {}
-        cursor = start + 1
-        while cursor < end - 1:
-            key = literal(tokens[cursor]) or tokens[cursor]
-            if cursor + 1 >= end - 1 or tokens[cursor + 1] != ':' or not re.fullmatch(r'[A-Za-z_]\w*', key):
-                unknown = True
-                break
-            value_start = cursor + 2
-            cursor = value_start
-            while cursor < end - 1 and tokens[cursor] != ',':
-                cursor = pairs[cursor] + 1 if cursor in pairs else cursor + 1
+        entries = fields.get(i)
+        if entries is None:
+            unknown = True
+        collection: list[str] | None = None
+        for key, _, value_start, value_end in entries or []:
             if key in {'cmd', 'workdir', 'command', 'cwd'}:
-                value = string_expression(tokens[value_start:cursor])
+                if key == 'cmd' and value_end == value_start + 1 and value_start in collections:
+                    collection = collections[value_start]
+                    value = collection[0]
+                else:
+                    value = string_expression(tokens[value_start:value_end])
                 if key in arguments or value is None:
                     unknown = True
                 arguments[key] = value
-            cursor += 1
         if not isinstance(arguments.get('cmd'), str):
             unknown = True
-        commands.append(arguments)
+        if collection:
+            commands.extend({**arguments, 'cmd': value} for value in collection)
+        else:
+            commands.append(arguments)
     return commands, patches, unknown

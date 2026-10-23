@@ -1,3 +1,32 @@
+# Code-mode templates and immutable command arrays — 2026-10-23
+
+Decode substitution-free backtick literals with JavaScript escape and newline
+semantics. Accept quoted strings and these templates in const/let command arrays
+used once through a direct tool argument, map callback or for-of loop. Expand
+every element into a separate audited command without evaluating JavaScript.
+
+Require one binding and one collection use, direct element arguments, and no
+rebinding, mutation, aliases, extra uses or scope escapes. Interpolation,
+nonliteral array elements, unsupported argument forms and uncertain identifier
+identity remain inconclusive. Preserve existing command/path checks and access
+invalidation, including a private-path command in a middle array element.
+
+Regression tests replay native custom_tool_call records with both exact host
+shapes, const/let bindings, quoted/template elements, map/for-of/direct-array
+uses, and synthetic private paths. Near misses cover interpolation, nonliterals,
+reassignment, push/splice/index mutation, aliases, repeated uses, transformed
+elements, scope escapes and escaped identifiers.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1218 passed in
+114.77s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas` — exit 0.
+
+## Assumptions
+
+- Supplied input shapes describe the two host failures. Actual host streams and
+  private graders are unavailable; this session verifies synthetic evidence
+  only. Retained-evidence recovery remains a host step.
+
 # Restart recovery, selective reruns and audit precision — 2026-10-23
 
 Exempt only missing terminal events in explicitly interrupted executor segments;
