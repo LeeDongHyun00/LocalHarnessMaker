@@ -274,6 +274,210 @@ def workspace_glob(pattern: Path, workspace: Path | None) -> bool:
     return canonical == allowed or canonical.startswith(allowed + "/")
 
 
+def shell_data_spans(command: str) -> list[tuple[int, int]]:
+    """Locate heredoc bodies/delimiters and comments for shell-loop detection.
+
+    These spans only prevent interpreting data as new shell syntax. The legacy
+    operand, expansion and protected-path checks still inspect the original text.
+    Quoted arguments already remain single raw words in shell_tokens.
+    """
+    if "<<" not in command and "#" not in command:
+        return []
+    spans: list[tuple[int, int]] = []
+    pending: list[tuple[str, bool]] = []
+    word = re.compile(r"(?:[^\s;&|()<>'\"\\]|\\.|'[^']*'|\"(?:[^\"\\]|\\.)*\")+", re.DOTALL)
+    index = 0
+    quote: str | None = None
+    while index < len(command):
+        ch = command[index]
+        if quote is not None:
+            if ch == "\\" and quote == '"':
+                index += 2
+                continue
+            if ch == quote:
+                quote = None
+        elif ch == "\\":
+            index += 2
+            continue
+        elif ch in "'\"":
+            quote = ch
+        elif ch == "#" and (index == 0 or command[index - 1] in " \t\r\n;&|()"):
+            end = command.find("\n", index)
+            end = len(command) if end < 0 else end
+            spans.append((index, end))
+            index = end
+            continue
+        elif command.startswith("((", index):
+            # An arithmetic shift is not a heredoc redirection.
+            end = command.find("))", index + 2)
+            index = len(command) if end < 0 else end + 2
+            continue
+        elif command.startswith("<<<", index):
+            index += 3
+            continue
+        elif command.startswith("<<", index):
+            index += 2
+            strip_tabs = command[index:index + 1] == "-"
+            index += int(strip_tabs)
+            while command[index:index + 1] in {" ", "\t"}:
+                index += 1
+            match = word.match(command, index)
+            if match is not None:
+                delimiter = shlex.split(match.group())
+                if len(delimiter) == 1:
+                    pending.append((delimiter[0], strip_tabs))
+                index = match.end()
+            continue
+        elif ch == "\n" and pending:
+            index += 1
+            for delimiter, strip_tabs in pending:
+                start = index
+                while index < len(command):
+                    end = command.find("\n", index)
+                    end = len(command) if end < 0 else end + 1
+                    line = command[index:end].removesuffix("\n")
+                    index = end
+                    if (line.lstrip("\t") if strip_tabs else line) == delimiter:
+                        break
+                spans.append((start, index))
+            pending.clear()
+            continue
+        index += 1
+    return spans
+
+
+def literal_loop_tokens(tokens: list[tuple[str, str]], command: str) -> tuple[list[tuple[str, str]], bool]:
+    """Unroll one literal for loop, retaining uncertainty for every other form.
+
+    This is operand extraction, not shell execution: inspect both sides of an
+    if and every literal iteration, even when a file does not currently exist.
+    Rejected forms retain their original tokens so concrete access still wins.
+    """
+    separators = {";", "&&", "||", "|", "&"}
+    data = shell_data_spans(command)
+    loops: list[int] = []
+    offset = 0
+    for i, (value, raw) in enumerate(tokens):
+        position = command.index(raw, offset)
+        at_start = (i == 0 or "\n" in command[offset:position] or
+                    tokens[i - 1][1] in separators | {"(", "do", "then", "else"})
+        if (at_start and value == raw and value in {"for", "while", "until", "select"}
+                and not any(start <= position < end for start, end in data)):
+            loops.append(i)
+        offset = position + len(raw)
+    if not loops:
+        return tokens, False
+    if data:
+        # Unrolling across data could rewrite it or mistake its assignments for
+        # shell mutations. Mixed forms are outside the bounded loop grammar.
+        return tokens, True
+    if len(loops) != 1 or tokens[loops[0]][0] != "for":
+        return tokens, True
+    start = loops[0]
+    if start and tokens[start - 1][1] not in separators:
+        return tokens, True
+    header = tokens[start + 1:]
+    if (len(header) < 6 or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", header[0][1])
+            or header[1] != ("in", "in")):
+        return tokens, True
+    variable = header[0][0]
+    boundary = next((i for i in range(start + 3, len(tokens)) if tokens[i] == (";", ";")), -1)
+    if boundary < 0 or tokens[boundary + 1:boundary + 2] != [("do", "do")]:
+        return tokens, True
+    words = tokens[start + 3:boundary]
+    # Reject expansions even when quoted; the supported list is strictly literal.
+    if not words or any(not value or any(ch in raw for ch in "$`*?[]{}~\\\n") or
+                        raw in separators | {"(", ")"} for value, raw in words):
+        return tokens, True
+    ends = [i for i, pair in enumerate(tokens) if pair == ("done", "done")]
+    if len(ends) != 1:
+        return tokens, True
+    end = ends[0]
+    if (end <= boundary + 2 or tokens[end - 1] != (";", ";") or
+            (end + 1 < len(tokens) and tokens[end + 1][1] not in separators)):
+        return tokens, True
+    # No other assignment, mutation, directory change or indirect shell code can
+    # be allowed to alter the induction variable or the meaning of its operands.
+    forbidden = {"cd", "pushd", "popd", "read", "readarray", "mapfile", "vared", "getopts",
+                 "export", "unset", "typeset", "declare", "local", "readonly", "integer", "float", "let", "set",
+                 "eval", "source", ".", "exec", "command", "builtin", "env", "trap", "alias", "unalias",
+                 "sh", "bash", "zsh", "dash", "break", "continue", "return",
+                 "case", "esac", "elif", "else", "function", "do", "{", "}"}
+    outside_header = tokens[:start] + tokens[boundary + 2:end] + tokens[end + 1:]
+    if (any(Path(value).name in forbidden or value == raw and any(ch in raw for ch in "()") or
+            re.match(r"[A-Za-z_][A-Za-z0-9_]*(?:=|\+=|\[)", value) or
+            re.search(rf"(?:\+\+|--){variable}\b|\b{variable}(?:\+\+|--)", value)
+            for value, raw in outside_header) or
+            any(value == "printf" for value, _ in outside_header) and
+            any(value == "-v" for value, _ in outside_header)):
+        return tokens, True
+    body = tokens[boundary + 2:end]
+    groups: list[list[tuple[str, str]]] = [[]]
+    for pair in body:
+        if pair[1] in separators:
+            groups.append([])
+        else:
+            groups[-1].append(pair)
+    # Only simple commands and a single if/then/fi are supported. Strip the
+    # control words so recursive command flags keep their ordinary semantics.
+    commands: list[list[tuple[str, str]]] = []
+    conditional: str | None = None
+    for group in groups:
+        if not group:
+            continue
+        if group[0] == ("if", "if") and conditional is None:
+            conditional = "condition"
+            group = group[1:]
+        elif group[0] == ("then", "then") and conditional == "condition":
+            conditional = "body"
+            group = group[1:]
+        elif group == [("fi", "fi")] and conditional == "body":
+            conditional = None
+            continue
+        if (not group or any(raw in {"if", "then", "fi", "in", "done"} for _, raw in group)
+                or "$" in group[0][1] or "`" in group[0][1]):
+            return tokens, True
+        if (Path(group[0][0]).name in {"python", "python3", "perl", "ruby", "node"} and
+                any(value in {"-c", "-e", "--eval"} for value, _ in group[1:])):
+            return tokens, True
+        commands.append(group)
+    if conditional is not None or not commands:
+        return tokens, True
+    reference = re.compile(r"\$(?:\{" + variable + r"\}|" + variable + r"(?![A-Za-z0-9_]))")
+    expanded: list[tuple[str, str]] = []
+    for word, _ in words:
+        for group in commands:
+            for value, raw in group:
+                if "$" in raw or "`" in raw:
+                    # Option values, redirections and embedded program text are
+                    # not the ordinary filesystem words handled by this parser.
+                    if value.startswith("-") or any(ch in value for ch in "=<>();@'\""):
+                        return tokens, True
+                    quote: str | None = None
+                    position = 0
+                    while position < len(raw):
+                        ch = raw[position]
+                        if ch in "'\"" and (quote is None or quote == ch):
+                            quote = ch if quote is None else None
+                        elif ch == "$":
+                            match = reference.match(raw, position)
+                            if (quote == "'" or match is None or
+                                    quote is None and any(c.isspace() for c in word)):
+                                return tokens, True
+                            position = match.end()
+                            continue
+                        elif ch in "`\\*?[]{}~":
+                            return tokens, True
+                        position += 1
+                    value = reference.sub(lambda _: word, value)
+                    # The fully resolved word is literal; preserve word boundaries
+                    # rather than feeding inserted text through a shell parser.
+                    raw = shlex.quote(value)
+                expanded.append((value, raw))
+            expanded.append((";", ";"))
+    return tokens[:start] + expanded + tokens[end + 1:], False
+
+
 def command_operands(command: str, cwd: Path | None, *,
                      workspace: Path | None = None) -> tuple[list[tuple[Path, bool]], bool]:
     """Resolve supported shell operands; uncertainty never establishes cleanliness."""
@@ -284,7 +488,8 @@ def command_operands(command: str, cwd: Path | None, *,
         tokens = shell_tokens(command)
     except ValueError:
         return [], True
-    if "$" in command or "`" in command:
+    tokens, unresolved = literal_loop_tokens(tokens, command)
+    if any("$" in raw or "`" in raw for _, raw in tokens):
         unresolved = True
     if re.search(r"(?:base64|xxd|openssl).*\|.*(?:sh|bash|python|perl|ruby)\b", command):
         unresolved = True

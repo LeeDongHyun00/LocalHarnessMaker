@@ -9,7 +9,7 @@ from typing import Any
 
 import pytest
 
-from eval.runner.audit import PrivateGraders, audit_logs, executor_environment
+from eval.runner.audit import PrivateGraders, audit_logs, command_operands, executor_environment
 from eval.metrics import pass_rate
 
 
@@ -177,6 +177,235 @@ def audit_command(tmp_path: Path, private: PrivateGraders, command: str,
     return audit_logs([log], private, workspace=workspace, repository=tmp_path / 'repository')
 
 
+LITERAL_LOOP_COMMAND = (
+    '/bin/zsh -lc \'cat solution.py test_solution.py HANDOFF.md; '
+    'for d in .. ../.. ../../..; do if [ -f "$d/AGENTS.md" ]; '
+    'then cat "$d/AGENTS.md"; fi; done\''
+)
+LOOP_RECORDS = ["json", "native_command", "native_function", "native_custom"]
+
+
+def audit_loop_record(tmp_path: Path, private: PrivateGraders, command: str,
+                      workspace: Path, form: str) -> dict[str, Any]:
+    """Exercise the shared parser through executor and native capture shapes."""
+    if form == "json":
+        return audit_command(tmp_path, private, command, workspace)
+    if form == "json_lifecycle":
+        item = {"type": "command_execution", "id": "heredoc", "command": command}
+        events = [{"type": "item.started", "item": item},
+                  {"type": "item.completed", "item": item}, {"type": "turn.completed"}]
+    elif form == "native_command":
+        events = [{"type": "event_msg", "payload": {"type": "item_completed", "item": {
+            "type": "CommandExecution", "command": ["/bin/zsh", "-lc", command]}}}]
+    else:
+        custom = form == "native_custom"
+        events = [{"type": "response_item", "payload": {
+            "type": "custom_tool_call" if custom else "function_call", "call_id": "loop",
+            "name": "exec" if custom else "exec_command",
+            "input" if custom else "arguments": (
+                'text(await tools.exec_command({cmd:' + json.dumps(command) + '}));'
+                if custom else json.dumps({"cmd": command}))}},
+            {"type": "response_item", "payload": {
+                "type": "custom_tool_call_output" if custom else "function_call_output",
+                "call_id": "loop", "output": ""}}]
+    log = tmp_path / "native-loop.jsonl"
+    log.write_text("".join(json.dumps(event) + "\n" for event in events))
+    return audit_logs([log], private, workspace=workspace, repository=tmp_path / "repository")
+
+
+HEREDOC_SCRIPTS = [
+    "python -m py_compile chunking.py\npython - <<'PY'\n"
+    "from chunking import chunked\n\n"
+    "for length in range(20):\n"
+    "    for size in range(1, 25):\n"
+    "        items = list(range(length))\n"
+    "        result = list(chunked(items, size))\n"
+    "        assert sum(result, []) == items\nPY",
+    "PYTHONDONTWRITEBYTECODE=1 python3 - <<'PY'\n"
+    "from chunking import chunked\n"
+    "cases = [([], 2, []), ([3, 4, 5], 2, [[3, 4], [5]])]\n"
+    "for items, size, expected in cases:\n"
+    "    assert list(chunked(items, size)) == expected\nPY",
+]
+
+
+@pytest.mark.parametrize("form", LOOP_RECORDS + ["json_lifecycle"])
+@pytest.mark.parametrize("script", HEREDOC_SCRIPTS)
+def test_python_heredoc_preserves_pre_loop_audit(tmp_path: Path, private: PrivateGraders,
+                                              monkeypatch: pytest.MonkeyPatch,
+                                              form: str, script: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    command = '/bin/zsh -lc "' + script + '"'
+    # Disable only the new transformation to retain the pre-change operand and
+    # path checks as the reference. Log bytes and all evidence stay identical.
+    with monkeypatch.context() as previous:
+        previous.setattr("eval.runner.audit.literal_loop_tokens", lambda tokens, command: (tokens, False))
+        expected = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert expected["status"] == "clean", expected
+    actual = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("form", LOOP_RECORDS + ["json_lifecycle"])
+@pytest.mark.parametrize("case, status", [
+    ("unquoted_delimiter", "clean"), ("escaped_delimiter", "clean"),
+    ("tab_stripped", "clean"), ("multiple_heredocs", "clean"),
+    ("quoted_argument", "clean"), ("here_string", "clean"), ("comment", "clean"),
+    ("shell_shaped_data", "inconclusive"), ("unquoted_expansion", "inconclusive"),
+    ("private_data", "access_detected"),
+])
+def test_shell_data_preserves_pre_loop_audit(tmp_path: Path, private: PrivateGraders,
+                                          monkeypatch: pytest.MonkeyPatch,
+                                          form: str, case: str, status: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    body = "for length in range(3):\n    print(length)\n"
+    commands = {
+        "unquoted_delimiter": "python - <<PY\n" + body + "PY",
+        "escaped_delimiter": "python - <<\\PY\n" + body + "PY",
+        "tab_stripped": "python - <<-'PY'\n" + "".join("\t" + line + "\n" for line in body.splitlines()) + "\tPY",
+        "multiple_heredocs": "python - <<'FIRST' 3<<\"SECOND\"\n" + body + "FIRST\n" + body + "SECOND",
+        "quoted_argument": "python -c " + shlex.quote(body),
+        "here_string": "python - <<< " + shlex.quote(body),
+        "comment": "printf ok # ignored; for d in ..; do true; done",
+        "shell_shaped_data": 'cat <<\'TEXT\'\nfor d in ..; do cat "$d/AGENTS.md"; done\nTEXT',
+        "unquoted_expansion": "cat <<TEXT\n" + body + "$UNKNOWN\nTEXT",
+        "private_data": "python - <<'PY'\n" + body + repr(str(private.root / "probe")) + "\nPY",
+    }
+    command = "/bin/zsh -lc " + shlex.quote(commands[case])
+    with monkeypatch.context() as previous:
+        previous.setattr("eval.runner.audit.literal_loop_tokens", lambda tokens, command: (tokens, False))
+        expected = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert expected["status"] == status, expected
+    actual = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("form", LOOP_RECORDS)
+def test_heredoc_does_not_hide_real_unsupported_shell_loop(tmp_path: Path, private: PrivateGraders,
+                                                        form: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    command = "cat <<'TEXT'\nfor length in range(3):\n    print(length)\nTEXT\nwhile false; do true; done"
+    audit = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert audit["status"] == "inconclusive", audit
+    assert any(error.startswith("unresolved_operand:") for error in audit["errors"])
+
+
+@pytest.mark.parametrize("form", LOOP_RECORDS)
+def test_quoted_redirection_text_keeps_real_literal_loop(tmp_path: Path, private: PrivateGraders,
+                                                      form: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    command = "printf '%s' '<<PY'; for directory in .. ../.. ../../.. ../../../..; do "
+    command += 'if [ -f "$directory/AGENTS.md" ]; then printf "%s\\n" "$directory/AGENTS.md"; '
+    command += 'cat "$directory/AGENTS.md"; fi; done'
+    audit = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert audit["status"] == "clean", audit
+    assert audit["errors"] == audit["matches"] == []
+
+
+@pytest.mark.parametrize("form", LOOP_RECORDS)
+def test_exact_smoke_literal_for_loop(tmp_path: Path, private: PrivateGraders, form: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    audit = audit_loop_record(tmp_path, private, LITERAL_LOOP_COMMAND, workspace, form)
+    assert audit["status"] == "clean", audit
+    assert audit["errors"] == audit["matches"] == []
+    operands, unresolved = command_operands(LITERAL_LOOP_COMMAND, workspace, workspace=workspace)
+    assert not unresolved
+    for parent in ("..", "../..", "../../.."):
+        # Missing files and conditional reads must still produce concrete paths.
+        assert operands.count(((workspace / parent / "AGENTS.md").resolve(), False)) == 2
+
+
+@pytest.mark.parametrize("form", LOOP_RECORDS)
+@pytest.mark.parametrize("target", ["traversal", "symlink", "recursive_ancestor", "later_value"])
+def test_literal_for_loop_protected_operands(tmp_path: Path, private: PrivateGraders,
+                                           form: str, target: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    (workspace / "portal").symlink_to(private.root, target_is_directory=True)
+    (workspace / "ancestor").symlink_to(private.root.parent, target_is_directory=True)
+    command = {
+        "traversal": 'for d in .. ../.. ../../..; do if [ -f "$d/../trusted-storage/probe" ]; '
+                     'then cat "$d/../trusted-storage/probe"; fi; done',
+        "symlink": 'for d in portal; do cat "${d}/probe"; done',
+        "recursive_ancestor": 'for d in ancestor; do if [ -d "$d" ]; then ls -R "$d"; fi; done',
+        "later_value": 'for d in ordinary portal; do cat prefix/../"$d"/probe; done',
+    }[target]
+    audit = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert audit["status"] == "access_detected", audit
+    assert any(match["marker"] == "protected_path" for match in audit["matches"])
+    assert audit["errors"] == []
+
+
+@pytest.mark.parametrize("form", LOOP_RECORDS)
+@pytest.mark.parametrize("command", [
+    'for d in ../*; do cat "$d/AGENTS.md"; done',
+    'for d in "../*"; do cat "$d/AGENTS.md"; done',
+    'for d in $PARENTS; do cat "$d/AGENTS.md"; done',
+    'for d in ${PARENTS}; do cat "$d/AGENTS.md"; done',
+    'for d in $(printf ..); do cat "$d/AGENTS.md"; done',
+    'for d in `printf ..`; do cat "$d/AGENTS.md"; done',
+    'for d in $((1+1)); do cat "$d/AGENTS.md"; done',
+    'for d in {..,../..}; do cat "$d/AGENTS.md"; done',
+    'for d in ~; do cat "$d/AGENTS.md"; done',
+    'for d in ..; do for e in ..; do cat "$d/AGENTS.md"; done; done',
+    'for d in ..; do while false; do cat "$d/AGENTS.md"; done; done',
+    'while false; do cat AGENTS.md; done',
+    'd=..; for d in ..; do cat "$d/AGENTS.md"; done',
+    'for d in ..; do d=../..; cat "$d/AGENTS.md"; done',
+    'for d in ..; do cat "$d/AGENTS.md"; done; d=../..',
+    'for d in ..; do d+=/..; cat "$d/AGENTS.md"; done',
+    'for d in ..; do read d; cat "$d/AGENTS.md"; done',
+    'for d in ..; do printf -v d ..; cat "$d/AGENTS.md"; done',
+    'for d in ..; do unset d; cat "$d/AGENTS.md"; done',
+    'for d in ..; do ((d++)); cat "$d/AGENTS.md"; done',
+    'for d in ..; do cd "$d"; cat "$d/AGENTS.md"; done',
+    'for d in ..; do if true; then pushd .; fi; cat "$d/AGENTS.md"; done',
+    'for d in ..; do popd; cat "$d/AGENTS.md"; done',
+    'for d in ..; do cat "$d/$OTHER"; done',
+    'for d in ..; do cat "${d:-..}/AGENTS.md"; done',
+    'for d in ..; do cat "$d/$(printf AGENTS.md)"; done',
+    'for d in ..; do cat "$d/"*.md; done',
+    'for d in ..; do cat "$d/"{AGENTS,HANDOFF}.md; done',
+    'for d in ..; do "$d" AGENTS.md; done',
+    'for d in "a b"; do cat $d/AGENTS.md; done',
+    "for d in ..; do cat '$d/AGENTS.md'; done",
+    'for d in ..; do cat "$directory/AGENTS.md"; done',
+    'for d in ..; do cat >"$d/AGENTS.md"; done',
+    'for d in ..; do rg --file="$d/AGENTS.md"; done',
+    'for d in ..; do python -c "print(\'$d/AGENTS.md\')"; done',
+    'for d in ..; do trap "d=../.." EXIT; cat "$d/AGENTS.md"; done',
+    'for d in ..; do cat "$d/AGENTS.md"; done; read d',
+    'for d in ..; do cat "$d/AGENTS.md"; done; ((d++))',
+    'for d in ..; do (( d = 2 )); cat "$d/AGENTS.md"; done',
+    '(( 1 + 1 )); for d in ..; do cat "$d/AGENTS.md"; done',
+    'integer d; for d in ..; do cat "$d/AGENTS.md"; done',
+])
+def test_near_miss_for_loops_remain_inconclusive(tmp_path: Path, private: PrivateGraders,
+                                               form: str, command: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    audit = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert audit["status"] == "inconclusive", audit
+    assert any(error.startswith("unresolved_operand:") for error in audit["errors"])
+
+
+@pytest.mark.parametrize("command", [
+    'for d in .. ../..; do cat $d/AGENTS.md; done',
+    'for d in "a b"; do cat "${d}/AGENTS.md"; done',
+    'for d in ..; do cat prefix/../"${d}"/AGENTS.md; done',
+])
+def test_literal_for_loop_word_boundaries(tmp_path: Path, private: PrivateGraders, command: str) -> None:
+    workspace = tmp_path / "runtime/workspace"
+    workspace.mkdir(parents=True)
+    audit = audit_command(tmp_path, private, command, workspace)
+    assert audit["status"] == "clean", audit
+
+
 @pytest.mark.parametrize('wrap', [False, True])
 @pytest.mark.parametrize('case', ['cd_root', 'cd_twice', 'cd_combined', 'glob_root',
                                  'quote_split', 'tilde_user', 'find_exec', 'recursive_grep',
@@ -202,7 +431,8 @@ def test_host_h1_commands(tmp_path: Path, private: PrivateGraders, case: str, wr
     assert result['status'] == ('inconclusive' if case == 'tilde_user' else 'access_detected')
 
 
-@pytest.mark.parametrize('command', ['cd src && pytest -q', 'cat solution.py', 'python -m pytest', 'ls', 'git diff'])
+@pytest.mark.parametrize('command', ['cd src && pytest -q', 'cat solution.py', 'python -m pytest', 'ls', 'git diff',
+                                     'rg for solution.py', 'rg while solution.py'])
 def test_ordinary_workspace_commands_stay_clean(tmp_path: Path, private: PrivateGraders, command: str) -> None:
     workspace = tmp_path / 'workspace'
     (workspace / 'src').mkdir(parents=True)

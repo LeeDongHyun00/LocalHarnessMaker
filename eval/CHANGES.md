@@ -1,3 +1,67 @@
+# Heredoc regression in literal-loop audit — 2026-10-23
+
+Restrict loop discovery to shell syntax. Heredoc payloads/delimiters and comments
+are excluded from discovery; quoted arguments already retain their raw word
+boundaries. Original text still receives the same operand, expansion, private
+marker, canonical-path and output checks as before literal-loop resolution.
+This restores Python scripts passed through quoted heredocs without hiding
+protected-path evidence or clearing previously unresolved expansions. Mixed
+actual shell loops and heredoc/comment spans remain outside bounded unrolling.
+
+Both supplied shapes are synthetic regressions: py_compile followed by nested
+Python loops, and PYTHONDONTWRITEBYTECODE=1 with a case list and tuple-unpacking
+loop. Tests compare complete audits against the pre-loop-resolution behavior,
+cover item.started/completed pairs and native command/function/code-mode records,
+and retain the literal parent-directory loop fixes. Additional data cases cover
+tab-stripped/multiple/escaped heredocs, quoted arguments and here strings.
+
+Claude's host comparison across 104 finished tasks is user-provided evidence:
+three literal-loop tasks became clean, while Python heredoc scripts regressed.
+Rechecking all 104 for clean audits with no private matches remains host work;
+this session cannot inspect those logs or the real private root. Retained
+reports and frozen tasks are unchanged; no model calls, staging or commits.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 943 passed in 83.58s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports` both exited 0.
+
+## Assumptions
+
+- The retained host logs are unavailable here. Pre-change behavior is compared
+  by disabling only loop transformation while retaining all legacy audit checks
+  and identical synthetic log bytes; no host outcome is inferred from tests.
+
+# Literal for-loop access audit — 2026-10-23
+
+Resolve one bounded literal-list `for` loop without executing shell code. Each
+`$name`/`${name}` filesystem word is expanded for every literal value and passed
+through the existing canonical/private-root, symlink, traversal and recursive
+access checks. Conditional operands are inspected even when absent. Executor
+JSON, native command items, function calls and custom JavaScript wrappers share
+the same parser.
+
+Regression coverage includes the exact smoke command reading parent
+`AGENTS.md` files, synthetic private-root traversal and symlink access (including
+a later list value), and recursive access through an ancestor alias. Dynamic or
+glob lists, command substitution, arithmetic, nested/while loops, mutations
+before/inside/after the loop and directory-changing bodies remain inconclusive.
+Unsupported embedded options, redirections and executable code also retain
+uncertainty. No shell command from a captured record is executed by this audit.
+
+Host re-audit of the retained second harness smoke and pilot B is pending.
+No retained report, frozen task, shared interface or CLI flag changed. This
+session uses only this worktree's `.venv`, synthetic private locations and
+mocked model calls; the main-checkout baseline A remains separate.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 875 passed in 78.68s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports` both exited 0.
+
+## Assumptions
+
+- The supplied smoke/pilot failures describe unavailable host evidence. These
+  regressions establish parser behavior, not the retained runs' audit outcomes.
+
 # Smoke accounting and publication fixes — 2026-10-23
 
 Control accounting accepts symlinked ancestors above the runtime (macOS `/var`),

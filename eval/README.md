@@ -72,6 +72,21 @@ Literal zsh/bash/sh `-c`/`-lc` wrappers are unwrapped before operand analysis;
 single or double wrapper quotes do not count as quotes inside an operand.
 Quote checks use each inner word's own spelling. Unresolved quoting/escaping
 inside a path remains inconclusive.
+One bounded `for name in LITERAL_WORDS; do ...; done` loop can resolve `$name`
+and `${name}` inside otherwise literal filesystem words. Simple body commands
+and an `if ...; then ...; fi` guard are inspected for every list value, including
+conditional paths that do not exist. Resolved operands use the ordinary private
+root, canonical alias, symlink, traversal and recursive-ancestor checks in both
+executor JSON and native command/function/custom records. This covers the smoke
+command that reads `AGENTS.md` from `..`, `../..` and `../../..`.
+Loop detection excludes heredoc bodies/delimiters and comments; quoted arguments
+remain data. Their pre-existing expansion and protected-path checks still apply.
+Commands mixing actual shell loops with these data spans remain outside the
+bounded unrolling grammar and inconclusive.
+Lists containing globs or expansions, nested/while loops, arithmetic, other
+assignments or variable mutations, and directory-changing bodies remain
+unresolved and inconclusive. Indirect code, embedded option/redirection values,
+and unquoted substitutions that would split words also remain unsupported.
 A glob is bounded when its static directory prefix resolves inside the workspace
 and no `..` component follows its first wildcard. Such globs may audit clean
 even with no current matches. Concrete matches still resolve through symlinks
