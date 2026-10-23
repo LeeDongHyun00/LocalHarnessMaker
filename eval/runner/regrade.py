@@ -6,7 +6,6 @@ import copy
 import json
 from pathlib import Path
 import re
-import shutil
 import sys
 import tempfile
 from typing import Any, Callable
@@ -118,7 +117,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         for path in (source / task).iterdir():
             if path.is_file() and not path.is_symlink() and path.name not in {
                     'result.json', 'access-audit.json', 'grading.log'}:
-                shutil.copy2(path, task_out / path.name)
+                core.publish(path, task_out / path.name, private)
         core.write_json(task_out / 'access-audit.json', json.loads(private.redact(json.dumps(audit))))
         result['grading'] = None
         last = entry['segments'][-1]
@@ -165,7 +164,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     text = json.dumps(report, indent=2) + '\n'
     for private in private_by_task.values():
         text = private.redact(text)
-    (out / 'report.json').write_text(text)
+    (out / 'report.json').write_text(core.checkout_text(text))
     return out / 'report.json'
 
 

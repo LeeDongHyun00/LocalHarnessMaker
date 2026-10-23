@@ -9,6 +9,8 @@ from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
 
+from eval.runner.publication import checkout_text, evidence_path
+
 from eval.metrics import METHOD, compute, metric, total
 from eval.runner.audit import digest
 from eval.runner.control_accounting import control_calls
@@ -18,7 +20,7 @@ from eval.runner.limits import capacity_message, capacity_refusal_without_items
 
 def artifact(path: Path) -> dict[str, str]:
     """Pin an existing artifact, including external unredacted event evidence."""
-    return {"path": str(path), "sha256": digest(path.read_bytes())}
+    return {"path": checkout_text(str(path)), "sha256": digest(path.read_bytes())}
 
 
 def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str = "standard", native_counts: dict[str, int] | None = None) -> dict[str, Any]:
@@ -150,10 +152,10 @@ def task_version_reasons(task: dict[str, Any], version: str) -> list[str]:
     """Verify retained native hashes before interpreting per-session versions."""
     paths = []
     for item in task["artifacts"]:
-        path = Path(item["path"])
+        path = evidence_path(item["path"])
         if "sessions" not in path.parts or path.suffix != ".jsonl":
             continue
-        if artifact(path) != item:
+        if digest(path.read_bytes()) != item["sha256"]:
             raise ValueError("Native session log hash mismatch")
         paths.append(path)
     return native_version_reasons(paths, [s["session_id"] for s in task["executor_segments"]], version)
@@ -178,7 +180,7 @@ def validate(report: dict[str, Any], repository: Path) -> None:
         raise ValueError("Duplicate call identifiers")
     for task in tasks:
         validate_session_versions(task, report["metadata"]["codex_version"])
-        if task["attempts"] != max(1, sum(not capacity_message([Path(s["events"]["path"])]) for s in task["executor_segments"])) and task["outcome"] != "invalid":
+        if task["attempts"] != max(1, sum(not capacity_message([evidence_path(s["events"]["path"])]) for s in task["executor_segments"])) and task["outcome"] != "invalid":
             raise ValueError("Attempt/segment count mismatch")
         previous = None
         for index, seg in enumerate(task["executor_segments"], 1):
@@ -186,16 +188,16 @@ def validate(report: dict[str, Any], repository: Path) -> None:
             if end < start or previous is not None and start < previous or seg["attempt"] != index:
                 raise ValueError("Executor segment ordering mismatch")
             previous = end
-            if artifact(Path(seg["events"]["path"])) != seg["events"]:
+            if digest(evidence_path(seg["events"]["path"]).read_bytes()) != seg["events"]["sha256"]:
                 raise ValueError("Executor log hash mismatch")
         if task["grading"] and previous is not None and datetime.fromisoformat(task["grading"]["copied_at"]) <= previous:
             raise ValueError("Grading must follow executor exit")
         if task["handoff"]:
             evidence = task["handoff"]["evidence"]
-            observation = json.loads(Path(evidence["path"]).read_text())
-            if (artifact(Path(evidence["path"])) != evidence or
+            observation = json.loads(evidence_path(evidence["path"]).read_text())
+            if (digest(evidence_path(evidence["path"]).read_bytes()) != evidence["sha256"] or
                     observation["delivered_sha256"] != observation["public_sha256"] or
-                    digest(Path(observation["prompt_path"]).read_bytes()) != observation["delivered_sha256"] or
+                    digest(evidence_path(observation["prompt_path"]).read_bytes()) != observation["delivered_sha256"] or
                     len({s["session_id"] for s in task["executor_segments"]}) < 2 or
                     task["handoff"]["user_restated_day1_context"] or
                     task["handoff"]["day2_pass"] != (task["outcome"] == "pass")):

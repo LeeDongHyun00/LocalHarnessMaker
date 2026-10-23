@@ -1,3 +1,34 @@
+# Smoke accounting and publication fixes — 2026-10-23
+
+Control accounting accepts symlinked ancestors above the runtime (macOS `/var`),
+while rejecting links at/below the runtime and absolute/traversing manifest
+entries. Hash-pinned control envelopes retain observed models and priced costs.
+
+Published grading logs now allow only unittest identifiers/status and summary
+lines. Full stdout/stderr and the combined grading log stay in the external
+runtime. Synthetic failing/error/skipped graders verify that assertion source,
+assertion/error messages and skip reasons appear nowhere in either the initial
+published report directory or its regraded copy.
+
+Generated JSON, log copies and artifact references use repository-relative
+checkout paths. Validation resolves references from the repository root and
+accepts historical absolute references. Regrading normalizes copied historical
+review logs without changing the retained source; comparison source references
+use the same path convention. External runtime references remain absolute.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 686 passed in 79.93s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports` both exited 0.
+Frozen tasks and retained reports remain unchanged. No model calls, real private
+grader lookup, staging or commits. Host smoke verification remains pending.
+
+## Assumptions
+
+- The host smoke result is user-provided evidence; its external report is not
+  available or inspected here. All new grader/executor coverage is synthetic.
+- Relative published references use the repository root, while external runtime
+  references retain their absolute locations for evidence verification.
+
 # Capacity recovery and timeout continuation — 2026-10-23
 
 Recognize only case-insensitive `at capacity` in structured `error` and

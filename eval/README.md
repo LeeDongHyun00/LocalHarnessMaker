@@ -31,6 +31,26 @@ A later executor can reach these paths because reads are not denied;
 observed access invalidates the task. External raw logs are retained;
 public evidence uses redacted labels and hashes.
 Native logs are referenced with hashes as well as executor JSON streams.
+
+Published `grading.log` contains only unittest test identifiers with `ok`, `FAIL`,
+`ERROR` or `skipped`, the `Ran N tests` summary, and `OK`/`FAILED` counts.
+Tracebacks, assertion source/messages, error text and skip reasons remain only
+in the external runtime's `grading.stdout`, `grading.stderr` and full
+`grading.log`. Regrading applies the same publication rule; report fields and
+checkpoints record grading counts/status rather than raw grader output.
+
+Generated evidence uses repository-relative references for checkout files,
+including handoff evidence and grading logs. Report validation resolves these
+against the repository root, independent of the caller's working directory;
+legacy absolute references remain readable. External raw runtime references
+remain absolute and hash-pinned. Published JSON/log copies also remove checkout
+prefixes embedded in logged paths. Existing retained reports are unchanged.
+
+Control accounting checks for symlinks at and below its runtime boundary and
+rejects manifest paths that escape it. Symlinked ancestors above the runtime
+are allowed, including macOS `/var` pointing to `/private/var`; their presence
+must not erase observed control models or known control costs.
+
 Each task also writes `access-audit.json`, containing every error and match with
 log name, line number and evidence hashes. The audit scans the entire file after
 an error, so multiple unsupported records appear in one run. The same complete

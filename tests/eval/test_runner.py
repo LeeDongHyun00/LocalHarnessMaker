@@ -1874,3 +1874,64 @@ def test_capacity_after_work_retains_native_cost_and_resume_delta(setup: tuple[P
     assert [c['usage']['input_tokens'] for c in task['calls']] == [100, 20]
     assert [c['usage']['output_tokens'] for c in task['calls']] == [10, 8]
     assert task['costs']['executor_usd'] == pytest.approx(.00042)
+
+
+def test_failing_grader_content_never_published(setup: tuple[Path, Path, Path], tmp_path: Path) -> None:
+    from eval.runner import regrade
+    root, config, out = setup
+    assertion = "self.assertEqual('PRIVATE_ASSERT_SOURCE_724', 'other', 'PRIVATE_ASSERT_MESSAGE_931')"
+    (root / 'bug-chunk-tail/test_private_synthetic.py').write_text(
+        'import unittest\nclass Checks(unittest.TestCase):\n'
+        f' def test_failure(self): {assertion}\n'
+        " def test_error(self): raise RuntimeError('PRIVATE_ERROR_MESSAGE_892')\n"
+        " @unittest.skip('PRIVATE_SKIP_REASON_623')\n def test_skip(self): pass\n")
+    executor = Executor()
+    report = json.loads(run(config, out, root, execute=executor, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert report['tasks'][0]['outcome'] == 'fail'
+    state = json.loads((out / 'checkpoint.json').read_text())
+    retained = Path(state['tasks']['bug-chunk-tail']['runtime']) / 'grading.log'
+    assert assertion in retained.read_text() and 'PRIVATE_ASSERT_MESSAGE_931' in retained.read_text()
+    new = tmp_path / 'regraded'
+    regrade.regrade(root, out, new, execute=executor)
+    for destination in (out, new):
+        published = '\n'.join(p.read_text() for p in destination.rglob('*') if p.is_file())
+        for secret in (assertion, 'PRIVATE_ASSERT_SOURCE_724', 'PRIVATE_ASSERT_MESSAGE_931',
+                       'PRIVATE_ERROR_MESSAGE_892', 'PRIVATE_SKIP_REASON_623'):
+            assert secret not in published
+        log = (destination / 'bug-chunk-tail/grading.log').read_text()
+        assert 'test_failure (test_private_synthetic.Checks.test_failure) ... FAIL' in log
+        assert 'test_error (test_private_synthetic.Checks.test_error) ... ERROR' in log
+        assert 'test_skip (test_private_synthetic.Checks.test_skip) ... skipped' in log
+        assert 'Ran 3 tests' in log and 'FAILED (failures=1, errors=1, skipped=1)' in log
+
+
+def test_checkout_paths_are_relative_and_resolve_outside_checkout(
+    setup: tuple[Path, Path, Path], monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    from eval.runner import core, regrade
+    from eval.runner.report import validate
+    root, config, _ = two_session_config(setup, monkeypatch, tmp_path)
+    out = core.REPOSITORY / 'eval/generated-smoke'
+    executor = TwoSessionExecutor()
+    report = json.loads(run(config, out, root, execute=executor, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    task = report['tasks'][0]
+    assert task['handoff']['evidence']['path'] == 'eval/generated-smoke/bug-chunk-tail/handoff-evidence.json'
+    assert task['grading']['log']['path'] == 'eval/generated-smoke/bug-chunk-tail/grading.log'
+    monkeypatch.chdir(tmp_path)
+    validate(report, core.REPOSITORY)
+    legacy = json.loads(json.dumps(report))
+    legacy['tasks'][0]['handoff']['evidence']['path'] = str(
+        core.REPOSITORY / task['handoff']['evidence']['path'])
+    validate(legacy, core.REPOSITORY)
+    run(config, out, root, execute=executor, version='codex-cli 0.162.0-alpha.17.2')
+    # Historical review copies can still contain the checkout prefix.
+    (out / 'bug-chunk-tail/legacy-review.log').write_text(str(core.REPOSITORY / 'eval/tasks') + '\n')
+    new = core.REPOSITORY / 'eval/generated-regrade'
+    regrade.regrade(root, out, new, execute=executor)
+    assert (new / 'bug-chunk-tail/legacy-review.log').read_text() == 'eval/tasks\n'
+    # The retained source stays unchanged; only the new review copy is normalized.
+    assert str(core.REPOSITORY) in (out / 'bug-chunk-tail/legacy-review.log').read_text()
+    for destination in (out, new):
+        assert str(core.REPOSITORY) not in '\n'.join(
+            p.read_text() for p in destination.rglob('*') if p.is_file()
+            and p.name != 'legacy-review.log')

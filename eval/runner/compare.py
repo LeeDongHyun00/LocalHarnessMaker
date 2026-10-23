@@ -9,6 +9,7 @@ from jsonschema import Draft202012Validator, FormatChecker, ValidationError
 
 from eval.__main__ import InputParser
 from eval.metrics import METHOD, metric, total
+from eval.runner.publication import checkout_text
 from eval.runner.audit import digest
 from eval.runner.compare_versions import require_same_codex_version
 
@@ -130,7 +131,7 @@ def main() -> int:
         for report in reports:
             Draft202012Validator(schema, format_checker=FormatChecker()).validate(report)
         result = compare(*reports)
-        result["sources"] = [{"path": str(p), "sha256": digest(b)} for p, b in zip(paths, contents)]
+        result["sources"] = [{"path": checkout_text(str(p)), "sha256": digest(b)} for p, b in zip(paths, contents)]
     except (OSError, ValueError, KeyError, TypeError, ValidationError) as exc:
         print(f"Input error: {exc}", file=sys.stderr)
         return 1

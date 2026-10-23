@@ -22,7 +22,9 @@ def control_calls(entry: dict[str, Any], task_id: str,
 
     def read(name: str) -> str | None:
         path = runtime / name
-        if (not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)) or
+        if (Path(name).is_absolute() or not path.is_relative_to(runtime) or ".." in Path(name).parts or
+                not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)
+                                          if p == runtime or p.is_relative_to(runtime)) or
                 digest(path.read_bytes()) != pinned.get(name)):
             return None
         return path.read_text(errors="replace")

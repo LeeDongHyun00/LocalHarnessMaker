@@ -190,3 +190,37 @@ def test_capacity_does_not_zero_previous_success_or_http_fallback(entry: dict[st
     calls, cost = control_calls(entry, 'task', PRICES)
     assert [c['usage']['input_tokens'] for c in calls] == [1000, 0, 1000]
     assert cost == pytest.approx(2 * .000132)
+
+
+def test_runtime_below_symlinked_parent_retains_control_costs(tmp_path: Path) -> None:
+    actual = tmp_path / 'actual'
+    actual.mkdir()
+    alias = tmp_path / 'alias'
+    alias.symlink_to(actual, target_is_directory=True)
+    entry = {'runtime': str(alias / 'runtime'), 'control_files': {}}
+    retain(entry, 'contract.stderr', generation())
+    calls, usd = control_calls(entry, 'task', PRICES)
+    assert [call['model'] for call in calls] == ['gpt-6-luna']
+    assert usd == pytest.approx(.000132)
+
+
+@pytest.mark.parametrize('location', ['runtime', 'child', 'file', 'traversal', 'absolute'])
+def test_control_accounting_rejects_links_within_runtime_and_escapes(tmp_path: Path, location: str) -> None:
+    runtime = tmp_path / 'runtime'
+    entry = {'runtime': str(runtime), 'control_files': {}}
+    retain(entry, 'child/contract.stderr', generation())
+    target = tmp_path / 'retained'
+    if location == 'runtime':
+        runtime.rename(target)
+        runtime.symlink_to(target, target_is_directory=True)
+    elif location == 'child':
+        (runtime / 'child').rename(target)
+        (runtime / 'child').symlink_to(target, target_is_directory=True)
+    elif location == 'file':
+        (runtime / 'child/contract.stderr').rename(target)
+        (runtime / 'child/contract.stderr').symlink_to(target)
+    else:
+        entry['control_files'] = {
+            str(runtime / name) if location == 'absolute' else '../runtime/' + name: value
+            for name, value in entry['control_files'].items()}
+    assert control_calls(entry, 'task', PRICES) == ([], None)

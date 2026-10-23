@@ -17,6 +17,7 @@ from typing import Any, Callable
 import uuid
 
 from eval.runner import harness
+from eval.runner.publication import checkout_text
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
@@ -35,7 +36,7 @@ def now() -> str:
 def write_json(path: Path, value: Any) -> None:
     """Replace a checkpoint atomically without deleting previous artifacts."""
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
+    temporary.write_text(checkout_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n"))
     temporary.replace(path)
 
 
@@ -190,7 +191,19 @@ def taskset_digest(private_by_task: dict[str, PrivateGraders]) -> str:
 def publish(source: Path, destination: Path, private: PrivateGraders) -> None:
     """Retain original logs externally and publish a redacted review copy."""
     if source.is_file() and not any(p.is_symlink() for p in (source, *source.parents)):
-        destination.write_text(private.redact(source.read_text(errors="replace")))
+        destination.write_text(checkout_text(private.redact(source.read_text(errors="replace"))))
+
+
+def grading_summary(text: str) -> str:
+    """Publish unittest identifiers/status and totals, never tracebacks or messages."""
+    lines = []
+    for line in text.splitlines():
+        test = re.fullmatch(r"([\w.]+ \([\w.]+\)) \.\.\. (ok|FAIL|ERROR|skipped)(?: .*)?", line)
+        if test:
+            lines.append(f"{test[1]} ... {test[2]}")
+        elif re.fullmatch(r"Ran \d+ tests? in [0-9.]+s|OK(?: \([a-zA-Z ]+=\d+(?:, [a-zA-Z ]+=\d+)*\))?|FAILED \([a-zA-Z ]+=\d+(?:, [a-zA-Z ]+=\d+)*\)", line):
+            lines.append(line)
+    return "\n".join(lines) + ("\n" if lines else "")
 
 
 def grade(
@@ -226,7 +239,8 @@ def grade(
         stdout=runtime / "grading.stdout", stderr=runtime / "grading.stderr", timeout=timeout,
     )
     text = (runtime / "grading.stdout").read_text(errors="replace") + (runtime / "grading.stderr").read_text(errors="replace")
-    destination.write_text(private.redact(text))
+    (runtime / "grading.log").write_text(text)
+    destination.write_text(private.redact(grading_summary(text)))
     counts = re.findall(r"Ran (\d+) tests?", text)
     count = int(counts[-1]) if counts else 0
     failures = sum(int(n) for n in re.findall(r"(?:failures|errors)=(\d+)", text))
@@ -677,7 +691,7 @@ def run(
                     if event.get("type") == "turn_context" or
                     (event.get("type") == "event_msg" and event.get("payload", {}).get("type") in
                      {"token_count", "thread_settings_applied"})]
-        (task_out / "session-evidence.jsonl").write_text(private.redact("".join(json.dumps(e) + "\n" for e in selected)))
+        (task_out / "session-evidence.jsonl").write_text(checkout_text(private.redact("".join(json.dumps(e) + "\n" for e in selected))))
         for segment, path in zip(entry["segments"], event_paths):
             publish(path, task_out / path.name, private)
             publish(runtime / segment["stderr"], task_out / segment["stderr"], private)
@@ -783,5 +797,5 @@ def run(
     text = json.dumps(report, indent=2) + "\n"
     for private in private_by_task.values():
         text = private.redact(text)
-    destination.write_text(text)
+    destination.write_text(checkout_text(text))
     return destination
