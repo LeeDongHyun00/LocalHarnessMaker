@@ -353,3 +353,201 @@ def test_existing_absolute_artifact_is_reused_without_duplicate_reference(
     after = json.loads(report_path.read_text())
     refs = [ref for ref in after['tasks'][0]['artifacts'] if Path(ref['path']).name == 'contract.json']
     assert refs == [{'path': str(target), 'sha256': digest(target.read_bytes())}]
+
+
+def make_unpinned(out: Path) -> None:
+    """Reproduce historical manifests without inventing retrospective hashes."""
+    path = out / 'checkpoint.json'
+    state = json.loads(path.read_text())
+    entry = state['tasks']['unit-task']
+    entry['segments'][0].pop('evidence_sha256')
+    entry['result']['segments'] = deepcopy(entry['segments'])
+    path.write_text(json.dumps(state))
+
+
+@pytest.mark.parametrize('backup', [False, True])
+@pytest.mark.parametrize('version', [1, 2])
+def test_allow_unpinned_restores_labels_and_preserves_report_fields(
+        finished: tuple[Path, Path, Path], tmp_path: Path, backup: bool, version: int) -> None:
+    private, out, runtime = finished
+    make_unpinned(out)
+    (runtime / 'exec-1.stderr').write_text(str(private) + '\n')
+    (runtime / 'final-1.md').write_text('The task is done.\n' + str(private) + '\n')
+    diagnostics_path = out / 'run-diagnostics.json'
+    diagnostics_path.write_text(json.dumps({'calibration': True, 'executor_runs': ['unchanged']}))
+    report = json.loads((out / 'report.json').read_text())
+    if version == 2:
+        example = json.loads((REPOSITORY / 'schemas/examples/evaluation_report.json').read_text())
+        report['metrics']['task_false_done_rate'] = example['metrics']['task_false_done_rate']
+        (out / 'report.json').write_text(json.dumps(report))
+        state = json.loads((out / 'checkpoint.json').read_text())
+        state['report_schema'] = 'evaluation-report-v2'
+        (out / 'checkpoint.json').write_text(json.dumps(state))
+    checkpoint = (out / 'checkpoint.json').read_bytes()
+    backup_root = None
+    if backup:
+        backup_root = tmp_path / 'backup'
+        backup_root.mkdir()
+        runtime.rename(backup_root / 'unit-task')
+    row = republish.republish(private, out, backup_root, allow_unpinned=True)[0]
+    assert row == {'task_id': 'unit-task', 'published': 11, 'existing': 0, 'unpinned': 0,
+                   'published_unpinned': 2}
+    after = json.loads((out / 'report.json').read_text())
+    refs = after['tasks'][0]['artifacts']
+    diagnostics = json.loads(diagnostics_path.read_text())
+    records = diagnostics.pop('republication')['artifacts']
+    assert diagnostics == {'calibration': True, 'executor_runs': ['unchanged']}
+    assert len(records) == 2
+    for name in ('exec-1.stderr', 'final-1.md'):
+        path = out / 'unit-task' / name
+        assert str(private) not in path.read_text()
+        record = next(r for r in records if Path(r['path']).name == name)
+        assert record['provenance'] == 'republished_unpinned'
+        assert record['sha256'] == digest(path.read_bytes())
+        assert {'path': record['path'], 'sha256': record['sha256']} in refs
+    after['tasks'][0]['artifacts'] = report['tasks'][0]['artifacts']
+    assert after == report
+    assert (out / 'checkpoint.json').read_bytes() == checkpoint
+    assert not (out / 'unit-task/workspace').exists()
+    before = snapshot(out)
+    again = republish.republish(private, out, backup_root, allow_unpinned=True)[0]
+    assert again == dict(row, published=0, existing=11, published_unpinned=0)
+    assert snapshot(out) == before
+    # Default invocation still skips the unpinned sources and leaves diagnostics alone.
+    assert republish.republish(private, out, backup_root)[0]['unpinned'] == 2
+    assert snapshot(out) == before
+
+
+@pytest.mark.parametrize('name', ['exec-1.stderr', 'final-1.md'])
+@pytest.mark.parametrize('case', ['link', 'destination_conflict', 'missing', 'directory'])
+def test_allow_unpinned_keeps_file_guards_and_reports_missing(
+        finished: tuple[Path, Path, Path], tmp_path: Path, name: str, case: str) -> None:
+    private, out, runtime = finished
+    make_unpinned(out)
+    source = runtime / name
+    if case in {'link', 'missing', 'directory'}:
+        moved = tmp_path / 'original'
+        source.rename(moved)
+        if case == 'link':
+            source.symlink_to(moved)
+        if case == 'directory':
+            source.mkdir()
+    else:
+        (out / 'unit-task' / name).write_text('different')
+    before = snapshot(out)
+    if case == 'missing':
+        row = republish.republish(private, out, allow_unpinned=True)[0]
+        assert row['published'] == 10 and row['published_unpinned'] == row['unpinned'] == 1
+        records = json.loads((out / 'run-diagnostics.json').read_text())['republication']['artifacts']
+        assert len(records) == 1 and Path(records[0]['path']).name != name
+    else:
+        with pytest.raises(ValueError):
+            republish.republish(private, out, allow_unpinned=True)
+        assert snapshot(out) == before
+
+
+@pytest.mark.parametrize('name', ['exec-1.stderr', 'final-1.md', 'exec-1.jsonl', 'contract.json'])
+def test_allow_unpinned_never_waives_recorded_pins(
+        finished: tuple[Path, Path, Path], name: str) -> None:
+    private, out, runtime = finished
+    (runtime / name).write_text('changed pinned bytes')
+    before = snapshot(out)
+    with pytest.raises(ValueError):
+        republish.republish(private, out, allow_unpinned=True)
+    assert snapshot(out) == before
+
+
+def test_allow_unpinned_cli_counts_only(finished: tuple[Path, Path, Path], monkeypatch: pytest.MonkeyPatch,
+                                       capsys: pytest.CaptureFixture[str]) -> None:
+    private, out, _ = finished
+    make_unpinned(out)
+    monkeypatch.setattr('sys.argv', ['republish', '--private-root', str(private), '--out', str(out),
+                                    '--allow-unpinned'])
+    assert republish.main() == 0
+    captured = capsys.readouterr()
+    rows = [json.loads(line) for line in captured.out.splitlines()]
+    assert captured.err == ''
+    assert rows[-1] == {'tasks': 1, 'published': 11, 'existing': 0, 'unpinned': 0,
+                        'published_unpinned': 2}
+    assert str(private) not in captured.out and str(out) not in captured.out
+    assert '.md' not in captured.out and '.stderr' not in captured.out
+
+
+@pytest.mark.parametrize('case', ['link', 'malformed', 'not_object', 'changed_provenance'])
+def test_unpinned_diagnostics_refusal_before_writing(finished: tuple[Path, Path, Path],
+                                                    tmp_path: Path, case: str) -> None:
+    private, out, _ = finished
+    make_unpinned(out)
+    diagnostics = out / 'run-diagnostics.json'
+    if case == 'changed_provenance':
+        republish.republish(private, out, allow_unpinned=True)
+        value = json.loads(diagnostics.read_text())
+        value['republication']['artifacts'][0]['sha256'] = '0' * 64
+        diagnostics.write_text(json.dumps(value))
+    elif case == 'link':
+        other = tmp_path / 'outside-diagnostics'
+        other.write_text('{}')
+        diagnostics.symlink_to(other)
+    else:
+        diagnostics.write_text('bad-json' if case == 'malformed' else '[]')
+    before = snapshot(out)
+    with pytest.raises(ValueError):
+        republish.republish(private, out, allow_unpinned=True)
+    assert snapshot(out) == before
+
+
+@pytest.mark.parametrize('value', [{'republication': []}, {'republication': {'artifacts': {}}},
+                                  {'republication': {'artifacts': ['invalid']}}])
+def test_malformed_republication_records_refused(finished: tuple[Path, Path, Path],
+                                                value: dict[str, Any]) -> None:
+    private, out, _ = finished
+    make_unpinned(out)
+    (out / 'run-diagnostics.json').write_text(json.dumps(value))
+    before = snapshot(out)
+    with pytest.raises(ValueError):
+        republish.republish(private, out, allow_unpinned=True)
+    assert snapshot(out) == before
+
+
+def test_default_does_not_read_or_modify_diagnostics(finished: tuple[Path, Path, Path]) -> None:
+    private, out, _ = finished
+    make_unpinned(out)
+    path = out / 'run-diagnostics.json'
+    path.write_text('unrelated old diagnostics\n')
+    before = path.read_bytes()
+    assert republish.republish(private, out)[0]['unpinned'] == 2
+    assert path.read_bytes() == before
+
+
+def test_unpinned_diagnostics_reference_hash_is_updated(finished: tuple[Path, Path, Path]) -> None:
+    private, out, _ = finished
+    make_unpinned(out)
+    path = out / 'run-diagnostics.json'
+    path.write_text('{"other": "retained"}\n')
+    report_path = out / 'report.json'
+    report = json.loads(report_path.read_text())
+    report['tasks'][0]['artifacts'].append({'path': str(path), 'sha256': digest(path.read_bytes())})
+    report_path.write_text(json.dumps(report))
+    republish.republish(private, out, allow_unpinned=True)
+    report = json.loads(report_path.read_text())
+    assert {'path': str(path), 'sha256': digest(path.read_bytes())} in report['tasks'][0]['artifacts']
+    assert json.loads(path.read_text())['other'] == 'retained'
+
+
+def test_allow_unpinned_all_task_preflight_before_writes(finished: tuple[Path, Path, Path]) -> None:
+    private, out, _ = finished
+    make_unpinned(out)
+    shutil.copytree(private / 'unit-task', private / 'second-task')
+    state_path, report_path = out / 'checkpoint.json', out / 'report.json'
+    state, report = json.loads(state_path.read_text()), json.loads(report_path.read_text())
+    state['tasks']['second-task'] = deepcopy(state['tasks']['unit-task'])
+    state['config']['tasks'].append('second-task')
+    report['tasks'].append(dict(deepcopy(report['tasks'][0]), task_id='second-task'))
+    (out / 'second-task').mkdir()
+    (out / 'second-task/final-1.md').write_text('conflict in later task')
+    state_path.write_text(json.dumps(state))
+    report_path.write_text(json.dumps(report))
+    before = snapshot(out)
+    with pytest.raises(ValueError):
+        republish.republish(private, out, allow_unpinned=True)
+    assert snapshot(out) == before

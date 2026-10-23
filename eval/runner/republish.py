@@ -40,10 +40,11 @@ def read_pinned(path: Path, root: Path, expected: str) -> bytes:
     return data
 
 
-def republish(private_root: Path, out: Path, runtime_root: Path | None = None) -> list[dict[str, Any]]:
+def republish(private_root: Path, out: Path, runtime_root: Path | None = None, *,
+              allow_unpinned: bool = False) -> list[dict[str, Any]]:
     """Preflight every task before writing; change only report artifact entries.
 
-    Old segments without stderr/final hashes are counted as unpinned and skipped.
+    Old stderr/final captures are skipped unless explicitly allowed and labeled.
     No model, grader, subprocess, workspace copy or checkpoint rewrite is performed.
     """
     # Do not resolve runtime roots: links at the boundary itself must remain visible.
@@ -69,6 +70,33 @@ def republish(private_root: Path, out: Path, runtime_root: Path | None = None) -
             private_root.resolve().is_relative_to(out.resolve())):
         raise ValueError('Output overlaps private storage')
     report = copy.deepcopy(original)
+    diagnostics_path = out / 'run-diagnostics.json'
+    diagnostics: dict[str, Any] = {}
+    if allow_unpinned:
+        if not safe_source(diagnostics_path, out):
+            raise ValueError('Unsafe diagnostics destination')
+        if diagnostics_path.exists():
+            diagnostics = json.loads(diagnostics_path.read_text())
+        if not isinstance(diagnostics, dict):
+            raise ValueError('Invalid run diagnostics')
+    original_diagnostics = copy.deepcopy(diagnostics)
+    unpinned_records: dict[tuple[str, str], dict[str, str]] = {}
+    if allow_unpinned:
+        republication = diagnostics.get('republication', {})
+        if not isinstance(republication, dict) or not isinstance(republication.get('artifacts', []), list):
+            raise ValueError('Invalid republication diagnostics')
+        for record in republication.get('artifacts', []):
+            if (not isinstance(record, dict) or set(record) != {'task_id', 'path', 'sha256', 'provenance'} or
+                    record['task_id'] not in entries or record['provenance'] != 'republished_unpinned'):
+                raise ValueError('Invalid republication provenance')
+            path = evidence_path(record['path'])
+            if (path.parent != out / record['task_id'] or
+                    not re.fullmatch(r'(?:exec-[0-9]+\.stderr|final-[0-9]+\.md)', path.name)):
+                raise ValueError('Unsafe republication provenance')
+            key = (record['task_id'], record['path'])
+            if key in unpinned_records:
+                raise ValueError('Duplicate republication provenance')
+            unpinned_records[key] = record
     pending: dict[Path, bytes] = {}
     rows = []
     for task in report['tasks']:
@@ -167,12 +195,24 @@ def republish(private_root: Path, out: Path, runtime_root: Path | None = None) -
         if len(refs) != len(task['artifacts']) or len(refs_by_path) != len(refs):
             raise ValueError('Duplicate artifact references')
         written = existing = 0
+        published_unpinned = 0
         destinations: set[Path] = set()
         for name, target in sorted(candidates.items()):
+            unverified = name not in raw
             if name not in raw:
                 # Historical runner versions did not pin stderr/final bytes.
-                unpinned += 1
-                continue
+                source = runtime / relative_name(name)
+                if not allow_unpinned or not re.fullmatch(r'(?:exec-[0-9]+\.stderr|final-[0-9]+\.md)', name):
+                    unpinned += 1
+                    continue
+                if not safe_source(source, runtime):
+                    raise ValueError('Unsafe unpinned capture')
+                if not source.exists():
+                    unpinned += 1
+                    continue
+                if not source.is_file():
+                    raise ValueError('Invalid unpinned capture')
+                raw[name] = source.read_bytes()
             data = review_bytes(raw[name], private)
             if not safe_source(target, out) or target in destinations:
                 raise ValueError('Unsafe publication destination')
@@ -181,6 +221,12 @@ def republish(private_root: Path, out: Path, runtime_root: Path | None = None) -
             ref = {'path': prior['path'] if prior else checkout_text(str(target)), 'sha256': digest(data)}
             if prior is not None and prior['sha256'] != ref['sha256']:
                 raise ValueError('Published artifact pin conflicts with retained evidence')
+            if unverified:
+                key = (task_id, ref['path'])
+                record = {**ref, 'task_id': task_id, 'provenance': 'republished_unpinned'}
+                if key in unpinned_records and unpinned_records[key] != record:
+                    raise ValueError('Unpinned publication provenance changed')
+                unpinned_records[key] = record
             if target.exists():
                 if not target.is_file() or target.read_bytes() != data:
                     raise ValueError('Existing published bytes differ')
@@ -190,6 +236,7 @@ def republish(private_root: Path, out: Path, runtime_root: Path | None = None) -
                     raise ValueError('Colliding publication destinations')
                 pending[target] = data
                 written += 1
+                published_unpinned += int(unverified)
             refs[ref['path']] = ref
         # Preserve historical external references (including raw native streams),
         # while verifying their backup counterpart when original runtimes moved.
@@ -205,7 +252,27 @@ def republish(private_root: Path, out: Path, runtime_root: Path | None = None) -
                 else:
                     read_pinned(path, out, ref['sha256'])
         task['artifacts'] = list(refs.values())
-        rows.append({'task_id': task_id, 'published': written, 'existing': existing, 'unpinned': unpinned})
+        row = {'task_id': task_id, 'published': written, 'existing': existing, 'unpinned': unpinned}
+        if allow_unpinned:
+            row['published_unpinned'] = published_unpinned
+        rows.append(row)
+    if allow_unpinned and unpinned_records:
+        # The frozen report artifact shape accepts path/sha256 only. Store the
+        # richer artifact entries in diagnostics, never weaken schema validation.
+        diagnostics.setdefault('republication', {})['artifacts'] = list(unpinned_records.values())
+        for record in unpinned_records.values():
+            path = evidence_path(record['path'])
+            if path in pending:
+                if digest(pending[path]) != record['sha256']:
+                    raise ValueError('Unpinned artifact hash mismatch')
+            else:
+                read_pinned(path, out, record['sha256'])
+    if diagnostics != original_diagnostics:
+        diagnostics_hash = digest((json.dumps(diagnostics, indent=2, ensure_ascii=False) + '\n').encode('utf-8'))
+        for task in report['tasks']:
+            for ref in task['artifacts']:
+                if evidence_path(ref['path']) == diagnostics_path:
+                    ref['sha256'] = diagnostics_hash
     validate_schema(report, core.REPOSITORY)
     # No output changes occur until all sources, destinations and report edits pass.
     # Exclusive creation also refuses a destination that appears after preflight.
@@ -215,12 +282,15 @@ def republish(private_root: Path, out: Path, runtime_root: Path | None = None) -
             raise ValueError('Unsafe publication destination')
         with target.open('xb') as stream:
             stream.write(data)
-    if report != original:
+    for path, value, previous in ((diagnostics_path, diagnostics, original_diagnostics),
+                                  (out / 'report.json', report, original)):
+        if value == previous:
+            continue
         with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=out,
                                          prefix='.republish-', suffix='.tmp', delete=False) as stream:
             temporary = Path(stream.name)
-            stream.write(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
-        temporary.replace(out / 'report.json')
+            stream.write(json.dumps(value, indent=2, ensure_ascii=False) + '\n')
+        temporary.replace(path)
     return rows
 
 
@@ -230,9 +300,11 @@ def main() -> int:
     parser.add_argument('--private-root', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--runtime-root', type=Path)
+    parser.add_argument('--allow-unpinned', action='store_true',
+                        help='Restore unpinned executor stderr/finals and label their provenance in diagnostics')
     try:
         args = parser.parse_args()
-        rows = republish(args.private_root, args.out, args.runtime_root)
+        rows = republish(args.private_root, args.out, args.runtime_root, allow_unpinned=args.allow_unpinned)
     except (ValueError, OSError, KeyError, TypeError, ValidationError):
         print('Republication input error', file=sys.stderr)
         return 1
@@ -241,8 +313,8 @@ def main() -> int:
         return 2
     for row in rows:
         print(json.dumps(row, sort_keys=True))
-    print(json.dumps({'tasks': len(rows), **{key: sum(r[key] for r in rows)
-                                           for key in ('published', 'existing', 'unpinned')}}, sort_keys=True))
+    keys = ('published', 'existing', 'unpinned') + (('published_unpinned',) if args.allow_unpinned else ())
+    print(json.dumps({'tasks': len(rows), **{key: sum(r[key] for r in rows) for key in keys}}, sort_keys=True))
     return 0
 
 

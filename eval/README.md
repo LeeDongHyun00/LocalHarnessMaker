@@ -876,7 +876,7 @@ Run this only after the host runner has exited; it is not a concurrent repair.
 
 All tasks are checked before the first write. Every control-file pin and the
 complete executor/native audit-log manifest must match, including log sizes.
-Only runner-allowlisted controls and hash-pinned executor captures are published,
+By default, only runner-allowlisted controls and hash-pinned executor captures are published,
 using the same text decoding, private-path redaction and destination layout as
 normal publication. Nested interruption archives retain their directory layout.
 Unlisted files, workspaces, authentication files and grading copies are never
@@ -885,14 +885,26 @@ refusal; identical files are reused. Repeating a successful command is harmless.
 
 Historical segments in the checked-in full-A/full-B/smoke reports have no
 stderr or final-message hash, contrary to the recovery brief's assumption.
-Those files are counted as `unpinned` and skipped, even if still present in the
-runtime/backup. Control stderr is already pinned and can be restored. New
+Without `--allow-unpinned`, those files are counted as `unpinned` and skipped,
+even if still present in the runtime/backup. Add `--allow-unpinned` to recover
+regular root-level `exec-N.stderr` and `final-N.md` files through normal
+redaction. This does not waive any existing pin or admit other unpinned files.
+Missing captures remain skipped; symlinks and conflicting destinations fail.
+Control stderr is already pinned and can be restored. New
 executor segments record `evidence_sha256` for events, stderr and any final
 message immediately after process exit. Hashes are never backfilled from
 unverified historical bytes. Missing or mismatched *pinned* files cause refusal.
 
 Success prints JSON rows containing only task IDs and `published`, `existing`,
-`unpinned` counts, followed by totals. Errors are generic and contain no paths
+`unpinned` counts, followed by totals. With the flag, `published_unpinned` counts
+newly restored unpinned captures; `unpinned` counts those still skipped.
+`run-diagnostics.json.republication.artifacts` retains each recovered capture's
+`task_id`, `path`, `sha256` of the redacted published content and
+`provenance: republished_unpinned`. The frozen report artifact schema permits
+only `path` and `sha256`, so report references keep that shape and the richer
+artifact entries live in diagnostics. Existing diagnostic fields are preserved,
+and identical repeated repairs do not rewrite diagnostics.
+Errors are generic and contain no paths
 or source contents. Input errors exit 1; internal errors exit 2. Only per-task
 `artifacts` entries in report.json change; hashes there describe the redacted
 published bytes, while historical external raw-log references remain intact.

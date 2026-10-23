@@ -1,5 +1,8 @@
 ## Done
 
+- Added explicit --allow-unpinned recovery for historical executor stderr/finals through normal redaction, with labeled diagnostic artifact entries and published-content hashes; verified original/backup runtimes, v1/v2 reports, missing files, existing pins, conflicts, symlinks, repeat runs and unchanged default behavior (`.venv/bin/python -m pytest tests/eval -q`: 1476 passed in 139.70s).
+- Confirmed runtime capture pinning already shipped in 6dbc684; strengthened both capture tests to require persisted segment hashes before grading and independent recovery without --allow-unpinned (`.venv/bin/python -m pytest tests/eval -q`: 1476 passed in 139.70s; focused republication/runtime suite: 70 passed in 12.11s).
+- Updated README, CHANGES and this status for the opt-in mode and schema-compatible diagnostic provenance; kept report references path/sha256 and preserved metrics, classifications, checkpoints, frozen tasks, retained reports and other roles' files (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md`: exit 0; authorized scope/STATUS-format check: passed, branch r5/v2).
 - Fixed publication and related boundary checks to allow symlinked system ancestors while rejecting runtime/source-root links, inner links and traversal; covered explicit aliased-parent publication, control guard/accounting, static templates, day-2 copying and infrastructure reruns (`.venv/bin/python -m pytest tests/eval -q`: 1448 passed in 132.21s).
 - Added offline `eval.runner.republish` with original/backup runtimes, all-task hash/manifest preflight, normal redaction/layout, conflicting-output refusal, idempotence, v1/v2 support, counts/task-ID output and artifact-only report updates; verified no workspace copying or subprocess/model execution (`.venv/bin/python -m pytest tests/eval -q`: 1448 passed in 132.21s).
 - Added future per-segment capture hashes and explicit unpinned counts/skips for historical executor stderr/finals; verified old files are not adopted and report metrics/classifications remain unchanged (`.venv/bin/python -m pytest tests/eval -q`: 1448 passed in 132.21s).
@@ -25,8 +28,8 @@
 
 ## Remaining
 
-- Host/Claude: review and transfer this publication fix, then run `.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN [--runtime-root BACKUP/RUN]` for full-a, full-b, full-harness, smoke-harness-3 and pilot-v2-a. Each backup directory contains TASK subdirectories. This sandbox did not access host backups/private storage or repair retained reports.
-- Host/Claude: review each republication's unpinned counts. Sampled historical checkpoints lack executor stderr/final hashes; those captures are deliberately skipped. Do not backfill historical pins from today's files or recompute classifications/metrics as part of publication repair.
+- Host/Claude: review and transfer this opt-in republication follow-up, then restore historical stderr/finals using `.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN --allow-unpinned` for the intended retained runs. Review run-diagnostics.json.republication.artifacts and published_unpinned counts. This sandbox did not access host backups/private storage or repair retained reports.
+- Host/Claude: review each republication's remaining unpinned counts for missing captures. The default still skips unpinned files; the explicit flag restores only stderr/finals and labels their current published-content hashes. Never backfill historical checkpoint pins. Any later task_false_done_rate/classification refresh remains separate retained-evidence work, with no new models or grading of invalid tasks.
 - Host/Claude: review and transfer this first-occurrence follow-up at a safe boundary, then re-audit retained calibration evidence using the original hash-pinned graders. Earlier public/generic-only changes are committed according to the user; this session claims no host re-audit result.
 - Host/Claude: supply executor-written Python tests under private .corpus/ storage, run ordinary grader validation and review warning counts by task ID. The actual corpus is pending; synthetic tests are not a measurement of its contents.
 - Review repository changes through the final Commit plan. Do not stage or commit here, modify private storage, or run live models. Corpus warnings must never waive public-input validation failures or access-audit evidence.
@@ -39,9 +42,13 @@
 
 ## Decisions
 
+- Allow historical stderr/final recovery only with explicit --allow-unpinned: the user authorized publication of these retained bytes with a visible provenance distinction, not a fabricated original hash.
+- Store provenance=republished_unpinned in diagnostic artifact entries and path/sha256 in report references: the frozen shared schema rejects extra report artifact fields, and no schema or validation exception is introduced.
+- Preserve default behavior and all existing hash checks: the flag applies only to regular, root-level executor stderr/finals; pinned mismatches, symlinks, conflicting destinations and altered prior provenance still fail before writes.
+- Retain existing runtime pinning and strengthen its tests: 6dbc684 already records these captures in segment evidence_sha256; tests now require persisted pins before grading and recovery without the flag for each file.
 - Check symlinks only at/below the runtime/source boundary: macOS /var is a system alias above the runtime, while root/inner links and traversal must still fail closed.
 - Preflight every republication task and refuse conflicting destination bytes/pins before writing: restore only hash-verified allowlisted evidence, preserve all report fields except per-task artifacts, and never copy a workspace in this command.
-- Count historical executor stderr/finals without retained pins as unpinned rather than adopting them: sampled checkpoints contradict the recovery brief's blanket hash claim. New executor segments pin captures at exit; no retrospective hashes are fabricated.
+- By default, count historical executor stderr/finals without retained pins as unpinned rather than adopting them: sampled checkpoints contradict the recovery brief's blanket hash claim. New executor segments pin captures at exit; no retrospective hashes are fabricated.
 - Exempt a qualifying fingerprint only when literal tool-input authorship provably precedes every output occurrence: later copying cannot erase an output-first match, and current workspace contents never establish historical authorship.
 - Reconcile streams with record order, strict timezone-aware timestamps and session-scoped command/result anchors: equal-count ordered repetitions can align, while missing identity, unequal repetitions and ambiguous chronology retain the match.
 - Share provenance across retained/fresh audit contexts without sharing their filesystem permissions: path checks, retained hashes and malformed/incomplete evidence remain independent and fail closed.
@@ -67,6 +74,7 @@
 
 ## Verify commands
 
+- Host/explicit historical-capture recovery: .venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN --allow-unpinned
 - Host/finished run only: .venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN
 - .venv/bin/python -m pytest tests/eval/test_republish.py tests/eval/test_publication_runtime.py -q
 - .venv/bin/python -m pytest tests/eval -q
@@ -88,6 +96,9 @@
 
 ## Assumptions
 
+- The requested per-artifact provenance field is represented in run-diagnostics.json.republication.artifacts; report artifact references retain the frozen path/sha256 shape. The schema prohibition remains in force.
+- Claude committed 6dbc684 and observed 34 published/6 skipped files on a smoke-harness-3 report copy, as supplied by the user. No host repair or private-root access was performed in this follow-up.
+- Restoring final messages supplies retained evidence for later task_false_done_rate analysis; republication does not rewrite metrics or completion classifications itself.
 - The five runtime backups and their RUN/TASK layout are user-supplied host facts. No private grader root or backup was located or accessed in this session; tests use synthetic graders and mocked executors.
 - Republication runs after all host runner activity exits. Existing raw external log references stay historical; backup selection relocates reads without migrating executor segment fields.
 - The sampled full-a, full-b and smoke-harness-3 checkpoint entries pin controls and audited logs, but contain no executor stderr/final hashes. This is repository evidence, and the command reports those files as unpinned instead of assuming their integrity.

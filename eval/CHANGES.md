@@ -1,3 +1,44 @@
+# Explicit recovery of unpinned executor captures — 2026-10-23
+
+Add optional `--allow-unpinned` to republication. Recover only regular
+`exec-N.stderr` and `final-N.md` captures from the recorded runtime or BACKUP/TASK,
+with the same redaction and destination-conflict checks. Existing control/log
+pins are always enforced. Without the flag, publication and counts stay as
+before; missing captures remain skipped even with the flag.
+
+Record per-capture artifact entries in
+`run-diagnostics.json.republication.artifacts`, containing task_id, path,
+sha256 of the published redacted bytes and provenance=republished_unpinned.
+The frozen shared report schema accepts path/sha256 only; its artifact
+references retain that shape. Preserve existing diagnostics, refresh any
+report references to the changed diagnostics hash, and refuse altered
+provenance. Preflight all tasks before writing, and reuse identical evidence
+without duplicate records or repeated metadata writes. CLI output contains
+only task IDs and counts, including opt-in published_unpinned counts.
+
+Runtime capture pinning already shipped in 6dbc684. Strengthen mocked runner
+tests for both stderr and final messages: require persisted per-segment hashes
+before trusted grading and verify each capture restores without the flag.
+No retrospective checkpoint pins, model calls, grading, workspace copies or
+metric/classification rewrites are introduced by republication.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1476 passed in
+139.70s. Focused republication/runtime checks — 70 passed in 12.11s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md` — exit 0.
+Authorized scope/STATUS-format check passed; branch r5/v2. No retained report,
+frozen task, shared schema, private storage or other checkout was changed.
+No staging, commits or live executor/controller/judge calls were performed.
+
+## Assumptions
+
+- The requested provenance field belongs to the richer diagnostic artifact
+  entries; report artifact references remain valid under the frozen schema.
+- Claude's 34 published/6 skipped smoke-copy result is a user-supplied host
+  observation. This session uses only synthetic runtimes and mocked executors.
+- Restored final messages enable later retained-evidence classification;
+  republication itself preserves historical metrics and classifications.
+
 # macOS evidence publication and offline republication — 2026-10-23
 
 Bound symlink checks to the runtime/source root. Permit system aliases above

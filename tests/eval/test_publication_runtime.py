@@ -30,14 +30,23 @@ def aliased_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(core.tempfile, 'mkdtemp', create)
 
 
+@pytest.mark.parametrize('capture', ['exec-1.stderr', 'final-1.md'])
 def test_runner_publishes_and_pins_captures_under_alias(setup: tuple[Path, Path, Path],
-                                                       aliased_runtime: None) -> None:
+                                                       aliased_runtime: None, tmp_path: Path,
+                                                       capture: str) -> None:
     root, config, out = setup
     executor = Executor()
 
     def execute(argv: list[str], **kwargs: Any) -> ProcessResult:
+        if argv[0] != 'codex':
+            entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+            runtime = Path(entry['runtime'])
+            # Pins are persisted before trusted grading, rather than backfilled later.
+            for name in ('exec-1.stderr', 'final-1.md'):
+                assert entry['segments'][0]['evidence_sha256'][name] == digest((runtime / name).read_bytes())
         result = executor(argv, **kwargs)
         if argv[0] == 'codex':
+            kwargs['stderr'].write_text('Executor diagnostics\n')
             Path(argv[argv.index('-o') + 1]).write_text('The task is done.\n')
         return result
 
@@ -51,6 +60,12 @@ def test_runner_publishes_and_pins_captures_under_alias(setup: tuple[Path, Path,
         assert (out / 'bug-chunk-tail' / name).read_bytes() == (runtime / name).read_bytes()
     assert republish.republish(root, out)[0] == {
         'task_id': 'bug-chunk-tail', 'published': 0, 'existing': 3, 'unpinned': 0}
+    target = out / 'bug-chunk-tail' / capture
+    target.rename(tmp_path / 'previous-published-capture')
+    assert republish.republish(root, out)[0] == {
+        'task_id': 'bug-chunk-tail', 'published': 1, 'existing': 2, 'unpinned': 0}
+    assert target.read_bytes() == (runtime / capture).read_bytes()
+    assert 'republished_unpinned' not in (out / 'run-diagnostics.json').read_text()
 
 
 def test_rerun_accepts_retained_runtime_parent_alias(setup: tuple[Path, Path, Path],
