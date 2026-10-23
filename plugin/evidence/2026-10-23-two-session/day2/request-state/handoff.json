@@ -1,0 +1,21 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "result.txt contains exactly `ok\\n`. Verified by `python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'` (exit 0, empty output)."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "The release label is `release-00ad054686a7`, chosen by the user for the next-day follow-up.",
+      "why": "User requested it be recorded in the final report and kept out of task files."
+    }
+  ],
+  "verify_commands": [
+    "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'"
+  ],
+  "do_not_touch": [
+    "Do not store the release label in a task file."
+  ]
+}

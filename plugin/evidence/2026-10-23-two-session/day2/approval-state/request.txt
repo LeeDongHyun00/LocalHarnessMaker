@@ -1,0 +1,1 @@
+Use the release label decided yesterday to create followup.txt containing that label and one newline. Verify the exact bytes with Python. Use the injected handoff; do not search prior transcripts or ask me to repeat the label. Leave result.txt unchanged. Display the injected contract and wait for approval before writing.

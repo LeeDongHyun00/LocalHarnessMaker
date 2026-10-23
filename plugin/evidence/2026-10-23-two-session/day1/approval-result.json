@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "--no-daemon",
+    "--dangerously-bypass-hook-trust",
+    "exec",
+    "resume",
+    "01a166e9-0150-73d1-b891-9c238702bb77",
+    "--skip-git-repo-check",
+    "--json",
+    "--output-last-message",
+    "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-23-two-session/day1/approval-reply.txt",
+    "-"
+  ],
+  "exit_code": 0
+}

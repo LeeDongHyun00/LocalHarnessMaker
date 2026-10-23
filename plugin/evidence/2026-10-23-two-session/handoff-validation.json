@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/.venv/bin/python",
+    "-m",
+    "verifier",
+    "validate-handoff",
+    "--handoff",
+    "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-23-two-session/day1/approval-state/handoff.json"
+  ],
+  "exit_code": 0,
+  "stdout": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/plugin/evidence/2026-10-23-two-session/day1/approval-state/handoff.json\n",
+  "stderr": "",
+  "sha256": "62035f04c2af9c751ce1ad96285e8cd761d07d27e50f078f00fc1e9c2158fd9f"
+}

@@ -1,0 +1,31 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "Python byte check passed (exit 0, empty output): `followup.txt` contains `release-00ad054686a7` followed by one newline."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "Python byte check passed (exit 0, empty output): `result.txt` contains exactly `ok\\n`."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "The release label is `release-00ad054686a7`, chosen by the user for the next-day follow-up.",
+      "why": "The injected handoff records this user decision."
+    },
+    {
+      "what": "Approval was obtained before writing `followup.txt`.",
+      "why": "The user replied `approve` after the proposed contract was displayed."
+    }
+  ],
+  "verify_commands": [
+    "python -c 'from pathlib import Path; assert Path(\"followup.txt\").read_bytes() == b\"release-00ad054686a7\\n\"'",
+    "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'"
+  ],
+  "do_not_touch": [
+    "Leave `result.txt` unchanged.",
+    "Do not search prior transcripts or ask the user to repeat the label."
+  ]
+}

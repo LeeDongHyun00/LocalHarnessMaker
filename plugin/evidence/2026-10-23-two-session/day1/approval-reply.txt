@@ -1,0 +1,7 @@
+Created `result.txt`.
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| SC-1: Exactly `ok` plus one newline | Passed | `python -c 'from pathlib import Path; assert Path("result.txt").read_bytes() == b"ok\n"'` — exit code `0`, no output |
+
+For the next session: the user chose release label `release-00ad054686a7` for the next-day follow-up. The label was not stored in a task file.

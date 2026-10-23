@@ -1,0 +1,48 @@
+{
+  "task_summary": "Create result.txt with exactly `ok` followed by a newline, and propose a Python exact-content check. The user also requests displaying this contract and waiting for approval before writing; contract approval and execution are outside this contract-generation task.",
+  "constraints": [
+    "Do not write result.txt before approval.",
+    "result.txt must contain only `ok` and a newline.",
+    "Do not store the release label in a task file.",
+    "The requested release label and follow-up explanation belong in the final report, outside this contract."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "result.txt contains exactly `ok` followed by one newline byte.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [
+    "Stop if approval to write result.txt is not provided.",
+    "Stop if fulfilling the task requires storing the release label in a task file."
+  ],
+  "assumptions": [
+    "The requested result.txt path is relative to the workspace root.",
+    "The exact-content check is proposed for execution after approval and after result.txt has been written.",
+    "The release label release-00ad054686a7 and the explanation that the user chose it for next-day follow-up should be included in the eventual final report, not saved in a file."
+  ],
+  "reasoning_effort": {
+    "value": "medium",
+    "rationale": "effort-v1: utf8_byte_bound=464; distinct_files=1; tests_requested=false; requirement_segments=8; score=3"
+  },
+  "cost_estimate": {
+    "input_tokens": 15590,
+    "output_tokens": 329,
+    "usd": 0.0017235
+  }
+}

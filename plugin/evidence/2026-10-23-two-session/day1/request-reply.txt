@@ -1,0 +1,16 @@
+Injected contract:
+
+- **Goal:** After approval, create `result.txt` containing exactly `ok` followed by one newline.
+- **Success checklist:** SC-1 — Verify the exact bytes with Python:
+  ```sh
+  python -c 'from pathlib import Path; assert Path("result.txt").read_bytes() == b"ok\n"'
+  ```
+  Expected exit code: `0`.
+- **Constraints:** No writing before approval. Keep the release label out of task files. Stop without approval or if the label must be stored in a task file.
+- **Assumptions:** `result.txt` is relative to the workspace root; verification runs after writing.
+- **Reasoning effort:** Medium. Injected rationale: `effort-v1: utf8_byte_bound=464; distinct_files=1; tests_requested=false; requirement_segments=8; score=3`.
+- **Estimated cost:** 15,590 input tokens, 329 output tokens; USD $0.0017235.
+
+For the next session: the release label is `release-00ad054686a7`, chosen by the user for the next-day follow-up. It will appear only in the report.
+
+No tools have run and no files have changed. Please reply **approve** or provide edits. The injected `HARNESS_CONTRACT` explicitly requires approval before work begins.

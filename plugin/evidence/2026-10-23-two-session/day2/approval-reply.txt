@@ -1,0 +1,6 @@
+Created `followup.txt`. Left `result.txt` unchanged.
+
+| Criterion | Status | Verification evidence |
+|---|---|---|
+| SC-1 | Done | `python -c 'from pathlib import Path; assert Path("followup.txt").read_bytes() == b"release-00ad054686a7\n"'` — exit 0, empty output |
+| SC-2 | Done | `python -c 'from pathlib import Path; assert Path("result.txt").read_bytes() == b"ok\n"'` — exit 0, empty output |

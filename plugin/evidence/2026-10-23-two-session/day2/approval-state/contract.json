@@ -1,0 +1,63 @@
+{
+  "task_summary": "Create followup.txt containing the release label from the injected handoff followed by exactly one newline; verify its exact bytes with Python. Preserve result.txt unchanged. Display the proposed contract and wait for approval before writing.",
+  "constraints": [
+    "Do not search prior transcripts or ask the user to repeat the label.",
+    "Leave result.txt unchanged.",
+    "Wait for approval before writing followup.txt."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "followup.txt contains exactly the handoff release label followed by one newline.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from pathlib import Path; assert Path(\"followup.txt\").read_bytes() == b\"release-00ad054686a7\\n\"'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "result.txt retains its previously verified exact bytes.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c 'from pathlib import Path; assert Path(\"followup.txt\").read_bytes() == b\"release-00ad054686a7\\n\"'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [
+    "Stop if approval has not been granted; do not write followup.txt before approval.",
+    "Stop if the injected handoff is unavailable or does not provide the release label."
+  ],
+  "assumptions": [
+    "The injected handoff's label `release-00ad054686a7` is the intended release label, and its prior verification of result.txt reflects the starting state.",
+    "The requested file paths are relative to the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "high",
+    "rationale": "effort-v1: utf8_byte_bound=322; distinct_files=2; tests_requested=false; requirement_segments=6; score=4"
+  },
+  "cost_estimate": {
+    "input_tokens": 15659,
+    "output_tokens": 404,
+    "usd": 0.0017679
+  }
+}
