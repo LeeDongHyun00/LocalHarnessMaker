@@ -47,6 +47,10 @@ Continue a session: the same flags, then `resume SESSION_ID -` before the stdin 
 - Nobody answers questions during a job. Jobs must be written so that a stop condition ends with a report, not a question.
 - One Codex job per role at a time. Two jobs for the same role at the same time corrupt that role's files and STATUS.
 
+### 2.4 Long host runs
+
+Start every evaluation run and other long host process through ../codex-bridge/detach.sh LOGDIR -- COMMAND. It detaches the process (setsid, nohup) so that a Claude session restart cannot kill it; the 2026-10-23 restart killed two attached full runs. Resume a killed run with the same --out. After every push, confirm the GitHub CI run for that SHA.
+
 ## 3. The job prompt template
 
 Every job prompt has this shape. Keep it in English, ASCII only.

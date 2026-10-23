@@ -329,3 +329,26 @@ r2-cont-008 compares recorded paths in a canonical form without filesystem acces
 - On the new code, all 5 tests pass and all 5 committed evidence checkers pass.
 - A copy whose hook cwd points to another workspace is rejected.
 CI on 1550267: validate (3.11) success and validate (3.14) success.
+
+## 2026-10-23 afternoon: task set v2 approved, Fast tier, two new audit patterns
+
+- The user approved task set v2 and allowed the Codex Fast tier, with usage not a constraint and completeness of results as the goal. Decision 0008 is c0e7d39 (CI green).
+  - Codex "Fast" is service_tier "priority": "2x speed, increased usage" for gpt-6.1-sol, and the default tier for gpt-6-luna. A host probe showed `-c service_tier="priority"` is accepted, and the native thread_settings_applied record carries service_tier, so runs can verify it.
+  - Because Luna defaults to priority, control calls already ran at that tier while costs used Standard rates. The evaluation will state this.
+- r5-v2-001 runs in the worktree (branch r5/v2) in private-write mode on the Fast tier. It covers runner support for task_root and service_tier, eval/tasks-v2/DESIGN.md, and a pilot of 4 families (20 tasks) with private graders.
+- Two new inconclusive audits, both single-session and both recoverable by regrade after the fixes. Neither is an access attempt:
+  - full-b multiple-requirements-line-endings: malformed_event. The audit splits JSONL with str.splitlines(), which also breaks on \x85,   and   inside JSON strings. The stream has 21 lines by "\n" and 26 by splitlines(); every "\n" line parses. Fix: split JSONL on "\n" only, in every runner reader.
+  - full-harness multiple-requirements-round-robin, attempt 2: unresolved_operand on a quoted heredoc Python script whose regex mixes quotes and backslashes.
+
+## Tech-lead review and reinforcement (2026-10-23, 07:00 UTC)
+
+Incident: the Claude session restarted at about 06:50 UTC and killed every attached background process: full B (94 of 100 done), harness v2 (46 of 120) and the Role 5 v2 job. Both runs resumed from their checkpoints with the same --out; B resumed its interrupted session as attempt 2. The Role 5 thread was resumed. Codex is still 0.163.0-alpha.11.1 although the Sparkle updater is active. From now on long host runs start through codex-bridge/detach.sh (setsid, nohup) so a session restart cannot kill them.
+
+Review of what is weak, and the reinforcement dispatched for each:
+1. false_done_rate is undefined in every report, although it is the project's central claim. The verifier exposes only negative claim evidence, and baselines have no verifier at all. Role 4 (r4-cont-009) adds a per-criterion claims sidecar and a measured claim extractor. Role 1 (r1-cont-007) defines a task-level false-done metric from the final message and hidden grading, usable for A, B, C and the harness alike. Role 5 implements it after v2.
+2. The llm_judge produced false fails and unnecessary unverifiable results. Role 3 (r3-cont-009) writes judge prompt v2 with per-requirement evidence and a 24-case calibration set with an approval-gated live accuracy measurement; Claude measures before and after.
+3. Plugin host checks for persisted trust, bundled-binary discovery and unrelated-project silence had no procedure. Role 2 (r2-cont-009) scripts them with checkers and adds a once-per-session SessionStart warning for unverified CLI versions.
+4. SC-6 human review had not started. Claude drew docs/evaluation/human-review-sample-full-a.md: 22 valid full-A tasks (5 per type plus every failure) for the user to check against the workspaces and prompts.
+5. Audit precision: two new inconclusive patterns (JSONL splitting on Unicode separators, a heredoc with a quoted regex) are queued for Role 5 after the v2 pilot. The runtime-evidence idea of checking grader atime was tested and rejected: APFS does not update atime on reads.
+6. The runner leaves no diagnostics on SIGINT; queued for Role 5.
+7. Still open and not fixable by a job: the v1 ceiling (addressed by v2), single-run variance (no repeats planned), the C templates (user), and the concurrency of B and harness runs (latency only).
