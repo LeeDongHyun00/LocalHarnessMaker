@@ -23,7 +23,8 @@ from eval.runner.report import build_task, validate
 def audit_code_version() -> dict[str, str]:
     """Pin the audit implementation, including uncommitted parser changes."""
     directory = Path(__file__).parent
-    return {name: digest((directory / name).read_bytes()) for name in ('audit.py', 'javascript.py', 'regrade.py')}
+    return {name: digest((directory / name).read_bytes())
+            for name in ('audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py')}
 
 
 def regrade(private_root: Path, source: Path, out: Path, *,

@@ -77,6 +77,17 @@ equivalence rationales remain external; the v2 specification hash includes day 2
 Public regression and reference verification commands run separately, without
 executors, controllers, judges, network or timing-dependent assertions.
 
+Optional private `.corpus/` storage can contain executor-written Python test
+files in any task/run subdirectory layout. Normal validation reads its regular
+`.py` files recursively and reports `corpus_file_count`,
+`shared_corpus_assertion_line_count` and `corpus_warning_count`. Shared assertion
+lines count grader-line occurrences, regardless of duplication in the corpus.
+These matches are warnings and do not affect validity or exit status; the
+existing public-input rejection still applies. The summary totals warning tasks
+and shared assertion occurrences. An absent corpus reports zero files, rather
+than evidence that executor text has been checked. No corpus contents or paths
+are published, and the corpus never contributes access-audit fingerprints.
+
 The frozen command is `python -m eval run --config FILE --out DIR`.
 Successful stdout is exactly the supplied output directory plus a newline;
 exit codes are 0 for computed reports (including invalid tasks), 1 for input
@@ -199,7 +210,20 @@ matched. Executor-authored patches, file changes, arguments and metadata are
 never fingerprint evidence. File changes and patches are checked only through
 their target and move paths; authored content/diffs are not operands or path
 access evidence, even when they contain `$`, backticks, quotes or path strings.
-Distinctive hidden output remains access_detected even when a read hides its path.
+First-occurrence provenance spans the JSON stream and native rollout. A line is
+exempt only when a recorded literal tool input demonstrably precedes every
+output occurrence: patch additions, heredoc bodies and decoded command string
+payloads establish authorship; patch context/deletions and current workspace
+contents do not. A first output remains a match after later copying. Within-file
+order and strict timezone-aware timestamps establish chronology. Untimed CLI
+results can align with matching native command results within the same session,
+using IDs or equal-count ordered command/output matches. Missing or ambiguous
+correspondence retains the match. Private-path checks and incomplete/unsupported
+capture errors are never waived. Retained and fresh contexts share provenance
+while retaining separate filesystem checks. The runner includes prior segments
+and all native logs before making retry/verification decisions, and recovery
+pins the fingerprint-history implementation hash.
+Output-first distinctive hidden text remains access_detected even when a read hides its path.
 Only hashes, labels and redacted evidence are retained in audit results.
 Decode-and-execute pipelines such as `base64 -d | sh` are inconclusive.
 For pinned codex-cli `0.162.0-alpha.17.2`, native records include `session_meta`,

@@ -628,13 +628,12 @@ def run(
                     entry["workspace_exit_sha256"] = workspace_digest(workspace)
                     segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
                 write_json(checkpoint, state)
-                current_audit = audit([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                current_audit = audit([runtime / saved['events'] for saved in entry['segments']] +
+                                      sorted((codex_home / 'sessions').rglob('*.jsonl')),
+                                      private, workspace=workspace, repository=REPOSITORY,
+                                      grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 infrastructure_stop = usage_limit_message([event_path])
                 capacity = capacity_message([event_path])
-                if capacity:
-                    current_audit = audit([event_path, *native_changed], private, workspace=workspace,
-                                               repository=REPOSITORY, grading_roots=audit_roots(runtime),
-                                               fingerprint_cache=fingerprint_cache)
                 if capacity and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
                     segment.update(capacity_error=True, infrastructure_recovery=True,
                                    usage_evidence="Capacity refusal before any item: zero tokens" if

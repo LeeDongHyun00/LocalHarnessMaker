@@ -16,6 +16,7 @@ from typing import Any, Callable
 from urllib.parse import unquote
 
 from eval.runner.javascript import tool_calls
+from eval.runner.fingerprint_history import FingerprintHistory, input_texts
 
 
 def digest(data: bytes) -> str:
@@ -758,6 +759,8 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
     pinned = retained_context['logs']
     retained = [path for path in paths if str(path) in pinned]
     fresh = [path for path in paths if str(path) not in pinned]
+    history = FingerprintHistory(private.line_fingerprints(kwargs.get('fingerprint_cache')))
+    kwargs = dict(kwargs, _fingerprint_history=history)
     results = []
     if retained:
         historical = dict(kwargs, workspace=Path(retained_context['workspace']),
@@ -783,6 +786,7 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
     combined = dict(results[0])
     for key in ('logs', 'matches', 'errors'):
         combined[key] = [item for result in results for item in result[key]]
+    combined['matches'].extend(history.matches())
     combined['status'] = ('access_detected' if combined['matches'] else
                           'inconclusive' if combined['errors'] else 'clean')
     return combined
@@ -798,7 +802,8 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                interrupted_paths: set[Path] | None = None,
                workspace: Path | None = None, repository: Path | None = None,
                grading_roots: tuple[Path, ...] = (),
-               fingerprint_cache: FingerprintCache | None = None) -> dict[str, Any]:
+               fingerprint_cache: FingerprintCache | None = None,
+               _fingerprint_history: FingerprintHistory | None = None) -> dict[str, Any]:
     """Audit tool access and native metadata disclosure; retain every error."""
     matches: list[dict[str, Any]] = []
     errors: list[str] = []
@@ -810,6 +815,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                for name in (".codex", ".claude")
                for prefix in ("~/", "$HOME/", "${HOME}/")}
     fingerprints = private.line_fingerprints(fingerprint_cache)
+    history = _fingerprint_history or FingerprintHistory(fingerprints)
     calls: dict[str, str] = {}
     pending_calls: set[str] = set()
     pending_items: set[str] = set()
@@ -831,6 +837,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
         logs.append({"name": path.name, "sha256": digest(data), "bytes": len(data)})
         terminal = False
         native = False
+        session: str | None = None
         if not data or not data.endswith(b"\n"):
             errors.append(f"empty_or_truncated_log:{path.name}")
         for number, line in enumerate(data.decode("utf-8", errors="replace").removesuffix("\n").split("\n"), 1):
@@ -842,6 +849,12 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 errors.append(f"malformed_event:{path.name}:{number}")
                 continue
             kind = event["type"]
+            if kind == 'thread.started':
+                session = event.get('thread_id')
+            elif kind == 'session_meta' and isinstance(event.get('payload'), dict):
+                session = event['payload'].get('session_id', event['payload'].get('id'))
+            if not isinstance(session, str):
+                session = None
             terminal |= kind in {"turn.completed", "turn.failed", "error"}
             native_kinds = {"session_meta", "turn_context", "response_item", "event_msg",
                             "world_state", "token_usage_record"}
@@ -984,6 +997,18 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 commands = custom
             elif patch_call or item_type == "file_change":
                 commands = []
+            authored_commands = [value for command_item in commands
+                                 if isinstance(value := command_item.get('command', command_item.get('cmd')), str)]
+            # Array-form native shell commands preserve literal code operands too.
+            authored_commands.extend(shlex.join(value) for command_item in commands
+                                     if isinstance(value := command_item.get('command', command_item.get('cmd')), list)
+                                     and all(isinstance(word, str) for word in value))
+            alignment_command = None
+            if item_type == 'command_execution' and authored_commands:
+                try:
+                    alignment_command = unwrap_shell(authored_commands[0])
+                except ValueError:
+                    pass
             for command_item in ([] if metadata else commands):
                 command = command_item.get("command", command_item.get("cmd"))
                 if isinstance(command, list) and all(isinstance(word, str) for word in command):
@@ -1037,14 +1062,16 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                     candidate = cwd / candidate
                 if protected(candidate):
                     hits.add("protected_path")
-            # Fingerprints establish observed output, never executor authorship.
-            # Input checks above use shell operands or file targets, not contents.
             output = (item.get("output") if item_type in {"function_call_output", "custom_tool_call_output"}
                       else item.get("aggregated_output") if item_type == "command_execution" else None)
-            for value in leaves(output):
-                if any(digest(normalize_line(output_line).encode()) in fingerprints
-                       for output_line in value.splitlines()):
-                    hits.add("private_line_fingerprint")
+            evidence = {"log": path.name, "line": number, "tool": tool,
+                        "operation": "execute" if "command" in tool or "exec" in tool else "unknown",
+                        "evidence_sha256": digest(line.encode()),
+                        "redacted_evidence": "Observed protected access; see external stream hash."}
+            if fingerprints:
+                history.observe(path=path, line=number, event=event, item=item,
+                                authored=input_texts(authored_commands, patches), output=leaves(output),
+                                session=session, command=alignment_command, evidence=evidence)
             for hit in sorted(hits):
                 matches.append({"log": path.name, "line": number, "marker": hit, "tool": tool,
                                 "operation": "read" if metadata else "execute" if "command" in tool or "exec" in tool else "unknown",
@@ -1057,6 +1084,8 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
         errors.append("unfinished_tool_events")
     if not paths:
         errors.append("missing_logs")
+    if _fingerprint_history is None:
+        matches.extend(history.matches())
     return {"method": "access_audit", "status": "access_detected" if matches else "inconclusive" if errors else "clean",
             "root_fingerprint": digest(str(private.root).encode()),
             "grader_fingerprints": [digest(p.read_bytes()) for p in private.files],

@@ -62,6 +62,7 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
     public = public_task(task_id)
     overlap = public_overlap(private, public)
+    corpus = corpus_overlap(private)
     expected = json.loads((public / 'expected.json').read_text())
     with tempfile.TemporaryDirectory(prefix='lhm-grader-validation-', dir=private.root) as temporary:
         runtime = Path(temporary)
@@ -95,7 +96,41 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
             'public_failed': baseline['failed_tests'], 'reference_passed': reference['passed_tests'],
             'reference_failed': reference['failed_tests'], 'valid_count': int(valid),
             'grader_sha256': [digest(p.read_bytes()) for p in private.files],
-            **overlap, **reference.get('coverage', {})}
+            **overlap, **corpus, **reference.get('coverage', {})}
+
+
+def assertion_lines(text: str) -> set[int]:
+    """Locate complete Python assert statements and assert* call spans."""
+    lines: set[int] = set()
+    for node in ast.walk(ast.parse(text)):
+        if (isinstance(node, ast.Assert) or isinstance(node, ast.Call) and
+                (isinstance(node.func, ast.Attribute) and node.func.attr.startswith('assert')
+                 or isinstance(node.func, ast.Name) and node.func.id.startswith('assert'))):
+            lines.update(range(node.lineno, (node.end_lineno or node.lineno) + 1))
+    return lines
+
+
+def corpus_overlap(private: PrivateGraders) -> dict[str, int]:
+    """Warn about predictable assertion text in the optional private .corpus/.
+
+    Read regular Python files recursively, regardless of task/run layout. Never
+    follow symlinks outside the corpus, publish source, or alter task validity.
+    """
+    corpus = private.root / '.corpus'
+    if corpus.is_symlink():
+        raise ValueError('Executor corpus must be a regular directory')
+    files = sorted(path for path in corpus.rglob('*.py') if path.is_file())
+    if any(path.is_symlink() or not path.resolve().is_relative_to(corpus.resolve()) for path in files):
+        raise ValueError('Executor corpus requires regular private files')
+    lines = {normalize_line(line) for path in files for line in path.read_text(errors='replace').splitlines()}
+    shared = 0
+    for source in private.files:
+        text = source.read_text()
+        assertions = assertion_lines(text)
+        shared += sum(bool(normalize_line(line)) and normalize_line(line) in lines
+                      for number, line in enumerate(text.splitlines(), 1) if number in assertions)
+    return {'corpus_file_count': len(files), 'shared_corpus_assertion_line_count': shared,
+            'corpus_warning_count': int(shared > 0)}
 
 
 def public_overlap(private: PrivateGraders, public: Path) -> dict[str, int]:
@@ -105,21 +140,16 @@ def public_overlap(private: PrivateGraders, public: Path) -> dict[str, int]:
     multiline assert statements and unittest assert* calls, including helpers.
     """
     public_lines = {normalize_line(line) for text in public_inputs(public) for line in text.splitlines()}
-    shared = assertions = 0
+    shared = shared_assertions = 0
     for source in private.files:
         text = source.read_text()
-        assertion_lines: set[int] = set()
-        for node in ast.walk(ast.parse(text)):
-            if (isinstance(node, ast.Assert) or isinstance(node, ast.Call) and
-                    (isinstance(node.func, ast.Attribute) and node.func.attr.startswith('assert')
-                     or isinstance(node.func, ast.Name) and node.func.id.startswith('assert'))):
-                assertion_lines.update(range(node.lineno, (node.end_lineno or node.lineno) + 1))
+        assertions = assertion_lines(text)
         for number, line in enumerate(text.splitlines(), 1):
             line = normalize_line(line)
             if line and line in public_lines:
                 shared += 1
-                assertions += int(number in assertion_lines)
-    return {'shared_public_line_count': shared, 'shared_assertion_line_count': assertions}
+                shared_assertions += int(number in assertions)
+    return {'shared_public_line_count': shared, 'shared_assertion_line_count': shared_assertions}
 
 
 def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
@@ -228,7 +258,7 @@ def main() -> int:
                 accepted &= not row.get('error_count') and denominator > 0 and row['killed'] / denominator >= 0.90
                 print(json.dumps(row, sort_keys=True), flush=True)
         return 0 if accepted else 1
-    valid = 0
+    valid = corpus_warnings = corpus_shared = 0
     for task in tasks:
         try:
             row = validate_task(args.private_root, task)
@@ -237,8 +267,12 @@ def main() -> int:
                    'valid_count': 0}
         print(json.dumps(row, sort_keys=True), flush=True)
         valid += row['valid_count']
+        corpus_warnings += row.get('corpus_warning_count', 0)
+        corpus_shared += row.get('shared_corpus_assertion_line_count', 0)
     summary: dict[str, Any] = {'task_count': len(tasks), 'valid_count': valid,
-                               'invalid_count': len(tasks) - valid}
+                               'invalid_count': len(tasks) - valid,
+                               'corpus_warning_count': corpus_warnings,
+                               'shared_corpus_assertion_line_count': corpus_shared}
     if valid == len(tasks):
         try:
             roots = {public_task(task).parent.relative_to(core.REPOSITORY).as_posix() for task in tasks}

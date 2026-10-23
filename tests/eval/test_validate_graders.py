@@ -271,3 +271,80 @@ def test_v2_mutation_equivalence_expires_when_day2_changes(synthetic_v2: tuple[P
     assert validate_graders.mutate_task(private, 'v2-synthetic', 10)['recorded_equivalent'] == 1
     (public / 'day2.md').write_text('D1. Changed specification.\n')
     assert validate_graders.mutate_task(private, 'v2-synthetic', 10)['recorded_equivalent'] == 0
+
+
+@pytest.mark.parametrize('version', ['v1', 'v2'])
+def test_executor_corpus_assertion_match_is_warning_only(
+    synthetic_v2: tuple[Path, Path], version: str,
+) -> None:
+    private, _ = synthetic_v2
+    task_id = 'v2-synthetic' if version == 'v2' else 'synthetic'
+    corpus = private / '.corpus/pilot/task'
+    corpus.mkdir(parents=True)
+    line = 'def test_answer(self) -> None: self.assertEqual(answer(), 42)'
+    # Duplicate corpus lines count once per matching grader-line occurrence.
+    (corpus / 'test_regression.py').write_text('import unittest\nclass Own(unittest.TestCase):\n '
+                                               + line + '\n ' + line + '\n')
+    (corpus / 'test_second.py').write_text(line + '\n')
+    (corpus / 'transcript.txt').write_text('not a Python test corpus file')
+    row = validate_graders.validate_task(private, task_id)
+    assert row['valid_count'] == 1
+    assert row['shared_assertion_line_count'] == 0
+    assert row['corpus_file_count'] == 2
+    assert row['shared_corpus_assertion_line_count'] == 1
+    assert row['corpus_warning_count'] == 1
+    assert str(private) not in json.dumps(row) and line not in json.dumps(row)
+
+
+def test_absent_executor_corpus_has_explicit_zero_file_count(synthetic: tuple[Path, Path]) -> None:
+    private, _ = synthetic
+    row = validate_graders.validate_task(private, 'synthetic')
+    assert row['corpus_file_count'] == row['shared_corpus_assertion_line_count'] == row['corpus_warning_count'] == 0
+
+
+def test_corpus_nonassertion_matches_do_not_warn(synthetic: tuple[Path, Path]) -> None:
+    private, _ = synthetic
+    corpus = private / '.corpus'
+    corpus.mkdir()
+    (corpus / 'test_regression.py').write_text('import unittest\nfrom example import answer\n')
+    row = validate_graders.validate_task(private, 'synthetic')
+    assert row['valid_count'] == 1 and row['corpus_file_count'] == 1
+    assert row['shared_corpus_assertion_line_count'] == row['corpus_warning_count'] == 0
+
+
+def test_public_assertion_copy_still_fails_with_corpus_warning(synthetic_v2: tuple[Path, Path]) -> None:
+    private, public = synthetic_v2
+    line = 'def test_answer(self) -> None: self.assertEqual(answer(), 42)'
+    (public / 'prompt.md').write_text('R1. Keep the required answer.\n' + line + '\n')
+    corpus = private / '.corpus'
+    corpus.mkdir()
+    (corpus / 'test_regression.py').write_text(line + '\n')
+    row = validate_graders.validate_task(private, 'v2-synthetic')
+    assert row['valid_count'] == 0
+    assert row['shared_assertion_line_count'] == row['shared_corpus_assertion_line_count'] == row['corpus_warning_count'] == 1
+
+
+def test_cli_corpus_warning_preserves_success_and_sanitized_counts(
+    synthetic: tuple[Path, Path], monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    private, public = synthetic
+    corpus = private / '.corpus'
+    corpus.mkdir()
+    line = 'def test_answer(self) -> None: self.assertEqual(answer(), 42)'
+    (corpus / 'test_regression.py').write_text(line + '\n')
+    monkeypatch.setattr('sys.argv', ['validate_graders', '--private-root', str(private), '--tasks', 'synthetic'])
+    monkeypatch.setattr(core, 'public_files', lambda task: sorted(p for p in public.rglob('*') if p.is_file()))
+    assert validate_graders.main() == 0
+    output = capsys.readouterr()
+    row = json.loads(output.out.splitlines()[0])
+    assert row['valid_count'] == row['corpus_warning_count'] == row['shared_corpus_assertion_line_count'] == 1
+    assert str(private) not in output.out + output.err and line not in output.out + output.err
+
+
+def test_corpus_cannot_follow_external_symlink(synthetic: tuple[Path, Path]) -> None:
+    private, public = synthetic
+    corpus = private / '.corpus'
+    corpus.mkdir()
+    (corpus / 'test_regression.py').symlink_to(public / 'workspace/example.py')
+    with pytest.raises(ValueError, match='regular private files'):
+        validate_graders.validate_task(private, 'synthetic')

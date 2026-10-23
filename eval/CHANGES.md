@@ -1,3 +1,60 @@
+# First-occurrence fingerprints and executor corpus warnings — 2026-10-23
+
+Track each qualifying fingerprint's first tool-input/output provenance across
+executor JSON and native rollout streams. Decode literal command payloads and
+patch additions; context/deletion lines and current workspace files never
+establish authorship. Exempt later echoed output only when an authored input
+provably precedes every output occurrence. Earlier output remains access evidence
+after copying, and private-path checks remain independent.
+
+Use within-stream record order, strict timezone-aware timestamps and matching
+command-result anchors within a known session. Match exact command/output
+representations with IDs, or equal-count ordered repetitions in one native and
+one CLI stream. Unknown session identity, unequal repetitions, missing timestamps
+without an anchor and unresolved cross-stream order keep the fingerprint match.
+Do not use caller path order as chronology. Retained/fresh filesystem contexts
+share only provenance, and malformed/incomplete evidence still invalidates.
+
+Audit accumulated executor/native history before runner continuation decisions.
+Pin fingerprint_history.py in retained recovery implementation hashes. Keep
+existing access and performance probes unchanged; update only the recovery hash
+inventory expectation to include the new implementation file.
+
+Normal grader validation optionally reads regular Python files recursively from
+private .corpus/ storage. Report corpus_file_count,
+shared_corpus_assertion_line_count and corpus_warning_count per task, with warning
+task/shared-line totals in the summary. Counts describe grader-line occurrences,
+so duplicate corpus copies do not inflate them. Corpus matches never change
+validity or exit status; v2 public assertion copies still fail validation. An
+absent corpus has zero files. Publish no corpus/grader contents or private paths.
+
+Regression coverage includes patch/heredoc/printf/Python/raw-template writes
+followed by cat or test execution, output-first opaque/private reads followed by
+copying, cross-stream timestamps and untimed duplicates, repeated results,
+ambiguous chronology, session-ID reuse, retained contexts, per-line provenance
+and mocked harness retries. Corpus tests cover missing/populated corpora, both
+task versions, warning-only CLI output, duplicate lines and public-copy failure.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1406 passed in
+138.46s. Existing access/performance probes remain unchanged; the initial full
+run exposed extra Python parses of plain shell operands, corrected before the
+passing rerun. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md` — exit 0.
+Scope/private-path scan passed. No live evaluation or real corpus validation
+was performed; retained reports and private files were not modified.
+
+## Assumptions
+
+- Claude's 22 shared executor-written assertion lines across 20 pilot tasks are
+  user-supplied findings. The actual corpus will be supplied later; this session
+  uses synthetic graders/logs/corpus files and makes no model calls.
+- Corpus layout is unspecified. Read regular .py files recursively below
+  .corpus/ across task/run directories. File count distinguishes an absent
+  corpus from a checked corpus with no matching assertion lines.
+- Ambiguous cross-stream chronology cannot establish input-first authorship.
+  Retain the fingerprint match rather than infer order from filenames or waive
+  malformed/incomplete evidence. Host re-audit remains Claude's task.
+
 # Calibration pilot audit corrections — 2026-10-23
 
 Exclude shared public lines across both shipped task-set versions at audit time,

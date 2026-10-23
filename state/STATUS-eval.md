@@ -1,5 +1,9 @@
 ## Done
 
+- Added per-line first-occurrence provenance across executor/native captures; verified authored writes followed by cat/tests are clean, output-first text remains detected after copying, and private-path/unsupported-evidence checks remain fail closed (`.venv/bin/python -m pytest tests/eval -q`: 1406 passed in 138.46s)
+- Added strict timestamp and session-scoped duplicate-result alignment, retained/fresh shared provenance, accumulated-history runner decisions and recovery implementation hashing; verified mocked retry/verification behavior and ambiguous/session-reuse cases (`.venv/bin/python -m pytest tests/eval -q`: 1406 passed in 138.46s)
+- Added optional .corpus/ assertion-overlap warnings with per-task and summary counts; verified v1/v2 warning-only validity/exit behavior, missing corpora, deduplication and continued rejection of public assertion copies (`.venv/bin/python -m pytest tests/eval -q`: 1406 passed in 138.46s)
+- Updated eval/README.md and eval/CHANGES.md; preserved existing access/performance probes, public tasks, retained reports, schemas and other roles; checked repository scope and private-path exclusion (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md`: exit 0; offline scope/private-path scan: passed)
 - Excluded shipped public lines across v1/v2 and generic scaffolding from audit-time fingerprints; retained output-only, distinctive-literal and qualifying-line invalidation rules, including synthetic public-workspace overlap and executor-written-line regressions (`.venv/bin/python -m pytest tests/eval -q`: 1351 passed in 179.73s)
 - Resolved substitution-free String.raw templates with raw escape semantics and bounded relative globs in literal for-loop lists; verified quoted heredoc data, all four capture forms, no matches, whitespace, private symlinks and fail-closed near misses (`.venv/bin/python -m pytest tests/eval -q`: 1351 passed in 179.73s)
 - Added per-task shared_public_line_count and shared_assertion_line_count; rejected shared v2 assertion lines in ordinary and mutation validation while preserving v1 acceptance (`.venv/bin/python -m pytest tests/eval -q`: 1351 passed in 179.73s)
@@ -17,17 +21,24 @@
 
 ## Remaining
 
-- Host/Claude: transfer the updated audit code at a safe boundary and re-audit the four reported calibration invalidities with the original hash-pinned graders. Preserve original run evidence. Privately archived originals are available; revised candidate hashes must not replace the original hashes during recovery.
-- Review and transfer repository changes and matching private v2 revisions for subsequent calibration at a safe boundary. Do not stage or commit here; use the final Commit plan on the host. This worktree has no live v2 streams and claims no host re-audit result.
-- Host: finish the running baseline-A/Fast calibration, retain every outcome/cost and review diagnostic results before freeze. Calibration remains separate from headline evidence.
+- Host/Claude: review and transfer this first-occurrence follow-up at a safe boundary, then re-audit retained calibration evidence using the original hash-pinned graders. Earlier public/generic-only changes are committed according to the user; this session claims no host re-audit result.
+- Host/Claude: supply executor-written Python tests under private .corpus/ storage, run ordinary grader validation and review warning counts by task ID. The actual corpus is pending; synthetic tests are not a measurement of its contents.
+- Review repository changes through the final Commit plan. Do not stage or commit here, modify private storage, or run live models. Corpus warnings must never waive public-input validation failures or access-audit evidence.
+- Host: finish/recover baseline-A/Fast calibration as needed, retain every outcome/cost and review diagnostic results before freeze. Final calibration outcomes have not been observed in this worktree.
 - After calibration: revise only at whole-family/type level if needed, build the remaining sixteen planned families, validate the whole population and publish its separate freeze through Role 1.
 - Host recovery remains pending: regrade full B's interrupted terminal/Unicode framing, full harness's quoted heredoc and the retained const-array full-harness record with updated code. Use retained evidence first; other checkouts were not modified here.
 - Host: use the existing infrastructure-only rerun flow for eligible completed harness invalidities; checkpoint-only interrupted/capacity-limited runs resume their original command first. Never rerun a quality failure to improve the score.
 - Preserve C skeletons for the user's authorship, paired comparison scope, five pilot-A reviews and twenty-sample reporting. Disclose historical v1 Luna control underpricing in the final evaluation; do not rewrite retained v1 reports or treat absent task-level metrics as zero.
-- Run the full repository suite once before merge on the host. This session ran tests/eval only and made no live executor/controller/judge calls.
+- Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
 
+- Exempt a qualifying fingerprint only when literal tool-input authorship provably precedes every output occurrence: later copying cannot erase an output-first match, and current workspace contents never establish historical authorship.
+- Reconcile streams with record order, strict timezone-aware timestamps and session-scoped command/result anchors: equal-count ordered repetitions can align, while missing identity, unequal repetitions and ambiguous chronology retain the match.
+- Share provenance across retained/fresh audit contexts without sharing their filesystem permissions: path checks, retained hashes and malformed/incomplete evidence remain independent and fail closed.
+- Include accumulated executor segments and all native streams before continuation decisions: auditing an isolated CLI stream can omit an earlier native write. Pin the new history implementation in recovery hashes.
+- Treat private executor-corpus assertion overlap as warning-only diagnostics: report nonempty normalized grader-line occurrences, deduplicating corpus copies, without affecting validity or exit status. Preserve public-input assertion rejection and keep corpus contents out of fingerprints.
+- Read regular .py files recursively under optional .corpus/ storage: its task/run layout is unspecified, and corpus_file_count distinguishes missing evidence from a checked corpus without matches.
 - Include both shipped public versions in fingerprint exclusions: immediate private grader sources span versions, and a public line cannot establish private provenance. Never use executor-mutated workspaces as public exclusions.
 - Exclude Python scaffolding explicitly and retain qualifying hidden-line invalidation: multiline decorator spans and common headers are generic; no general fingerprint waiver was added.
 - Count per-task nonempty normalized grader-line occurrences and assertion spans: ordinary and mutation validation reject any shared v2 assertion line; v1 only gains diagnostics.
@@ -48,15 +59,15 @@
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
-- Offline/private validation: .venv/bin/python "$LHM_PRIVATE_GRADERS/validate_public_overlap_pilot.py"
+- Host after corpus supply: .venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_GRADERS" --tasks TASK_IDS
 - git diff --check -- eval tests/eval state/STATUS-eval.md
-- git diff --exit-code -- eval/tasks eval/tasks-v2 schemas controller verifier plugin prompts AGENTS.md
+- git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md
 - Host/retained evidence only: python -m eval.runner.regrade --private-root P --from SOURCE --out NEW
 - Host/approved spending only: python -m eval run --config eval/configs/pilot-v2-a.yaml --out eval/reports/pilot-v2-a/
 
 ## Do not touch
 
-- Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. Private v2 grader revisions are authorized; preserve archived originals, other checkouts and other roles' paths.
+- Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. Do not modify private storage in this session; preserve archived originals, other checkouts and other roles' paths.
 - Frozen v1 public tasks/graders, retained v1 reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or project-file deletion.
 - No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Model and executor integration checks must use mocks.
@@ -66,7 +77,10 @@
 
 ## Assumptions
 
-- The user reports the running host calibration's first twelve outcomes as 6 pass, 2 fail and 4 invalid, with none of the invalidities an access attempt. This session has no live v2 host streams; synthetic parser tests and offline grader validation are the evidence produced here. Claude owns host re-audit.
+- Claude reports 22 private grader assertion lines matching executor-written tests across the 20 pilot tasks, with no public-input occurrence. This is a user-supplied host finding; the actual .corpus/ will be supplied later. All new regression evidence uses synthetic files/logs and mocked executors/controllers/verifiers.
+- Earlier changes were committed by Claude as reported by the user. This follow-up remains unstaged/uncommitted, with no actual grader/corpus revision or live evaluation performed here.
+- Recorded order is required to establish authorship. Untimed records without a session-scoped duplicate anchor cannot borrow an arbitrary other stream's ordering; such output retains its match.
+- The earlier user-supplied host snapshot reported the first twelve outcomes as 6 pass, 2 fail and 4 invalid, with none of the invalidities an access attempt. This session has no live v2 host streams; synthetic parser tests and offline grader validation are the evidence produced here. Claude owns host re-audit.
 - Supplied local v2 graders had 0 exact shared assertion lines before revision; every task had 5 shared nonempty public lines. Independent hidden input/expectation pairs were still revised across all four families as requested, without publishing values or source.
 - Existing retained-run hash checks require original grader bytes during host recovery. Revised candidate validation is separate evidence and does not authorize rewriting original run provenance.
 - The Fast prices, 2026-07-30 naming change and Luna CLI priority default are user-supplied official-page/host observations; network verification is unavailable. No live cost or quality measurement is claimed.
