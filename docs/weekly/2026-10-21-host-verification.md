@@ -279,3 +279,39 @@ eval/configs/full-a.yaml ran 120 tasks and 139 executor sessions on codex-cli 0.
 - Implication for the comparison: A sits at a ceiling on single-session tasks. The harness can match but not exceed A's pass rate there, and its control calls add cost. Any harness gain has to come from the two-session tasks or from cost.
 
 Full harness and full B (100 single-session tasks) started at 05:04 UTC from d44feda, concurrently, with the fixed audit.
+
+## Full harness v1: interim findings after 17 tasks (05:40 UTC)
+
+The full harness started at 05:04 UTC from d44feda. After 17 tasks: 15 pass, 1 fail, 1 invalid. Many tasks used 2 to 4 executor attempts, and in most of them the verifier failed an item that the hidden tests later passed. Five generic defects explain the futile re-instructions:
+1. Stop conditions blocked requested work (Role 3). For requests that ask to add a test file, the contract said to stop if that file was unavailable, and Sol stopped on attempt 1 without changes. Seen in bug-fix-clamp-values and bug-fix-prefix-sums.
+2. Prose in a path field (Role 3). A regex criterion's path was a sentence. The verifier classified the resulting ENOENT as workspace-caused and re-instructed twice. Seen in multiple-requirements-adjacent-runs.
+3. An invalid regex (Role 3): `(?s)` after `|`. The verifier correctly classified it as contract-caused. Seen in feature-plus-test-rotate-left.
+4. Judge "unverifiable" was re-instructed (Role 4, under the rule from Claude's r4-cont-007 prompt). Judges wanted test-run evidence that the workspace cannot contain. Seen in multiple-requirements-word-counts and bug-fix-window-slices.
+5. Judge false failures. One judge described satisfying code and still returned fail. Seen in constrained-refactoring-unique-permutations.
+
+r3-cont-008 adds code-level contract validation, stop conditions that never block requested files, and rubrics decidable from the workspace files alone. r4-cont-008 stops re-instructing unverifiable judgments and classifies non-path paths as contract-caused. Plan: let full B finish, stop harness v1 and keep it as a partial diagnostic run, then rerun the smoke and run harness v2 on the fixed code. The final evaluation reports both runs, and that v1 results informed v2.
+
+One more audit pattern appeared: feature-plus-test-window-slices was inconclusive on attempt 3. Sol ran Python heredoc scripts that list the workspace with `Path.cwd().rglob('*')` to check that only the two expected files exist. It is left fail-closed for now.
+
+Harness v1 was stopped at 05:42 UTC by SIGINT after 21 finished tasks and kept as eval/reports/full-harness-v1-partial/, a diagnostic record with no report. The interrupt landed during a subprocess wait, so the runner exited 130 with a traceback and wrote no diagnostics. That is a small robustness item for Role 5. On those 21 tasks, compared with full A:
+
+| Measure | Harness v1 | Full A |
+|---|---|---|
+| Outcomes | 19 pass, 1 fail, 1 invalid | 20 pass, 1 fail |
+| Executor attempts | 44 | 23 |
+| v1 attempt distribution | 1: 7 tasks, 2: 6, 3: 7, 4: 1 | |
+
+Fixes on main: controller 067384f, with code-level contract validation and no prerequisite stops on requested files; verifier fbe11fe, with no re-instruction on unverifiable judgments and contract-caused classification of prose paths. Harness smoke 3 and the controller measurement for prompt v3 are running. Harness v2 follows if the smoke is clean.
+
+Harness smoke 3 (fbe11fe, 05:43 to 05:47 UTC) gives a valid report for the first time: 2 of 2 pass, 0 invalid, control_model gpt-6-luna.
+- bug-chunk-tail passed on attempt 1 for 0.033 USD, including 0.006 control. One unverifiable judgment was correctly not re-instructed.
+- two-session-prefix-sums passed both days on attempt 1 for 0.088 USD. handoff day2_pass is true and user_restated_day1_context false.
+- No contract had a prerequisite stop condition. The day-1 contract of the two-session task was all mechanical.
+Full harness v2 started at 05:47 UTC from fbe11fe.
+
+Controller measurement for prompt v3 (controller/evidence/2026-10-23-d4-v3.json):
+- 30 of 30 contracts are schema-valid, with 37 criteria: 9 command, 11 file_exists, 10 regex and 7 llm_judge.
+- The llm_judge share is 19 percent, down from 31 at baseline and 27 with v2. 5 contracts are judge-only, and 22 have no command.
+- There were 35 generations, with the repair step firing 3 times, for 0.024 USD.
+
+Leak scans: smoke-harness-attempt2 and smoke-harness-3 are clean. full-harness-v1-partial has one cross-task coincidental match. A 35-character line appears in the verifier evidence for two-session-common-prefix; it also appears in that task's executor-written test_solution.py and its event streams, but not in that task's prompt or grader. It equals a line of bug-chunk-tail's grader, which the executor never had access to. This is the same class as the known pilot false positive, and it is not grader content.

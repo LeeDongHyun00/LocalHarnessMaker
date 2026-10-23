@@ -1,0 +1,617 @@
+{
+  "task_id": "two-session-common-prefix",
+  "task_type": "feature_plus_test",
+  "outcome": "fail",
+  "invalid_reasons": [],
+  "attempts": 2,
+  "session_id": "01a16726-a36f-7a32-b85e-80c0c41a4345",
+  "segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T05:05:47.752779+00:00",
+      "events": "exec-1.jsonl",
+      "stderr": "exec-1.stderr",
+      "day": 1,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T05:06:29.036155+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 41.28181148600197,
+      "native_usage": {
+        "input_tokens": 62505,
+        "cached_input_tokens": 55424,
+        "output_tokens": 1199
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3ihc4or4/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-05-48-01a16726-a36f-7a32-b85e-80c0c41a4345.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "f4ef6d7a1fcd85bfed7d022b154be2fead5e51581ecd7a6d22ebc09c86d19c02"
+    },
+    {
+      "attempt": 2,
+      "started_at": "2026-10-23T05:07:04.897558+00:00",
+      "events": "exec-2.jsonl",
+      "stderr": "exec-2.stderr",
+      "day": 2,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T05:07:43.337959+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 38.436379360999126,
+      "native_usage": {
+        "input_tokens": 81036,
+        "cached_input_tokens": 71296,
+        "output_tokens": 1358
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3ihc4or4/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-07-04-01a16727-d08d-7a23-8023-ef3fc5de010f.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "a7a1cf0ad4d53033ad7e32821820f1546b2ceaa89150a32acd8c20f8cb3d6483"
+    }
+  ],
+  "two_session": true,
+  "day2_observation": {
+    "delivered_sha256": "7e3e67acdce1542154f23faa265cfddba9530c9951836452dd4f3b72acb8ff55",
+    "public_sha256": "7e3e67acdce1542154f23faa265cfddba9530c9951836452dd4f3b72acb8ff55",
+    "prompt_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3ihc4or4/day2-delivered.md",
+    "attempt": 2
+  },
+  "grader_access_audit": {
+    "method": "access_audit",
+    "status": "clean",
+    "root_fingerprint": "9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a",
+    "grader_fingerprints": [
+      "1abb2e7c6169d272221447f65e89fb3b9999a0410760ae839fb581c9ed0e4974"
+    ],
+    "line_fingerprints": [
+      "0048c51e1ec1efa860500f19ff18c7972944bbf312850082e703c8fe1e3e371d",
+      "0092cd218c95e12887634a9a6cff9252ab7b9ebcc41f75448dcb805c906decc5",
+      "037d468d83d54cd8667b9a6e4b99997f0cdab164c6dcff2c8202be4ba0eb0153",
+      "097dc88adcd223b44e0dca00392fe700074b94a9842b58e4bf48c131c47225de",
+      "10125b721080de432f39c94ce03fa29f429937f39d2b020c2d19f9bae1d5d605",
+      "13da8201a04dd988472071dfafe421ba3edd88c3f2ffdf459590b3d74d8b1c9e",
+      "179498b8aa0b7874b0e17a6442d5aabda94dd44b674f5467e2e521edb3d9d5f4",
+      "1dd7f836067ba24b1522ee05047963b49b5a98df141af52604da28a3a67becf9",
+      "20e2aac1bf3cd97b36f97eb0e68548209ca977dcda8f0826cca34f72dfce2005",
+      "247dba064e9fb8782c29f7c0e78278e1abbe2de64b3cfd3f6d1326324ea1bdf5",
+      "24f072eac29efcdfd46d7797d2879a7c112a7ace3bf19ec50ab5f1211c267c3b",
+      "2aec93a620f366d7f1ba48061fd09f89fcbce0716ec666a19c705f543590baa7",
+      "2cb3e84c03d15c9862c51d64bba5ffe08edafa66c815fb331ac5321f8aeb20db",
+      "3014960e9feaa28b21306af1395999614fdf2a03fbb26a8939099738f1ee05a9",
+      "33110429c1e4fbaedf92df36a2d840bd5b4bcfe2660422f0a660f507279ec350",
+      "347ad76bc9b78d6fea945f685a0ccf53dc00debe8bc865807f37c451086ae148",
+      "3e280b2fd5b22c7f55860376406b1cffe002b47b47fdf7f7e5008e7236388fce",
+      "4a5c4477af82bab077076ec05739f44456633daabebc65407dc9e0cac2cfb843",
+      "4abc6d081e40371e3c9edab67f6127f81b64b9c49b94c9724b5031c25e11239d",
+      "4b1977cf2657454b4711db3c3f7bd7ab70f64769cc18cca688292481586bab8d",
+      "4b82f2af03117228130f5a73d0d4d21d135cc830b8d2fe621101a8d631ffe8bb",
+      "4ca013c5b46f9b5e217bacfa5a65e01046b1c2674af2ac330bc74dbd1ff9d22f",
+      "5423e637c1a6ad390f4ec96e3a1812e36492c3264d1ea77669e296e0986483ae",
+      "5811ce42190c8c5699992bc88e9f223ecdc128bdb661c178c5d602ca9e67b7c6",
+      "6806f415c5914586d129d3f9950fd57a56eceddefd5a09913814064394abbe59",
+      "68e767b85c03cee9313df944026d29666f9e95ac76743ba864d9991ff9c32f00",
+      "6b3e1ff9287b37c4fcc2925a370fa7a17ebe3fab6f890397aa98c61b548ac207",
+      "6c969e3c75df140a5cfef2d849ce397ecef4a177b62fe69a5ce3459a0c5a4188",
+      "6eb564538980b4bc58751edb955ec4407307dabff9e4408cc1dd97be37ee4af0",
+      "70b951faecb2a60651d97a6fcf5ca743fbc3aa0ac626a6d200f92bf9d616a684",
+      "73ea69f8feb19cafcdacce1cd65e281c3b03c92375bb0dd7cbb2998a4d056a4e",
+      "772fcfa050950f286d2ab2f80e869843ed04f6a64ebd1b0f8f8b960843c3a835",
+      "7a1841fe5645eb61cd26cb0a9a66827f48033363cef9d6dea260189bd3de2b83",
+      "7d2bb93833f57376fd45d4d9d5b81a49064182dbf3f08d48963ece5737585d95",
+      "7e0f060013d4289a6b942ef9c410b4b98f262a0926a3f4e1f7d08a656cf0672e",
+      "7e9fd7fc24aa23a1a073ac3954ad4fb3a323451db969ba20df49a7326335e3bc",
+      "7f38c526ebe9ff7fafbeb9959f8826fe43f67991fed36f410f0baad0338bb9e4",
+      "84aad23556b6536c21c8242a80a3844210fea9f41bbca8d331e62a2519d64ca9",
+      "9028ef26e0d021602104ea046bc0d3d973815cf57face8331d261cfde647f2db",
+      "98a4c9067b72bca2b25e490f2598b7029cad5d55eb3f6a0b88dff7bc7d6c7ad6",
+      "9b54079cf246b0ea0f513a924e212b3cd2afeb41580d3171773963e195ee6837",
+      "9def9842bc9dc1f24ce19a0f439d8e6a60ee77cca17b84d275865ea5bd3eb9dc",
+      "a0444898bc97b4fcdafccf8c38d72ca967291b0e37321bd87b38d55588f4c186",
+      "a7eb2f1cb690f44b169e1f19667ddf58cef53588d01e15c7e3bf37e81e552104",
+      "a9e83dbf885db332dc63585c823fcb3d449ccd395676237e5bbdd911cda56ad0",
+      "ab38fbff69aaabb6b6126136da26a165a1ec0375db22e22837323f8e18c2866d",
+      "abae5faa2e8188ee10504dbf04ed71ad0cdb52064c3fd6db7771dd0a34d42962",
+      "b02a9aa9be5ea929c31fb36d372e73ee0c141e26dac396ec4cbc092c248935a3",
+      "bcf3dbf51448a2e620461d7ea48032f1a41051e1c4dbdf14967fa2fb38b9cc21",
+      "bf6ef0f856d3e8521fbf0feab1a535c61433db1a42aeca272889b64580316350",
+      "bfdc1cfa08991846df86b3d3f343ee9171f45b0c42041033abd3ee09dbdc6a65",
+      "c9bbc3df5372d5b4763fa6315d975b3dbee242e56dd62d06c8335cb10213af5b",
+      "cc45c9ff8ec0c5110750377636b49924500b49a195f99fe5104f3cc961bf35d0",
+      "d0fffd212b1ecca72c3701ab58ca376ace28b7076901240a2c1300f0d2aedeb2",
+      "de3e7649f61d25cb9290dac2b45b711b36821b94b6e003cfb17a207a51765870",
+      "e433c4d3cd282d2340c2f47a49af2d4aa3cb68df0cc05f52dbfc42133454d891",
+      "e65f65aa83bcaeb99f1367bd0fd2ccd512ae6bb5eb43e2cac900b493ebf221da",
+      "e722634993cc3f535416f7f984ba2de28244f10a9398c79c618e3cbdaffdeaf8",
+      "f0c9529e5d106022327779a07875353c47d09bb63ca23a0358cf856501a5ce6a",
+      "f1a0ccbf594090d32ed419241a00e8333b00b8050e9286fb34d640f206ba0631",
+      "f387f147fb9df8b45a98f8ffa9cfb64e23e1ab9afac4d229ef305983ff62cf49"
+    ],
+    "logs": [
+      {
+        "name": "exec-1.jsonl",
+        "sha256": "0b49881d0cec19010b8c610f33a5f30b7e03b4de19d8cd138f2f21f79b42d4e3",
+        "bytes": 4225
+      },
+      {
+        "name": "exec-2.jsonl",
+        "sha256": "8cffc12a406af07f67b8d334db3fe47f45f5142076827d4ddea0b67c5287b46f",
+        "bytes": 7955
+      },
+      {
+        "name": "rollout-2026-10-23T14-05-48-01a16726-a36f-7a32-b85e-80c0c41a4345.jsonl",
+        "sha256": "6a12365cb6311006e5f5c9bc8330caa0dcce9a42124e9027cb25bd6d57ca7454",
+        "bytes": 78414
+      },
+      {
+        "name": "rollout-2026-10-23T14-07-04-01a16727-d08d-7a23-8023-ef3fc5de010f.jsonl",
+        "sha256": "c2312daa3bc1b550ef74802de73ed368945dfdb8dfb6008ae776439e7dc98bf4",
+        "bytes": 87438
+      }
+    ],
+    "matches": [],
+    "errors": [],
+    "scope": "Observed tool events and native metadata; a clean audit does not prove isolation."
+  },
+  "grading": {
+    "result": "fail",
+    "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-45e9beebdbff4152b8972cd289b9fe21",
+    "copied_at": "2026-10-23T05:07:47.488262+00:00",
+    "executor_already_exited": true,
+    "grader_source_outside_repository": true,
+    "exit_code": 1,
+    "timed_out": false,
+    "passed_tests": 4,
+    "failed_tests": 1,
+    "total_tests": 5,
+    "log": "grading.log"
+  },
+  "verdicts": [
+    {
+      "items": [
+        {
+          "id": "SC-1",
+          "status": "pass",
+          "evidence": "llm_judge: `solution.py` defines `common(items: list[str]) -> str`; it returns `\"\"` for empty input, initializes the prefix to the sole item for one-item input, compares characters directly (case-sensitive), and only reads `items` while shortening a local string. `test_solution.py` supplies corresponding examples and checks that the input list remains unchanged.",
+          "reason": "The public function implements the longest shared character prefix, covers the specified edge behavior, uses type hints, and does not mutate the input list."
+        },
+        {
+          "id": "SC-2",
+          "status": "pass",
+          "evidence": "llm_judge: In test_solution.py, `import unittest`, `CommonTests(unittest.TestCase)`, and methods `test_empty_input`, `test_single_item`, and `test_case_sensitive_matching` provide concrete coverage; the tests invoke `common(...)` and assert expected results. Additional methods cover shared prefixes, empty items, Unicode, and input preservation.",
+          "reason": "test_solution.py uses unittest and defines seven test methods that call the public common API. Coverage explicitly includes empty input, a single item, and case-sensitive matching, alongside additional prefix regressions."
+        },
+        {
+          "id": "SC-3",
+          "status": "pass",
+          "evidence": "path: HANDOFF.md; pattern: (?s)(?=.*[Dd]esign)(?=.*python -m unittest discover -v)\n1: # Day 1 handoff\n2: \n3: ## Design decisions",
+          "reason": "pattern matched"
+        }
+      ],
+      "overall": "pass",
+      "reinstruct_message": null,
+      "attempt": 1
+    },
+    {
+      "items": [
+        {
+          "id": "SC-1",
+          "status": "pass",
+          "evidence": "path: solution.py; pattern: common_many\n22: def common_many(cases: list[tuple]) -> list:",
+          "reason": "pattern matched"
+        },
+        {
+          "id": "SC-2",
+          "status": "pass",
+          "evidence": "path: test_solution.py; pattern: def test_\n11:     def test_empty_input(self) -> None:\n14:     def test_single_item(self) -> None:\n19:     def test_longest_shared_prefix(self) -> None:\n24:     def test_case_sensitive_matching(self) -> None:\n28:     def test_empty_item_and_no_shared_prefix(self) -> None:\n33:     def test_unicode_characters(self) -> None:\n36:     def test_input_is_not_mutated(self) -> None:\n44:     def test_batch_order_and_input_preservation(self) -> None:\n53:     def test_empty_batch(self) -> None:\n58:     def test_positional_argument_forwarding(self) -> None:",
+          "reason": "pattern matched"
+        },
+        {
+          "id": "SC-3",
+          "status": "pass",
+          "evidence": "path: HANDOFF.md; pattern: python -m unittest discover -v\n21: python -m unittest discover -v",
+          "reason": "pattern matched"
+        }
+      ],
+      "overall": "pass",
+      "reinstruct_message": null,
+      "attempt": 1
+    }
+  ],
+  "pricing_evidence": {
+    "tier": "standard",
+    "basis": "native turn_context when present; otherwise Standard baseline assumption"
+  },
+  "settings_evidence": {
+    "verified": true,
+    "source": "native_session_jsonl.turn_context + native_session_jsonl.event_msg.thread_settings_applied",
+    "observed": [
+      {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      }
+    ],
+    "exec_json_exposes_effort": false
+  },
+  "usage": {
+    "billing_basis": "chatgpt_subscription",
+    "tokens": {
+      "input_tokens": 143541,
+      "cached_input_tokens": 126720,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 2557,
+      "reasoning_output_tokens": 84
+    },
+    "billed_usd": null,
+    "plan_usage": {
+      "availability": "account_snapshots",
+      "snapshots": [
+        {
+          "timestamp": "2026-10-23T05:05:58.536Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:06:02.998Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:06:24.437Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:06:27.786Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:07:12.229Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:07:14.445Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:07:32.060Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:07:39.173Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        {
+          "timestamp": "2026-10-23T05:07:42.053Z",
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 10.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        }
+      ],
+      "exact_task_consumption": null,
+      "limitation": "Account-wide, rounded snapshots; first observation may follow usage. Concurrent sessions prevent exact task attribution."
+    }
+  },
+  "executor_runs": [
+    {
+      "attempt": 1,
+      "events": "exec-1.jsonl",
+      "started_at": "2026-10-23T05:05:47.752779+00:00",
+      "exited_at": "2026-10-23T05:06:29.036155+00:00",
+      "tokens": {
+        "input_tokens": 62505,
+        "cached_input_tokens": 55424,
+        "output_tokens": 1199
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": null,
+        "after": {
+          "timestamp": "2026-10-23T05:06:27.786Z",
+          "primary_used_percent": 9.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-23T05:05:58.536Z",
+          "primary_used_percent": 9.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    },
+    {
+      "attempt": 2,
+      "events": "exec-2.jsonl",
+      "started_at": "2026-10-23T05:07:04.897558+00:00",
+      "exited_at": "2026-10-23T05:07:43.337959+00:00",
+      "tokens": {
+        "input_tokens": 81036,
+        "cached_input_tokens": 71296,
+        "output_tokens": 1358
+      },
+      "plan_usage": {
+        "source": "native_session_jsonl.event_msg.token_count.rate_limits.primary.used_percent",
+        "before": {
+          "timestamp": "2026-10-23T05:06:27.786Z",
+          "primary_used_percent": 9.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "after": {
+          "timestamp": "2026-10-23T05:07:42.053Z",
+          "primary_used_percent": 10.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 10.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "first_observed_during_run": {
+          "timestamp": "2026-10-23T05:07:12.229Z",
+          "primary_used_percent": 9.0,
+          "rate_limits": {
+            "limit_id": "codex",
+            "limit_name": null,
+            "primary": {
+              "used_percent": 9.0,
+              "window_minutes": 10080,
+              "resets_at": 1793325601
+            },
+            "secondary": null,
+            "credits": {
+              "has_credits": false,
+              "unlimited": false,
+              "balance": "0"
+            },
+            "individual_limit": null,
+            "spend_control_reached": null,
+            "plan_type": "prolite",
+            "rate_limit_reached_type": null
+          }
+        },
+        "exact_task_consumption": null,
+        "limitation": "Account-wide rounded observations; no pre-run observation means before=null. After is the last observation during the process, not a post-exit measurement."
+      }
+    }
+  ]
+}

@@ -1,0 +1,532 @@
+{
+  "metadata": {
+    "run_id": "6bfd00c9f759435e9f6607bc1733eb5f",
+    "created_at": "2026-10-23T05:43:02.162379+00:00",
+    "config_name": "smoke-harness",
+    "config_sha256": "baea151742d3d2a1e80083cf44fa5f12b4ea31946d6ffe50bea63c1444dabefa",
+    "task_set_sha256": "dbfa54a0fcef889b988de800c70f4f3284865a64cd9edc3bc11cfc3ff7138068",
+    "git_commit": "fbe11fe17b92332885b71018bfc6f9db3486a6cb",
+    "codex_version": "codex-cli 0.163.0-alpha.11.1",
+    "executor_model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "control_backend": "codex_cli",
+    "control_model": "gpt-6-luna",
+    "seed": 0,
+    "reinstruction_limit": 2,
+    "cost_basis": "api_equivalent_usd",
+    "pricing": {
+      "snapshot_id": "openai-standard-short-2026-10-22-v1",
+      "source": "https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).",
+      "checked_on": "2026-10-22",
+      "rates": [
+        {
+          "model": "gpt-6.1-sol",
+          "input_per_million_usd": 2,
+          "cached_input_per_million_usd": 0.1,
+          "output_per_million_usd": 10
+        },
+        {
+          "model": "gpt-6-luna",
+          "input_per_million_usd": 0.1,
+          "cached_input_per_million_usd": 0.01,
+          "output_per_million_usd": 0.5
+        }
+      ]
+    },
+    "confidence": {
+      "level": 0.95,
+      "method": "task_cluster_percentile_bootstrap",
+      "resamples": 10000,
+      "seed": 0
+    },
+    "parity_comparator": null
+  },
+  "tasks": [
+    {
+      "task_id": "bug-chunk-tail",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T05:43:26.125513+00:00",
+          "exited_at": "2026-10-23T05:43:54.767732+00:00",
+          "exit_code": 0,
+          "session_id": "01a16749-1936-7320-bc47-ca3fe48c763d",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-8o5i6_nf/exec-1.jsonl",
+            "sha256": "bac6de963684da82a8e7ac2edb45d34c66a7c46e269b8ac48368b08b79dbc1a9"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-e0c03b31a40047788efa1c8e72349bc6",
+        "copied_at": "2026-10-23T05:44:30.350692+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 3,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/grading.log",
+          "sha256": "e403ea6870821a0988b54a70b7e138ea0b6fddfc838010c62452f1ea40d26e97"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-chunk-tail-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 61712,
+            "cached_input_tokens": 54144,
+            "output_tokens": 681,
+            "usd": 0.0273604,
+            "latency_seconds": 28.641052680999564,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-1",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17294,
+            "cached_input_tokens": 14976,
+            "output_tokens": 328,
+            "usd": 0.00054556,
+            "latency_seconds": 10.945108620999235,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-2",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17450,
+            "cached_input_tokens": 0,
+            "output_tokens": 528,
+            "usd": 0.002009,
+            "latency_seconds": 12.615588102999027,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-3",
+          "purpose": "judge",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 15551,
+            "cached_input_tokens": 0,
+            "output_tokens": 114,
+            "usd": 0.0016121000000000002,
+            "latency_seconds": 8.588980202999664,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-4",
+          "purpose": "judge",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 15514,
+            "cached_input_tokens": 14720,
+            "output_tokens": 90,
+            "usd": 0.00027160000000000004,
+            "latency_seconds": 7.941090838998207,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-5",
+          "purpose": "judge",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 15519,
+            "cached_input_tokens": 0,
+            "output_tokens": 184,
+            "usd": 0.0016439,
+            "latency_seconds": 8.650718200999108,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0273604,
+        "control_usd": 0.0060821600000000005,
+        "total_usd": 0.03344256
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/access-audit.json",
+          "sha256": "bec3ff6eb935ceda3d615ba2c83000673df080ddd6e871c01530a1f3ef04bfff"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/grading.log",
+          "sha256": "e403ea6870821a0988b54a70b7e138ea0b6fddfc838010c62452f1ea40d26e97"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/result.json",
+          "sha256": "3b8d3c58c27f31999d425dbf1a95d6f590821b915963dce97224a3cceff0fde6"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/bug-chunk-tail/session-evidence.jsonl",
+          "sha256": "59264c559b04f2d15af81a30ca4d8e62ba00e0309a272219f744594b0060c1f8"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-8o5i6_nf/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-43-28-01a16749-1936-7320-bc47-ca3fe48c763d.jsonl",
+          "sha256": "8f4bf965901f9f1c1c9b30c55887fc4408ee5f28b164c9075e11717b8a53ea13"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "two-session-prefix-sums",
+      "task_type": "feature_plus_test",
+      "two_session": true,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 2,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T05:45:00.313262+00:00",
+          "exited_at": "2026-10-23T05:45:36.324287+00:00",
+          "exit_code": 0,
+          "session_id": "01a1674a-893a-7890-8a01-3216aee73fc0",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-njrzazf5/exec-1.jsonl",
+            "sha256": "65278f7eafdf1879334f1e3435b5f161e2253a33b81c315b06eda450a9f05cd0"
+          }
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-10-23T05:46:03.798595+00:00",
+          "exited_at": "2026-10-23T05:47:02.873998+00:00",
+          "exit_code": 0,
+          "session_id": "01a1674b-810b-7802-9951-f7d4d00e4a61",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-njrzazf5/exec-2.jsonl",
+            "sha256": "245fe652812b7636a2ff65d1199d5d92dca2cda449a62ac793904cd09171a08c"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-f8ffa5c6f6b64faa94332e607ce2513e",
+        "copied_at": "2026-10-23T05:47:26.159138+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 5,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/grading.log",
+          "sha256": "fa2bacea3099b0b991a104fea379b25e858a3b0e4750f96cc5c0447855947040"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "two-session-prefix-sums-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 64926,
+            "cached_input_tokens": 55424,
+            "output_tokens": 1078,
+            "usd": 0.0353264,
+            "latency_seconds": 36.0097612890022,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-exec-2",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 100642,
+            "cached_input_tokens": 91776,
+            "output_tokens": 1557,
+            "usd": 0.0424796,
+            "latency_seconds": 59.07181028899868,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-1",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 21155,
+            "cached_input_tokens": 0,
+            "output_tokens": 800,
+            "usd": 0.0025155,
+            "latency_seconds": 14.505296523999277,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-2",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17511,
+            "cached_input_tokens": 14976,
+            "output_tokens": 1073,
+            "usd": 0.00093976,
+            "latency_seconds": 14.947570058000565,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-3",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17669,
+            "cached_input_tokens": 14976,
+            "output_tokens": 867,
+            "usd": 0.0008525599999999999,
+            "latency_seconds": 13.541840817997581,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-4",
+          "purpose": "judge",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 16919,
+            "cached_input_tokens": 14720,
+            "output_tokens": 111,
+            "usd": 0.0004226,
+            "latency_seconds": 7.427712659002282,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-5",
+          "purpose": "judge",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 20653,
+            "cached_input_tokens": 12544,
+            "output_tokens": 151,
+            "usd": 0.0010118400000000002,
+            "latency_seconds": 8.599321764999331,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-6",
+          "purpose": "handoff",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 43364,
+            "cached_input_tokens": 0,
+            "output_tokens": 284,
+            "usd": 0.0044784000000000004,
+            "latency_seconds": 10.172576318997017,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.077806,
+        "control_usd": 0.010220660000000001,
+        "total_usd": 0.08802666
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/access-audit.json",
+          "sha256": "67b87a9dd84e7e9073f082abe89954716324b816037068348f746894d547efa2"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/grading.log",
+          "sha256": "fa2bacea3099b0b991a104fea379b25e858a3b0e4750f96cc5c0447855947040"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff-evidence.json",
+          "sha256": "b8b4fa3d5909a82c29a481ebf6ebefb445ad2301827d25f9a7a2cc920e852a03"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/result.json",
+          "sha256": "71e4f2246aced727726539d974d178e8d85096cfc456094c891c95cc563aa2db"
+        },
+        {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/session-evidence.jsonl",
+          "sha256": "56d9bc1abe5287845e968600100e859453742781f28a8fe5be07b6a4390265ea"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-njrzazf5/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-45-01-01a1674a-893a-7890-8a01-3216aee73fc0.jsonl",
+          "sha256": "e2c4a5a8b261eb68d9a295112a507524a144390b48810197a7d940bae36ef9fe"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-njrzazf5/codex-home/sessions/2026/10/23/rollout-2026-10-23T14-46-03-01a1674b-810b-7802-9951-f7d4d00e4a61.jsonl",
+          "sha256": "5254bc45f51283794fc1de9b13580a63fa62a9a24780fb2f92c4b58389663350"
+        }
+      ],
+      "handoff": {
+        "day2_pass": true,
+        "user_restated_day1_context": false,
+        "evidence": {
+          "path": "eval/reports/smoke-harness-3/two-session-prefix-sums/handoff-evidence.json",
+          "sha256": "b8b4fa3d5909a82c29a481ebf6ebefb445ad2301827d25f9a7a2cc920e852a03"
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "pass_rate": {
+      "value": 1.0,
+      "sample_size": 2,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "false_done_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "claimed_criterion",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Complete done-claim denominator is not yet observed; verdicts retain negative evidence."
+    },
+    "cost_per_pass": {
+      "value": 0.06073461000000001,
+      "sample_size": 2,
+      "sample_unit": "attempted_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 0.03344256,
+        "upper": 0.08802666,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "avg_attempts": {
+      "value": 1.5,
+      "sample_size": 2,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 2.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "handoff_success": {
+      "value": 1.0,
+      "sample_size": 1,
+      "sample_unit": "eligible_two_session_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "parity": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "matched_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No hash-pinned paired local/cheap_api comparator."
+    }
+  },
+  "accounting": {
+    "attempted_tasks": 2,
+    "valid_tasks": 2,
+    "invalid_tasks": 0,
+    "total_cost_usd": 0.12146922000000002
+  },
+  "validity": {
+    "status": "valid",
+    "reasons": []
+  }
+}

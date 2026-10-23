@@ -1,0 +1,457 @@
+{
+  "metadata": {
+    "run_id": "9ab3091b52934aad8d888204b2477357",
+    "created_at": "2026-10-23T03:36:41.619223+00:00",
+    "config_name": "smoke-harness",
+    "config_sha256": "baea151742d3d2a1e80083cf44fa5f12b4ea31946d6ffe50bea63c1444dabefa",
+    "task_set_sha256": "dbfa54a0fcef889b988de800c70f4f3284865a64cd9edc3bc11cfc3ff7138068",
+    "git_commit": "c47cc721d9c3f6cbe13e932cf21e9c6449482426",
+    "codex_version": "codex-cli 0.163.0-alpha.11.1",
+    "executor_model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "control_backend": "codex_cli",
+    "control_model": "gpt-6-luna",
+    "seed": 0,
+    "reinstruction_limit": 2,
+    "cost_basis": "api_equivalent_usd",
+    "pricing": {
+      "snapshot_id": "openai-standard-short-2026-10-22-v1",
+      "source": "https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).",
+      "checked_on": "2026-10-22",
+      "rates": [
+        {
+          "model": "gpt-6.1-sol",
+          "input_per_million_usd": 2,
+          "cached_input_per_million_usd": 0.1,
+          "output_per_million_usd": 10
+        },
+        {
+          "model": "gpt-6-luna",
+          "input_per_million_usd": 0.1,
+          "cached_input_per_million_usd": 0.01,
+          "output_per_million_usd": 0.5
+        }
+      ]
+    },
+    "confidence": {
+      "level": 0.95,
+      "method": "task_cluster_percentile_bootstrap",
+      "resamples": 10000,
+      "seed": 0
+    },
+    "parity_comparator": null
+  },
+  "tasks": [
+    {
+      "task_id": "bug-chunk-tail",
+      "task_type": "bug_fix",
+      "two_session": false,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 1,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T03:37:04.604858+00:00",
+          "exited_at": "2026-10-23T03:37:28.589893+00:00",
+          "exit_code": 0,
+          "session_id": "01a166d5-69d8-7f62-b9dd-71b98c7dfb3a",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-b0m7osyh/exec-1.jsonl",
+            "sha256": "2e53e7a9dc7a07e3c078c60ce91bca6ebfd00622b9deaaddb2e9ac36c6b3bcb6"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-db264d1508cf4bd8aa7d8b0c3fc09bb3",
+        "copied_at": "2026-10-23T03:37:41.854109+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 3,
+        "failed_tests": 0,
+        "log": {
+          "path": "eval/reports/smoke-harness/bug-chunk-tail/grading.log",
+          "sha256": "e403ea6870821a0988b54a70b7e138ea0b6fddfc838010c62452f1ea40d26e97"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "bug-chunk-tail-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 60698,
+            "cached_input_tokens": 56576,
+            "output_tokens": 463,
+            "usd": 0.0185316,
+            "latency_seconds": 23.983808888999192,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-1",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17089,
+            "cached_input_tokens": 14976,
+            "output_tokens": 418,
+            "usd": 0.00057006,
+            "latency_seconds": 10.851758600998437,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-2",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17241,
+            "cached_input_tokens": 14976,
+            "output_tokens": 457,
+            "usd": 0.00060476,
+            "latency_seconds": 11.814918600000965,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "bug-chunk-tail-control-3",
+          "purpose": "judge",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 15580,
+            "cached_input_tokens": 0,
+            "output_tokens": 109,
+            "usd": 0.0016125,
+            "latency_seconds": 9.565263283002423,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0185316,
+        "control_usd": 0.00278732,
+        "total_usd": 0.021318919999999998
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/smoke-harness/bug-chunk-tail/access-audit.json",
+          "sha256": "66f1ad689f31fcaedf16731ef61003d4596566ccb7f43c0c56b8de72713bdcec"
+        },
+        {
+          "path": "eval/reports/smoke-harness/bug-chunk-tail/grading.log",
+          "sha256": "e403ea6870821a0988b54a70b7e138ea0b6fddfc838010c62452f1ea40d26e97"
+        },
+        {
+          "path": "eval/reports/smoke-harness/bug-chunk-tail/result.json",
+          "sha256": "934a42ac6ca26d55c4df432101035a4617555968c6de8929cce34f0f372466ea"
+        },
+        {
+          "path": "eval/reports/smoke-harness/bug-chunk-tail/session-evidence.jsonl",
+          "sha256": "9cffe954dc9000d65cf50b8347af87804f0f42d9b75ebb43b99dd4a405683a30"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-b0m7osyh/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-37-06-01a166d5-69d8-7f62-b9dd-71b98c7dfb3a.jsonl",
+          "sha256": "ad57ac37bd8cd61438e5bb6c36dca5705c216b6e27c607ebd66a5f4259edab60"
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "task_id": "two-session-prefix-sums",
+      "task_type": "feature_plus_test",
+      "two_session": true,
+      "outcome": "invalid",
+      "invalid_reasons": [
+        "incomplete_access_audit"
+      ],
+      "attempts": 2,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T03:37:55.346001+00:00",
+          "exited_at": "2026-10-23T03:38:38.298461+00:00",
+          "exit_code": 0,
+          "session_id": "01a166d6-3017-7f80-b2ca-dabe09e7544b",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-aecswmcv/exec-1.jsonl",
+            "sha256": "10392bb0007d83c21fcd051921847ded174902ebfbba66084b2ffb24ccaf0313"
+          }
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-10-23T03:39:14.402023+00:00",
+          "exited_at": "2026-10-23T03:40:09.244511+00:00",
+          "exit_code": 0,
+          "session_id": "01a166d7-64a4-70b3-b10c-a1dbe4e64348",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-aecswmcv/exec-2.jsonl",
+            "sha256": "169e91f6589b7e202a682a0bddaf86e49cf717e47273ec7250927f5a0787ddd3"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "inconclusive",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": "unresolved_operand:exec-2.jsonl:6; unresolved_operand:exec-2.jsonl:7; unresolved_operand:rollout-2026-10-23T12-39-14-01a166d7-64a4-70b3-b10c-a1dbe4e64348.jsonl:19; unresolved_operand:rollout-2026-10-23T12-39-14-01a166d7-64a4-70b3-b10c-a1dbe4e64348.jsonl:21",
+        "matches": []
+      },
+      "grading": null,
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "two-session-prefix-sums-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 63345,
+            "cached_input_tokens": 59008,
+            "output_tokens": 1001,
+            "usd": 0.0245848,
+            "latency_seconds": 42.95095582399881,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-exec-2",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 82287,
+            "cached_input_tokens": 65152,
+            "output_tokens": 1533,
+            "usd": 0.0561152,
+            "latency_seconds": 54.83884124599717,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-1",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17181,
+            "cached_input_tokens": 14976,
+            "output_tokens": 740,
+            "usd": 0.00074026,
+            "latency_seconds": 12.974550749000628,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-2",
+          "purpose": "judge",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 16031,
+            "cached_input_tokens": 14720,
+            "output_tokens": 128,
+            "usd": 0.0003423,
+            "latency_seconds": 7.341862563000177,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-3",
+          "purpose": "contract",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 17478,
+            "cached_input_tokens": 14976,
+            "output_tokens": 777,
+            "usd": 0.00078846,
+            "latency_seconds": 15.236565955001424,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-control-4",
+          "purpose": "handoff",
+          "backend": "codex_cli",
+          "model": "gpt-6-luna",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 40200,
+            "cached_input_tokens": 0,
+            "output_tokens": 308,
+            "usd": 0.004174,
+            "latency_seconds": 11.001351361999696,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0807,
+        "control_usd": 0.00604502,
+        "total_usd": 0.08674501999999999
+      },
+      "artifacts": [
+        {
+          "path": "eval/reports/smoke-harness/two-session-prefix-sums/access-audit.json",
+          "sha256": "aa4fbc1d86bdf432c027219e548a8485c4c1b831f3836dc71f0ccafca5aa78bf"
+        },
+        {
+          "path": "eval/reports/smoke-harness/two-session-prefix-sums/handoff-evidence.json",
+          "sha256": "ea22faa27532a73cbd30d864993eb61316098161c0a5209ae1045450cbae9695"
+        },
+        {
+          "path": "eval/reports/smoke-harness/two-session-prefix-sums/result.json",
+          "sha256": "0c3b4155993eab634adc0f4ee5a7e0ed65a8f94b71b40324785b6f34e99d00ed"
+        },
+        {
+          "path": "eval/reports/smoke-harness/two-session-prefix-sums/session-evidence.jsonl",
+          "sha256": "38f36a38690ae7f21dc533c49c05dd8178b23c5bddbd10014eefd59e25027ad9"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-aecswmcv/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-37-56-01a166d6-3017-7f80-b2ca-dabe09e7544b.jsonl",
+          "sha256": "3d963bb012a7243d300c7359882153753deb386b3a9d441b5b9981ee94147306"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-aecswmcv/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-39-14-01a166d7-64a4-70b3-b10c-a1dbe4e64348.jsonl",
+          "sha256": "de817ad0e5bc3c3484b33f445031b0c585812fba03e14cbfc2dbe8422e96ea8a"
+        }
+      ],
+      "handoff": {
+        "day2_pass": false,
+        "user_restated_day1_context": false,
+        "evidence": {
+          "path": "eval/reports/smoke-harness/two-session-prefix-sums/handoff-evidence.json",
+          "sha256": "ea22faa27532a73cbd30d864993eb61316098161c0a5209ae1045450cbae9695"
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "pass_rate": {
+      "value": 1.0,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "false_done_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "claimed_criterion",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Complete done-claim denominator is not yet observed; verdicts retain negative evidence."
+    },
+    "cost_per_pass": {
+      "value": null,
+      "sample_size": 2,
+      "sample_unit": "attempted_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "A bootstrap replicate has zero denominator or missing accounting."
+    },
+    "avg_attempts": {
+      "value": 1.0,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "handoff_success": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "eligible_two_session_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Zero denominator or missing accounting."
+    },
+    "parity": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "matched_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No hash-pinned paired local/cheap_api comparator."
+    }
+  },
+  "accounting": {
+    "attempted_tasks": 2,
+    "valid_tasks": 1,
+    "invalid_tasks": 1,
+    "total_cost_usd": 0.10806394
+  },
+  "validity": {
+    "status": "invalid",
+    "reasons": [
+      "two-session-prefix-sums: incomplete_access_audit"
+    ]
+  }
+}
