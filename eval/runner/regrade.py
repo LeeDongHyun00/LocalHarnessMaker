@@ -85,11 +85,12 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                 not any(s.get('day') == 2 for s in entry['segments'])):
             if not core.valid_day2_observation(entry, core.task_directory(config) / task):
                 raise ValueError("Regrade refused: two-session exit hashes or day-2 observation missing")
-        observed = core.workspace_digest(runtime / 'workspace')
+        matched_version = core.matching_workspace_digest_version(runtime / 'workspace', entry)
         expected = entry['workspace_exit_sha256']
-        if observed != expected:
+        if matched_version is None:
             raise ValueError(f"Regrade refused: workspace exit hash mismatch for {task}")
-        checks.append({'task_id': task, 'expected_sha256': expected, 'observed_sha256': observed, 'matched': True})
+        checks.append({'task_id': task, 'expected_sha256': expected, 'observed_sha256': expected,
+                       'workspace_digest_version': matched_version, 'matched': True})
     # All task hashes are checked before any destination or grading copy is made.
     out.mkdir(parents=True)
     cache = FingerprintCache()
@@ -141,14 +142,14 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         if (audit['status'] == 'clean' and not result['invalid_reasons'] and
                 last['exit_code'] == 0 and not last.get('timed_out') and
                 old_task['outcome'] not in {'timeout', 'error'}):
-            if core.workspace_digest(workspace) != entry['workspace_exit_sha256']:
+            if core.matching_workspace_digest_version(workspace, entry) is None:
                 raise ValueError(f"Regrade refused: workspace exit hash mismatch for {task}")
             scratch = Path(tempfile.mkdtemp(prefix='lhm-eval-regrade-'))
             result['grading'] = core.grade(
                 workspace, private, scratch, task_out / 'grading.log',
                 json.loads((core.task_directory(config) / task / 'expected.json').read_text()),
                 config['grading_timeout_seconds'], execute)
-            if core.workspace_digest(workspace) != entry['workspace_exit_sha256']:
+            if core.matching_workspace_digest_version(workspace, entry) is None:
                 raise ValueError(f"Regrade refused: workspace changed during grading for {task}")
         result['outcome'] = ('invalid' if result['invalid_reasons'] else
                              old_task['outcome'] if old_task['outcome'] in {'timeout', 'error'} else

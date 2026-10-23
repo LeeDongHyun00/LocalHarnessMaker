@@ -771,9 +771,9 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
                                         if p.is_relative_to(Path(retained_context['copied_runtime']))) or
                     digest(path.read_bytes()) != pinned[str(path)]):
                 results[-1]['errors'].append('retained_context_log_hash_mismatch:' + path.name)
-        from eval.runner.core import workspace_digest
+        from eval.runner.core import matching_workspace_digest_version
         try:
-            workspace_matches = workspace_digest(Path(retained_context['workspace'])) == retained_context['workspace_exit_sha256']
+            workspace_matches = matching_workspace_digest_version(Path(retained_context['workspace']), retained_context) is not None
         except (OSError, ValueError):
             workspace_matches = False
         if not workspace_matches:

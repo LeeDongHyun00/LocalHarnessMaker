@@ -26,6 +26,11 @@ from eval.runner.telemetry import collect, collect_runs, applied_tier_records, c
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
+WORKSPACE_DIGEST_VERSION = 2
+WORKSPACE_CACHE_PATTERNS = (
+    "__pycache__", "*.pyc", "*.pyo", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".hypothesis",
+)
+WORKSPACE_COPY_IGNORE = shutil.ignore_patterns(*WORKSPACE_CACHE_PATTERNS)
 
 
 def now() -> str:
@@ -40,12 +45,27 @@ def write_json(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def workspace_digest(workspace: Path) -> str:
-    """Hash all retained paths, contents, modes and symlink targets without following links."""
+def workspace_digest(workspace: Path, version: int = WORKSPACE_DIGEST_VERSION) -> str:
+    """Hash retained paths, contents, modes and links; v2 excludes generated caches."""
+    if type(version) is not int or version not in (1, 2):
+        raise ValueError("Unsupported workspace digest version")
     if not workspace.is_dir() or workspace.is_symlink():
         raise ValueError("Retained workspace is unavailable")
+    if version == 1:
+        paths = sorted(workspace.rglob("*"))
+    else:
+        paths = []
+
+        def unreadable(error: OSError) -> None:
+            raise error
+
+        for directory, directories, files in os.walk(workspace, followlinks=False, onerror=unreadable):
+            ignored = WORKSPACE_COPY_IGNORE(directory, directories + files)
+            directories[:] = [name for name in directories if name not in ignored]
+            paths.extend(Path(directory) / name for name in directories + files if name not in ignored)
+        paths.sort()
     manifest = []
-    for path in sorted(workspace.rglob("*")):
+    for path in paths:
         info = path.lstat()
         kind = ("link" if stat.S_ISLNK(info.st_mode) else "file" if stat.S_ISREG(info.st_mode)
                 else "directory" if stat.S_ISDIR(info.st_mode) else None)
@@ -54,6 +74,27 @@ def workspace_digest(workspace: Path) -> str:
         content = os.readlink(path) if kind == "link" else digest(path.read_bytes()) if kind == "file" else None
         manifest.append([path.relative_to(workspace).as_posix(), kind, stat.S_IMODE(info.st_mode), content])
     return digest(json.dumps(manifest, ensure_ascii=True, separators=(",", ":")).encode())
+
+
+def matching_workspace_digest_version(workspace: Path, recorded: dict[str, Any]) -> int | None:
+    """Match a retained pin without changing it; unversioned pins may use v1 or v2."""
+    expected = recorded.get("workspace_exit_sha256")
+    if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+        return None
+    versions = (recorded["workspace_digest_version"],) if "workspace_digest_version" in recorded else (1, 2)
+    for version in versions:
+        if type(version) is not int or version not in (1, 2):
+            return None
+        if workspace_digest(workspace, version) == expected:
+            return version
+    return None
+
+
+def record_workspace_exit(workspace: Path, entry: dict[str, Any], segment: dict[str, Any]) -> None:
+    """Pin the current attempt after its verifier checks, using the current algorithm."""
+    value = workspace_digest(workspace)
+    for record in (entry, segment):
+        record.update(workspace_exit_sha256=value, workspace_digest_version=WORKSPACE_DIGEST_VERSION)
 
 
 def valid_day2_observation(entry: dict[str, Any], public: Path) -> bool:
@@ -242,7 +283,7 @@ def grade(
     grading = retained / ("grading-" + uuid.uuid4().hex)
     if any(p.is_symlink() for p in workspace.rglob("*")):
         return {"result": "error", "reason": "Executor workspace contains a symlink", "passed_tests": 0, "failed_tests": 0}
-    shutil.copytree(workspace, grading, ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
+    shutil.copytree(workspace, grading, ignore=WORKSPACE_COPY_IGNORE)
     copied_at = now()
     for source in private.files:
         if (grading / source.name).exists():
@@ -495,8 +536,12 @@ def run(
                 write_json(checkpoint, state)
                 native = sorted((codex_home / "sessions").rglob("*.jsonl"))
                 attempt = len(entry.get(f"verdicts_day{day}", [])) + 1
-                verdict = harness.verify(control_runtime, workspace, native, attempt, config,
-                                         repository=REPOSITORY, execute=execute, guard=guard)
+                try:
+                    verdict = harness.verify(control_runtime, workspace, native, attempt, config,
+                                             repository=REPOSITORY, execute=execute, guard=guard)
+                finally:
+                    record_workspace_exit(workspace, entry, entry["segments"][-1])
+                    write_json(checkpoint, state)
                 entry.setdefault("verdicts", []).append(verdict)
                 entry.setdefault(f"verdicts_day{day}", []).append(verdict)
                 entry["reinstruction"] = verdict["reinstruct_message"]
@@ -629,68 +674,70 @@ def run(
                 segment["settings_verified"] = settings["verified"]
                 if "service_tier" in config:
                     segment["service_tier_verified"] = settings["service_tier_verified"]
-                if not interrupted:
-                    entry["workspace_exit_sha256"] = workspace_digest(workspace)
-                    segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
-                write_json(checkpoint, state)
-                current_audit = audit([runtime / saved['events'] for saved in entry['segments']] +
-                                      sorted((codex_home / 'sessions').rglob('*.jsonl')),
-                                      private, workspace=workspace, repository=REPOSITORY,
-                                      grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
-                infrastructure_stop = usage_limit_message([event_path])
-                capacity = capacity_message([event_path])
-                if capacity and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
-                    segment.update(capacity_error=True, infrastructure_recovery=True,
-                                   usage_evidence="Capacity refusal before any item: zero tokens" if
-                                   capacity_refusal_without_items(records(event_path)) else
-                                   "Capacity refusal after work: missing usage remains unknown")
-                    if capacity_refusal_without_items(records(event_path)):
-                        segment["capacity_refusal_usage"] = dict.fromkeys(
-                            ("input_tokens", "cached_input_tokens", "output_tokens"), 0)
+                try:
+                    write_json(checkpoint, state)
+                    current_audit = audit([runtime / saved['events'] for saved in entry['segments']] +
+                                          sorted((codex_home / 'sessions').rglob('*.jsonl')),
+                                          private, workspace=workspace, repository=REPOSITORY,
+                                          grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                    infrastructure_stop = usage_limit_message([event_path])
+                    capacity = capacity_message([event_path])
+                    if capacity and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
+                        segment.update(capacity_error=True, infrastructure_recovery=True,
+                                       usage_evidence="Capacity refusal before any item: zero tokens" if
+                                       capacity_refusal_without_items(records(event_path)) else
+                                       "Capacity refusal after work: missing usage remains unknown")
+                        if capacity_refusal_without_items(records(event_path)):
+                            segment["capacity_refusal_usage"] = dict.fromkeys(
+                                ("input_tokens", "cached_input_tokens", "output_tokens"), 0)
+                        resumed_id = session_id([event_path]) or resumed_id
+                        wait = BACKOFF_SECONDS[recovery] if recovery < len(BACKOFF_SECONDS) and resumed_id else None
+                        segment["recovery_wait_seconds"] = wait
+                        entry["phase"] = "capacity_limited"
+                        write_json(checkpoint, state)
+                        if wait is None:
+                            infrastructure_stop = capacity
+                            break
+                        sleep(wait)
+                        recovery += 1
+                        continue
+                    remaining -= 1
+                    recovery = 0
+                    if infrastructure_stop:
+                        break
+                    if interrupted or current_audit["status"] != "clean":
+                        break
                     resumed_id = session_id([event_path]) or resumed_id
-                    wait = BACKOFF_SECONDS[recovery] if recovery < len(BACKOFF_SECONDS) and resumed_id else None
-                    segment["recovery_wait_seconds"] = wait
-                    entry["phase"] = "capacity_limited"
-                    write_json(checkpoint, state)
-                    if wait is None:
-                        infrastructure_stop = capacity
-                        break
-                    sleep(wait)
-                    recovery += 1
-                    continue
-                remaining -= 1
-                recovery = 0
-                if infrastructure_stop:
-                    break
-                if interrupted or current_audit["status"] != "clean":
-                    break
-                resumed_id = session_id([event_path]) or resumed_id
-                if final_process.returncode == 0 and not final_process.timed_out:
-                    transport_retries = 0
-                    entry["transport_retries"] = 0
-                    if not config["harness"]:
-                        break
-                    try:
-                        native = sorted((codex_home / "sessions").rglob("*.jsonl"))
-                        native_audit = audit(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
-                        if native_audit["status"] != "clean":
+                    if final_process.returncode == 0 and not final_process.timed_out:
+                        transport_retries = 0
+                        entry["transport_retries"] = 0
+                        if not config["harness"]:
                             break
-                        if verify_executor():
+                        try:
+                            native = sorted((codex_home / "sessions").rglob("*.jsonl"))
+                            native_audit = audit(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                            if native_audit["status"] != "clean":
+                                break
+                            if verify_executor():
+                                break
+                        except UsageLimitError as exc:
+                            infrastructure_stop = str(exc)
                             break
-                    except UsageLimitError as exc:
-                        infrastructure_stop = str(exc)
-                        break
-                    except harness.HarnessError as exc:
-                        entry["control_invalid_reason"] = exc.invalid_reason
-                        control_error = str(exc)
-                        entry["control_error"] = control_error
-                        break
-                else:
-                    if transport_retries >= config["retry_limit"]:
-                        break
-                    transport_retries += 1
-                    entry["transport_retries"] = transport_retries
-                    write_json(checkpoint, state)
+                        except harness.HarnessError as exc:
+                            entry["control_invalid_reason"] = exc.invalid_reason
+                            control_error = str(exc)
+                            entry["control_error"] = control_error
+                            break
+                    else:
+                        if transport_retries >= config["retry_limit"]:
+                            break
+                        transport_retries += 1
+                        entry["transport_retries"] = transport_retries
+                        write_json(checkpoint, state)
+                finally:
+                    if not interrupted:
+                        record_workspace_exit(workspace, entry, segment)
+                        write_json(checkpoint, state)
             if (infrastructure_stop or interrupted or blocked or control_error or not final_process or
                     current_audit is None or current_audit["status"] != "clean"):
                 break
@@ -706,8 +753,12 @@ def run(
                 if config["harness"]:
                     try:
                         if not entry.get(f"verdicts_day{day}"):
-                            verdict = harness.verify(control_runtime, workspace, native, 1, config,
-                                                     repository=REPOSITORY, execute=execute, guard=guard)
+                            try:
+                                verdict = harness.verify(control_runtime, workspace, native, 1, config,
+                                                         repository=REPOSITORY, execute=execute, guard=guard)
+                            finally:
+                                record_workspace_exit(workspace, entry, entry["segments"][-1])
+                                write_json(checkpoint, state)
                             entry.setdefault("verdicts", []).append(verdict)
                             entry.setdefault(f"verdicts_day{day}", []).append(verdict)
                             write_json(checkpoint, state)
@@ -811,7 +862,7 @@ def run(
         write_json(task_out / "result.json", json.loads(private.redact(json.dumps(result))))
         # Preserve completed source only; no private grader or grading copy is published.
         if grading and grading.get("executor_already_exited") and not (task_out / "workspace").exists():
-            shutil.copytree(workspace, task_out / "workspace", ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
+            shutil.copytree(workspace, task_out / "workspace", ignore=WORKSPACE_COPY_IGNORE)
         entry["phase"] = "interrupted" if interrupted else "finished"
         if not interrupted:
             entry["result"] = json.loads(private.redact(json.dumps(result)))

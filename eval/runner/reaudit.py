@@ -67,6 +67,9 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
                 errors.add("private_grader_manifest_mismatch")
             if not workspace.is_dir():
                 errors.add("missing_retained_workspace")
+            elif ("workspace_exit_sha256" in entry and
+                  core.matching_workspace_digest_version(workspace, entry) is None):
+                errors.add("workspace_exit_hash_mismatch")
         except Exception:
             # Exceptions can contain grader paths or source. Do not serialize them.
             errors.add("reaudit_input_error")

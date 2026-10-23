@@ -1,5 +1,9 @@
 ## Done
 
+- Verified the complete evaluation package after the digest/timing changes and preserved frozen tasks, retained reports, shared interfaces and other roles' files (`.venv/bin/python -m pytest tests/eval -q`: 1510 passed in 142.90s; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; authorized-path/STATUS-heading check: passed, branch r5/v2).
+- Added cache-excluding workspace digest v2, unchanged v1 matching and recorded checkpoint pin versions across regrade, day-2 copy/retained context, infrastructure reruns, re-audit and republication; unmatched or unknown-version existing pins fail closed (`.venv/bin/python -m pytest tests/eval/test_workspace_digest.py -q`: 34 passed in 9.75s).
+- Moved attempt workspace pinning after verifier checks, including pending/error paths; launched verifier Python with -B and PYTHONDONTWRITEBYTECODE=1 in a copied environment, preserving pre-verification capture pins (`.venv/bin/python -m pytest tests/eval/test_workspace_digest.py -q`: 34 passed in 9.75s; existing runner/continuation/re-audit/republication suite: 251 passed in 237.26s).
+- Documented algorithm compatibility, common copy exclusions, legacy cache-hash limitations and verifier-owned inner commands in eval/README.md and eval/CHANGES.md (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0).
 - Added explicit --allow-unpinned recovery for historical executor stderr/finals through normal redaction, with labeled diagnostic artifact entries and published-content hashes; verified original/backup runtimes, v1/v2 reports, missing files, existing pins, conflicts, symlinks, repeat runs and unchanged default behavior (`.venv/bin/python -m pytest tests/eval -q`: 1476 passed in 139.70s).
 - Confirmed runtime capture pinning already shipped in 6dbc684; strengthened both capture tests to require persisted segment hashes before grading and independent recovery without --allow-unpinned (`.venv/bin/python -m pytest tests/eval -q`: 1476 passed in 139.70s; focused republication/runtime suite: 70 passed in 12.11s).
 - Updated README, CHANGES and this status for the opt-in mode and schema-compatible diagnostic provenance; kept report references path/sha256 and preserved metrics, classifications, checkpoints, frozen tasks, retained reports and other roles' files (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md`: exit 0; authorized scope/STATUS-format check: passed, branch r5/v2).
@@ -28,6 +32,7 @@
 
 ## Remaining
 
+- Host/Claude: review and transfer the workspace digest fix, then retry retained full-harness recovery using the original hash-pinned inputs. This worktree did not access host workspaces/private graders or repair reports. Unversioned hashes must match current retained bytes under v1 or v2; a v1 pin that included subsequently changed caches can still match neither and must remain refused. Never replace the historical pin with a current digest.
 - Host/Claude: review and transfer this opt-in republication follow-up, then restore historical stderr/finals using `.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN --allow-unpinned` for the intended retained runs. Review run-diagnostics.json.republication.artifacts and published_unpinned counts. This sandbox did not access host backups/private storage or repair retained reports.
 - Host/Claude: review each republication's remaining unpinned counts for missing captures. The default still skips unpinned files; the explicit flag restores only stderr/finals and labels their current published-content hashes. Never backfill historical checkpoint pins. Any later task_false_done_rate/classification refresh remains separate retained-evidence work, with no new models or grading of invalid tasks.
 - Host/Claude: review and transfer this first-occurrence follow-up at a safe boundary, then re-audit retained calibration evidence using the original hash-pinned graders. Earlier public/generic-only changes are committed according to the user; this session claims no host re-audit result.
@@ -42,6 +47,11 @@
 
 ## Decisions
 
+- Hash source paths, contents, modes and link targets while excluding all requested bytecode/tool caches in v2: verification and tools generate these caches after executor exit; trusted grading and published workspace copies now share the exclusion patterns.
+- Honor explicit digest versions and try v1/v2 only for entries without a version: keep exact historical v1 manifests and reject unknown algorithms or unmatched pins without silently migrating evidence.
+- Refresh the current attempt pin after verifier completion even on failed/pending checks: prevent verifier workspace writes from immediately invalidating retained evidence while keeping executor capture pins at exit.
+- Preserve read-only re-audit/republication support for historical missing pins, but validate every existing pin: these tools previously accepted missing workspace hashes; regrade/day-2 continuation continue requiring them, and selected infrastructure reruns retain their interruption/pre-launch exceptions.
+- Set -B and PYTHONDONTWRITEBYTECODE for the runner-owned verifier launch only: inner Python command arguments belong to Role 4, and explicit compilation/tool cache generation still requires digest exclusions.
 - Allow historical stderr/final recovery only with explicit --allow-unpinned: the user authorized publication of these retained bytes with a visible provenance distinction, not a fabricated original hash.
 - Store provenance=republished_unpinned in diagnostic artifact entries and path/sha256 in report references: the frozen shared schema rejects extra report artifact fields, and no schema or validation exception is introduced.
 - Preserve default behavior and all existing hash checks: the flag applies only to regular, root-level executor stderr/finals; pinned mismatches, symlinks, conflicting destinations and altered prior provenance still fail before writes.
@@ -74,6 +84,7 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/eval/test_workspace_digest.py -q
 - Host/explicit historical-capture recovery: .venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN --allow-unpinned
 - Host/finished run only: .venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN
 - .venv/bin/python -m pytest tests/eval/test_republish.py tests/eval/test_publication_runtime.py -q
@@ -96,6 +107,8 @@
 
 ## Assumptions
 
+- The reported 104/120 full-harness mismatches, task-exit modification times and dual-interpreter bytecode caches are user-supplied host observations; this offline worktree did not inspect or repair those runtimes. Existing historical hashes are never rewritten, even if a cache-only history cannot be reconstructed.
+- workspace_digest_version is evaluation-owned checkpoint/runtime metadata, not a new shared report field; shared schemas and CLI flags remain unchanged. Segments without an exit pin after executor interruption do not claim a digest version or historical hash.
 - The requested per-artifact provenance field is represented in run-diagnostics.json.republication.artifacts; report artifact references retain the frozen path/sha256 shape. The schema prohibition remains in force.
 - Claude committed 6dbc684 and observed 34 published/6 skipped files on a smoke-harness-3 report copy, as supplied by the user. No host repair or private-root access was performed in this follow-up.
 - Restoring final messages supplies retained evidence for later task_false_done_rate analysis; republication does not rewrite metrics or completion classifications itself.

@@ -152,6 +152,8 @@ def _invoke_once(module: str, operation: str, arguments: list[str], destination:
     if private_root:
         env = {k: v for k, v in env.items() if private_root not in v}
     env.update(overrides or {})
+    if module == "verifier":
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
     streams = destination.with_name("handoff-validation.json") if operation == "validate-handoff" else destination
     stdout = streams.with_suffix(".stdout")
     stderr = streams.with_suffix(".stderr")
@@ -166,7 +168,8 @@ def _invoke_once(module: str, operation: str, arguments: list[str], destination:
     guard.remember(accounting)
     started = time.monotonic()
     try:
-        process = execute([sys.executable, "-m", module, operation, *arguments, *output_args],
+        python_flags = ["-B"] if module == "verifier" else []
+        process = execute([sys.executable, *python_flags, "-m", module, operation, *arguments, *output_args],
                           cwd=repository, env=env, stdin="", stdout=stdout, stderr=stderr, timeout=timeout)
     except (KeyboardInterrupt, OSError):
         interrupted = [stdout, stderr, *([] if operation == "validate-handoff" else [destination])]
