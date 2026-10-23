@@ -396,3 +396,17 @@ After 12 of 20 tasks: 6 pass, 2 fail, 4 invalid. Executor attempts 14. On the 8 
 Earlier audit fixes on the branch (64a825b, cd3bdb4) cleared both remaining harness v2 code-mode records; the two-session-line-endings record needed a second pass because Claude's first brief paraphrased the input instead of quoting it. Audit-precision rounds so far today: 7. The pattern is not converging on its own; the fingerprint change above removes one whole class, and the final evaluation will report the per-run invalid counts before and after each fix.
 
 v2 calibration pilot, complete (08:11 to 08:46 UTC, 20 tasks, 24 sessions, Fast tier priced at the Fast snapshot): 10 pass, 4 fail, 6 invalid; 2.99 USD, 0.30 USD per pass. On the 14 valid tasks A passes 71 percent (10 of 14), at the top of the 30 to 70 percent target. All 4 two-session tasks are invalid on the same false-positive fingerprint class (every matched grader line occurs in public inputs or executor-written tests), plus the two unresolved shapes above. The report is calibration evidence and is kept outside the repository (codex-bridge/outbox/run-pilot-v2-a/report/) until the audit and grader fixes land; a regrade then yields the calibration figure for the two-session tasks. By type on valid tasks: bug_fix 2 of 3, feature_plus_test 3 of 4, multiple_requirements 3 of 4, constrained_refactoring 2 of 3. Decision after the regrade: if the valid pass rate stays above 70 percent, raise difficulty at the design level for the remaining 16 families (more interacting requirements and tighter constraints), not by dropping tasks.
+
+## Full harness v2 (2026-10-23, 05:47 to 08:48 UTC, fbe11fe, resumed once after the restart)
+
+eval/configs/full-harness.yaml: 120 tasks, Sol medium executor, gpt-6-luna control through codex_cli, 3 attempts per day. Leak scan: 745 files, 0 private markers, 0 tracebacks from graders (the two "Traceback" strings are the executor's own failing test output quoted in verifier evidence), 0 user paths, 1 cross-task coincidental grader line in verdict evidence (same class as the pilot false positive).
+
+| Metric | Harness v2 | Full A |
+|---|---|---|
+| Outcomes | 114 pass, 1 fail, 5 invalid | 115 pass, 3 fail, 2 invalid |
+| pass_rate on valid tasks | 0.991 (n=115, CI 0.974 to 1.0) | 0.975 (n=118, CI 0.941 to 1.0) |
+| handoff_success | 0.944 (n=18) | 0.833 (n=18) |
+| avg_attempts | 1.19 | 1.15 |
+| Cost (tasks with accounting) | 5.14 USD on 119: executor 4.78, control 0.37 | 3.82 USD on 120 |
+
+On the 113 tasks valid in both runs: harness 112 pass, A 111 pass. The harness used 147 executor attempts against A's 139. The report is invalid under the approved rule until the 5 invalid tasks are recovered: 3 audit-precision cases that the r5/v2 audit fixes clear on re-audit, 1 restart casualty (rerun_invalid), and multiple-requirements-strip-prefix (to inspect). Control cost is 7 percent of the total. The quality difference is inside the confidence intervals; the harness's gain sits in the two-session tasks (handoff 17 of 18 against 15 of 18), at about 35 percent more cost. The paired comparison with intervals follows after recovery.
