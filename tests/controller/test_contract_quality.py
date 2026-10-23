@@ -165,7 +165,7 @@ def test_feedback_cannot_promote_request_instructions() -> None:
 
 def test_prompt_version_and_supported_commands() -> None:
     prompt = build_messages('safe')[0]['content']
-    assert 'contract prompt v2' in prompt
+    assert 'contract prompt v3' in prompt
     for form in ('python -m py_compile FILES', 'python -m pytest', 'python -m unittest discover',
                  '-s DIR', '-p PATTERN', '-t DIR', '-k EXPR', 'python -c CODE'):
         assert form in prompt

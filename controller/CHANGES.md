@@ -1,5 +1,39 @@
 # Controller update — 2026-10-23
 
+Contract prompt v3 addresses the first smoke measurement's contract defects.
+Requested create/edit targets cannot be missing-file prerequisites. Code removes
+recognized missing-target stops and adds a per-file assumption that the file may
+not exist yet and may be created. Named external inputs and scope/conflict stops
+remain prerequisites. Target recognition is lexical, bounded to action clauses,
+and excludes inputs introduced by using/from and explicit do-not-edit clauses;
+it is not a complete natural-language proof.
+
+Every schema-valid candidate now passes static criterion validation before
+return: one relative path per file/regex check, Python re compilation, supported
+direct Python command forms, and detection of judge rubrics demanding execution
+results. Verification commands are also checked. One repair generation names all
+invalid criteria in an escaped diagnostic block. Persistent invalid criteria are
+removed with one assumption each; invalid verification commands and command pairs
+for removed criteria are removed too. If earlier schema retries/fallback have
+already spent all three slots, this explicit degradation happens immediately.
+Even removal of every criterion remains schema-valid and is disclosed for user
+review. Existing accounting and production routing retain the shared three-call
+budget. Schema/transport failures still follow their existing error behavior.
+
+The controller-owned static command grammar mirrors a conservative subset of
+the verifier forms without importing verifier or checking file existence.
+Runtime path existence, symlink containment, installed dependencies and command
+execution remain verifier responsibilities. Prompt v3 also requires all judge
+rubrics to be decidable by reading workspace files alone; tests executing and
+passing belong in command criteria. The lexical rubric guard catches explicit
+execution demands, not every possible semantic paraphrase.
+
+Added authored regressions for all three defects, invalid verification pairs,
+regex compilation errors, escaped repair diagnostics, schema/fallback budgets,
+unknown target existence and preserving external inputs. No evaluation task was
+read and the original measurement request population is unchanged.
+
+
 Contract prompt v2 now derives mechanical checks from request-named files,
 Python modules/functions and tests. It requests py_compile for named Python
 files, the named supported test command, or standard discovery with the runner
@@ -19,8 +53,8 @@ and log contract_quality_gate with action accept_degraded. Schema retries and CL
 three-generation budget and usage accounting. Schema-invalid output, transport
 failures and exhausted budgets still fail; a first judge-only result on the
 final slot still fails because no targeted regeneration can run. The gate checks criterion types;
-it does not prove command acceptance, meaningful test collection or behavioral
-coverage. Its lexical recognition is not a complete natural-language parser.
+before v3 it did not check command forms. Neither gate proves meaningful test
+collection or behavioral coverage. Its lexical recognition is not a complete natural-language parser.
 Schemas, public CLI flags, analyze.py metadata and escaped data blocks are unchanged.
 
 Added authored unittest/discovery fixtures and regressions for degraded quality acceptance,
@@ -81,7 +115,8 @@ review 1. Unknown costs are never fabricated as zero.
 
 ## Verification
 
-`.venv/bin/python -m pytest tests/controller -q`: 188 passed in 2.14s.
+`.venv/bin/python -m pytest tests/controller -q`: 273 passed in 3.85s.
+`git diff --check -- controller tests/controller state/STATUS-controller.md`: exit 0.
 The new mocked tests exercise approval refusal, all 30 samples, log accounting,
 quality/schema regeneration sequences, persistent judge-only acceptance with
 exact gate logs and one appended assumption, CLI success/path output via the
@@ -93,6 +128,17 @@ sandbox-exec check ran. The full suite is reserved for coordinated host
 verification before merge. No staging or commit was performed.
 
 ## Assumptions
+
+- Missing-target and runtime-rubric recognition are conservative English lexical
+  checks plus prompt instructions; they do not decide arbitrary natural language.
+- Static command validation intentionally does not require target files to exist.
+  It accepts a conservative verifier subset and needs host runtime verification.
+- When no generation slot remains, invalid criteria are removed with assumptions
+  rather than attempting a fourth call. Empty criteria are allowed by the schema;
+  removal is incomplete coverage requiring user review, not proof of completion.
+- Claude must rerun measure_contracts and harness smoke on the host with v3.
+  Network, nested Codex, live model calls and macOS sandbox-exec are unavailable
+  here. The coordinated full suite remains pending before merge.
 
 - When tests are mentioned without a runner, unittest discovery is a proposed
   dependency-free default for user review, not a verified project convention.

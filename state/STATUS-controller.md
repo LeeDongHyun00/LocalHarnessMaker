@@ -1,5 +1,10 @@
 ## Done
 
+- Implemented prompt v3 and code repair of recognized missing requested-target stops into per-file creation assumptions; preserved external input/scope stops and added own-fixture regressions (.venv/bin/python -m pytest tests/controller -q: 273 passed in 3.85s).
+- Added controller-owned static validation for every criterion: single relative paths, Python regex compilation, conservative accepted command grammar, and explicit runtime-only judge demands; validate verification commands too, without verifier imports or workspace existence checks (.venv/bin/python -m pytest tests/controller -q: 273 passed in 3.85s).
+- Added one named-check repair generation inside the production three-call budget; persistent invalid criteria are removed with one assumption each and matching invalid verification pairs removed, including final-slot/fallback exhaustion; preserved schema validity and summed usage (.venv/bin/python -m pytest tests/controller -q: 273 passed in 3.85s).
+- Updated controller/CHANGES.md, prompt version note and role handoff; authored regressions include external-input preservation, diagnostic escaping, schema retries and fallback; no evaluation tasks, live models or nested Codex were accessed (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
+
 - Changed persistent judge-only quality regeneration to return the regenerated contract with one appended judgment-only assumption and contract_quality_gate action accept_degraded; preserved one targeted regeneration, schema/transport errors and the shared three-call budget (.venv/bin/python -m pytest tests/controller -q: 188 passed in 2.14s).
 - Added regressions for exact gate logs, regenerated content/assumption preservation, summed usage, successful contract CLI measurement, schema retry combinations, degraded HTTP fallback, transport failure and final-slot rejection; updated controller/CHANGES.md (.venv/bin/python -m pytest tests/controller -q: 188 passed in 2.14s).
 - Verified the patch touches only the five owned files listed in the commit plan; no staging or commit was performed (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0; git status --short: only controller/CHANGES.md, controller/contract_gen.py, tests/controller/test_contract_quality.py, tests/controller/test_measure_contracts.py and state/STATUS-controller.md modified).
@@ -42,14 +47,20 @@
 
 ## Remaining
 
+- Pending host verification of this session's v3 changes: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production-v3.json --i-have-approval` and harness smoke using the host/main checkout after integration. Inspect removed-criterion assumptions, contract_check_gate logs, target stops and file-only judge rubrics. Network, nested Codex, live model calls and macOS sandbox-exec are unavailable here and were not attempted.
+
 - Pending host verification of degraded acceptance with live models and plugin/evaluation integration; network, nested codex exec and macOS sandbox-exec are unavailable here and were not attempted.
-- Pending revised production-pipeline measurement, D-4: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production.json --i-have-approval` on the host. The preview prints 90 maximum CLI generations and estimated API-equivalent USD 0.198000 before any calls. Compare both preserved evidence files above; the old post-v2 adapter failures are not evidence of production retry failure. Inspect per-sample quality_gate_fired/generations and total quality_gate_firings/generations/usd. HTTP is deliberately disabled even with a key; local comparison is dropped. Live prompt v2 quality, SC-1/SC-2, SC-4 targets and SC-5 semantic injection resistance remain pending.
+- Pending revised production-pipeline measurement, D-4: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production.json --i-have-approval` on the host. The preview prints 90 maximum CLI generations and estimated API-equivalent USD 0.198000 before any calls. Compare both preserved evidence files above; the old post-v2 adapter failures are not evidence of production retry failure. Inspect per-sample quality_gate_fired/generations and total quality_gate_firings/generations/usd. HTTP is deliberately disabled even with a key; local comparison is dropped. Live prompt v3 quality, SC-1/SC-2, SC-4 targets and SC-5 semantic injection resistance remain pending.
 - Pending host verification: configured HTTP fallback with an environment key, production hook guard and retry-budget integration under the 35 s deadlines, and Role 2's 120 s handoff budget. The three primary codex_cli commands and live contract/handoff demo are already completed host checks, as recorded in Done. Network, nested Codex, live model calls and macOS sandbox-exec are unavailable here and were not attempted.
 - Pending host verification, D-1: measure API-equivalent control cost against an executor baseline and empirically calibrate effort v1 from task outcomes. Existing thresholds have only synthetic/fixture calibration; no exact tokenizer dependency is presently needed.
 - D-2 library population requires verified, permitted provenance; do not gather executor/paid-model output for training without the STOP-C3 terms review. The curated seed library is intentionally empty.
 - Before merge: run the full repository suite once in a coordinated host session and verify packaging resources if wheel installation is required. Only controller tests were run here; no staging or commit was performed and .git was read-only.
 
 ## Decisions
+
+- Validate checks before any successful contract return: use a controller-owned conservative command grammar to keep the no-verifier-import interface and avoid requiring not-yet-created files.
+- Repair invalid checks once within the existing budget, then remove unresolved criteria with assumptions: the user's defect-remediation priority supersedes mechanical-check quota rejection for a contract degraded by invalid-check removal, including an empty criterion array allowed by the schema.
+- Convert recognized missing-target prerequisites deterministically and require file-only judge rubrics in prompt v3: avoid executor dead ends while preserving genuinely external prerequisites; lexical checks do not establish full semantic correctness.
 
 - Supersede the prior record-only criterion observation with the user's contract-quality priority: prompt v2 proposes objective checks from request facts and records inferred choices for review instead of treating unknown workspace details as grounds for judge-only contracts.
 - Limit quality repair to one regeneration within the existing three-call budget: per the current user instruction, accept a schema-valid judge-only regeneration with one explicit assumption and accept_degraded log; schema-invalid output, transport failure and budget exhaustion still fail. A first judge-only result in the final slot still fails because no quality regeneration is available.
@@ -73,6 +84,9 @@
 
 ## Verify commands
 
+- Pending host v3 remeasurement: .venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production-v3.json --i-have-approval
+- Pending host: harness smoke after controller changes are integrated into the host/main checkout.
+
 - .venv/bin/python -m pytest tests/controller -q
 - git diff --check -- controller tests/controller state/STATUS-controller.md
 - Pending host, approved D-4 batch only: .venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production.json --i-have-approval
@@ -89,6 +103,11 @@
 - Keep local.enabled=false and retain version 1 fail-closed behavior; D-3/D-5 are dropped and local must never become a hidden fallback.
 
 ## Assumptions
+
+- English lexical action/file and rubric patterns are deliberately bounded; prompt v3 covers other paraphrases. They do not prove that every natural-language stop/rubric is correct. Inputs introduced by using/from and explicit do-not-edit clauses remain external.
+- Static validation accepts a conservative subset of the verifier grammar read this session; runtime existence/symlink/dependency checks and live command acceptance need host verification. No shared interface or verifier import was added.
+- With no call slot left after schema retries or transport fallback, invalid-check degradation occurs without another generation. Every removed criterion is identified by an assumption and remains unverified; even empty success_criteria is schema-valid and needs user review.
+- This session edits only controller/, tests/controller/ and this file in the provided worktree using its .venv. Concurrent Role 4 changes visible in git status are not ours and must not be included in the controller commit. No staging, commit or PR was performed; controller/CHANGES.md supplies the reviewable summary and Assumptions.
 
 - Degraded acceptance applies only after the targeted quality regeneration has been requested and a schema-valid response is available; intervening schema retries may consume the remaining third slot. No available quality-regeneration slot remains an error, preserving the requested budget-exhaustion behavior.
 

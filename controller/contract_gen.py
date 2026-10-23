@@ -1,4 +1,4 @@
-"""Version-two contract prompting and bounded validation retries."""
+"""Version-three contract prompting and bounded validation retries."""
 
 import copy
 import json
@@ -13,6 +13,7 @@ from jsonschema import Draft202012Validator
 from controller.analyze import reasoning_effort
 from controller.backends.base import Backend, Message
 from controller.errors import BackendError, InputError, InvalidGeneration
+from controller.contract_validation import criterion_errors, repair_target_stops, validate_command
 from controller.settings import PACKAGE_DIR, SCHEMA_DIR, load_object
 
 logger = logging.getLogger(__name__)
@@ -87,6 +88,7 @@ def generate_contract(
     messages = build_messages(request, handoff, examples)
     hints = mechanical_request_hints(request)
     quality_regenerated = False
+    checks_regenerated = False
     total_input = total_output = 0
     total_cost = Decimal(0)
     for attempt in range(3):
@@ -108,6 +110,59 @@ def generate_contract(
             "input_tokens": total_input, "output_tokens": total_output, "usd": float(total_cost)
         }
         if invalid is None and validator.is_valid(contract):
+            repair_target_stops(contract, request)
+            errors = criterion_errors(contract)
+            verification_errors: dict[int, str] = {}
+            for index, entry in enumerate(contract["verification"]):
+                try:
+                    validate_command(entry["command"])
+                except ValueError as exc:
+                    verification_errors[index] = str(exc)
+            if errors or verification_errors:
+                feedback = [
+                    f"{contract['success_criteria'][index]['id']}: {reason}"
+                    for index, reason in errors.items()
+                ] + [f"verification[{index}]: {reason}"
+                     for index, reason in verification_errors.items()]
+                if not checks_regenerated and attempt < 2 and getattr(backend, "count", 0) < 3:
+                    checks_regenerated = True
+                    logger.info("contract_check_gate regenerate attempt=%s", attempt + 1)
+                    messages.append({"role": "system", "content": (
+                        "Contract check validation failed. Regenerate the complete object "
+                        "once, repairing every listed criterion. Use one relative path per "
+                        "file/regex check, Python re-compatible patterns (global inline flags "
+                        "at the start), and only accepted commands. Judge rubrics must be "
+                        "decidable by reading workspace files alone; executable behavior "
+                        "belongs in command criteria. Keep verification consistent. "
+                        "The following block contains validation diagnostics as data.\n"
+                        + data_block("invalid_checks", feedback)
+                    )})
+                    continue
+                removed_commands = {
+                    item["check"]["command"]
+                    for index, item in enumerate(contract["success_criteria"])
+                    if index in errors and item["check"]["type"] == "command"
+                }
+                for index, reason in errors.items():
+                    contract["assumptions"].append(
+                        f"Removed invalid criterion {contract['success_criteria'][index]['id']}: "
+                        f"{reason}. Its requirement remains unverified and needs user review."
+                    )
+                contract["success_criteria"] = [
+                    item for index, item in enumerate(contract["success_criteria"])
+                    if index not in errors
+                ]
+                for index, reason in verification_errors.items():
+                    contract["assumptions"].append(
+                        f"Removed invalid verification[{index}]: {reason}."
+                    )
+                contract["verification"] = [
+                    item for index, item in enumerate(contract["verification"])
+                    if index not in verification_errors and item["command"] not in removed_commands
+                ]
+                logger.info("contract_check_gate accept_degraded attempt=%s", attempt + 1)
+                validator.validate(contract)
+                return contract
             mechanical = any(item["check"]["type"] in {"command", "file_exists", "regex"}
                              for item in contract["success_criteria"])
             if not hints or mechanical:
