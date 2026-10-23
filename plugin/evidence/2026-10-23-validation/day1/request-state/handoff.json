@@ -1,0 +1,12 @@
+{
+  "done": [],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "obsolete-release-context",
+      "why": "Demo-only previous handoff; must be archived on failure."
+    }
+  ],
+  "verify_commands": [],
+  "do_not_touch": []
+}

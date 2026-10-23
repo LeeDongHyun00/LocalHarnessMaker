@@ -1,0 +1,1 @@
+{"mode": "validation", "args": ["-m", "verifier", "validate-handoff", "--handoff", "${WORKSPACE}/.harness/handoff.pending.e0661945414a47d08e392b67aea01fbd.json"], "exit_code": 2}

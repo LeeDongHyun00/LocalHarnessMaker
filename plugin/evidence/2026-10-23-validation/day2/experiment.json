@@ -1,0 +1,15 @@
+{
+  "version": "codex-cli 0.163.0-alpha.11.1",
+  "workspace": "${WORKSPACE}",
+  "codex_home": "${CODEX_HOME}",
+  "out": "${EVIDENCE}/day2",
+  "codex": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+  "mode": "real",
+  "executor": "gpt-6.1-sol",
+  "prompt": "Show any injected handoff and the new contract, then wait for approval. Do not write task files.",
+  "approval": "pending",
+  "real_task_verified": false,
+  "max_attempts": 1,
+  "scenario": "validation",
+  "thread_id": "01a166fc-a68f-7ba0-8036-166c1029a970"
+}

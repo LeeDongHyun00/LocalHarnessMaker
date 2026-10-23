@@ -1,0 +1,43 @@
+{
+  "task_summary": "Show the injected handoff and a new execution contract, then wait for approval. Do not write task files.",
+  "constraints": [
+    "Do not write task files.",
+    "Do not perform task execution or verification before approval.",
+    "Preserve the handoff as context; do not retry, repair, bypass, or alter its failed verification command."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The injected handoff is presented to the user, including its failed criterion, recorded decision, verification result, and do-not-touch instructions.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Confirm the handoff details are presented accurately and without implying the failed verification passed."
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "A new reviewable execution contract is presented and approval is requested before any task execution.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Confirm a concrete contract is provided and the response waits for user approval before execution."
+      }
+    }
+  ],
+  "verification": [],
+  "stop_conditions": [
+    "Stop after presenting the handoff and contract; continue only after explicit approval.",
+    "Stop if fulfilling the new contract would require writing task files."
+  ],
+  "assumptions": [
+    "No new implementation objective or verification requirements are supplied beyond presenting the injected handoff and preparing a contract for approval; the proposed contract therefore covers only those actions."
+  ],
+  "reasoning_effort": {
+    "value": "low",
+    "rationale": "effort-v1: utf8_byte_bound=96; distinct_files=0; tests_requested=false; requirement_segments=2; score=0"
+  },
+  "cost_estimate": {
+    "input_tokens": 15633,
+    "output_tokens": 274,
+    "usd": 0.00062894
+  }
+}

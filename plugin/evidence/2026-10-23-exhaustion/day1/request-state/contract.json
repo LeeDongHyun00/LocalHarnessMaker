@@ -1,0 +1,45 @@
+{
+  "task_summary": "Create a reviewable contract for an intentionally impossible verification demonstration, without creating task files.",
+  "constraints": [
+    "The sole success criterion must be a command check running exactly `python -c 'raise SystemExit(1)'` with expected exit_code 0.",
+    "Do not repair or bypass the command, change PATH, create Python wrappers, or add criteria.",
+    "Allow only one verification attempt, after approval; report its failure honestly and leave the criterion unmet.",
+    "Display the contract and wait for approval."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The specified command exits with code 0.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'raise SystemExit(1)'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c 'raise SystemExit(1)'",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [
+    "Do not run verification before approval.",
+    "Do not retry verification; stop after the single attempt.",
+    "Stop if executing the requested command would require changing the command, environment, or workspace."
+  ],
+  "assumptions": [],
+  "reasoning_effort": {
+    "value": "medium",
+    "rationale": "effort-v1: utf8_byte_bound=469; distinct_files=0; tests_requested=false; requirement_segments=7; score=2"
+  },
+  "cost_estimate": {
+    "input_tokens": 15587,
+    "output_tokens": 228,
+    "usd": 0.0016727
+  }
+}

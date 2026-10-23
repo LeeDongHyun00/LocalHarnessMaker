@@ -1,0 +1,5 @@
+| Criterion | Status | Evidence |
+|---|---|---|
+| SC-1: Command exits with code 0 | Unmet | `python -c 'raise SystemExit(1)'` returned exit code **1**, with no output. |
+
+The single allowed attempt failed. No retry was made and no task files were created.

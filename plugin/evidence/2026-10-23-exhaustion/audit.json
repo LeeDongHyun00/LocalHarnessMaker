@@ -1,0 +1,8 @@
+{
+  "scenario": "exhaustion",
+  "new_session": true,
+  "approval_gates": true,
+  "remaining_injected": true,
+  "stale_injected": false,
+  "overall": "pass"
+}

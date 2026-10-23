@@ -1,0 +1,3 @@
+| Criterion | Status | Evidence |
+|---|---|---|
+| SC-1: `result.txt` contains exactly `ok\n` | Done | `python -c 'from pathlib import Path; assert Path("result.txt").read_bytes() == b"ok\n"'` — exit code 0; no output. |

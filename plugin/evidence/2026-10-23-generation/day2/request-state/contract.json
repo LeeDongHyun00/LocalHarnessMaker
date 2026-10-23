@@ -1,0 +1,43 @@
+{
+  "task_summary": "Produce a reviewable execution contract for showing any injected handoff and a new contract, then wait for approval; do not write task files.",
+  "constraints": [
+    "Do not write task files.",
+    "Show the injected handoff, if any, and the new contract before waiting for approval."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "A handoff is shown only if one is available; the supplied handoff is null.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Confirm the response accurately reports that no handoff was supplied and does not fabricate prior-session context."
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "A new contract is shown for review before approval is requested.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Confirm the response presents a new reviewable execution contract and waits for approval without claiming approval or executing the underlying task."
+      }
+    }
+  ],
+  "verification": [],
+  "stop_conditions": [
+    "Stop after presenting the handoff status and new contract; do not execute the underlying task until approval.",
+    "Do not write task files."
+  ],
+  "assumptions": [
+    "The request does not describe the underlying task, so the new contract can only cover the requested handoff display and approval sequence.",
+    "No handoff content is available because handoff_data is null."
+  ],
+  "reasoning_effort": {
+    "value": "low",
+    "rationale": "effort-v1: utf8_byte_bound=96; distinct_files=0; tests_requested=false; requirement_segments=2; score=0"
+  },
+  "cost_estimate": {
+    "input_tokens": 15449,
+    "output_tokens": 267,
+    "usd": 0.0016784
+  }
+}

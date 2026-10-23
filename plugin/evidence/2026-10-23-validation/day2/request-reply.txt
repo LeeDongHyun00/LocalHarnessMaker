@@ -1,0 +1,13 @@
+No injected handoff data is available.
+
+The new contract is:
+
+- **Goal:** Create a reviewable execution contract for the requested work.
+- **Success checklist:** No success criteria or verification commands are specified.
+- **Constraint:** Do not write task files.
+- **Assumptions:** No handoff is available; no concrete implementation task has been specified.
+- **Reasoning effort:** Low, based on no files, tests, or implementation requirements.
+- **Estimate:** 15,450 input tokens, 88 output tokens; **$0.001589 USD**.
+- **Stop condition:** Wait for approval before execution.
+
+No tools have been run or files written. The injected contract requires approval before any work. Reply **approve** or provide edits.

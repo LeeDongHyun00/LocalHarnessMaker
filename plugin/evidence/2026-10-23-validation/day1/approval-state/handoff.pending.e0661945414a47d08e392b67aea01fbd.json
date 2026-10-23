@@ -1,0 +1,23 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "result.txt contains exactly `ok\\n`; verification command `python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'` exited 0."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Obtain approval before writing result.txt",
+      "why": "The user requested approval before writing, and the injected contract required approval; user approved before the file was created."
+    },
+    {
+      "what": "Limit changes to result.txt with the requested exact contents",
+      "why": "The contract confines the task to this file and its contents."
+    }
+  ],
+  "verify_commands": [
+    "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'"
+  ],
+  "do_not_touch": []
+}

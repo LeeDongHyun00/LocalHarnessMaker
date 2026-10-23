@@ -1,0 +1,15 @@
+{
+  "version": "codex-cli 0.163.0-alpha.11.1",
+  "workspace": "${WORKSPACE}",
+  "codex_home": "${CODEX_HOME}",
+  "out": "${EVIDENCE}/day1",
+  "codex": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+  "mode": "real",
+  "executor": "gpt-6.1-sol",
+  "prompt": "This is an intentionally impossible verification demonstration. Make no task files. The sole success criterion must be a command check running exactly python -c 'raise SystemExit(1)' with expected exit_code 0. Run it once after approval, report its failure honestly, and leave it unmet. Do not repair or bypass the command, change PATH, create python wrappers, or add criteria. There is only one allowed verification attempt. Display the contract and wait for approval.",
+  "approval": "pending",
+  "real_task_verified": false,
+  "max_attempts": 1,
+  "scenario": "exhaustion",
+  "thread_id": "01a166f9-ecd5-7c30-9195-21fae668c2b4"
+}

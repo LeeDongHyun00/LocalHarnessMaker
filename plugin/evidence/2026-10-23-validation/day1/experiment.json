@@ -1,0 +1,15 @@
+{
+  "version": "codex-cli 0.163.0-alpha.11.1",
+  "workspace": "${WORKSPACE}",
+  "codex_home": "${CODEX_HOME}",
+  "out": "${EVIDENCE}/day1",
+  "codex": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+  "mode": "real",
+  "executor": "gpt-6.1-sol",
+  "prompt": "Create result.txt containing exactly ok followed by a newline. Verify its exact contents with Python. This is the whole task. Display the injected contract and wait for approval before writing.",
+  "approval": "pending",
+  "real_task_verified": false,
+  "max_attempts": 1,
+  "scenario": "validation",
+  "thread_id": "01a166fb-e721-70e2-b96b-a7d0dc7fd095"
+}

@@ -1,0 +1,4 @@
+{
+  "transformation": "Host path prefixes replaced by placeholders; handoff validation hash recomputed for exported bytes.",
+  "raw_capture": "Retained separately on host; not modified."
+}

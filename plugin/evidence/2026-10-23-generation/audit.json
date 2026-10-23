@@ -1,0 +1,8 @@
+{
+  "scenario": "generation",
+  "new_session": true,
+  "approval_gates": true,
+  "remaining_injected": false,
+  "stale_injected": false,
+  "overall": "pass"
+}

@@ -1,0 +1,44 @@
+{
+  "task_summary": "Create result.txt containing exactly `ok` followed by a newline, then verify its exact contents with Python. Display this contract and wait for approval before writing.",
+  "constraints": [
+    "Do not write result.txt until the user approves this contract.",
+    "The task is limited to result.txt and its exact requested contents."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "result.txt contains exactly the bytes for `ok` followed by one newline.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c 'from pathlib import Path; assert Path(\"result.txt\").read_bytes() == b\"ok\\n\"'",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [
+    "Stop if approval is not received; do not write result.txt.",
+    "Stop if creating result.txt requires expanding the task scope."
+  ],
+  "assumptions": [
+    "The path result.txt is relative to the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "medium",
+    "rationale": "effort-v1: utf8_byte_bound=193; distinct_files=1; tests_requested=false; requirement_segments=4; score=2"
+  },
+  "cost_estimate": {
+    "input_tokens": 15576,
+    "output_tokens": 232,
+    "usd": 0.0016736
+  }
+}

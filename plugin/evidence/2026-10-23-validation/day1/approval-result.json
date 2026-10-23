@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "--no-daemon",
+    "--dangerously-bypass-hook-trust",
+    "exec",
+    "resume",
+    "01a166fb-e721-70e2-b96b-a7d0dc7fd095",
+    "--skip-git-repo-check",
+    "--json",
+    "--output-last-message",
+    "${EVIDENCE}/day1/approval-reply.txt",
+    "-"
+  ],
+  "exit_code": 0
+}

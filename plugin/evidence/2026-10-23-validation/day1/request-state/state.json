@@ -1,0 +1,7 @@
+{
+  "attempt": 0,
+  "contract_path": "${WORKSPACE}/.harness/contract.json",
+  "verdict_path": "${WORKSPACE}/.harness/verdict.json",
+  "handoff_path": "${WORKSPACE}/.harness/handoff.json",
+  "started_at": "2026-10-23T04:19:11.484323+00:00"
+}

@@ -1,0 +1,20 @@
+No injected handoff was supplied (`handoff_data` is null).
+
+**New contract for review**
+
+Goal: Show the handoff status and this contract, then wait for approval.
+
+Success criteria:
+
+- [ ] SC-1: Accurately report that no handoff was supplied.
+- [ ] SC-2: Present a reviewable contract before requesting approval, without executing an underlying task.
+
+Constraints and stop conditions: Do not write task files. Stop after presenting this contract and wait for approval.
+
+Assumptions: No prior-session handoff is available. Since no underlying task is described, this contract covers only the handoff display and approval sequence.
+
+Reasoning effort: **Low**, because this requires no file work or tests.
+
+Injected estimate: **15,449 input tokens**, **267 output tokens**, **$0.0016784 USD**.
+
+Reply **approve** or provide edits.

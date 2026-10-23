@@ -1,0 +1,15 @@
+Injected contract:
+
+- **Goal:** Create `result.txt` containing exactly `ok` followed by one newline.
+- **Success criterion (SC-1):** Verify the exact bytes using:
+  ```sh
+  python -c 'from pathlib import Path; assert Path("result.txt").read_bytes() == b"ok\n"'
+  ```
+  Expected exit code: `0`.
+- **Scope:** Only `result.txt`; no writing before approval.
+- **Assumption:** `result.txt` is relative to the workspace root.
+- **Reasoning effort:** Medium. Injected rationale: `utf8_byte_bound=193; distinct_files=1; tests_requested=false; requirement_segments=4; score=2`.
+- **Estimated cost:** 15,576 input tokens, 232 output tokens; USD $0.0016736.
+- **Stop conditions:** Stop without approval or if creating the file requires expanding scope.
+
+Reply **approve** or provide edits. Approval is required by the injected `HARNESS_CONTRACT` and your request; no tools have run or files changed.

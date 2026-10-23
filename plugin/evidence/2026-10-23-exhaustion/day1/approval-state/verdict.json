@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "fail",
+      "evidence": "command: python -c 'raise SystemExit(1)'\nexit: 1\nstdout (last 50 lines):\n(empty)",
+      "reason": "expected exit 0, got 1"
+    }
+  ],
+  "overall": "fail",
+  "reinstruct_message": null,
+  "attempt": 1
+}

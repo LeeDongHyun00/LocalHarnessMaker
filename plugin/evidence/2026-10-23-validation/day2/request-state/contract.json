@@ -1,0 +1,24 @@
+{
+  "task_summary": "Create a reviewable execution contract for the requested work.",
+  "constraints": [
+    "Do not write task files."
+  ],
+  "success_criteria": [],
+  "verification": [],
+  "stop_conditions": [
+    "Wait for user approval before executing the contract."
+  ],
+  "assumptions": [
+    "No injected handoff data is available.",
+    "The request does not specify a concrete task to implement; contract approval is required before any execution."
+  ],
+  "reasoning_effort": {
+    "value": "low",
+    "rationale": "effort-v1: utf8_byte_bound=96; distinct_files=0; tests_requested=false; requirement_segments=2; score=0"
+  },
+  "cost_estimate": {
+    "input_tokens": 15450,
+    "output_tokens": 88,
+    "usd": 0.001589
+  }
+}

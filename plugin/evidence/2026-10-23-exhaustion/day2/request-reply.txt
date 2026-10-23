@@ -1,0 +1,20 @@
+The injected handoff records:
+
+- **Failed criterion:** SC-1 remains unmet. The single run of `python -c 'raise SystemExit(1)'` returned exit code **1**, although **0** was expected. Stdout was empty.
+- **Recorded decision:** The prior contract allowed one verification attempt after approval, with no retries, repairs, bypasses, PATH changes, wrappers, or additional criteria. Failure must remain recorded.
+- **Do not touch:** Do not retry or alter that command, create Python wrappers, change PATH, add criteria, or create task files.
+
+The new execution contract is:
+
+- **Goal:** Present the injected handoff and this contract, then wait for approval.
+- **Success checklist:**
+  - [x] **SC-1:** Present the handoff’s failed criterion, decision, verification result, and restrictions.
+  - [x] **SC-2:** Present a reviewable contract and request approval before execution.
+- **Assumption:** No implementation objective or new verification requirements have been supplied; the scope covers presentation only.
+- **Constraints:** No task files, execution, or verification before approval. Preserve the prior failure without retrying, repairing, or bypassing it.
+- **Verification commands:** None.
+- **Stop conditions:** Stop here until explicit approval; stop if further work would require task files.
+- **Reasoning effort:** Low, because this requires only presenting supplied context.
+- **Injected estimate:** 15,633 input tokens, 274 output tokens, **$0.00062894**.
+
+Reply **approve** or provide edits. Approval is required by the injected `HARNESS_CONTRACT`; I will wait here.

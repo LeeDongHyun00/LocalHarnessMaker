@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env HARNESS_SESSIONSTART_TIMEOUT=10 ${REPO}/.venv/bin/python ${REPO}/plugin/hooks/session_start.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env HARNESS_USERPROMPTSUBMIT_TIMEOUT=40 ${REPO}/.venv/bin/python ${REPO}/plugin/hooks/user_prompt_submit.py",
+            "timeout": 40,
+            "additionalContextLimit": 5000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env HARNESS_STOP_TIMEOUT=660 ${REPO}/.venv/bin/python ${REPO}/plugin/hooks/stop.py",
+            "timeout": 660
+          }
+        ]
+      }
+    ]
+  }
+}
