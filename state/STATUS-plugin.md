@@ -1,5 +1,11 @@
 ## Done
 
+- Added plugin.host_checks prepare/second/check and plugin/HOST-CHECKS.md with explicit host commands, isolated installation, interactive trust capture, fresh second sessions without hook-trust bypass, empty-PATH bundle installation, raw production-hook stream recording, evidence layout and offline rejection of contradictory captures (.venv/bin/python -m pytest tests/plugin -q: 272 passed, 1 opt-in live Codex test skipped in 18.57s; new host-check fixtures cover all three scenarios and eleven incomplete/false-silence cases; no live procedure was run).
+- Added bounded SessionStart CLI-version checks against VERIFIED_VERSIONS.json, persisted cli_version, one advisory per session naming the probe command, resume detection and fail-open handling including unavailable handoff context (.venv/bin/python -m pytest tests/plugin -q: 272 passed, 1 skipped in 18.57s; fake-version tests cover listed/unlisted versions, once-per-session injection, resumed updates, timeout recovery and unavailable handoff).
+
+- Recorded Claude's live exhaustion, generation and validation handoff-failure demonstrations on 2026-10-23, committed as 3ef1e84, at plugin/evidence/2026-10-23-{exhaustion,generation,validation}; every checker passes on the exported copies (.venv/bin/python -m plugin.handoff_failure_demo check --scenario SCENARIO --out plugin/evidence/2026-10-23-SCENARIO, run separately for all three: overall=pass each).
+- Recorded the user's supplied successful GitHub CI result for OS-independent path fix 1550267 on Ubuntu/Python 3.11 and 3.14 (user host/CI report: both Python jobs passed; network-disabled session did not query GitHub).
+
 - Made recorded-path comparisons filesystem-independent across two_session_demo, handoff_failure_demo and check_demo_evidence, with matching lexical aliases in portable export. Added identity-resolution checks of committed evidence/export plus rejection of unrelated workspaces, macOS aliases pointing elsewhere, symlinks and mismatched placeholders; committed evidence is unchanged (.venv/bin/python -m pytest tests/plugin -q: 252 passed, 1 opt-in live Codex test skipped in 16.36s; .venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session: overall=pass; .venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real: overall=pass; git diff --name-only -- plugin/evidence: empty).
 
 - Prepared host-only plugin.handoff_failure_demo day1/day2/check for real retry exhaustion and separately injected handoff generation/validation failures, with offline evidence rejection tests and documented Claude steps. Added portable export for future captures and kept committed evidence unchanged (.venv/bin/python -m pytest tests/plugin -q: 219 passed, 1 opt-in live test skipped in 20.38s; git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
@@ -54,14 +60,15 @@
 
 ## Remaining
 
-- Claude commits the recorded-path portability fix, pushes it and confirms GitHub CI on Ubuntu/Python 3.11 and 3.14. Local plugin tests pass; GitHub CI was not run in this network-disabled session.
-
-- Claude runs plugin.handoff_failure_demo day1/day2/check separately for exhaustion, generation and validation after host evaluation capacity is available, following plugin/DEMO-SCENARIO.md. Export future evidence with plugin.export_demo_evidence and rerun the matching checker on the portable copy. These new lifecycle checks are prepared with offline tests; live outcomes remain pending.
-- Separate host checks remain for persisted hook trust, bundled-binary discovery, unrelated-project silence and macOS sandbox isolation. The completed README temporary-home install/--check, real-mode demo and two-session pass-path demonstration are no longer pending.
+- Claude runs the prepared trust, bundle and silence captures from plugin/HOST-CHECKS.md after host evaluation capacity is available, then runs plugin.host_checks check on each capture and its copied review directory. These procedures are offline-tested; live results remain pending. macOS sandbox isolation remains a separate unprepared host check.
 - Pending host measurement: revised Stop 660s / check 480s / handoff 120s / validation 5s budgets and Role 4's internal 450s verifier budget, plus contract cutoff at 30s inside 40s despite the controller's 35s deadline. SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants remains separate from the completed host SIGTERM/SIGHUP/child-exit checks.
 - Before merge: coordinating role runs the full suite once. This job runs only tests/plugin; .git is read-only and all work remains unstaged/uncommitted. Do not disturb the in-progress host evaluation or edit eval/, controller/ or verifier/.
 
 ## Decisions
+
+- Record host/CI completions as user-supplied evidence and rerun only the failure-demo offline checkers: network, live models, Codex, sandbox-exec and real-home writes are prohibited in this session.
+- Use an interactive trust-establishment session followed by a fresh exec session, with no hook-trust bypass in either launch; retain diagnostic wrappers around the production hooks: actual hook invocation and distinct session IDs prevent skipped/untrusted hooks from passing as silence or persisted trust.
+- SessionStart adds an advisory once per session for an unlisted discovered CLI version, including a probe command; bounded probe and registry failures fail open: the explicit user request supersedes the role prompt's old STOP-P2 blocking instruction without changing shared interfaces.
 
 - Canonicalize recorded paths using POSIX lexical normalization and only /private/var, /private/tmp and /private/etc aliases; compare any placeholder-bearing path exactly: evidence semantics must not depend on the checking host filesystem or arbitrary symlinks. Keep real source/destination filesystem safety checks in the exporter.
 
@@ -96,6 +103,10 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/plugin -q (latest: 272 passed, 1 opt-in live Codex test skipped in 18.57s).
+- Host only: .venv/bin/python -m plugin.host_checks prepare --scenario trust --out /tmp/lhm-trust-DATE; follow plugin/HOST-CHECKS.md for the recorded interactive session and second/check commands. Repeat separately for silence; bundle needs prepare/check only. No procedure was run in this session.
+- Offline after host capture: .venv/bin/python -m plugin.host_checks check --out /tmp/lhm-trust-DATE (repeat for bundle/silence and copied review directories).
+
 - Host only, one scenario/stage at a time: .venv/bin/python -m plugin.handoff_failure_demo day1 --scenario exhaustion --out /tmp/lhm-DATE-exhaustion --scripted-approval
 - Host only: .venv/bin/python -m plugin.handoff_failure_demo day2 --scenario exhaustion --out /tmp/lhm-DATE-exhaustion
 - Offline: .venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out /tmp/lhm-DATE-exhaustion (repeat with generation/validation and distinct directories).
@@ -128,10 +139,14 @@
 
 ## Assumptions
 
-- No additional product assumptions were required for the user-specified portability fix. Identity Path.resolve tests simulate the missing macOS aliases on Linux; actual Ubuntu/Python 3.11 and 3.14 CI confirmation belongs to Claude after push. No live models, Codex, network, real configuration changes, staging or commits ran in this session.
+- Claude's 3ef1e84 live demonstration results and 1550267 Ubuntu/Python 3.11/3.14 CI completion are user-supplied evidence; only retained demo checkers and offline plugin tests ran here.
+- New trust/silence procedures assume macOS /usr/bin/script and normal interactive acceptance of isolated hook trust. Their two executor sessions use stub control calls, not real task execution. Bundle discovery runs the actual installer with empty PATH/no HARNESS_CODEX; no new live host result is claimed.
+- The version probe observes the executable currently selected by HARNESS_CODEX/PATH/the app bundle, not the old in-memory image after replacement. Nonstandard launches must set HARNESS_CODEX to their executable. No subprocess version probe in the tests uses the real Codex binary.
+
+- No additional product assumptions were required for the user-specified portability fix. Identity Path.resolve tests simulate the missing macOS aliases on Linux; Ubuntu/Python 3.11 and 3.14 CI completion was subsequently supplied by the user (1550267). No live models, Codex, network, real configuration changes, staging or commits ran in this session.
 
 - Claude's supplied host run/commit account is accepted as host evidence and corroborated by the retained offline checker; this session performed no live Codex/model calls, installation, network access, staging or commit.
-- The failure demonstrations deliberately inject CLI errors, rather than asserting a naturally occurring provider/validation failure. Their seed is synthetic old context; their lifecycle, controller generation where not intercepted, verification and executor sessions are real host operations still to be run.
+- The failure demonstrations deliberately inject CLI errors, rather than asserting a naturally occurring provider/validation failure. Their seed is synthetic old context; their lifecycle, controller generation where not intercepted, verification and executor sessions are real host operations subsequently completed by Claude (3ef1e84).
 - Day 2 only needs to reach approval to demonstrate handoff receipt or stale-context absence. It is not a claim that remaining work was completed. Future evidence is committed only after portable export/review; raw operational capture remains host-local.
 
 - The user's supplied host results and commits are accepted as host evidence; only the probe/demo evidence audits and plugin tests were rerun here. No live Codex, model, network, sandbox-exec or real-home installation ran.

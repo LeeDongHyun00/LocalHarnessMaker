@@ -4,8 +4,25 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import re
+import os
+import shutil
+from typing import Any, Callable
 
 REGISTRY = Path(__file__).with_name('VERIFIED_VERSIONS.json')
+
+
+def cli_version(*, runner: Callable[..., Any], timeout: float) -> str:
+    """Probe the current CLI using the installer's discovery order, without models."""
+    bundle = '/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex'
+    executable = next((found for candidate in (os.environ.get('HARNESS_CODEX'), 'codex', bundle)
+                       if candidate and (found := shutil.which(candidate))), None)
+    if executable is None or timeout <= 0:
+        raise ValueError('CLI unavailable or version probe budget exhausted')
+    result = runner([executable, '--version'], shell=False, capture_output=True, text=True,
+                    check=False, timeout=min(1.0, timeout), env={**os.environ, 'HARNESS_NESTED': '1'})
+    if result.returncode != 0:
+        raise ValueError('CLI version probe failed')
+    return validate_version(result.stdout.strip())
 
 
 def validate_version(value: object) -> str:
