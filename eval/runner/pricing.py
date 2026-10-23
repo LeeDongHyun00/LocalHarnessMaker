@@ -44,7 +44,33 @@ def extends(current: dict[str, Any], recorded: dict[str, Any]) -> bool:
     return all(available.get(s["snapshot_id"]) == s for s in snapshots(recorded))
 
 
-def retained_provenance(task: dict[str, Any]) -> list[dict[str, Any]]:
+def snapshot_hashes(pricing: dict[str, Any]) -> dict[str, str]:
+    """Hash each complete snapshot independently of its enclosing catalog."""
+    from eval.runner.audit import digest
+
+    pins: dict[str, str] = {}
+    for snapshot in snapshots(pricing):
+        identity = snapshot["snapshot_id"]
+        value = digest(json.dumps(snapshot, sort_keys=True).encode())
+        if identity in pins and pins[identity] != value:
+            raise ValueError("Conflicting pricing snapshots")
+        pins[identity] = value
+    return pins
+
+
+def pin_provenance(rows: list[dict[str, Any]], pricing: dict[str, Any]) -> list[dict[str, Any]]:
+    """Bind each call to its own snapshot, including mixed historical tiers."""
+    pins = snapshot_hashes(pricing)
+    result = []
+    for row in rows:
+        reference = row.get("pricing_ref")
+        if reference is not None and reference not in pins:
+            raise ValueError("Call pricing snapshot unavailable")
+        result.append(dict(row, pricing_snapshot_sha256=pins.get(reference)))
+    return result
+
+
+def retained_provenance(task: dict[str, Any], pricing: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     """Read an existing task's pinned call-level price evidence without repricing."""
     from pathlib import Path
     from eval.runner.audit import digest
@@ -58,18 +84,26 @@ def retained_provenance(task: dict[str, Any]) -> list[dict[str, Any]]:
     path = evidence_path(refs[0]["path"])
     if digest(path.read_bytes()) != refs[0]["sha256"]:
         raise ValueError("Pricing provenance hash mismatch")
-    return json.loads(path.read_text())
+    rows = json.loads(path.read_text())
+    if pricing is not None:
+        pins = snapshot_hashes(pricing)
+        for row in rows:
+            if row.get("pricing_snapshot_sha256") is not None and (
+                    pins.get(row.get("pricing_ref")) != row["pricing_snapshot_sha256"]):
+                raise ValueError("Pricing snapshot hash mismatch")
+    return rows
 
 
 def preserve_provenance(task: dict[str, Any], directory: Path, *, prior: dict[str, Any],
+                        pricing: dict[str, Any],
                         additional: list[dict[str, Any]] | None = None) -> None:
     """Keep historical accounting distinct from fresh continuation observations."""
     from pathlib import Path
     from eval.runner.report import artifact
 
-    current = {row["call_id"]: row for row in retained_provenance(task)}
+    current = {row["call_id"]: row for row in retained_provenance(task, pricing)}
     current.update({row["call_id"]: row for row in additional or []})
-    previous = {row["call_id"]: row for row in retained_provenance(prior)}
+    previous = {row["call_id"]: row for row in retained_provenance(prior, pricing)}
     historical = {call["call_id"] for call in prior["calls"]}
     rows = []
     for call in task["calls"]:
@@ -80,5 +114,5 @@ def preserve_provenance(task: dict[str, Any], directory: Path, *, prior: dict[st
                    "basis": "Retained original accounting; no per-call tier observation available."}
         rows.append(dict(row, pricing_ref=call["usage"]["pricing_ref"]))
     path = directory / "pricing-provenance.json"
-    path.write_text(json.dumps(rows, indent=2) + "\n")
+    path.write_text(json.dumps(pin_provenance(rows, pricing), indent=2) + "\n")
     task["artifacts"] = [a for a in task["artifacts"] if Path(a["path"]).name != path.name] + [artifact(path)]

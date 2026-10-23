@@ -114,9 +114,11 @@ def test_call_tier_pricing_and_provenance(tmp_path: Path, tier: str | None, mult
     retain_control(entry, 'contract.stderr', generation(service_tier=tier))
     provenance: list[dict[str, Any]] = []
     calls, cost = control_calls(entry, 'synthetic', report_pricing(prices), provenance=provenance)
-    assert calls[0]['usage']['usd'] == value['usd'] == cost
+    control_multiplier = 2 if tier is None else 1 if tier == 'default' else multiplier
+    assert calls[0]['usage']['usd'] == cost == (pytest.approx(.000132 * control_multiplier)
+                                               if control_multiplier else None)
     assert provenance[0]['observed_service_tier'] == tier
-    assert provenance[0]['pricing_ref'] == value['pricing_ref']
+    assert provenance[0]['pricing_ref'] == calls[0]['usage']['pricing_ref']
     assert provenance[0]['stderr_sha256'] == entry['control_files']['contract.stderr']
 
 

@@ -211,7 +211,7 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
                               'total_usd': total([executor_usd, control_usd])}
         continued['done_claims'] = copy.deepcopy(old['done_claims'])
         from eval.runner.pricing import preserve_provenance
-        preserve_provenance(continued, out / task_id, prior=old, additional=control_provenance)
+        preserve_provenance(continued, out / task_id, prior=old, pricing=pricing, additional=control_provenance)
         entry = state['tasks'][task_id]
         day1 = [s for s in entry['segments'] if s.get('day', 1) == 1]
         day2 = [s for s in entry['segments'] if s.get('day') == 2]

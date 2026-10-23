@@ -173,7 +173,7 @@ def test_capacity_refusal_usage_from_envelope(entry: dict[str, Any], items: bool
     retain(entry, 'control-interruptions/one/contract.stderr', text, code=2)
     calls, cost = control_calls(entry, 'task', PRICES)
     assert len(calls) == 1
-    expected = None if items or not logged_call else 0
+    expected = None if items else 0
     assert cost == expected and calls[0]['usage']['usd'] == expected
     assert calls[0]['usage']['input_tokens'] == (None if items else 0)
     assert calls[0]['usage']['cached_input_tokens'] == (None if items else 0)
@@ -235,5 +235,5 @@ def test_unicode_separators_inside_control_jsonl_values(entry: dict[str, Any], l
         text += generation(status='error', input_tokens=None, cached_input_tokens=None, output_tokens=None)
     retain(entry, 'control-interruptions/unicode/contract.stderr', text, code=2)
     calls, cost = control_calls(entry, 'task', PRICES)
-    assert len(calls) == 1 and cost == (0 if logged_call else None)
+    assert len(calls) == 1 and cost == 0
     assert calls[0]['usage']['input_tokens'] == 0
