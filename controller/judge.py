@@ -63,8 +63,12 @@ def artifact_snapshot(path: Path) -> dict[str, Any]:
         raise InputError("Cannot read artifact snapshot") from exc
 
 
-def generate_judgment(criterion: dict[str, Any], artifact: Path, backend: Backend) -> dict[str, Any]:
+def generate_judgment(
+    criterion: dict[str, Any], artifact: Path, backend: Backend, *, prompt_version: str = "v2",
+) -> dict[str, Any]:
     validate_input(criterion, "judgment-input.schema.json")
+    if prompt_version not in ("v1", "v2"):
+        raise InputError("Unknown judge prompt version")
     snapshot = artifact_snapshot(artifact)
     schema = load_object(SCHEMA_DIR / "judgment.schema.json")
     model_schema = copy.deepcopy(schema)
@@ -73,7 +77,8 @@ def generate_judgment(criterion: dict[str, Any], artifact: Path, backend: Backen
         model_schema["required"].remove(field)
     model_schema.pop("$defs")
     messages: list[Message] = [
-        {"role": "system", "content": read_text(PACKAGE_DIR / "prompts/judge.md")},
+        {"role": "system", "content": read_text(PACKAGE_DIR / "prompts" / (
+            "judge-v1.md" if prompt_version == "v1" else "judge.md"))},
         {"role": "user", "content": data_block("criterion", criterion) + "\n" + data_block("artifact", snapshot)},
     ]
     usages: list[Usage] = []

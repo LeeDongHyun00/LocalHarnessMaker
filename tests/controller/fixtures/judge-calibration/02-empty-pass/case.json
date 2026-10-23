@@ -1,0 +1,12 @@
+{
+  "id": "02-empty-pass",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read head.py: head must return None for an empty list and the first element otherwise."
+    }
+  },
+  "expected_status": "pass"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "18-contradiction-before-unknown-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read app.py: enabled must return True; also confirm a successful test execution in this session."
+    }
+  },
+  "expected_status": "fail"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "06-exception-pass",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read divide.py: divide must raise ValueError with message zero divisor for a zero divisor and otherwise return a / b."
+    }
+  },
+  "expected_status": "pass"
+}

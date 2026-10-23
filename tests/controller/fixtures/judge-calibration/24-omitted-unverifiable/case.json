@@ -1,0 +1,12 @@
+{
+  "id": "24-omitted-unverifiable",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Confirm vendor_enabled in node_modules/vendor.py returns True by inspecting its implementation."
+    }
+  },
+  "expected_status": "unverifiable"
+}

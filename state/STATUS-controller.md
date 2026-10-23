@@ -1,5 +1,10 @@
 ## Done
 
+- Implemented judge prompt v2 with requirement-by-requirement artifact citations and consistent pass/fail/unverifiable rules; preserved untrusted-data/omission handling, previous prompt v1 and existing public CLI/schema (.venv/bin/python -m pytest tests/controller -q: 312 passed in 14.40s).
+- Added 24 hand-authored calibration workspaces: 8 pass, 10 fail and 6 unverifiable, including partial compliance, misleading comments, test source versus execution, external/history demands and omitted evidence; mocked tests exercise prompt assembly and schema parsing without claiming live accuracy (.venv/bin/python -m pytest tests/controller -q: 312 passed in 14.40s).
+- Added approval-gated controller.measure_judge with v1/v2 selection, one CLI generation per case, no retry/repair/HTTP fallback, neutral temporary workspace paths to prevent expected-label leakage, hashes, accuracy/confusion/errors, latency and nullable API-equivalent cost (.venv/bin/python -m pytest tests/controller -q: 312 passed in 14.40s).
+- Verified both unapproved previews print 24 maximum generations and estimated USD 0.052800 per version, then refuse before calls; updated CHANGES and calibration README (.venv/bin/python -m controller.measure_judge --prompt-version v1 --out /tmp/controller-judge-v1-preview.json and corresponding v2 command: each exit 1 with Refusing to start without --i-have-approval; no calls).
+
 - Implemented prompt v3 and code repair of recognized missing requested-target stops into per-file creation assumptions; preserved external input/scope stops and added own-fixture regressions (.venv/bin/python -m pytest tests/controller -q: 273 passed in 3.85s).
 - Added controller-owned static validation for every criterion: single relative paths, Python regex compilation, conservative accepted command grammar, and explicit runtime-only judge demands; validate verification commands too, without verifier imports or workspace existence checks (.venv/bin/python -m pytest tests/controller -q: 273 passed in 3.85s).
 - Added one named-check repair generation inside the production three-call budget; persistent invalid criteria are removed with one assumption each and matching invalid verification pairs removed, including final-slot/fallback exhaustion; preserved schema validity and summed usage (.venv/bin/python -m pytest tests/controller -q: 273 passed in 3.85s).
@@ -47,6 +52,8 @@
 
 ## Remaining
 
+- First priority, pending host judge calibration: Claude runs the approved v1/v2 batches on identical fixtures/settings with distinct output files: `.venv/bin/python -m controller.measure_judge --prompt-version v1 --out /tmp/judge-before-v1.json --i-have-approval` and `.venv/bin/python -m controller.measure_judge --prompt-version v2 --out /tmp/judge-after-v2.json --i-have-approval`. Each is at most 24 CLI generations, planning estimate USD 0.052800 (both: 48 generations / USD 0.105600; not caps). Compare accuracy, expected-status confusion matrix, errors, hashes, latency and cost; inspect false fails and file-decidable unverifiable results. No live accuracy improvement is established yet. Network, nested Codex and macOS sandbox-exec remain unavailable and were not attempted.
+
 - Pending host verification of this session's v3 changes: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production-v3.json --i-have-approval` and harness smoke using the host/main checkout after integration. Inspect removed-criterion assumptions, contract_check_gate logs, target stops and file-only judge rubrics. Network, nested Codex, live model calls and macOS sandbox-exec are unavailable here and were not attempted.
 
 - Pending host verification of degraded acceptance with live models and plugin/evaluation integration; network, nested codex exec and macOS sandbox-exec are unavailable here and were not attempted.
@@ -57,6 +64,11 @@
 - Before merge: run the full repository suite once in a coordinated host session and verify packaging resources if wheel installation is required. Only controller tests were run here; no staging or commit was performed and .git was read-only.
 
 ## Decisions
+
+- Make v2 the production default and retain the previous prompt verbatim as v1: support the user's host before/after calibration without changing the public judge CLI or judgment schema.
+- Judge inspected contradictions as fail even when another requirement is unavailable: preserve partial-satisfaction failures while reserving unverifiable for genuinely unavailable required evidence.
+- Measure exactly one CLI generation per case with errors counted as misses and failed-call costs retained: prevent repairs/fallback from confounding calibration; unknown costs remain null.
+- Copy each case to a neutral temporary workspace before judging: fixture directory names contain expected labels and must not leak into artifact paths or prompt content.
 
 - Validate checks before any successful contract return: use a controller-owned conservative command grammar to keep the no-verifier-import interface and avoid requiring not-yet-created files.
 - Repair invalid checks once within the existing budget, then remove unresolved criteria with assumptions: the user's defect-remediation priority supersedes mechanical-check quota rejection for a contract degraded by invalid-check removal, including an empty criterion array allowed by the schema.
@@ -84,6 +96,10 @@
 
 ## Verify commands
 
+- Pending host, approval-gated: .venv/bin/python -m controller.measure_judge --prompt-version v1 --out /tmp/judge-before-v1.json --i-have-approval
+- Pending host, approval-gated: .venv/bin/python -m controller.measure_judge --prompt-version v2 --out /tmp/judge-after-v2.json --i-have-approval
+- Preview only (exit 1, no calls): .venv/bin/python -m controller.measure_judge --prompt-version v2 --out /tmp/controller-judge-v2-preview.json
+
 - Pending host v3 remeasurement: .venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production-v3.json --i-have-approval
 - Pending host: harness smoke after controller changes are integrated into the host/main checkout.
 
@@ -95,6 +111,8 @@
 
 ## Do not touch
 
+- Keep tests/controller/fixtures/judge-calibration labels outside model input, including their label-bearing paths. The local .gitignore exception preserves the synthetic node_modules omission fixture; it is not an installed dependency.
+
 - Shared schemas/, root configuration, prompts/, verifier/, eval/, plugin/, other roles' tests/status and concurrent user/role changes; ownership is controller/, tests/controller/ and this STATUS file.
 - eval/tasks/ is forbidden reading; do not tune against the evaluation set.
 - .git is read-only in this session; do not stage, commit, rewrite history or delete files.
@@ -103,6 +121,10 @@
 - Keep local.enabled=false and retain version 1 fail-closed behavior; D-3/D-5 are dropped and local must never become a hidden fallback.
 
 ## Assumptions
+
+- Calibration labels are synthetic author judgments, not live outcomes; mock parsing/assembly results do not establish model quality. Source-only rubric requirements need no execution evidence; explicit execution/history/external demands remain unverifiable unless supplied evidence establishes them.
+- The authorized new host measurement module is controller-local tooling, not a revision of the published controller judge CLI. Only its internal generator keyword selects v1/v2; existing callers use v2 unchanged.
+- Host before/after runs use the preserved v1 option and the same case hashes/configuration. This worktree session performs no live model calls, network, nested Codex or sandbox-exec, and does not stage or commit. Only controller/, tests/controller/ and this STATUS file were edited.
 
 - English lexical action/file and rubric patterns are deliberately bounded; prompt v3 covers other paraphrases. They do not prove that every natural-language stop/rubric is correct. Inputs introduced by using/from and explicit do-not-edit clauses remain external.
 - Static validation accepts a conservative subset of the verifier grammar read this session; runtime existence/symlink/dependency checks and live command acceptance need host verification. No shared interface or verifier import was added.

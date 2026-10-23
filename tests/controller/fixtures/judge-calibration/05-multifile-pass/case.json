@@ -1,0 +1,12 @@
+{
+  "id": "05-multifile-pass",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read settings.py and service.py: DEFAULT_LIMIT must equal 5 and build must use that constant as its default limit."
+    }
+  },
+  "expected_status": "pass"
+}

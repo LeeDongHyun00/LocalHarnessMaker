@@ -1,0 +1,12 @@
+{
+  "id": "11-mutates-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read tags.py: add_tag must return a new list containing the old tags and the new tag, without mutating its input."
+    }
+  },
+  "expected_status": "fail"
+}

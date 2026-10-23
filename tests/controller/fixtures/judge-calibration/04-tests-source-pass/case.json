@@ -1,0 +1,12 @@
+{
+  "id": "04-tests-source-pass",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read checks.py: the test source must assert that normalize handles empty text and strips and lowercases nonempty text. Execution is not required."
+    }
+  },
+  "expected_status": "pass"
+}

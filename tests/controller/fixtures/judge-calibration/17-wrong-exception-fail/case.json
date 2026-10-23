@@ -1,0 +1,12 @@
+{
+  "id": "17-wrong-exception-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read divide.py: divide must raise ValueError for a zero divisor and return a / b otherwise."
+    }
+  },
+  "expected_status": "fail"
+}

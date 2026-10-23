@@ -1,0 +1,2 @@
+# This synthetic omission fixture must be retained despite the root exclusion.
+!node_modules/

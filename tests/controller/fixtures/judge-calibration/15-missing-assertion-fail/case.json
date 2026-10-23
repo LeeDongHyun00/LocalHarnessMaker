@@ -1,0 +1,12 @@
+{
+  "id": "15-missing-assertion-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read checks.py: check_normalize must assert both empty input and whitespace stripping."
+    }
+  },
+  "expected_status": "fail"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "23-external-unverifiable",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Confirm the deployed external production service currently returns HTTP 200 at /health. Local source alone cannot establish deployment state."
+    }
+  },
+  "expected_status": "unverifiable"
+}
