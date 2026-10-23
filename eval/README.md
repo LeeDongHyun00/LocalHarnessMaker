@@ -95,6 +95,16 @@ record, including nested keys and values, is scanned for private paths, aliases,
 canonical traversal/symlink targets. A match reports
 that a private location reached executor context and prevents grading. These
 records are metadata; ordinary session settings are not shell operands.
+For `0.163.0-alpha.11.1`, `event_msg.thread_settings_applied` is also metadata.
+Its required thread identity and settings fields are shape-checked, including
+model/provider, approval settings, managed filesystem/network profile, cwd,
+workspace roots, effort, collaboration settings and disabled plugins. The full
+record, including extra keys/values, receives the same private-marker scanning
+as `world_state`; malformed shapes and other unknown kinds remain inconclusive.
+Applied model/effort evidence includes both this event and `turn_context`;
+conflicts leave settings unverified. Both sources appear in session-evidence.jsonl.
+The synthetic 34-record `native-session-0.163.jsonl` fixture preserves the host
+smoke's record order and line-9 settings structure without absolute user paths.
 Native `event_msg.item_completed` command/file-change records are inspected,
 while user/assistant message items remain prose. Native `custom_tool_call.input`
 and `custom_tool_call_output` are paired; decoded input operands and output paths
@@ -240,7 +250,10 @@ that task (`missing_cli_version_evidence` / `mismatched_cli_version_evidence`),
 preserving its costs and the complete report. Compare only identical versions:
 `python -m eval.runner.compare_versions REPORT_A REPORT_B` refuses mixed versions.
 Every new version needs a hook compatibility probe and one-task audit smoke
-before large runs. The supplied 0.163 host hook probe passed; audit smoke and
+before large runs. The supplied 0.163 host hook probe passed. The first host
+two-session smoke stopped correctly before day 2: its audit was inconclusive
+only for the new line-9 settings event. That record is supported offline now;
+Claude must rerun the smoke in a fresh output directory. Audit smoke and
 production behavior remain host checks.
 
 STOP-3 estimates include both executor days and up to three generations per
@@ -297,6 +310,23 @@ quality/cost comparison is claimed.
 Incomplete runs halt without publishing a report and retain checkpoints for
 recovery. A report requires the complete configured task set; this preserves the
 shared schema without treating partial STOP-E1 evidence as a valid comparison.
+
+Account usage limits are resumable STOP-E1 infrastructure stops. The runner
+recognizes usage-limit wording only in `--json` `error.message` and
+`turn.failed.error.message` (or direct `message`) events. Control-call evidence
+comes from retained stdout/stderr, including nested `control_cli_events` logs.
+Assistant/tool prose and ordinary errors do not trigger this classification.
+It halts before any runner retry, day 2, grading or next task, prints the original
+limit message and reset time to stderr, exits 2 and prints no success path.
+The interrupted task has no result.json or checkpoint outcome; no report.json
+is published. Rerun with the same config and `--out` after the limit resets:
+existing sessions resume, or start fresh if no thread was created; pending
+control operations retry without rerunning completed executor work. Failed
+control streams and partial outputs remain hash-pinned under
+`control-interruptions/`, with redacted report copies. All retained executor
+attempts still count; missing usage/cost stays null. Control commands finish
+within their existing bounded subprocess deadline; the runner checks their
+retained events on return and makes no later call on a limit.
 
 Offline grader mutation validation uses
 `.venv/bin/python -m eval.runner.validate_graders --private-root "$PRIVATE_ROOT" --tasks all --mutants 10000`.

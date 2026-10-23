@@ -6,10 +6,12 @@ import re
 from pathlib import Path
 import sys
 from typing import Any, Callable
+import uuid
 
 from jsonschema import Draft202012Validator, FormatChecker
 
 from eval.runner.audit import digest
+from eval.runner.limits import UsageLimitError, usage_limit_message
 from eval.runner.process import ProcessResult
 
 
@@ -72,6 +74,21 @@ class ControlFiles:
             stream.write(content)
         self.remember(path)
 
+    def archive_interruption(self, paths: list[Path]) -> None:
+        """Retain interrupted outputs under fresh names so the operation can retry."""
+        self.verify()
+        archive = self.runtime / "control-interruptions" / uuid.uuid4().hex
+        for path in paths:
+            if not path.exists():
+                continue
+            destination = archive / path.relative_to(self.runtime)
+            self.fresh(destination)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            path.rename(destination)
+            self.hashes.pop(str(path.relative_to(self.runtime)))
+            self.hashes[str(destination.relative_to(self.runtime))] = digest(destination.read_bytes())
+        self.persist()
+
 
 def invoke(module: str, operation: str, arguments: list[str], destination: Path, *,
            repository: Path, timeout: float, execute: Callable[..., ProcessResult],
@@ -97,6 +114,10 @@ def invoke(module: str, operation: str, arguments: list[str], destination: Path,
         if path.exists() or path.is_symlink():
             guard.remember(path)
     guard.verify()
+    limit = usage_limit_message([stdout, stderr])
+    if limit:
+        guard.archive_interruption([stdout, stderr, *([] if operation == "validate-handoff" else [destination])])
+        raise UsageLimitError(limit)
     if process.returncode != 0 or process.timed_out:
         raise HarnessError(f"{module} {operation} failed")
     if stdout.read_text() != str(destination) + "\n":
@@ -158,8 +179,11 @@ def handoff(day1: Path, runtime: Path, transcript: list[Path], config: dict[str,
     if not verdicts:
         raise HarnessError("Day-1 handoff requires a verifier verdict")
     destination = runtime / "handoff.json"
-    invoke("controller", "handoff", ["--transcript", str(merged), "--contract", str(day1 / "contract.json"),
-           "--verdict", str(verdicts[-1]), "--backend", config["control_backend"]], destination,
-           repository=repository, timeout=config["timeout_seconds"], execute=execute, guard=guard)
-    invoke("verifier", "validate-handoff", ["--handoff", str(destination)], destination,
-           repository=repository, timeout=config["timeout_seconds"], execute=execute, guard=guard)
+    if str(destination.relative_to(guard.runtime)) not in guard.hashes:
+        invoke("controller", "handoff", ["--transcript", str(merged), "--contract", str(day1 / "contract.json"),
+               "--verdict", str(verdicts[-1]), "--backend", config["control_backend"]], destination,
+               repository=repository, timeout=config["timeout_seconds"], execute=execute, guard=guard)
+    validation = destination.with_name("handoff-validation.stdout")
+    if str(validation.relative_to(guard.runtime)) not in guard.hashes:
+        invoke("verifier", "validate-handoff", ["--handoff", str(destination)], destination,
+               repository=repository, timeout=config["timeout_seconds"], execute=execute, guard=guard)

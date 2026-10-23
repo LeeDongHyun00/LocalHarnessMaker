@@ -431,6 +431,46 @@ def valid_native_metadata(kind: str, payload: Any) -> bool:
         return False
     if kind == "world_state":
         return type(payload.get("full")) is bool and isinstance(payload.get("state"), dict)
+    if kind == "thread_settings_applied":
+        settings = payload.get("thread_settings")
+        if not isinstance(payload.get("thread_id"), str) or not payload["thread_id"] or not isinstance(settings, dict):
+            return False
+        strings = ("model", "model_provider_id", "approval_policy", "approvals_reviewer", "cwd", "reasoning_effort")
+        if not all(isinstance(settings.get(key), str) and settings[key] for key in strings):
+            return False
+        if not all(isinstance(settings.get(key), list) and all(isinstance(v, str) for v in settings[key])
+                   for key in ("runtime_workspace_roots", "disabled_plugin_ids")):
+            return False
+        profile = settings.get("permission_profile")
+        if (not isinstance(profile, dict) or not isinstance(profile.get("type"), str) or
+                not isinstance(profile.get("network"), str) or not isinstance(profile.get("file_system"), dict)):
+            return False
+        filesystem = profile["file_system"]
+        if not isinstance(filesystem.get("type"), str) or not isinstance(filesystem.get("entries"), list):
+            return False
+        for entry in filesystem["entries"]:
+            if not isinstance(entry, dict) or not isinstance(entry.get("access"), str):
+                return False
+            path = entry.get("path")
+            if not isinstance(path, dict):
+                return False
+            if path.get("type") == "path":
+                if not isinstance(path.get("path"), str):
+                    return False
+            elif path.get("type") == "special":
+                if not isinstance(path.get("value"), dict) or not isinstance(path["value"].get("kind"), str):
+                    return False
+            else:
+                return False
+            if "missing_path_behavior" in entry and not isinstance(entry["missing_path_behavior"], str):
+                return False
+        mode = settings.get("collaboration_mode")
+        if not isinstance(mode, dict) or not isinstance(mode.get("mode"), str) or not isinstance(mode.get("settings"), dict):
+            return False
+        applied = mode["settings"]
+        return (isinstance(applied.get("model"), str) and isinstance(applied.get("reasoning_effort"), str) and
+                "developer_instructions" in applied and
+                (applied["developer_instructions"] is None or isinstance(applied["developer_instructions"], str)))
     for key in ("usage", "turn_token_usage", "thread_token_usage"):
         counts = payload.get(key)
         if key not in payload and key != "usage":
@@ -497,9 +537,12 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                                            "item.started", "item.updated", "item.completed"}:
                 errors.append(f"unsupported_event:{path.name}:{number}:{kind}")
                 continue
-            metadata = kind in {"world_state", "token_usage_record"}
-            if metadata and not valid_native_metadata(kind, event.get("payload")):
-                errors.append(f"malformed_{kind}:{path.name}:{number}")
+            payload = event.get("payload")
+            metadata_kind = ("thread_settings_applied" if kind == "event_msg" and isinstance(payload, dict)
+                             and payload.get("type") == "thread_settings_applied" else kind)
+            metadata = metadata_kind in {"world_state", "token_usage_record", "thread_settings_applied"}
+            if metadata and not valid_native_metadata(metadata_kind, payload):
+                errors.append(f"malformed_{metadata_kind}:{path.name}:{number}")
             item = event.get("item", {})
             if kind == "response_item":
                 item = event.get("payload", {})
@@ -529,7 +572,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 errors.append(f"unsupported_item:{path.name}:{number}")
                 continue
             item_type = item.get("type", "")
-            tool = kind if metadata else ""
+            tool = metadata_kind if metadata else ""
             if metadata:
                 pass
             elif item_type in {"function_call", "custom_tool_call"}:

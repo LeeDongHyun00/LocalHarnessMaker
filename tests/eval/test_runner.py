@@ -220,6 +220,76 @@ def test_transport_retry_resumes_before_any_grading(setup: tuple[Path, Path, Pat
     assert report["tasks"][0]["attempts"] == 2
 
 
+@pytest.mark.parametrize("with_session", [False, True])
+def test_executor_usage_limit_halts_without_outcome_and_resumes(setup: tuple[Path, Path, Path],
+                                                               with_session: bool) -> None:
+    root, config, out = setup
+    value = json.loads(config.read_text())
+    value["retry_limit"] = 1
+    config.write_text(json.dumps(value))
+    executor = Executor()
+    limited_calls = 0
+    fixture = Path(__file__).parent / "fixtures/usage-limit.jsonl"
+    message = json.loads(fixture.read_text().splitlines()[0])["message"]
+
+    def limited(argv: list[str], **kwargs: Any) -> ProcessResult:
+        nonlocal limited_calls
+        assert argv[0] == "codex", "Usage limits must stop before grading or another call"
+        limited_calls += 1
+        if with_session:
+            executor(argv, **kwargs)
+        prefix = '{"type":"thread.started","thread_id":"unit-session"}\n' if with_session else ""
+        kwargs["stdout"].write_text(prefix + fixture.read_text())
+        kwargs["stderr"].write_text("")
+        return ProcessResult(1)
+
+    with pytest.raises(IncompleteRun, match="usage limit") as stopped:
+        run(config, out, root, execute=limited, version="codex-cli 0.162.0-alpha.17.2")
+    assert message in str(stopped.value)
+    assert limited_calls == 1
+    assert not (out / "report.json").exists()
+    assert not (out / "bug-chunk-tail/result.json").exists()
+    entry = json.loads((out / "checkpoint.json").read_text())["tasks"]["bug-chunk-tail"]
+    assert entry["phase"] == "usage_limited" and "result" not in entry
+    assert entry.get("transport_retries", 0) == 0
+    assert not list(Path(entry["runtime"]).glob("grading-*"))
+    assert (out / "bug-chunk-tail/exec-1.jsonl").read_text().endswith(fixture.read_text())
+    assert message in json.loads((out / "run-diagnostics.json").read_text())["stop_reason"]
+
+    def recovered(argv: list[str], **kwargs: Any) -> ProcessResult:
+        if argv[0] == "codex":
+            assert ("resume" in argv) == with_session
+        return executor(argv, **kwargs)
+
+    report = json.loads(run(config, out, root, execute=recovered, version="codex-cli 0.162.0-alpha.17.2").read_text())
+    assert report["tasks"][0]["outcome"] == "pass"
+    assert report["tasks"][0]["attempts"] == 2
+    assert report["accounting"]["total_cost_usd"] is None, "Missing usage on the limited call is unknown"
+
+
+def test_executor_usage_limit_cli_prints_reset_time_only_on_stderr(setup: tuple[Path, Path, Path],
+                                                                  monkeypatch: pytest.MonkeyPatch,
+                                                                  capsys: pytest.CaptureFixture[str]) -> None:
+    import eval.__main__ as cli
+
+    root, config, out = setup
+    fixture = Path(__file__).parent / "fixtures/usage-limit.jsonl"
+
+    def limited(argv: list[str], **kwargs: Any) -> ProcessResult:
+        kwargs["stdout"].write_text(fixture.read_text())
+        kwargs["stderr"].write_text("")
+        return ProcessResult(1)
+
+    monkeypatch.setenv("LHM_PRIVATE_GRADERS", str(root))
+    monkeypatch.setattr("sys.argv", ["eval", "run", "--config", str(config), "--out", str(out)])
+    monkeypatch.setattr(cli, "run", lambda c, o, r: run(c, o, r, execute=limited, version="codex-cli 0.162.0-alpha.17.2"))
+    assert cli.main() == 2
+    capture = capsys.readouterr()
+    assert capture.out == ""
+    assert "STOP-E1" in capture.err and "You've hit your usage limit" in capture.err
+    assert "Oct 28th, 2026 1:03 PM" in capture.err
+
+
 class HarnessExecutor(Executor):
     """Fake the frozen CLIs without importing either implementation."""
 
@@ -519,6 +589,57 @@ def test_cli_incomplete_run_exits_two_without_success_path(monkeypatch: pytest.M
     capture = capsys.readouterr()
     assert capture.out == ''
     assert 'STOP-E1: attempted=1, configured=2' in capture.err
+
+
+def test_usage_limit_stops_the_entire_task_loop(setup: tuple[Path, Path, Path], tmp_path: Path,
+                                               monkeypatch: pytest.MonkeyPatch) -> None:
+    root, config, out = setup
+    two_task_config(root, config, monkeypatch, tmp_path)
+    calls = 0
+
+    def limited(argv: list[str], **kwargs: Any) -> ProcessResult:
+        nonlocal calls
+        assert argv[0] == 'codex'
+        calls += 1
+        kwargs['stdout'].write_text((Path(__file__).parent / 'fixtures/usage-limit.jsonl').read_text())
+        kwargs['stderr'].write_text('')
+        return ProcessResult(1)
+
+    with pytest.raises(IncompleteRun, match='after 1 of 2 tasks'):
+        run(config, out, root, execute=limited, version='codex-cli 0.162.0-alpha.17.2')
+    assert calls == 1
+    assert len(json.loads((out / 'checkpoint.json').read_text())['tasks']) == 1
+    assert not list(out.glob('*/result.json'))
+
+
+def test_repeated_control_limits_retain_logs_then_resume_verifier_reinstruction(setup: tuple[Path, Path, Path]) -> None:
+    root, config, out = setup
+    harness_config(config)
+    executor = HarnessExecutor()
+    failures = 0
+
+    def limited(argv: list[str], **kwargs: Any) -> ProcessResult:
+        nonlocal failures
+        if '-m' in argv and argv[argv.index('-m') + 1] == 'verifier' and failures < 2:
+            failures += 1
+            kwargs['stdout'].write_text('')
+            # Retain the actual controller logger envelope, including its prefix.
+            kwargs['stderr'].write_text('INFO:controller.backends.codex_cli:control_cli_events ' + json.dumps({
+                'model': 'gpt-6-luna', 'events': (Path(__file__).parent / 'fixtures/usage-limit.jsonl').read_text()}) + '\n')
+            return ProcessResult(2)
+        return executor(argv, **kwargs)
+
+    for expected in (1, 2):
+        with pytest.raises(IncompleteRun, match='usage limit'):
+            run(config, out, root, execute=limited, version='codex-cli 0.162.0-alpha.17.2')
+        assert executor.calls == 1 and failures == expected
+        assert not (out / 'bug-chunk-tail/result.json').exists()
+    report = json.loads(run(config, out, root, execute=limited, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert report['tasks'][0]['outcome'] == 'pass' and executor.calls == 2
+    assert executor.operations == ['contract', 'check', 'check']
+    entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+    assert len([name for name in entry['control_files'] if name.startswith('control-interruptions/')]) == 4
+    assert len([a for a in report['tasks'][0]['artifacts'] if 'control-interruptions' in a['path']]) == 4
 
 
 def test_taskset_hash_ignores_generated_and_untracked_files(setup: tuple[Path, Path, Path], tmp_path: Path,
@@ -859,6 +980,88 @@ def test_two_session_baseline_exact_prompt_costs_and_regrade(setup: tuple[Path, 
     assert executor.calls == 2 and executor.grades == 2
     assert new['metrics'] == report['metrics'] and new['accounting'] == report['accounting']
     assert new['tasks'][0]['handoff']['evidence']['path'] != task['handoff']['evidence']['path']
+
+
+def test_two_session_0163_settings_record_allows_day2_and_is_published(setup: tuple[Path, Path, Path],
+                                                                    monkeypatch: pytest.MonkeyPatch,
+                                                                    tmp_path: Path) -> None:
+    root, config, out = two_session_config(setup, monkeypatch, tmp_path)
+    value = json.loads(config.read_text())
+    value['codex_version'] = 'codex-cli 0.163.0-alpha.11.1'
+    config.write_text(json.dumps(value))
+    executor = TwoSessionExecutor()
+
+    def native_0163(argv: list[str], **kwargs: Any) -> ProcessResult:
+        result = executor(argv, **kwargs)
+        if argv[0] == 'codex':
+            fixture = Path(__file__).parent / 'fixtures/native-session-0.163.jsonl'
+            events = [json.loads(line) for line in fixture.read_text().splitlines()]
+            events[0]['payload']['id'] = f'day-{executor.calls}'
+            native = Path(kwargs['env']['CODEX_HOME']) / f'sessions/rollout-day-{executor.calls}.jsonl'
+            native.write_text(''.join(json.dumps(e) + '\n' for e in events))
+        return result
+
+    report = json.loads(run(config, out, root, execute=native_0163, version='codex-cli 0.163.0-alpha.11.1').read_text())
+    assert report['tasks'][0]['outcome'] == 'pass'
+    assert executor.calls == 2 and executor.grades == 1
+    evidence = [json.loads(line) for line in (out / 'bug-chunk-tail/session-evidence.jsonl').read_text().splitlines()]
+    applied = [e for e in evidence if e.get('payload', {}).get('type') == 'thread_settings_applied']
+    assert len(applied) == 2
+    entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+    assert all(s['settings_verified'] for s in entry['segments'])
+
+
+@pytest.mark.parametrize('stage', ['contract', 'check', 'handoff', 'validate-handoff', 'day2-contract', 'day2-check'])
+def test_control_usage_limit_retries_pending_operation_without_reexecuting_days(setup: tuple[Path, Path, Path],
+                                                                               monkeypatch: pytest.MonkeyPatch,
+                                                                               tmp_path: Path, stage: str) -> None:
+    root, config, out = two_session_config(setup, monkeypatch, tmp_path, harness_on=True)
+    executor = TwoSessionExecutor()
+    fixture = Path(__file__).parent / 'fixtures/usage-limit.jsonl'
+    message = json.loads(fixture.read_text().splitlines()[0])['message']
+    limited_calls = 0
+
+    def limited(argv: list[str], **kwargs: Any) -> ProcessResult:
+        nonlocal limited_calls
+        if '-m' in argv and argv[argv.index('-m') + 1] in {'controller', 'verifier'}:
+            operation = argv[argv.index('-m') + 2]
+            key = ('day2-' + operation if operation in {'contract', 'check'} and executor.calls >=
+                   (1 if operation == 'contract' else 2) else operation)
+            if key == stage and not limited_calls:
+                limited_calls += 1
+                kwargs['stdout'].write_text('')
+                kwargs['stderr'].write_text('control_cli_events ' + json.dumps({
+                    'model': 'gpt-6-luna', 'events': fixture.read_text()}) + '\n')
+                if operation != 'validate-handoff':
+                    # Even a partial output must be preserved without blocking retry.
+                    Path(argv[argv.index('--out') + 1]).write_text('{partial output')
+                return ProcessResult(2)
+        return executor(argv, **kwargs)
+
+    with pytest.raises(IncompleteRun, match='usage limit') as stopped:
+        run(config, out, root, execute=limited, version='codex-cli 0.162.0-alpha.17.2')
+    assert message in str(stopped.value)
+    assert executor.grades == 0 and limited_calls == 1
+    assert not (out / 'bug-chunk-tail/result.json').exists()
+    entry = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']
+    assert entry['phase'] == 'usage_limited'
+    assert 'result' not in entry and 'control_error' not in entry
+    archived = {name: value for name, value in entry['control_files'].items() if name.startswith('control-interruptions/')}
+    assert len(archived) == (2 if stage == 'validate-handoff' else 3)
+    from eval.runner.audit import digest
+    for name, expected in archived.items():
+        assert digest((Path(entry['runtime']) / name).read_bytes()) == expected
+        if not name.endswith('.json'):
+            assert (out / 'bug-chunk-tail' / name).is_file()
+
+    report = json.loads(run(config, out, root, execute=limited, version='codex-cli 0.162.0-alpha.17.2').read_text())
+    assert report['tasks'][0]['outcome'] == 'pass'
+    assert report['tasks'][0]['attempts'] == 2
+    assert executor.calls == 2 and executor.grades == 1
+    assert executor.operations == ['contract', 'check', 'handoff', 'validate-handoff', 'contract', 'check']
+    retained = json.loads((out / 'checkpoint.json').read_text())['tasks']['bug-chunk-tail']['control_files']
+    assert archived.items() <= retained.items()
+    assert len([a for a in report['tasks'][0]['artifacts'] if 'control-interruptions' in a['path']]) == len(archived)
 
 
 @pytest.mark.parametrize('day', [1, 2])

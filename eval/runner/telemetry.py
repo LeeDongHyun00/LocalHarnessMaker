@@ -33,8 +33,15 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
     """Extract token counts, applied effort and account-wide plan snapshots."""
     events = [event for path in event_paths for event in records(path)]
     native = [event for path in native_paths for event in records(path)]
-    contexts = [event["payload"] for event in native if event.get("type") == "turn_context"]
-    observed = [{"model": p.get("model"), "effort": p.get("effort", p.get("reasoning_effort"))} for p in contexts]
+    contexts = [event["payload"] for event in native
+                if event.get("type") == "turn_context" and isinstance(event.get("payload"), dict)]
+    applied = [event["payload"].get("thread_settings", {}) for event in native
+               if event.get("type") == "event_msg" and isinstance(event.get("payload"), dict)
+               and event["payload"].get("type") == "thread_settings_applied"]
+    observed = [{"model": p.get("model"), "effort": p.get("effort", p.get("reasoning_effort"))}
+                if isinstance(p, dict) else {"model": None, "effort": None} for p in [*contexts, *applied]]
+    settings_source = " + ".join((["native_session_jsonl.turn_context"] if contexts else []) +
+                                 (["native_session_jsonl.event_msg.thread_settings_applied"] if applied else []))
     verified = bool(observed) and all(p == {"model": model, "effort": effort} for p in observed)
     totals: dict[str, int] = {}
     for event in events:
@@ -53,7 +60,7 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
     return {
         "pricing_evidence": {"tier": pricing_tier,
                              "basis": "native turn_context when present; otherwise Standard baseline assumption"},
-        "settings_evidence": {"verified": verified, "source": "native_session_jsonl.turn_context",
+        "settings_evidence": {"verified": verified, "source": settings_source or "native_session_jsonl",
                               "observed": observed,
                               "exec_json_exposes_effort": any("reasoning_effort" in event or "effort" in event for event in events)},
         "usage": {"billing_basis": "chatgpt_subscription", "tokens": totals or None, "billed_usd": None,

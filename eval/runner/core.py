@@ -18,6 +18,7 @@ import uuid
 from eval.runner import harness
 from eval.runner.report import build, build_task, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, digest, executor_environment
+from eval.runner.limits import UsageLimitError, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.telemetry import collect, collect_runs, records, session_id
 
@@ -345,6 +346,7 @@ def run(
             last = entry["segments"][-1]
             final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
         interrupted = False
+        infrastructure_stop: str | None = None
         prior_audit = audit_logs(prior, private, require_completion=False, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache) if prior else None
         blocked = prior_audit is not None and prior_audit["status"] != "clean"
         two_session = metadata[task_id]["two_session"]
@@ -381,6 +383,9 @@ def run(
                                      prompt_name="day2.md" if day == 2 else "prompt.md",
                                      handoff=runtime / "handoff.json" if day == 2 else None, guard=guard)
                     write_json(checkpoint, state)
+                except UsageLimitError as exc:
+                    infrastructure_stop = str(exc)
+                    break
                 except harness.HarnessError as exc:
                     entry["control_invalid_reason"] = exc.invalid_reason
                     control_error = str(exc)
@@ -391,10 +396,46 @@ def run(
                 entry.setdefault("judge_counts", {})[f"{task_id}:{day}"] = judges
                 require_call_estimate(config, {key: count for task in state["tasks"].values()
                                                for key, count in task.get("judge_counts", {}).items()})
+
+            def verify_executor() -> bool:
+                """Checkpoint a pending verifier call separately from executor transport."""
+                entry["pending_verification"] = True
+                entry["phase"] = "ready"
+                write_json(checkpoint, state)
+                native = sorted((codex_home / "sessions").rglob("*.jsonl"))
+                attempt = len(entry.get(f"verdicts_day{day}", [])) + 1
+                verdict = harness.verify(control_runtime, workspace, native, attempt, config,
+                                         repository=REPOSITORY, execute=execute, guard=guard)
+                entry.setdefault("verdicts", []).append(verdict)
+                entry.setdefault(f"verdicts_day{day}", []).append(verdict)
+                entry["reinstruction"] = verdict["reinstruct_message"]
+                entry.pop("pending_verification", None)
+                write_json(checkpoint, state)
+                finished = (verdict["overall"] == "pass" or attempt > config["reinstruction_limit"] or
+                            not verdict["reinstruct_message"])
+                if not finished and not resumed_id:
+                    raise harness.HarnessError("Verifier continuation needs an executor session ID")
+                return finished
+
+            if entry.get("pending_verification") and not blocked and not control_error:
+                native = sorted((codex_home / "sessions").rglob("*.jsonl"))
+                current_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY,
+                                           grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                if current_audit["status"] != "clean":
+                    blocked = True
+                else:
+                    try:
+                        day_finished = verify_executor()
+                    except UsageLimitError as exc:
+                        infrastructure_stop = str(exc)
+                        break
+                    except harness.HarnessError as exc:
+                        entry["control_invalid_reason"] = exc.invalid_reason
+                        control_error = entry["control_error"] = str(exc)
             remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - len(day_segments)
             if not config["harness"]:
                 remaining = config["retry_limit"] + 1 - len(day_segments)
-            if entry["phase"] == "interrupted":
+            if entry["phase"] in {"interrupted", "usage_limited"}:
                 remaining = max(1, remaining)
             transport_retries = entry.get("transport_retries", 0)
             for retry in range(0 if blocked or day_finished or control_error else remaining):
@@ -474,6 +515,9 @@ def run(
                     segment["workspace_exit_sha256"] = entry["workspace_exit_sha256"]
                 write_json(checkpoint, state)
                 current_audit = audit_logs([event_path], private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                infrastructure_stop = usage_limit_message([event_path])
+                if infrastructure_stop:
+                    break
                 if interrupted or current_audit["status"] != "clean":
                     break
                 resumed_id = session_id([event_path]) or resumed_id
@@ -487,17 +531,11 @@ def run(
                         native_audit = audit_logs(native, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                         if native_audit["status"] != "clean":
                             break
-                        attempt = len(entry.get(f"verdicts_day{day}", [])) + 1
-                        verdict = harness.verify(control_runtime, workspace, native, attempt, config,
-                                                 repository=REPOSITORY, execute=execute, guard=guard)
-                        entry.setdefault("verdicts", []).append(verdict)
-                        entry.setdefault(f"verdicts_day{day}", []).append(verdict)
-                        entry["reinstruction"] = verdict["reinstruct_message"]
-                        write_json(checkpoint, state)
-                        if verdict["overall"] == "pass" or attempt > config["reinstruction_limit"] or not verdict["reinstruct_message"]:
+                        if verify_executor():
                             break
-                        if not resumed_id:
-                            raise harness.HarnessError("Verifier continuation needs an executor session ID")
+                    except UsageLimitError as exc:
+                        infrastructure_stop = str(exc)
+                        break
                     except harness.HarnessError as exc:
                         entry["control_invalid_reason"] = exc.invalid_reason
                         control_error = str(exc)
@@ -509,7 +547,7 @@ def run(
                     transport_retries += 1
                     entry["transport_retries"] = transport_retries
                     write_json(checkpoint, state)
-            if (interrupted or blocked or control_error or not final_process or
+            if (infrastructure_stop or interrupted or blocked or control_error or not final_process or
                     current_audit is None or current_audit["status"] != "clean"):
                 break
             if day not in entry.setdefault("completed_days", []):
@@ -532,6 +570,9 @@ def run(
                         harness.handoff(control_runtime, runtime, native, config,
                                         repository=REPOSITORY, execute=execute, guard=guard)
                         write_json(checkpoint, state)
+                    except UsageLimitError as exc:
+                        infrastructure_stop = str(exc)
+                        break
                     except harness.HarnessError as exc:
                         entry["control_invalid_reason"] = exc.invalid_reason
                         control_error = entry["control_error"] = str(exc)
@@ -541,7 +582,11 @@ def run(
                 entry["transport_retries"] = 0
                 entry["phase"] = "ready"
                 write_json(checkpoint, state)
-        if not interrupted:
+        if infrastructure_stop:
+            entry["phase"] = "usage_limited"
+            entry["infrastructure_stop"] = infrastructure_stop
+            write_json(checkpoint, state)
+        elif not interrupted:
             entry["phase"] = "executed"
             write_json(checkpoint, state)
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
@@ -553,7 +598,8 @@ def run(
         # Extract only settings and token/rate-limit evidence from native transcripts.
         selected = [event for path in native_paths for event in records(path)
                     if event.get("type") == "turn_context" or
-                    (event.get("type") == "event_msg" and event.get("payload", {}).get("type") == "token_count")]
+                    (event.get("type") == "event_msg" and event.get("payload", {}).get("type") in
+                     {"token_count", "thread_settings_applied"})]
         (task_out / "session-evidence.jsonl").write_text(private.redact("".join(json.dumps(e) + "\n" for e in selected)))
         for segment, path in zip(entry["segments"], event_paths):
             publish(path, task_out / path.name, private)
@@ -569,8 +615,14 @@ def run(
                     (evidence.name in {"contract.json", "handoff.json"} or
                      re.fullmatch(r"verdict-[0-9]+\.json", evidence.name) or
                      re.fullmatch(r"(?:contract|verdict-[0-9]+|handoff|handoff-validation)\.std(?:out|err)", evidence.name))):
-                publish(evidence, task_out / (evidence.parent.name + "-" + evidence.name
-                        if evidence.parent != runtime else evidence.name), private)
+                target = (task_out / evidence.relative_to(runtime) if evidence.is_relative_to(runtime / "control-interruptions")
+                          else task_out / (evidence.parent.name + "-" + evidence.name
+                                           if evidence.parent != runtime else evidence.name))
+                target.parent.mkdir(parents=True, exist_ok=True)
+                publish(evidence, target, private)
+        if infrastructure_stop:
+            stop_reason = private.redact("STOP-E1: usage limit; run remains resumable. " + infrastructure_stop)
+            break
         if config["harness"]:
             try:
                 guard.verify()

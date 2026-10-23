@@ -283,6 +283,66 @@ def test_exact_native_session_structure_audits_clean(tmp_path: Path, private: Pr
     assert audit["errors"] == audit["matches"] == []
 
 
+def thread_settings_event() -> dict[str, Any]:
+    """Return the host's line-9 envelope with synthetic values only."""
+    fixture = Path(__file__).parent / "fixtures/native-session-0.163.jsonl"
+    return json.loads(fixture.read_text().splitlines()[8])
+
+
+def test_native_0163_session_structure_audits_clean(tmp_path: Path, private: PrivateGraders) -> None:
+    from collections import Counter
+
+    fixture = Path(__file__).parent / "fixtures/native-session-0.163.jsonl"
+    events = [json.loads(line) for line in fixture.read_text().splitlines()]
+    assert Counter(e["type"] for e in events) == {
+        "session_meta": 1, "turn_context": 1, "world_state": 1,
+        "token_usage_record": 4, "event_msg": 14, "response_item": 13,
+    }
+    assert events[8]["payload"]["type"] == "thread_settings_applied"
+    assert set(events[8]["payload"]) == {"type", "thread_id", "thread_settings"}
+    assert set(events[8]["payload"]["thread_settings"]) == {
+        "model", "model_provider_id", "approval_policy", "approvals_reviewer", "permission_profile",
+        "cwd", "runtime_workspace_roots", "reasoning_effort", "collaboration_mode", "disabled_plugin_ids",
+    }
+    audit = audit_native(tmp_path, private, events)
+    assert audit["status"] == "clean", audit
+    assert audit["errors"] == audit["matches"] == []
+
+
+@pytest.mark.parametrize("key,value", [
+    ("model", None), ("model_provider_id", []), ("approval_policy", 1), ("approvals_reviewer", False),
+    ("cwd", ""), ("reasoning_effort", None), ("runtime_workspace_roots", "."),
+    ("runtime_workspace_roots", [1]), ("disabled_plugin_ids", {}), ("disabled_plugin_ids", [False]),
+    ("permission_profile", None), ("collaboration_mode", []),
+])
+def test_malformed_thread_settings_is_inconclusive(tmp_path: Path, private: PrivateGraders,
+                                                  key: str, value: Any) -> None:
+    event = thread_settings_event()
+    event["payload"]["thread_settings"][key] = value
+    audit = audit_native(tmp_path, private, [event])
+    assert audit["status"] == "inconclusive"
+    assert audit["errors"] == ["malformed_thread_settings_applied:native.jsonl:1"]
+
+
+@pytest.mark.parametrize("location", ["thread_id", "thread_settings", "file_system", "network", "entries", "path", "mode_settings"])
+def test_missing_or_malformed_thread_settings_envelope(tmp_path: Path, private: PrivateGraders,
+                                                       location: str) -> None:
+    event = thread_settings_event()
+    payload = event["payload"]
+    settings = payload["thread_settings"]
+    if location in {"thread_id", "thread_settings"}:
+        payload.pop(location)
+    elif location in {"file_system", "network"}:
+        settings["permission_profile"][location] = None
+    elif location == "entries":
+        settings["permission_profile"]["file_system"]["entries"] = [None]
+    elif location == "path":
+        settings["permission_profile"]["file_system"]["entries"][0]["path"] = {"type": "new_path_kind"}
+    else:
+        settings["collaboration_mode"]["settings"] = {}
+    assert audit_native(tmp_path, private, [event])["status"] == "inconclusive"
+
+
 @pytest.mark.parametrize("location", ["world_state", "token_usage_record", "custom_tool_call", "custom_tool_call_output"])
 def test_native_private_path_injection(tmp_path: Path, private: PrivateGraders,
                                         native_session: list[dict[str, Any]], location: str) -> None:
@@ -304,7 +364,7 @@ def test_native_private_path_injection(tmp_path: Path, private: PrivateGraders,
     assert str(private.root) not in json.dumps(audit)
 
 
-@pytest.mark.parametrize("location", ["world_state", "token_usage_record"])
+@pytest.mark.parametrize("location", ["world_state", "token_usage_record", "thread_settings_applied"])
 @pytest.mark.parametrize("form", ["key", "alias", "traversal", "grading_copy", "encoded"])
 def test_metadata_full_text_and_canonical_private_markers(tmp_path: Path, private: PrivateGraders,
                                                          location: str, form: str) -> None:
@@ -314,11 +374,23 @@ def test_metadata_full_text_and_canonical_private_markers(tmp_path: Path, privat
     marker = {"key": str(private.root), "alias": str(alias / "child"),
               "traversal": str(tmp_path / "ordinary/../trusted-storage/child"),
               "grading_copy": str(grading / "child"), "encoded": quote(str(private.root), safe="")}[form]
-    payload: dict[str, Any] = {"full": True, "state": {}} if location == "world_state" else {
-        "usage": {"input_tokens": 0, "output_tokens": 0}}
+    payload: dict[str, Any] = (thread_settings_event()["payload"] if location == "thread_settings_applied" else
+        {"full": True, "state": {}} if location == "world_state" else {"usage": {"input_tokens": 0, "output_tokens": 0}})
     payload[marker if form == "key" else "synthetic_extra"] = "synthetic" if form == "key" else marker
-    audit = audit_native(tmp_path, private, [{"type": location, "payload": payload}], grading_roots=(grading,))
+    audit = audit_native(tmp_path, private, [{"type": "event_msg" if location == "thread_settings_applied" else location,
+                                            "payload": payload}], grading_roots=(grading,))
     assert audit["status"] == "access_detected"
+
+
+def test_thread_settings_full_record_scan_and_malformed_private_path(tmp_path: Path, private: PrivateGraders) -> None:
+    event = thread_settings_event()
+    event["payload"]["thread_settings"]["model"] = None
+    event[str(private.root)] = {"ignored_extra": str(private.root / "child")}
+    audit = audit_native(tmp_path, private, [event])
+    assert audit["status"] == "access_detected"
+    assert audit["errors"] == ["malformed_thread_settings_applied:native.jsonl:1"]
+    assert audit["matches"][0]["tool"] == "thread_settings_applied"
+    assert "reached executor context" in audit["matches"][0]["redacted_evidence"]
 
 
 @pytest.mark.parametrize("event", [

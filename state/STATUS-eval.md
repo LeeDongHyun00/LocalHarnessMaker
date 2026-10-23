@@ -1,40 +1,37 @@
 ## Done
 
-- Completed combined r5-full-001/r5-full-002 two-session orchestration: fresh day-2 session, exact day2.md, runner-owned handoff/contract delivery, per-day audits/settings/exit hashes, one final grade, handoff observations and summed costs (.venv/bin/python -m pytest tests/eval -q: 537 passed in 46.12s).
-- Hardened control evidence publishing and inputs: manifest-only files, no workspace/symlink adoption, specific runner_control_file_preexisting reason and numeric pinned verdict selection; forged verdict-99.json/verdict-final.json cannot replace verdict-1.json (.venv/bin/python -m pytest tests/eval -q: 537 passed).
-- Preserved active-session crash recovery, audit-clean day-1 timeout/error continuation and regrade timeout/error/invalid-task behavior (.venv/bin/python -m pytest tests/eval -q: 537 passed).
-- Applied decision 0006: native missing/mismatched cli_version invalidates only its task, retains costs and permits report.json; pre-session installed-version changes still halt; comparison helper rejects mixed versions (.venv/bin/python -m pytest tests/eval -q: 537 passed).
-- Fixed STOP-3 test's stale timeout override without changing loader validation; the guard budgets 11 calls for one two-session harness task including controller retries/fallbacks (.venv/bin/python -m pytest tests/eval -q: 537 passed).
-- Prepared full-a/full-b and smoke-two-session-a on codex-cli 0.163.0-alpha.11.1, 120 frozen tasks/140 sessions per full configuration, shared seed/pilot limits and published USD 4.10/6.03 estimate; updated combined README/CHANGES (.venv/bin/python -m pytest tests/eval -q: 537 passed, including configuration inventory checks).
-- Preserved frozen public tasks and retained pilots; checked whitespace for all owned changes (git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0; git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b: exit 0).
+- Added 0.163.0-alpha.11.1 thread_settings_applied metadata validation and full-record private-marker scanning; unknown kinds remain inconclusive. Added the synthetic 34-record native fixture with the exact line-9 settings structure (.venv/bin/python -m pytest tests/eval -q: 596 passed in 56.24s).
+- Added applied-thread model/effort telemetry beside turn_context, conflict rejection, retained session evidence and a two-session 0.163 regression that reaches day 2 and grades once (.venv/bin/python -m pytest tests/eval -q: 596 passed).
+- Added resumable STOP-E1 usage-limit handling for executor error/turn.failed events and control_cli_events stderr envelopes; stderr preserves the supplied limit/reset text, and the interrupted task gets no outcome/report (.venv/bin/python -m pytest tests/eval -q: 596 passed, including exact event-pair, CLI stderr, no-thread recovery and whole-loop halt tests).
+- Preserved pending verifier/control operations, completed days and hash-pinned interrupted control streams/partial outputs across same-output recovery; eventual reports include archived evidence and retain unknown costs (.venv/bin/python -m pytest tests/eval -q: 596 passed, including all six two-session control stages, repeated limits and verifier reinstruction recovery).
+- Updated eval/README.md and eval/CHANGES.md; preserved frozen tasks and retained pilots, with no staging or commits (git diff --check -- eval tests/eval state/STATUS-eval.md: exit 0; git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b: exit 0).
 
 ## Remaining
 
-- Claude host-runs eval/configs/smoke-two-session-a.yaml in a fresh directory using the existing login/private grader environment; confirm native/event audits, distinct sessions, exact day2.md, exit hashes and one post-day-2 grade. No live calls were made here.
-- Host-verify harness controller/verifier compatibility, developer_instructions delivery, retries, nested guards, termination, crash recovery and production sandbox behavior. New CLI versions require a hook probe and audit smoke under decision 0006.
-- Re-audit retained pilots with the matching private root; inspect every error/access match and rerun pilot B in a fresh directory if exit hashes are missing. Compare quality only across identical Codex versions; historical 0.162 pilots are diagnostic for 0.163 runs.
-- Manually review five valid pilot-A samples and A/B provenance/costs, then have Claude ask the user again before full runs. Configurations and estimate are not authorization.
+- Claude reruns eval/configs/smoke-two-session-a.yaml on the host in a fresh output directory. Confirm both days' native/event audits, settings, distinct sessions, exact day2.md, exit hashes and one post-day-2 grade. The attempt1 invalid report remains unchanged and uncommitted.
+- Host-verify harness controller/verifier compatibility, developer_instructions delivery, retries, nested guards, termination, usage-limit recovery and production sandbox behavior. New CLI versions require a hook probe and audit smoke under decision 0006.
+- Re-audit retained pilots with the matching private root; inspect every error/access match and rerun pilot B in a fresh directory if exit hashes are missing. Compare only identical Codex versions; historical 0.162 pilots are diagnostic for 0.163 runs.
+- Manually review five valid pilot-A samples and A/B provenance/costs, then have Claude ask the user again before full runs. Configurations and estimates are not authorization.
 - Review structural helper extraction and submitted regression quality manually; behavioral graders do not certify those properties.
 - Complete control per-call accounting, full done-claim denominator and hash-pinned paired local-minus-cheap_api parity; D-3 through D-5 measurements remain pending.
 - Run the full repository suite once before a future merge. Only tests/eval ran here; no staging or commits.
 
 ## Decisions
 
-- Preserve r5-full-001/r5-full-002 changes and finish their regressions/documentation together: the interrupted session's work remains uncommitted and was not redone.
-- Start day 2 fresh in the same public workspace and preserve exact prompt bytes: the benchmark measures workspace/handoff continuity without runner restatement of day 1.
-- Pin control bytes in a persisted runner manifest and select only numeric pinned verdicts: executor-created inputs cannot be adopted or published as trusted evidence.
-- Record runner_control_file_preexisting in addition to control_cli_error for fresh-output collisions: F2 now has a specific diagnostic without relaxing existing checks.
-- Invalidate native version-evidence failures per task before grading and again during report building: bad evidence must not suppress the whole report, while installed-version changes still halt the run.
-- Keep unknown control costs, done-claim denominator and parity unknown: frozen CLIs lack complete per-call accounting; missing usage is never free usage.
-- Use identical full task ordering/seed and pilot retry limits, with 600/1200-second process and 20-second grading deadlines: A/B share population and limits.
-- Retain bounded per-event protected-path caching: every call, match and unresolved operand remains audited.
+- Continue from committed b04f9b0: the two-session implementation was already complete; this session changes compatibility and infrastructure recovery only.
+- Treat thread_settings_applied as metadata: its full record receives private-path checks without interpreting ordinary settings as shell operands; malformed shapes and other unknown kinds remain inconclusive.
+- Require model/effort agreement across turn_context and thread_settings_applied: neither source can erase conflicting applied evidence.
+- Classify structured usage-limit failures as resumable infrastructure stops: halt the task loop before runner retries, grading or another task, without recording the interrupted task's outcome.
+- Archive interrupted control outputs and persist pending verification separately from executor transport: retries preserve evidence and avoid rerunning completed executor work.
+- Detect control limits after the bounded CLI returns: existing nested control_cli_events logs supply evidence without changing frozen interfaces or other-role paths.
+- Keep missing accounting unknown and reset text verbatim: quota stops do not establish zero cost or a reset timezone.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
 - git diff --check -- eval tests/eval state/STATUS-eval.md
 - git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b
-- Host only: .venv/bin/python -m eval run --config eval/configs/smoke-two-session-a.yaml --out eval/reports/smoke-two-session-a/
+- Host only, fresh destination: .venv/bin/python -m eval run --config eval/configs/smoke-two-session-a.yaml --out eval/reports/smoke-two-session-a-attempt2/
 - Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-a/
 - Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/pilot-b/
 - Host only, hash-bearing source/fresh destination: .venv/bin/python -m eval.runner.regrade --private-root "$LHM_PRIVATE_GRADERS" --from SOURCE --out NEWDIR
@@ -43,17 +40,17 @@
 
 ## Do not touch
 
-- Frozen eval/tasks/, retained pilot reports, docs/eval-freeze.md, controller/, verifier/, plugin/, shared schemas/configuration and other roles' tests/STATUS files. Never share tasks with Role 3.
-- .git is read-only: no staging, commits, history rewrites or file deletion. The final commit plan lists all 15 uncommitted owned paths, including eval/runner/compare_versions.py.
+- Frozen eval/tasks/, retained reports including eval/reports/smoke-two-session-a-attempt1/, docs/eval-freeze.md, controller/, verifier/, plugin/, shared schemas/configuration and other roles' tests/STATUS files. Never share tasks with Role 3.
+- .git is read-only: no staging, commits, history rewrites or file deletion. Exclude the uncommitted host smoke report from the commit plan.
 - No full measurement until Claude asks the user again and receives approval; configuration validation and estimates do not authorize calls.
 - No executor/controller/judge model calls, network, nested Codex, macOS sandbox-exec or private-root lookup in this sandbox. Tests use synthetic graders only.
 - Never backfill historical exit hashes, mutate source regrade runs, run Codex in grading copies or expose grader output to executor/controller context.
 
 ## Assumptions
 
-- Freeze commit 7cdaf3b and digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f remain authoritative; no public task content changed.
-- The offline price snapshot openai-standard-short-2026-10-22-v1 and retained pilot tokens/costs are planning inputs, not new measurements. Historical pilots use 0.162.0-alpha.17.2; full/smoke configurations select 0.163.0-alpha.11.1 under decision 0006.
-- Full estimates multiply ten-session pilot totals by 14 and budget each fresh day as one session. Supplied 0.4/0.6 plan percentage-point deltas ignore quota resets and concurrent usage; absent before/after observations remain null.
-- The previously recorded 0.163 host hook probe result is supplied evidence; one-task audit smoke and production compatibility remain host work.
-- Checkpoints are trusted runner evidence. Day-1 exit hashes are historical observations and cannot be reconstructed from the changed final workspace; regrade checks final workspace and retained day/log/prompt provenance.
-- Claude owns host verification, pilot review and renewed full-run approval. Mocked success establishes orchestration behavior only.
+- b04f9b0 contains the completed two-session work. The user's supplied host smoke stopped before day 2 and is invalid solely because line 9 was unsupported; this session inspected only the authorized native rollout and made no host/private-grader measurement.
+- Freeze commit 7cdaf3b and digest b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f remain authoritative. Frozen task content and historical pilots are unchanged.
+- The supplied usage-limit error and turn.failed events carry the same message; both nested error.message and direct message are supported. Reset text is relayed without inferring a timezone.
+- Control commands may finish existing internal retries/fallbacks before returning their retained structured events; eval halts on return and issues no subsequent call. No other-role implementation was changed.
+- The offline price snapshot and retained pilot totals remain planning inputs, not new measurements; unobserved accounting stays null. Historical pilots use 0.162.0-alpha.17.2 and full/smoke configurations select 0.163.0-alpha.11.1.
+- Checkpoints and runner manifests remain trusted evidence. Mocked regression success establishes orchestration only; Claude owns host verification, pilot review and renewed full-run approval.

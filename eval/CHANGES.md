@@ -1,3 +1,43 @@
+# 0.163 audit compatibility and usage-limit recovery — 2026-10-23
+
+Support the host smoke's line-9 `event_msg.thread_settings_applied` as non-tool
+metadata. Validate its thread/settings envelope and nested permissions and
+collaboration fields; scan the complete record for private markers, including
+extra keys, aliases and canonical traversal. Other unknown kinds and malformed
+settings remain inconclusive. Telemetry combines its applied model/effort with
+turn_context, rejects conflicts and publishes both evidence sources. A synthetic
+34-record fixture preserves the supplied native structure without user paths.
+
+Usage-limit error/turn.failed events now halt the entire run as resumable
+STOP-E1 infrastructure failures, with the original message/reset time on stderr
+and no interrupted-task outcome or report. Detection also reads control CLI
+stderr's nested control_cli_events, without changing controller/verifier code.
+The runner makes no further call after observing the limit. Same-output recovery
+resumes the active executor or pending control step and preserves completed days.
+Interrupted control streams/partial outputs are archived, hash-pinned, redacted
+and referenced by the eventual report; missing accounting remains null.
+
+Regressions cover both native versions, full-record private-marker injections,
+malformed settings, conflicting telemetry, the exact supplied usage-limit event
+pair, CLI stderr/reset time, no-thread recovery, loop-wide halt, all six
+two-session control stages, repeated limits and verifier reinstruction recovery.
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 596 passed in 56.24s.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/reports/pilot-a eval/reports/pilot-b`
+both exited 0. Only synthetic graders/local grading subprocesses were used.
+
+## Assumptions
+
+- b04f9b0 contains the completed two-session work. Claude's uncommitted smoke
+  report is retained unchanged and excluded from this commit plan.
+- The supplied host smoke was invalid/inconclusive before day 2; mock regression
+  success does not establish host compatibility. Claude reruns a fresh smoke.
+- Control CLIs retain bounded execution and may perform their existing internal
+  retry/fallback before returning. Eval detects their structured limit evidence
+  on return; no frozen interface or other-role implementation is changed.
+- Reset text is relayed verbatim; no timezone or missing usage is inferred.
+  No model calls, private-root lookup, staging or commits occurred here.
+
 # r5-full-001 and r5-full-002 — 2026-10-23
 
 The combined uncommitted change runs frozen two-session tasks as two fresh

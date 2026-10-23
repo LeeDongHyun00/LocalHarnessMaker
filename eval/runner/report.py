@@ -60,7 +60,7 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     audit = result["grader_access_audit"]
     status = audit["status"]
     reason = "Observed forbidden access." if status == "access_detected" else "; ".join(audit["errors"]) if status == "inconclusive" else None
-    if any(m["tool"] in {"world_state", "token_usage_record"} for m in audit["matches"]):
+    if any(m["tool"] in {"world_state", "token_usage_record", "thread_settings_applied"} for m in audit["matches"]):
         reason = "Private location reached executor context through native metadata."
     shared_audit = {"method": "access_audit", "status": status,
                     "private_grader_roots": ["sha256:" + audit["root_fingerprint"]],
@@ -106,7 +106,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
             "grading": grading, "done_claims": claims, "calls": calls,
             "costs": {"executor_usd": executor_usd, "control_usd": control_usd,
                       "total_usd": total([executor_usd, control_usd])},
-            "artifacts": [artifact(p) for p in [*sorted(out.iterdir()), *sorted((runtime / "codex-home/sessions").rglob("*.jsonl"))] if p.is_file()], "handoff": handoff}
+            "artifacts": [artifact(p) for p in [*sorted(out.iterdir()), *sorted((out / "control-interruptions").rglob("*")),
+                          *sorted((runtime / "codex-home/sessions").rglob("*.jsonl"))] if p.is_file()], "handoff": handoff}
 
 
 def require_same_codex_version(reports: list[dict[str, Any]]) -> str:
