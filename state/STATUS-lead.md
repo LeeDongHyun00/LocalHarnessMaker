@@ -1,5 +1,6 @@
 ## Done
 
+- Published user-approved decision 0008, the version 2 W2/W3 schedule and a separate-record notice in the version 1 freeze document; recorded Fast/priority policy, A-only calibration, fresh frozen-set full runs and anti-contamination disclosure without changing evaluation files or interfaces (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 3.93s; `git diff --check -- docs/decisions/0008-task-set-v2.md docs/plan.md docs/eval-freeze.md state/STATUS-lead.md`: exit 0, no output).
 - Wrote D-5 install-through-demo README, architecture and recorded-demo guide from code and committed evidence, including explicit evidence limits, deadlines/shutdown, evaluation boundaries and a pending fresh-clone host checklist (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 4.22s; `git diff --check -- README.md docs/architecture.md docs/demo.md state/STATUS-lead.md`: exit 0, no output).
 - Rechecked all five committed demonstrations offline: single-session approval/real verification/handoff; new-session context without user restatement; exhaustion remaining-work injection; and no stale context after injected generation/validation failures (`.venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real`: overall=pass, approval_gate=true, real_task_verified=true, synthetic=false, attempts=1, reinstructions=0; `.venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session`: overall=pass, saved_handoff_validated/session_start_injected/context_visible/new_session/approval_gates=true, user_restatement_needed=false; `.venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out plugin/evidence/2026-10-23-exhaustion`: overall=pass, remaining_injected=true, stale_injected=false; matching generation and validation checker commands: both overall=pass, remaining_injected=false, stale_injected=false).
 - Closed the version-registry publication follow-up: 0.163.0-alpha.11.1 is in plugin/VERIFIED_VERSIONS.json at commit 53cb8a9, alongside the original 0.162 history; no registry edit or live probe was performed here (`git show 53cb8a9:plugin/VERIFIED_VERSIONS.json`: entries for codex-cli 0.162.0-alpha.17.2 and codex-cli 0.163.0-alpha.11.1 with evidence directories).
@@ -23,6 +24,7 @@
 
 ## Remaining
 
+- Track decision 0008 with Role 5: W2 build/validate/A-only calibration of separate version 2, then receive its freeze inventory/digest/evidence and publish a separate freeze record before fresh full A/B/harness runs in W2/W3. Final analysis is due 2026-11-13; retain native priority-tier evidence, pinned Standard-rate accounting and disclosure of version 1 runs informing the 10/23 fixes. No version 2 result may inform a harness change after freeze. This session completes documentation only; no task construction, freeze or tier verification is claimed.
 - Pending Claude host acceptance for D-5/SC-4: execute the fresh-clone checklist in docs/demo.md (clone, venv, disposable installation/--check, committed offline evidence checkers, schema validation, full suite and a fresh typed-approval real demo); retain log/commit/version and all skip/xfail reasons. Documentation and existing-capture audits are complete; fresh-clone acceptance is not done.
 - Track decision 0006 run/session version recording, one-task audit smoke and mid-run detection through owning-role evidence. Registry publication is complete at 53cb8a9; registry membership alone does not prove all runtime version-policy behavior.
 
@@ -35,7 +37,9 @@
 
 ## Decisions
 
-- Use the current user scope for D-5: edit only README.md, docs/architecture.md, docs/demo.md and this STATUS; do not stage/commit, run foreign tests, call models or disturb the host evaluation.
+- Adopt decision 0008, approved 2026-10-23: version 1 remains frozen/reported; harder version 2 tests the project claim, usage is not a constraint and result completeness is the goal. Use priority for Codex development jobs and all version 2 configurations, verified from native settings, with pinned Standard-rate API-equivalent costs.
+- Limit this continuation to decision 0008, docs/plan.md, a separate-version-2-record notice in docs/eval-freeze.md and lead STATUS: the user prioritizes these documentation changes while host evaluation runs continue; no schema, CLI, hook or runtime change is needed.
+- Historical D-5 session scope: edit only README.md, docs/architecture.md, docs/demo.md and this STATUS; do not stage/commit, run foreign tests, call models or disturb the host evaluation.
 - Distinguish committed host captures, offline rechecks and pending fresh-clone acceptance: passing saved-evidence audits are not a new live run or persisted-trust/shutdown proof.
 
 - Adopt decision 0007, approved 2026-10-23, superseding the historical local-stage and optional-training decisions below: complete all remaining approved work before the local LLM stage; usage limits are no longer a concern, while executor API billing remains a cap-block fallback only.
@@ -58,6 +62,7 @@
 
 ## Verify commands
 
+- git diff --check -- docs/decisions/0008-task-set-v2.md docs/plan.md docs/eval-freeze.md state/STATUS-lead.md
 - .venv/bin/python -m pytest tests/lead -q
 - git diff --check -- README.md docs/architecture.md docs/demo.md state/STATUS-lead.md
 - .venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real
@@ -86,14 +91,15 @@
 ## Do not touch
 
 - Version 1 interfaces without new user approval, a decision record and a version increment.
-- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation edits only README.md, docs/architecture.md, docs/demo.md and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
+- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation edits only docs/decisions/0008-task-set-v2.md, docs/plan.md, docs/eval-freeze.md and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
 - Existing harness/, experiments/, scripts/, legacy tests and unrelated user edits.
 - No git add -A, broad staging, foreign-path commit, deletion, history rewrite, hook registration or external configuration change.
 - Keep the canonical hook contract and captured evidence; never replace measured evidence with a placeholder or claim production behavior from startup probes.
 
 ## Assumptions
 
-- No new product or interface assumption: this session documents current code and committed evidence only. Fresh-clone and live acceptance are assigned to Claude on the host after the active evaluation finishes; no result is inferred in advance.
+- Decision 0008 approval, baseline A figures/commit/version and the CLI Fast description are user-supplied facts; no host or network verification was performed. W2/W3 use decision 0007’s through-11/06 and through-11/13 windows. Version 2 task count, exact freeze date and digest await owning-role evidence.
+- Historical D-5 assumption: that session documented current code and committed evidence only. Fresh-clone and live acceptance are assigned to Claude on the host after the active evaluation finishes; no result is inferred in advance.
 - No PR was requested; these decisions, assumptions and documented verification results are the change summary for a future PR description. The commit plan contains only the four documentation/status paths edited here.
 
 - No additional scope assumption: decision 0007 approval and the usage-limit clarification are explicit user instructions dated 2026-10-23. Integration review 1 is attributed Claude host evidence; this offline documentation session does not independently verify its measurements.

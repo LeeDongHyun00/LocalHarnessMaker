@@ -168,3 +168,5 @@ Under [Role 5 SC-2](../prompts/05-eval-engineer.md), version 1 never changes. An
 ## Assumptions
 
 - The user-supplied Claude host results are the evidence for the private validation, digest, leakage inspection and mutation findings; this sandbox session independently checks public metadata and published counts only.
+
+A separate version 2 freeze record will follow under [decision 0008](decisions/0008-task-set-v2.md); this version 1 record remains unchanged.
