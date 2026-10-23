@@ -137,17 +137,44 @@ class Runtime:
     def dispatch(self, event: str) -> dict[str, Any] | None:
         state, session = self.initialize()
         if event == "SessionStart":
+            warning = self.version_warning(state, session)
             handoff = Path(state["handoff_path"])
             if handoff.is_file():
-                self.call("verifier", "validate-handoff", ["--handoff", str(handoff)], handoff)
-                validate(handoff, "handoff.schema.json")
-                return self.context(event, "HARNESS_HANDOFF\n" + handoff.read_text(encoding="utf-8"))
-            return None
+                try:
+                    self.call("verifier", "validate-handoff", ["--handoff", str(handoff)], handoff)
+                    validate(handoff, "handoff.schema.json")
+                    return self.context(event, (warning + "\n" if warning else "")
+                                        + "HARNESS_HANDOFF\n" + handoff.read_text(encoding="utf-8"))
+                except Exception:
+                    if not warning:
+                        raise
+                    print("harness warning: handoff unavailable; retaining version warning", file=sys.stderr)
+            return self.context(event, warning) if warning else None
         if event == "UserPromptSubmit":
             return self.submit(state, session)
         if event == "Stop":
             return self.stop(state, session)
         raise ValueError("unsupported hook event")
+
+    def version_warning(self, state: dict[str, Any], session: dict[str, Any]) -> str:
+        """Check each SessionStart, but inject at most one advisory per session."""
+        try:
+            if str(ROOT) not in sys.path:
+                sys.path.insert(0, str(ROOT))
+            from plugin.versions import cli_version, verified_versions
+            version = cli_version(runner=self.runner, timeout=self.deadline - self.clock())
+            session['cli_version'] = version
+            unlisted = version not in verified_versions()
+        except Exception as exc:
+            print(f'harness warning: CLI version check unavailable: {exc}', file=sys.stderr)
+            return ''
+        warning = ''
+        if unlisted and not session.get('version_warning_sent'):
+            warning = (f'Harness warning: unverified {version}; run python -m plugin.probe '
+                       '--mode exec --out plugin/evidence/NEW-exec before a large run.')
+            session['version_warning_sent'] = True
+        self.save(state, session)
+        return warning
 
     def submit(self, state: dict[str, Any], session: dict[str, Any]) -> dict[str, Any]:
         prompt = self.payload["prompt"]

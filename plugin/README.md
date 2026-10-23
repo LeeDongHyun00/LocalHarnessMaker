@@ -270,3 +270,11 @@ saved context, SessionStart injection visible in the new session, approval gates
 passing real verdicts and exact follow-up bytes. Offline synthetic tests do not
 establish live two-session success. Assumption: Claude runs both days on the host
 with the same retained temporary workspace/home and a working CLI login.
+
+### Scripted host installation checks
+
+See [HOST-CHECKS.md](HOST-CHECKS.md) for exact host commands, trust UI steps, evidence layouts and offline checkers for persisted hook trust, bundled binary discovery with an empty PATH, and unrelated-project silence. These remain host checks until their captures pass; this implementation session ran only offline fixtures.
+
+SessionStart probes the CLI selected through `HARNESS_CODEX`, PATH, then the ChatGPT bundle, with a one-second maximum within its existing deadline. It records `cli_version` in plugin-owned session metadata. An unlisted version adds one line to injected context once per session, naming `python -m plugin.probe --mode exec --out plugin/evidence/NEW-exec`. Resume checks can detect a newly replaced binary; listed versions inject no advisory. Probe/registry failures log a warning and continue; an advisory also survives unavailable handoff context. Use `HARNESS_CODEX` for a launch outside the normal discovery paths. This advisory does not certify the compatibility of a new version; decision 0006's probe and audit smoke remain prerequisites for large evaluation runs.
+
+Assumptions for this change: Claude's supplied 2026-10-23 host demo and Ubuntu CI results are accepted as reported evidence. The new host procedures use macOS's terminal recorder, interactive hook-trust acceptance and the existing login symlink in isolated homes; their live outcomes remain unmeasured. A version probe reports the currently selected executable on disk; it cannot recover the old in-memory version of an already-running executable replaced by the app.
