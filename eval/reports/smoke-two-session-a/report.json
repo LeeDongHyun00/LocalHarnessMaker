@@ -1,0 +1,264 @@
+{
+  "metadata": {
+    "run_id": "5ef33d44724b4a1d8a5b276ba053276c",
+    "created_at": "2026-10-23T02:17:55.682659+00:00",
+    "config_name": "smoke-two-session-a",
+    "config_sha256": "736bb5c5477692d591d3875f60b77894d752710d367a58d4baf99e23cf849dc7",
+    "task_set_sha256": "40c07154800a006864b86493ce7a7367a61c0b06e1e53b667edf3397a94f3aae",
+    "git_commit": "c0c9bb3b5f3c44294f96f707799e8711df6c071f",
+    "codex_version": "codex-cli 0.163.0-alpha.11.1",
+    "executor_model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "control_backend": "none",
+    "control_model": null,
+    "seed": 0,
+    "reinstruction_limit": 0,
+    "cost_basis": "api_equivalent_usd",
+    "pricing": {
+      "snapshot_id": "openai-standard-short-2026-10-22-v1",
+      "source": "https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).",
+      "checked_on": "2026-10-22",
+      "rates": [
+        {
+          "model": "gpt-6.1-sol",
+          "input_per_million_usd": 2,
+          "cached_input_per_million_usd": 0.1,
+          "output_per_million_usd": 10
+        },
+        {
+          "model": "gpt-6-luna",
+          "input_per_million_usd": 0.1,
+          "cached_input_per_million_usd": 0.01,
+          "output_per_million_usd": 0.5
+        }
+      ]
+    },
+    "confidence": {
+      "level": 0.95,
+      "method": "task_cluster_percentile_bootstrap",
+      "resamples": 10000,
+      "seed": 0
+    },
+    "parity_comparator": null
+  },
+  "tasks": [
+    {
+      "task_id": "two-session-prefix-sums",
+      "task_type": "feature_plus_test",
+      "two_session": true,
+      "outcome": "pass",
+      "invalid_reasons": [],
+      "attempts": 2,
+      "executor_segments": [
+        {
+          "attempt": 1,
+          "started_at": "2026-10-23T02:17:55.722161+00:00",
+          "exited_at": "2026-10-23T02:18:34.192270+00:00",
+          "exit_code": 0,
+          "session_id": "01a1668c-f398-70e3-a742-b0685eaa6562",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4rllzomu/exec-1.jsonl",
+            "sha256": "ef3f65b815bb2d31591c004b196d574b8d548111c5e10fb636d32900c4dd174e"
+          }
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-10-23T02:18:35.438294+00:00",
+          "exited_at": "2026-10-23T02:19:30.822424+00:00",
+          "exit_code": 0,
+          "session_id": "01a1668d-8e6e-7472-b8b9-a452f59c6073",
+          "events": {
+            "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4rllzomu/exec-2.jsonl",
+            "sha256": "3a9631f38b753e7d47af27014b8436014e9358644c713cd183d2c57f3458f8ba"
+          }
+        }
+      ],
+      "grader_access_audit": {
+        "method": "access_audit",
+        "status": "clean",
+        "private_grader_roots": [
+          "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+        ],
+        "reason": null,
+        "matches": []
+      },
+      "grading": {
+        "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-01bdbcd2bf634cc28bb86680a79b5e26",
+        "copied_at": "2026-10-23T02:19:31.389695+00:00",
+        "grader_source_outside_repo": true,
+        "result": "pass",
+        "passed_tests": 5,
+        "failed_tests": 0,
+        "log": {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/smoke-two-session-a/two-session-prefix-sums/grading.log",
+          "sha256": "cc124d3a80a8e2ed75483c2a6dbecaa6066df237aa13ebfe700fc4fe363ea198"
+        }
+      },
+      "done_claims": {
+        "claimed_items": 0,
+        "claimed_without_evidence": 0
+      },
+      "calls": [
+        {
+          "call_id": "two-session-prefix-sums-exec-1",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 59142,
+            "cached_input_tokens": 54912,
+            "output_tokens": 1016,
+            "usd": 0.0241112,
+            "latency_seconds": 38.46862965699984,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        },
+        {
+          "call_id": "two-session-prefix-sums-exec-2",
+          "purpose": "executor",
+          "backend": "codex_cli",
+          "model": "gpt-6.1-sol",
+          "status": "completed",
+          "usage": {
+            "input_tokens": 77035,
+            "cached_input_tokens": 70656,
+            "output_tokens": 1472,
+            "usd": 0.0345436,
+            "latency_seconds": 55.38192119100131,
+            "cost_basis": "api_equivalent_usd",
+            "pricing_ref": "openai-standard-short-2026-10-22-v1"
+          }
+        }
+      ],
+      "costs": {
+        "executor_usd": 0.0586548,
+        "control_usd": 0,
+        "total_usd": 0.0586548
+      },
+      "artifacts": [
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/smoke-two-session-a/two-session-prefix-sums/access-audit.json",
+          "sha256": "5d8e2b344758754a9d5e0aae71e07c72018f2adae088177726a19bf59b7fac48"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/smoke-two-session-a/two-session-prefix-sums/grading.log",
+          "sha256": "cc124d3a80a8e2ed75483c2a6dbecaa6066df237aa13ebfe700fc4fe363ea198"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/smoke-two-session-a/two-session-prefix-sums/handoff-evidence.json",
+          "sha256": "dfefe642cf9f1d7d7d10d2cb3931aeb05c70064a6d42d4362e4c7f13d9a45ea3"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/smoke-two-session-a/two-session-prefix-sums/result.json",
+          "sha256": "41c11a1af3e3db1adafe513476c17a718662f7ffa4dc6d1f83b08ac75267c33a"
+        },
+        {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/smoke-two-session-a/two-session-prefix-sums/session-evidence.jsonl",
+          "sha256": "ca82dd99006b0630a13a617b5c54b61ebc650db1c7625e259fdc3b6986f97032"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4rllzomu/codex-home/sessions/2026/10/23/rollout-2026-10-23T11-17-57-01a1668c-f398-70e3-a742-b0685eaa6562.jsonl",
+          "sha256": "db9044640c22d03f4a2a89f4c1049af7cc9b86abe20e63e8af481d02de0d644a"
+        },
+        {
+          "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-4rllzomu/codex-home/sessions/2026/10/23/rollout-2026-10-23T11-18-35-01a1668d-8e6e-7472-b8b9-a452f59c6073.jsonl",
+          "sha256": "27cdea82da46c11b3b3623305b9eb7a1a7c90dcb3ab5cbce3a1f6439acf5c36d"
+        }
+      ],
+      "handoff": {
+        "day2_pass": true,
+        "user_restated_day1_context": false,
+        "evidence": {
+          "path": "/Users/donghyunlee/Desktop/LocalHarnessMaker/LocalHarnessMaker/eval/reports/smoke-two-session-a/two-session-prefix-sums/handoff-evidence.json",
+          "sha256": "dfefe642cf9f1d7d7d10d2cb3931aeb05c70064a6d42d4362e4c7f13d9a45ea3"
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "pass_rate": {
+      "value": 1.0,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "false_done_rate": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "claimed_criterion",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "Complete done-claim denominator is not yet observed; verdicts retain negative evidence."
+    },
+    "cost_per_pass": {
+      "value": 0.0586548,
+      "sample_size": 1,
+      "sample_unit": "attempted_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 0.0586548,
+        "upper": 0.0586548,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "avg_attempts": {
+      "value": 2.0,
+      "sample_size": 1,
+      "sample_unit": "valid_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 2.0,
+        "upper": 2.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "handoff_success": {
+      "value": 1.0,
+      "sample_size": 1,
+      "sample_unit": "eligible_two_session_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": 1.0,
+        "upper": 1.0,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": null
+    },
+    "parity": {
+      "value": null,
+      "sample_size": 0,
+      "sample_unit": "matched_task",
+      "ci95": {
+        "level": 0.95,
+        "lower": null,
+        "upper": null,
+        "method": "task_cluster_percentile_bootstrap"
+      },
+      "undefined_reason": "No hash-pinned paired local/cheap_api comparator."
+    }
+  },
+  "accounting": {
+    "attempted_tasks": 1,
+    "valid_tasks": 1,
+    "invalid_tasks": 0,
+    "total_cost_usd": 0.0586548
+  },
+  "validity": {
+    "status": "valid",
+    "reasons": []
+  }
+}
