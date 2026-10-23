@@ -6,6 +6,7 @@ must never be named test_*.py. Only counts and content hashes are published.
 """
 
 import argparse
+import ast
 from concurrent.futures import ThreadPoolExecutor
 import json
 import re
@@ -15,7 +16,7 @@ import tempfile
 from typing import Any
 
 from eval.runner import core
-from eval.runner.audit import PrivateGraders, digest
+from eval.runner.audit import PrivateGraders, digest, normalize_line, public_inputs
 from eval.runner.process import run_process
 from eval.runner.mutations import mutations
 
@@ -60,6 +61,7 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
     """Exercise the exact trusted runner grader on two independent public copies."""
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
     public = public_task(task_id)
+    overlap = public_overlap(private, public)
     expected = json.loads((public / 'expected.json').read_text())
     with tempfile.TemporaryDirectory(prefix='lhm-grader-validation-', dir=private.root) as temporary:
         runtime = Path(temporary)
@@ -87,11 +89,37 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
     valid = (baseline['result'] == 'fail' and baseline['failed_tests'] >= 1
              and baseline.get('total_tests') == expected['expected_test_count']
              and reference['result'] == 'pass' and reference['failed_tests'] == 0
-             and reference.get('coverage', {}).get('uncovered_requirement_count', 0) == 0)
+             and reference.get('coverage', {}).get('uncovered_requirement_count', 0) == 0
+             and (not task_id.startswith('v2-') or overlap['shared_assertion_line_count'] == 0))
     return {'task_id': task_id, 'public_passed': baseline['passed_tests'],
             'public_failed': baseline['failed_tests'], 'reference_passed': reference['passed_tests'],
             'reference_failed': reference['failed_tests'], 'valid_count': int(valid),
-            'grader_sha256': [digest(p.read_bytes()) for p in private.files], **reference.get('coverage', {})}
+            'grader_sha256': [digest(p.read_bytes()) for p in private.files],
+            **overlap, **reference.get('coverage', {})}
+
+
+def public_overlap(private: PrivateGraders, public: Path) -> dict[str, int]:
+    """Count nonempty shared grader lines and assertion lines without publishing them.
+
+    Counts include occurrences across grader files; assertion spans include
+    multiline assert statements and unittest assert* calls, including helpers.
+    """
+    public_lines = {normalize_line(line) for text in public_inputs(public) for line in text.splitlines()}
+    shared = assertions = 0
+    for source in private.files:
+        text = source.read_text()
+        assertion_lines: set[int] = set()
+        for node in ast.walk(ast.parse(text)):
+            if (isinstance(node, ast.Assert) or isinstance(node, ast.Call) and
+                    (isinstance(node.func, ast.Attribute) and node.func.attr.startswith('assert')
+                     or isinstance(node.func, ast.Name) and node.func.id.startswith('assert'))):
+                assertion_lines.update(range(node.lineno, (node.end_lineno or node.lineno) + 1))
+        for number, line in enumerate(text.splitlines(), 1):
+            line = normalize_line(line)
+            if line and line in public_lines:
+                shared += 1
+                assertions += int(number in assertion_lines)
+    return {'shared_public_line_count': shared, 'shared_assertion_line_count': assertions}
 
 
 def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
@@ -104,6 +132,8 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
     public = public_task(task_id)
     reference = private.root / '.references' / task_id
+    if task_id.startswith('v2-') and public_overlap(private, public)['shared_assertion_line_count']:
+        raise ValueError('V2 grader assertions must be independent of public lines')
     files = json.loads((reference / 'application.json').read_text())['files']
     expected = json.loads((public / 'expected.json').read_text())
     specification_bytes = (public / 'prompt.md').read_bytes() + (public / 'expected.json').read_bytes()

@@ -211,6 +211,53 @@ def test_candidate_validation_hash_tracks_uncommitted_bytes(synthetic_v2: tuple[
     assert second != validate_graders.validation_digest(graders, config)
 
 
+@pytest.mark.parametrize('location', ['prompt.md', 'day2.md', 'workspace/test_public.py'])
+@pytest.mark.parametrize('assertion', [
+    'self.assertEqual(answer(), 42)', 'assert answer() == 42',
+    'self.assertEqual(\n            answer(),\n            42)',
+])
+def test_v2_shared_assertion_lines_fail_validation(synthetic_v2: tuple[Path, Path],
+                                                 location: str, assertion: str) -> None:
+    private, public = synthetic_v2
+    grader = next((private / 'v2-synthetic').glob('test_*.py'))
+    grader.write_text('import unittest\nfrom example import answer\nclass Checks(unittest.TestCase):\n'
+                      '    def test_answer(self):\n        ' + assertion + '\n')
+    target = public / location
+    # Input overlap is independent of whether public Python is executed.
+    content = 'R1. Return the specified synthetic answer.\n' if location == 'prompt.md' else ''
+    target.write_text(content + ('# public example\n' if location.endswith('.py') else '') +
+                      '\n'.join('        ' + line for line in assertion.splitlines()) + '\n')
+    row = validate_graders.validate_task(private, 'v2-synthetic')
+    assert row['valid_count'] == 0
+    assert row['reference_passed'] == 1 and row['reference_failed'] == 0
+    assert row['shared_assertion_line_count'] == len(assertion.splitlines())
+    assert row['shared_public_line_count'] >= row['shared_assertion_line_count']
+    assert assertion not in json.dumps(row)
+    with pytest.raises(ValueError, match='independent'):
+        validate_graders.mutate_task(private, 'v2-synthetic', 1)
+
+
+def test_v1_reports_shared_assertions_without_rejecting(synthetic: tuple[Path, Path]) -> None:
+    private, public = synthetic
+    line = 'def test_answer(self) -> None: self.assertEqual(answer(), 42)'
+    (public / 'prompt.md').write_text(line + '\n')
+    row = validate_graders.validate_task(private, 'synthetic')
+    assert row['valid_count'] == 1
+    assert row['shared_public_line_count'] == row['shared_assertion_line_count'] == 1
+
+
+def test_shared_imports_allowed_and_assertions_counted_per_task(synthetic_v2: tuple[Path, Path]) -> None:
+    private, public = synthetic_v2
+    (public / 'workspace/scaffolding.txt').write_text('import unittest\n\nimport unittest\n')
+    # Another task's public assertion does not count against this task's grader validation.
+    (core.REPOSITORY / 'eval/tasks/synthetic/prompt.md').write_text(
+        'def test_answer(self) -> None: self.assertEqual(answer(), 42)\n')
+    row = validate_graders.validate_task(private, 'v2-synthetic')
+    assert row['valid_count'] == 1
+    assert row['shared_public_line_count'] == 1
+    assert row['shared_assertion_line_count'] == 0
+
+
 def test_v2_mutation_equivalence_expires_when_day2_changes(synthetic_v2: tuple[Path, Path]) -> None:
     private, public = synthetic_v2
     grader = next((private / 'v2-synthetic').glob('test_*.py'))

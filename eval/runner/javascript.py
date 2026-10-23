@@ -102,7 +102,14 @@ def string_expression(tokens: list[str]) -> str | None:
                     raise ValueError("Unclosed string expression")
                 cursor += 1
             else:
-                value = literal(tokens[cursor]) if cursor < len(tokens) else None
+                if tokens[cursor:cursor + 3] == ['String', '.', 'raw']:
+                    cursor += 3
+                    token = tokens[cursor] if cursor < len(tokens) else ''
+                    value = (token[1:-1].replace('\r\n', '\n').replace('\r', '\n')
+                             if len(token) >= 2 and token.startswith('`') and token.endswith('`')
+                             and '${' not in token else None)
+                else:
+                    value = literal(tokens[cursor]) if cursor < len(tokens) else None
                 cursor += 1
                 if value is None:
                     raise ValueError("Nonliteral string expression")
@@ -312,6 +319,12 @@ def tool_calls(source: str) -> tuple[list[dict[str, Any]], list[str], bool]:
     pairs: dict[int, int] = {}
     stack: list[int] = []
     unknown = False
+    raw_tags = {i for i, token in enumerate(tokens) if token == 'String'
+                and tokens[i:i + 3] == ['String', '.', 'raw']
+                and i + 3 < len(tokens) and tokens[i + 3].startswith('`')
+                and (not i or tokens[i - 1] not in {'.', '?.'})}
+    if raw_tags and any(token == 'String' and i not in raw_tags for i, token in enumerate(tokens)):
+        unknown = True  # A shadowed/mutated tag is not the built-in raw literal operation.
     for i, token in enumerate(tokens):
         if token in {'(', '[', '{'}:
             stack.append(i)

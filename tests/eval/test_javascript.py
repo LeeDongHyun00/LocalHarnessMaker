@@ -23,6 +23,9 @@ from eval.runner.javascript import TOKEN, string_expression, tool_calls
      'python -c \'print("synthetic")\'\npython -m unittest discover -v'),
     ('`a\r\nb\rc`', 'a\nb\nc'),
     ('`a\\`b\\n\\u0063`', 'a`b\nc'),
+    (r'String.raw`cat test.py\n`', r'cat test.py\n'),
+    ('String.raw`a\r\nb\rc`', 'a\nb\nc'),
+    (r'String.raw`a\`b\u0063`', r'a\`b\u0063'),
 ])
 def test_string_expression_semantics(source: str, expected: str) -> None:
     assert string_expression(TOKEN.findall(source)) == expected
@@ -36,9 +39,18 @@ def test_string_expression_semantics(source: str, expected: str) -> None:
     '"a"["replace"]("a", "b")', '"a".replace?.("a", "b")',
     '"a".replaceAll(/a/g, "b")', '"a".toString()',
     '"\\123"', '"\\u{110000}"', '"\\uQQQQ"', '`a${}`', '`a\\${value}`',
+    'String.raw`cat ${path}`', 'String.raw`cat \\${path}`', 'other.raw`cat test.py`',
+    'String.raw("cat test.py")', 'String["raw"]`cat test.py`', 'String.raw`unterminated',
 ])
 def test_string_expression_near_misses_are_unresolved(source: str) -> None:
     assert string_expression(TOKEN.findall(source)) is None
+
+
+@pytest.mark.parametrize('shadow', ['const String = custom;', 'String.raw = custom;',
+                                    'function wrap(String) {}', 'const alias = String;'])
+def test_raw_template_requires_unmodified_builtin_tag(shadow: str) -> None:
+    source = 'await tools.exec_command({cmd:String.raw`cat test_own.py`});'
+    assert tool_calls(shadow + source)[2]
 
 
 COMMAND_VALUES = ['python -m py_compile solution.py', 'python -c \'print("synthetic")\'',

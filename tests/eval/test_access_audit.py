@@ -988,6 +988,116 @@ def test_equivalent_public_literals_are_excluded(tmp_path: Path, private: Privat
     assert private.line_fingerprints() == set()
 
 
+@pytest.mark.parametrize('task_root', ['tasks', 'tasks-v2'])
+@pytest.mark.parametrize('public_file', ['prompt.md', 'day2.md', 'workspace/nested/example.py'])
+def test_fingerprints_exclude_shipped_lines_across_versions(
+    tmp_path: Path, private: PrivateGraders, task_root: str, public_file: str,
+) -> None:
+    repository = tmp_path / 'repository'
+    line = 'assert synthetic_shared_check("shipped-example-37291") == 81937'
+    public = repository / 'eval' / task_root / 'another-task' / public_file
+    public.parent.mkdir(parents=True)
+    public.write_text('    ' + line + '\n')
+    private.files[0].write_text(line + '\n')
+    # A v2 audit also scans v1 graders, and vice versa.
+    other = 'tasks-v2' if task_root == 'tasks' else 'tasks'
+    observed = PrivateGraders(private.root, private.files, public_root=repository / 'eval' / other)
+    result = audit_command(tmp_path, observed, 'cat test_own.py', tmp_path, aggregated_output=line)
+    assert result['status'] == 'clean', result
+    assert result['line_fingerprints'] == []
+
+
+def test_generic_grader_lines_never_establish_hidden_provenance(
+    tmp_path: Path, private: PrivateGraders,
+) -> None:
+    scaffolding = ('import unittest\nfrom example import identity\n'
+                   '@synthetic_decorator(\n    "unique-scaffolding-69312"\n)\n'
+                   'class Checks(unittest.TestCase):\n'
+                   '    def test_synthetic(self):\n        pass\n'
+                   'if __name__ == "__main__":\n    unittest.main()\n')
+    private.files[0].write_text(scaffolding)
+    result = audit_command(tmp_path, private, 'cat test_own.py', tmp_path, aggregated_output=scaffolding)
+    assert result['status'] == 'clean', result
+    assert result['line_fingerprints'] == []
+
+
+def test_executor_written_lines_do_not_expand_public_exclusions(tmp_path: Path, private: PrivateGraders) -> None:
+    line = 'assert synthetic_hidden_check("opaque-independent-98317") == 82493'
+    private.files[0].write_text(line + '\n')
+    (tmp_path / 'test_own.py').write_text(line + '\n')
+    result = audit_command(tmp_path, private, 'cat test_own.py', tmp_path, aggregated_output=line)
+    assert result['status'] == 'access_detected', result
+    assert {match['marker'] for match in result['matches']} == {'private_line_fingerprint'}
+
+
+@pytest.mark.parametrize('form', LOOP_RECORDS)
+@pytest.mark.parametrize('matches', [False, True])
+def test_relative_globs_in_literal_for_lists(tmp_path: Path, private: PrivateGraders,
+                                            form: str, matches: bool) -> None:
+    workspace = tmp_path / 'workspace'
+    (workspace / 'project').mkdir(parents=True)
+    if matches:
+        (workspace / 'project/one.py').write_text('')
+        (workspace / 'project/two words.py').write_text('')
+    command = "/bin/zsh -lc " + shlex.quote(
+        'for f in project/*.py test_public.py verify.py README.md; do echo "$f"; cat "$f"; done')
+    result = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert result['status'] == 'clean', result
+    operands, unknown = command_operands(command, workspace, workspace=workspace)
+    assert not unknown
+    if matches:
+        for name in ['one.py', 'two words.py']:
+            assert operands.count(((workspace / 'project' / name).resolve(), False)) == 2
+
+
+@pytest.mark.parametrize('form', LOOP_RECORDS)
+def test_loop_glob_expands_before_suffix_and_keeps_private_symlink_detection(
+    tmp_path: Path, private: PrivateGraders, form: str,
+) -> None:
+    workspace = tmp_path / 'workspace'
+    (workspace / 'project/one').mkdir(parents=True)
+    (workspace / 'project/two').mkdir()
+    (workspace / 'project/one/probe').symlink_to(private.files[0])
+    command = 'for d in project/*; do cat "$d/probe"; done'
+    result = audit_loop_record(tmp_path, private, command, workspace, form)
+    assert result['status'] == 'access_detected', result
+    assert result['errors'] == []
+
+
+@pytest.mark.parametrize('form', LOOP_RECORDS)
+@pytest.mark.parametrize('word', ['../*.py', 'project/../*.py', '/workspace/*.py',
+                                 '$DIR/*.py', '${DIR}/*.py', '"project/*.py"'])
+def test_loop_glob_near_misses_stay_unresolved(tmp_path: Path, private: PrivateGraders,
+                                             form: str, word: str) -> None:
+    workspace = tmp_path / 'workspace'
+    workspace.mkdir()
+    result = audit_loop_record(tmp_path, private, f'for f in {word}; do cat "$f"; done', workspace, form)
+    assert result['status'] == 'inconclusive', result
+    assert any(error.startswith('unresolved_operand:') for error in result['errors'])
+
+
+@pytest.mark.parametrize('case', ['heredoc', 'private_operand', 'private_output', 'interpolation'])
+def test_raw_template_heredoc_native_audit(tmp_path: Path, private: PrivateGraders,
+                                          native_session: list[dict[str, Any]], case: str) -> None:
+    # Heredoc Python loops, quotes and backslashes are data, not shell operands.
+    command = "cat > test_own.py <<'PY'\nimport unittest\nclass Own(unittest.TestCase):\n"
+    command += '    def test_example(self):\n        for value in ("a", "b"):\n'
+    command += '            self.assertTrue(value)\nPY\npython -m unittest -q'
+    output = ''
+    if case == 'private_operand':
+        command += '\ncat ' + shlex.quote(str(private.files[0]))
+    elif case == 'private_output':
+        output = 'assert synthetic_hidden_check("opaque-value-97351") == 98327'
+        private.files[0].write_text(output + '\n')
+    elif case == 'interpolation':
+        command += '\ncat ${filename}'
+    native_session[22]['payload']['input'] = 'text(await tools.exec_command({cmd:String.raw`' + command + '`}));'
+    native_session[26]['payload']['output'][0]['text'] = output
+    result = audit_native(tmp_path, private, native_session)
+    expected = 'inconclusive' if case == 'interpolation' else 'clean' if case == 'heredoc' else 'access_detected'
+    assert result['status'] == expected, result
+
+
 @pytest.mark.parametrize('dynamic', [False, True])
 def test_parallel_code_mode_literal_calls(tmp_path: Path, private: PrivateGraders,
                                            native_session: list[dict[str, Any]], dynamic: bool) -> None:

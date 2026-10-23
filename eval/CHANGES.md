@@ -1,3 +1,52 @@
+# Calibration pilot audit corrections — 2026-10-23
+
+Exclude shared public lines across both shipped task-set versions at audit time,
+because the private grader corpus spans v1 and v2. Exclude generic imports,
+comments, blank/punctuation-only lines, decorator spans, TestCase headers and
+test method headers. Preserve distinctive-literal filtering, output-only
+fingerprints, immutable shipped-input exclusions and fail-closed detection of
+qualifying hidden lines. Synthetic regressions cover graders sharing public
+workspace, prompt and day-2 lines across versions, plus generic scaffolding and
+executor-written lines that must remain eligible.
+
+Report per-task shared_public_line_count and shared_assertion_line_count in
+offline grader validation. Count nonempty normalized line occurrences; assertion
+spans include Python assert statements and assert* calls. Reject shared assertion
+lines for v2 in ordinary and mutation validation; v1 reports counts without
+changing its acceptance rule. Revise private input/expectation pairs across all
+four pilot families, preserve every requirement mapping and archive originals
+privately. Refresh the counts-only validation table. Current local graders had
+zero exact shared assertion lines before the revision as well.
+
+Decode substitution-free String.raw templates as literals with raw backslashes
+and normalized newlines. Audit their contained shell command normally, including
+quoted heredoc data. Interpolation, other/dynamic tags and uncertain String
+bindings remain inconclusive. Expand bounded relative globs in literal for-loop
+word lists before variable substitution. Preserve concrete symlink/private-path
+detection and reject absolute, parent-traversing, variable-built and quoted glob
+words. Regression cases cover executor JSON plus native command/function/custom
+records, no matches, whitespace in matches, suffixes and private symlinks.
+
+Offline candidate validation: 20/20 valid starter/reference pairs, 249 reference
+checks, 156 starter failures, 252/252 requirement mappings covered, 100 shared
+public lines, 0 shared assertion lines, 1121 killed mutants, 18 reviewed
+equivalents and 0 unreviewed survivors. Per-task IDs and counts are in
+reports/pilot-v2-validation.md. No live executor/controller/judge calls were made.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1351 passed in
+179.73s. Offline validation and mutation CLIs — exit 0.
+`git diff --check -- eval tests/eval state/STATUS-eval.md` — exit 0.
+Frozen public tasks, schemas, retained run reports and other roles remain unchanged.
+
+## Assumptions
+
+- The host's four invalidities and absence of access attempts are user-supplied
+  findings. This session verifies synthetic logs and offline graders; Claude
+  owns host retained-run re-audit and recovery.
+- Host retained-run recovery must use the original hash-pinned graders with the
+  updated audit code. Revised private candidates have different hashes and are
+  for subsequent calibration; privately archived originals preserve recovery.
+
 # Read-only command-array display callbacks — 2026-10-23
 
 Resolve the retained const-array shape with a later

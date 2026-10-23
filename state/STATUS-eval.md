@@ -1,5 +1,10 @@
 ## Done
 
+- Excluded shipped public lines across v1/v2 and generic scaffolding from audit-time fingerprints; retained output-only, distinctive-literal and qualifying-line invalidation rules, including synthetic public-workspace overlap and executor-written-line regressions (`.venv/bin/python -m pytest tests/eval -q`: 1351 passed in 179.73s)
+- Resolved substitution-free String.raw templates with raw escape semantics and bounded relative globs in literal for-loop lists; verified quoted heredoc data, all four capture forms, no matches, whitespace, private symlinks and fail-closed near misses (`.venv/bin/python -m pytest tests/eval -q`: 1351 passed in 179.73s)
+- Added per-task shared_public_line_count and shared_assertion_line_count; rejected shared v2 assertion lines in ordinary and mutation validation while preserving v1 acceptance (`.venv/bin/python -m pytest tests/eval -q`: 1351 passed in 179.73s)
+- Revised private input/expectation pairs across all four pilot families, archived originals privately and refreshed the counts-only validation table (`.venv/bin/python "$LHM_PRIVATE_GRADERS/validate_public_overlap_pilot.py"`, private-root argument expressed through the environment variable: validation/mutation CLIs exit 0; 20/20 valid pairs, 249 reference checks, 156 starter failures, 252/252 requirements covered, 100 shared public lines, 0 shared assertion lines, 1121 killed mutants, 18 reviewed equivalents, 0 unreviewed survivors)
+- Updated eval/README.md and eval/CHANGES.md; preserved all public task files, schemas and retained run reports (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/tasks-v2 schemas controller verifier plugin prompts AGENTS.md`: exit 0)
 - Supported later read-only commands[i] display callbacks in the supplied complete const-array structure; verified all/allSettled, shorthand cmd plus literal options, nested Python quotes, synthetic alias access detection and rejection of every listed mutation before/inside/after the callback (`.venv/bin/python -m pytest tests/eval -q`: 1279 passed in 123.01s)
 - Updated eval/CHANGES.md for the read-only callback follow-up and preserved frozen tasks, retained reports and schemas (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas`: exit 0)
 - Resolved substitution-free command templates and immutable const/let string arrays through map, for-of and direct tool arguments; audited every element and verified native synthetic private-path detection plus fail-closed near misses (`.venv/bin/python -m pytest tests/eval -q`: 1218 passed in 114.77s)
@@ -12,17 +17,23 @@
 
 ## Remaining
 
-- Host: transfer this read-only display follow-up at a safe boundary and re-audit the remaining const-array full-harness record. The user reports the template case is clean after 64a825b; host streams and the actual private grader root remain unavailable here.
-- Review and transfer repository changes and the matching private v2 candidate artifacts at a safe boundary for other checkouts. Do not stage or commit here; use the final Commit plan on the host.
-- Host: obtain spending approval for the 24-session baseline-A calibration using calibration=true. Run with the approved Codex version and observed priority tiers; retain candidate hashes and all outcomes. Calibration precedes freeze and is never headline evidence.
+- Host/Claude: transfer the updated audit code at a safe boundary and re-audit the four reported calibration invalidities with the original hash-pinned graders. Preserve original run evidence. Privately archived originals are available; revised candidate hashes must not replace the original hashes during recovery.
+- Review and transfer repository changes and matching private v2 revisions for subsequent calibration at a safe boundary. Do not stage or commit here; use the final Commit plan on the host. This worktree has no live v2 streams and claims no host re-audit result.
+- Host: finish the running baseline-A/Fast calibration, retain every outcome/cost and review diagnostic results before freeze. Calibration remains separate from headline evidence.
 - After calibration: revise only at whole-family/type level if needed, build the remaining sixteen planned families, validate the whole population and publish its separate freeze through Role 1.
-- Host recovery remains pending: regrade full B's interrupted terminal/Unicode framing and full harness's quoted heredoc. Use retained evidence first; source artifacts from other checkouts were not recovered in this session.
+- Host recovery remains pending: regrade full B's interrupted terminal/Unicode framing, full harness's quoted heredoc and the retained const-array full-harness record with updated code. Use retained evidence first; other checkouts were not modified here.
 - Host: use the existing infrastructure-only rerun flow for eligible completed harness invalidities; checkpoint-only interrupted/capacity-limited runs resume their original command first. Never rerun a quality failure to improve the score.
 - Preserve C skeletons for the user's authorship, paired comparison scope, five pilot-A reviews and twenty-sample reporting. Disclose historical v1 Luna control underpricing in the final evaluation; do not rewrite retained v1 reports or treat absent task-level metrics as zero.
-- Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
+- Run the full repository suite once before merge on the host. This session ran tests/eval only and made no live executor/controller/judge calls.
 
 ## Decisions
 
+- Include both shipped public versions in fingerprint exclusions: immediate private grader sources span versions, and a public line cannot establish private provenance. Never use executor-mutated workspaces as public exclusions.
+- Exclude Python scaffolding explicitly and retain qualifying hidden-line invalidation: multiline decorator spans and common headers are generic; no general fingerprint waiver was added.
+- Count per-task nonempty normalized grader-line occurrences and assertion spans: ordinary and mutation validation reject any shared v2 assertion line; v1 only gains diagnostics.
+- Change hidden input/expectation pairs across every pilot family while preserving all mappings: local exact assertion overlap was already zero, but public-example-based hidden cases also needed independent values.
+- Preserve original grader bytes privately for retained-run recovery: existing hash checks remain strict; revised candidates require their own subsequent calibration provenance.
+- Resolve only static String.raw literals and bounded unquoted relative loop globs: raw backslashes and expansion-before-substitution semantics matter; interpolation, uncertain tags, absolute/traversing/variable globs remain inconclusive.
 - Permit later indexed display reads only inside a read-only forEach text callback: the supplied retained record logs commands[i] after its single collection use; every mutation, alias and unsupported extra reference must still prevent binding resolution.
 - Decode substitution-free templates and one-use literal command arrays without executing JavaScript: expand every array element into an independently audited command, and retain inconclusive outcomes for interpolation, nonliterals, rebinding, mutation, aliases, unsupported uses or unsupported binding identity/scope.
 - Permit an explicit calibration procedure before freeze: the default freeze rule remains, candidate bytes remain hash-pinned, and calibration status is persisted through recovery and refused by compare.
@@ -37,15 +48,15 @@
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
-- Host/private validation only: .venv/bin/python "$LHM_PRIVATE_GRADERS/validate_distinct_pilot.py"
+- Offline/private validation: .venv/bin/python "$LHM_PRIVATE_GRADERS/validate_public_overlap_pilot.py"
 - git diff --check -- eval tests/eval state/STATUS-eval.md
-- git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports schemas
+- git diff --exit-code -- eval/tasks eval/tasks-v2 schemas controller verifier plugin prompts AGENTS.md
 - Host/retained evidence only: python -m eval.runner.regrade --private-root P --from SOURCE --out NEW
 - Host/approved spending only: python -m eval run --config eval/configs/pilot-v2-a.yaml --out eval/reports/pilot-v2-a/
 
 ## Do not touch
 
-- Work only in r5/v2 with this worktree's .venv; edit only eval/, tests/eval/ and this status file. Preserve other checkouts, private companion artifacts and other roles' paths.
+- Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. Private v2 grader revisions are authorized; preserve archived originals, other checkouts and other roles' paths.
 - Frozen v1 public tasks/graders, retained v1 reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or project-file deletion.
 - No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Model and executor integration checks must use mocks.
@@ -55,8 +66,10 @@
 
 ## Assumptions
 
-- The user reports 64a825b was committed and the template record re-audited clean; the supplied full const-array structure supersedes the earlier brief. Synthetic native custom_tool_call regressions verify this follow-up, and the const-array outcome awaits host re-audit.
+- The user reports the running host calibration's first twelve outcomes as 6 pass, 2 fail and 4 invalid, with none of the invalidities an access attempt. This session has no live v2 host streams; synthetic parser tests and offline grader validation are the evidence produced here. Claude owns host re-audit.
+- Supplied local v2 graders had 0 exact shared assertion lines before revision; every task had 5 shared nonempty public lines. Independent hidden input/expectation pairs were still revised across all four families as requested, without publishing values or source.
+- Existing retained-run hash checks require original grader bytes during host recovery. Revised candidate validation is separate evidence and does not authorize rewriting original run provenance.
 - The Fast prices, 2026-07-30 naming change and Luna CLI priority default are user-supplied official-page/host observations; network verification is unavailable. No live cost or quality measurement is claimed.
 - The existing verifier exposes criterion extraction only. Binding task-scoped prose to one synthetic task ID applies its completion vocabulary, negation, exceptions and quote/code rules without treating criterion counts or test-only statements as whole-task completion.
 - Only the retained final output of the final process in the last required session supplies completion evidence; absent evidence is explicitly undefined, with no earlier-session or intermediate-message substitution.
-- Other historical host recovery outcomes are still unknown. Private v2 artifacts are local companion changes and must remain paired with the revised public candidate; no v1 private grader was edited.
+- Other historical host recovery outcomes remain unknown. Private v2 revisions are companion changes; no v1 grader or reference was revised.

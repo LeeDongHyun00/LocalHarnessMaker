@@ -63,12 +63,14 @@ class PrivateGraders:
         """Analyze unique immediate task graders against the public corpus once."""
         public: list[str] = []
         if self.public_root is not None:
-            for task in self.public_root.iterdir() if self.public_root.is_dir() else ():
-                if not task.is_dir():
-                    continue
-                paths = [task / name for name in ("prompt.md", "day2.md", "expected.json", "meta.json")]
-                paths.extend((task / "workspace").rglob("*"))
-                public.extend(path.read_text(errors="replace") for path in paths if path.is_file())
+            roots = {self.public_root}
+            # Grader sources span versions, so public exclusions must too.
+            if self.public_root.name in {"tasks", "tasks-v2"}:
+                roots.update(self.public_root.parent / name for name in ("tasks", "tasks-v2"))
+            for root in sorted(roots):
+                for task in root.iterdir() if root.is_dir() else ():
+                    if task.is_dir():
+                        public.extend(public_inputs(task))
         public_lines = {normalize_line(line) for text in public for line in text.splitlines()}
         public_literals: set[str | int | float | complex] = set()
         for text in public:
@@ -99,7 +101,11 @@ class PrivateGraders:
             # Docstrings, the module entry guard and unittest's launcher are
             # scaffolding, even when their literals happen to be absent publicly.
             boilerplate: set[int] = set()
+            decorator_lines: set[int] = set()
             for node in nodes:
+                if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                    for decorator in node.decorator_list:
+                        decorator_lines.update(range(decorator.lineno, (decorator.end_lineno or decorator.lineno) + 1))
                 if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
                     boilerplate.add(id(node.value))
                 if ((isinstance(node, ast.If) and any(isinstance(child, ast.Name) and child.id == "__name__"
@@ -131,7 +137,8 @@ class PrivateGraders:
                     continue
                 for number in range(node.lineno, (node.end_lineno or node.lineno) + 1):
                     line = normalize_line(lines[number - 1])
-                    if len(line) >= 16 and line not in public_lines:
+                    if (len(line) >= 16 and line not in public_lines and number not in decorator_lines
+                            and not generic_grader_line(line)):
                         fingerprints.add(digest(line.encode()))
         return fingerprints
 
@@ -219,6 +226,22 @@ def executor_environment(private: PrivateGraders, codex_home: Path) -> dict[str,
     if any(marker in value for marker in private.markers() for value in environment.values()):
         raise ValueError("Private grader location would reach executor environment")
     return environment
+
+
+def public_inputs(task: Path) -> list[str]:
+    """Read shipped task inputs, never an executor's mutable workspace."""
+    paths = [task / name for name in ("prompt.md", "day2.md", "expected.json", "meta.json")]
+    paths.extend((task / "workspace").rglob("*"))
+    return [path.read_text(errors="replace") for path in paths if path.is_file()]
+
+
+def generic_grader_line(line: str) -> bool:
+    """Exclude Python scaffolding that cannot establish private provenance."""
+    return (not line or line.startswith(("#", "@", "import ", "from "))
+            or not re.search(r"\w", line)
+            or bool(re.fullmatch(r"class\s+\w+\s*\(\s*(?:unittest\.)?TestCase\s*\)\s*:", line))
+            or bool(re.fullmatch(r"(?:async\s+)?def\s+test_\w+\s*\(\s*self\s*\)\s*(?:->\s*None\s*)?:", line))
+            or bool(re.match(r"if\s+__name__\s*==", line)))
 
 
 def normalize_line(line: str) -> str:
@@ -358,7 +381,8 @@ def shell_data_spans(command: str, *, expansions: list[str] | None = None) -> li
 
 
 def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
-                        data: list[tuple[int, int]] | None = None) -> tuple[list[tuple[str, str]], bool]:
+                        data: list[tuple[int, int]] | None = None,
+                        cwd: Path | None = None, workspace: Path | None = None) -> tuple[list[tuple[str, str]], bool]:
     """Unroll one literal for loop, retaining uncertainty for every other form.
 
     This is operand extraction, not shell execution: inspect both sides of an
@@ -397,10 +421,22 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
     if boundary < 0 or tokens[boundary + 1:boundary + 2] != [("do", "do")]:
         return tokens, True
     words = tokens[start + 3:boundary]
-    # Reject expansions even when quoted; the supported list is strictly literal.
-    if not words or any(not value or any(ch in raw for ch in "$`*?[]{}~\\\n") or
+    # Relative static globs are the only supported word-list expansion.
+    if not words or any(not value or any(ch in raw for ch in "$`{}~\\\n") or
                         raw in separators | {"(", ")"} for value, raw in words):
         return tokens, True
+    resolved_words: list[str] = []
+    for value, raw in words:
+        if glob.has_magic(value):
+            if (raw != value or Path(value).is_absolute() or ".." in Path(value).parts
+                    or cwd is None or not workspace_glob(cwd / value, workspace)):
+                return tokens, True
+            matches = glob.glob(str(cwd / value), recursive=True)
+            resolved_words.extend(str(Path(match).relative_to(cwd)) for match in matches)
+            if not matches:
+                resolved_words.append(value)  # Same bounded no-match rule as direct globs.
+        else:
+            resolved_words.append(value)
     ends = [i for i, pair in enumerate(tokens) if pair == ("done", "done")]
     if len(ends) != 1:
         return tokens, True
@@ -457,7 +493,7 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
         return tokens, True
     reference = re.compile(r"\$(?:\{" + variable + r"\}|" + variable + r"(?![A-Za-z0-9_]))")
     expanded: list[tuple[str, str]] = []
-    for word, _ in words:
+    for word in resolved_words:
         for group in commands:
             for value, raw in group:
                 if "$" in raw or "`" in raw:
@@ -507,7 +543,7 @@ def command_operands(command: str, cwd: Path | None, *,
         tokens = shell_tokens(command)
     except ValueError:
         return [], True
-    tokens, loop_unknown = literal_loop_tokens(tokens, command, data=spans)
+    tokens, loop_unknown = literal_loop_tokens(tokens, command, data=spans, cwd=cwd, workspace=workspace)
     unresolved |= loop_unknown
     if any("$" in raw or "`" in raw for _, raw in tokens):
         unresolved = True

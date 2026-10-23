@@ -62,7 +62,15 @@ never select or drop individual tasks by pilot outcome. Preserve all candidates.
 The existing `eval.runner.validate_graders` command accepts explicit v2 IDs in
 `--tasks`; `--tasks all` retains its v1 meaning. V2 validation checks a private
 requirement-to-executed-test manifest, references and failing starters through
-the normal trusted grading path. It can hash untracked candidate bytes offline;
+the normal trusted grading path. Each task also reports
+`shared_public_line_count` and `shared_assertion_line_count`: counts of nonempty,
+whitespace-normalized grader-line occurrences found in that task's shipped
+public inputs. Python `assert` statements and unittest `assert*` calls include
+every line of a multiline assertion. V2 validation fails on any shared assertion
+line, including in mutation mode; v1 reports the counts without changing its
+acceptance rule. Counts are published without source lines. The four pilot
+families use independent private input/expectation values while preserving
+their requirement mappings. It can hash untracked candidate bytes offline;
 that is not a run freeze. `--mutants 100000` exceeds the current complete AST
 mutation population for each pilot task. Mutation source/reviews and hash-bound
 equivalence rationales remain external; the v2 specification hash includes day 2.
@@ -144,7 +152,14 @@ Loop detection excludes heredoc bodies/delimiters and comments; quoted arguments
 remain data. Their pre-existing expansion and protected-path checks still apply.
 Commands mixing actual shell loops with these data spans remain outside the
 bounded unrolling grammar and inconclusive.
-Lists containing globs or expansions, nested/while loops, arithmetic, other
+Literal lists can also contain unquoted relative globs such as `project/*.py`.
+Expand them inside the workspace before substituting each loop variable; every
+concrete match retains canonical-path and symlink checks. The same bounded
+no-match rule as direct globs applies. Absolute patterns, any `..` component,
+variable-built patterns and quoted glob words remain unresolved. This covers
+`for f in project/*.py test_public.py verify.py README.md; do echo "$f"; cat "$f"; done`
+inside a literal shell wrapper.
+Lists containing other expansions, nested/while loops, arithmetic, other
 assignments or variable mutations, and directory-changing bodies remain
 unresolved and inconclusive. Indirect code, embedded option/redirection values,
 and unquoted substitutions that would split words also remain unsupported.
@@ -170,9 +185,14 @@ read-only re-audit share one fingerprint/public-corpus analysis across tasks,
 retries and streams per invocation; a new invocation gets a new cache.
 A candidate
 must contain a number or string literal absent from every public task's
-`prompt.md`, `day2.md`, `expected.json`, `meta.json` and `workspace/` files;
-lines already present publicly, docstrings, module entry guards and unittest
-launchers are excluded. Literal comparison includes decoded strings and numeric
+`prompt.md`, `day2.md`, `expected.json`, `meta.json` and `workspace/` files.
+Because the private grader corpus spans versions, exclusions include shipped
+public inputs from both v1 and v2 at audit time, including during retained-log
+re-audit. Executor-written files never enlarge those exclusions. Lines already
+present publicly, imports, comments, blank/punctuation-only lines, decorators
+(including multiline spans), TestCase class headers, test method headers,
+docstrings, module entry guards and unittest launchers are excluded. A qualifying
+hidden-line match still invalidates the task. Literal comparison includes decoded strings and numeric
 spellings, with conservative substring exclusion for common values.
 Only command `aggregated_output` and function/custom tool output contents are
 matched. Executor-authored patches, file changes, arguments and metadata are
@@ -210,6 +230,11 @@ Literal `exec` JavaScript wrappers around `tools.exec_command` and
 command and its literal `workdir` (when supplied) is audited separately;
 JavaScript glue and patch contents are never parsed as shell commands. Patch
 targets receive path checks, including moves and bare symlink filenames.
+Substitution-free `String.raw` tagged templates are also literal strings, with
+backslashes preserved and template newlines normalized. Their shell commands
+receive the usual operand, heredoc and output checks. Quoted heredoc bodies
+remain data. Interpolation, alternate/dynamic tags and uncertain `String`
+binding or tag mutation remain inconclusive.
 Quoted literal expressions may use `+` concatenation, parentheses and chained
 `.replace(literal, literal)` / `.replaceAll(literal, literal)`. String-pattern
 `replace` changes the first occurrence; `replaceAll` changes every occurrence.
