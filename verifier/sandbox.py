@@ -19,6 +19,7 @@ import sys
 import time
 from typing import Protocol
 
+from verifier.causes import Cause
 from verifier.processes import LaunchError, run_owned
 
 
@@ -31,6 +32,7 @@ class Execution:
     stderr: str = ""
     error: str | None = None
     duration: float = 0.0
+    cause: Cause = Cause.VERIFIER
 
 
 class Runner(Protocol):
@@ -40,6 +42,10 @@ class Runner(Protocol):
 class RejectedCommand(ValueError):
     """A command cannot be safely dispatched by the initial runner."""
 
+    def __init__(self, message: str, cause: Cause = Cause.CONTRACT) -> None:
+        super().__init__(message)
+        self.cause = cause
+
 
 _MUTATING_CALLS = {
     "remove", "unlink", "rmdir", "rmtree", "rename", "replace", "truncate",
@@ -47,10 +53,95 @@ _MUTATING_CALLS = {
 }
 
 
+def _input_path(token: str, workspace: Path) -> None:
+    path = Path(token)
+    if path.is_absolute() or not (workspace / path).resolve().is_relative_to(workspace):
+        raise RejectedCommand(f"path outside workspace: {token}")
+    if not (workspace / path).is_file() and not (workspace / path).is_dir():
+        raise RejectedCommand(f"missing command input path: {token}", Cause.WORKSPACE)
+
+
+def _unittest_target(token: str, workspace: Path) -> None:
+    if "/" in token or "\\" in token or token.endswith(".py"):
+        _input_path(token, workspace)
+        return
+    if not re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", token):
+        raise RejectedCommand(f"unsupported unittest target: {token}")
+    # Resolve the longest local module/package prefix without importing code.
+    # Class and method suffixes are names, never filesystem operands.
+    parts = token.split(".")
+    for length in range(len(parts), 0, -1):
+        relative = Path(*parts[:length])
+        for candidate in (relative.with_suffix(".py"), relative):
+            resolved = (workspace / candidate).resolve()
+            if not resolved.is_relative_to(workspace):
+                raise RejectedCommand(f"path outside workspace: {token}")
+            if resolved.is_file() or resolved.is_dir():
+                return
+    raise RejectedCommand(f"missing command input path: {token}", Cause.WORKSPACE)
+
+
+def _test_arguments(module: str, arguments: list[str], workspace: Path) -> None:
+    discover = module == "unittest" and bool(arguments) and arguments[0] == "discover"
+    tokens = arguments[1:] if discover else arguments
+    flags = ({"-v", "-q", "-b", "-f"} if module == "unittest" else
+             {"-q", "-v", "-s", "-x", "-rA", "--tb=short", "--disable-warnings"})
+    operands = {"-k"} | ({"-s", "-p", "-t"} if discover else set())
+    if module == "pytest":
+        operands.add("-p")
+    index = 0
+    positional = 0
+    while index < len(tokens):
+        token = tokens[index]
+        if token in flags:
+            index += 1
+            continue
+        option = token[:2]
+        if option in operands:
+            if token == option:
+                index += 1
+                if index >= len(tokens) or tokens[index].startswith("-"):
+                    raise RejectedCommand(f"missing command option value: {option}")
+                value = tokens[index]
+            else:
+                value = token[2:]
+            if not value:
+                raise RejectedCommand(f"missing command option value: {option}")
+            if option in {"-s", "-t"}:
+                _input_path(value, workspace)
+            elif option == "-p":
+                if module == "pytest":
+                    if value != "no:cacheprovider":
+                        raise RejectedCommand(f"unsupported pytest plugin: {value}")
+                elif "/" in value or "\\" in value or value in {".", ".."}:
+                    raise RejectedCommand(f"discovery pattern must be a filename pattern: {value}")
+            # -k consumes an expression/name pattern, not a path.
+        elif token.startswith("-"):
+            raise RejectedCommand(f"unsupported command option: {token}")
+        elif discover:
+            # unittest also accepts positional start, pattern and top-level.
+            if positional in {0, 2}:
+                _input_path(token, workspace)
+            elif positional == 1:
+                if "/" in token or "\\" in token or token in {".", ".."}:
+                    raise RejectedCommand(f"discovery pattern must be a filename pattern: {token}")
+            else:
+                raise RejectedCommand("too many unittest discover arguments")
+            positional += 1
+        elif module == "unittest":
+            _unittest_target(token, workspace)
+        else:
+            _input_path(token.split("::", 1)[0], workspace)
+        index += 1
+
+
 def command_argv(command: str, workspace: Path) -> list[str]:
     """Accept direct Python checks only; never interpret a shell program."""
     try:
-        argv = shlex.split(command)
+        lexer = shlex.shlex(command, posix=True, punctuation_chars=";&|<>")
+        lexer.whitespace_split = True
+        lexer.commenters = ""
+        argv = list(lexer)
     except ValueError as exc:
         raise RejectedCommand(f"invalid command quoting: {exc}") from exc
     if not argv or argv[0] not in {"python", "python3", sys.executable}:
@@ -58,18 +149,14 @@ def command_argv(command: str, workspace: Path) -> list[str]:
     if any(token in {";", "&&", "||", "|", ">", ">>", "<", "&"} for token in argv):
         raise RejectedCommand("shell operators are not supported")
     if len(argv) < 3:
-        raise RejectedCommand("expected python -m py_compile/pytest or python -c CODE")
-    if argv[1] == "-m" and argv[2] in {"py_compile", "pytest"}:
+        raise RejectedCommand("expected python -m py_compile/pytest/unittest or python -c CODE")
+    if argv[1] == "-m" and argv[2] in {"pytest", "unittest"}:
+        _test_arguments(argv[2], argv[3:], workspace.resolve())
+    elif argv[1] == "-m" and argv[2] == "py_compile":
         for token in argv[3:]:
             if token.startswith("-"):
-                if argv[2] != "pytest" or token not in {"-q", "-v", "-s", "--disable-warnings"}:
-                    raise RejectedCommand(f"unsupported command option: {token}")
-                continue
-            path = Path(token.split("::", 1)[0])
-            if path.is_absolute() or not (workspace / path).resolve().is_relative_to(workspace):
-                raise RejectedCommand(f"path outside workspace: {token}")
-            if not (workspace / path).is_file() and not (workspace / path).is_dir():
-                raise RejectedCommand(f"missing command input path: {token}")
+                raise RejectedCommand(f"unsupported command option: {token}")
+            _input_path(token, workspace.resolve())
     elif argv[1] == "-c" and len(argv) == 3:
         try:
             tree = ast.parse(argv[2])
@@ -108,8 +195,10 @@ def run_command(command: str, workspace: Path, timeout: float = 120.0) -> Execut
         return Execution(error="workspace is not a directory")
     try:
         argv = command_argv(command, workspace)
-    except (RejectedCommand, OSError, RuntimeError) as exc:
-        return Execution(error=f"command rejected: {exc}")
+    except RejectedCommand as exc:
+        return Execution(error=f"command rejected: {exc}", cause=exc.cause)
+    except (OSError, RuntimeError) as exc:
+        return Execution(error=f"command validation failed: {exc}")
     sandbox = Path("/usr/bin/sandbox-exec")
     if sys.platform != "darwin" or not sandbox.is_file():
         return Execution(error="sandbox unavailable; command not executed")

@@ -13,6 +13,7 @@ from typing import Any, Callable
 
 from jsonschema import ValidationError
 
+from verifier.causes import Cause
 from verifier.processes import CaptureState, run_owned
 from verifier.rules import Result
 from verifier.schema import validate
@@ -121,18 +122,18 @@ def judge_criterion(
             ):
                 raise ValueError("judgment cost lacks usage or pricing reference")
             outcome = "completed"
-            return Result(judgment["status"], judgment["evidence"], judgment["reason"])
+            return Result(judgment["status"], judgment["evidence"], judgment["reason"], cause=Cause.WORKSPACE)
     except subprocess.TimeoutExpired as exc:
         capture.launched = True
         if exc.stderr is not None:
             capture.stderr = exc.stderr
         outcome = "timeout"
         return Result("unverifiable", f"llm_judge: {exc}",
-                      f"judge delegation timed out after {timeout:g} seconds")
+                      f"judge delegation timed out after {timeout:g} seconds", cause=Cause.TRANSPORT)
     except (OSError, ValueError, RuntimeError, ValidationError, subprocess.SubprocessError) as exc:
         # Never turn broken transport/schema/identity into a passing judgment.
-        reason = f"judge delegation unavailable: {type(exc).__name__}"
         detail = str(exc).splitlines()[0] if str(exc) else type(exc).__name__
-        return Result("unverifiable", f"llm_judge: {detail}", reason)
+        reason = f"judge delegation unavailable: {type(exc).__name__}: {detail}"
+        return Result("unverifiable", f"llm_judge: {detail}", reason, cause=Cause.TRANSPORT)
     finally:
         _forward_accounting(capture, backend, criterion["id"], outcome)

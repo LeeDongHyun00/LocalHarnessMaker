@@ -45,7 +45,7 @@ def test_command_budget_and_cutoff(
     assert calls == ([] if expected is None else [expected])
     skipped = verdict["items"] if expected is None else verdict["items"][1:]
     assert all(item["status"] == "unverifiable" and "budget" in item["reason"] for item in skipped)
-    assert verdict["reinstruct_message"] and verdict["overall"] == "fail"
+    assert verdict["reinstruct_message"] is None and verdict["overall"] == "fail"
     validate(verdict, "verdict.schema.json")
 
 
@@ -92,4 +92,4 @@ def test_budget_cli_writes_schema_valid_verdict_with_success_exit(
     verdict = json.loads(out.read_text())
     validate(verdict, "verdict.schema.json")
     assert all(i["status"] == "unverifiable" and "budget" in i["reason"] for i in verdict["items"])
-    assert (verdict["reinstruct_message"] is None) == (attempt == 3)
+    assert verdict["reinstruct_message"] is None

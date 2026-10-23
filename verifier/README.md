@@ -13,6 +13,9 @@ Exit codes are 0 for successful computation (including a failed verdict), 1 for
 input errors and 2 for internal errors. Errors print no success path.
 `validate-handoff` validates without rewriting and prints the supplied path.
 The existing check/verdict and handoff schemas and judgment semantics apply.
+Command support and actionable retry categories are documented in [RULES.md](RULES.md).
+A failed verdict can have null reinstruct_message before retry exhaustion when
+only contract, verifier, budget or judge transport problems remain.
 
 ## Judge accounting on stderr
 

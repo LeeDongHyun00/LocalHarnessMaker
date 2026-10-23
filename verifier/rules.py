@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 from typing import Any, Literal
 
+from verifier.causes import Cause
 from verifier.sandbox import Execution, Runner, run_command
 
 
@@ -16,6 +17,7 @@ class Result:
     evidence: str
     reason: str
     command_duration: float = 0.0
+    cause: Cause = Cause.VERIFIER
 
 
 def _tail(text: str, count: int) -> str:
@@ -34,16 +36,18 @@ def command_rule(
     if execution.stderr:
         evidence += f"\nstderr (last 50 lines):\n{_tail(execution.stderr, 50)}"
     error = execution.error
+    cause = execution.cause
     if error is None and re.search(
         r"ModuleNotFoundError:|ImportError:|FileNotFoundError:|PermissionError:|"
         r"No module named |ERROR: file or directory not found:|can't open file ",
         execution.stdout + "\n" + execution.stderr,
     ):
-        error = "missing dependency/path or denied resource; command cannot verify criterion"
+        error = "workspace command missing dependency/path or denied resource; command cannot verify criterion"
+        cause = Cause.WORKSPACE
     if execution.exit_code is None and error is None:
         error = "command runner returned no exit code"
     if error is not None:
-        return Result("unverifiable", f"{evidence}\nerror: {error}", error, execution.duration)
+        return Result("unverifiable", f"{evidence}\nerror: {error}", error, execution.duration, cause)
     expected = check["expected"]
     if execution.exit_code != expected["exit_code"]:
         return Result("fail", evidence, f"expected exit {expected['exit_code']}, got {execution.exit_code}", execution.duration)
@@ -73,8 +77,10 @@ def file_rule(check: dict[str, Any], workspace: Path) -> Result:
         if not path.is_file():
             return Result("fail", evidence, "required path is not a regular file")
         return Result("pass", evidence, "required file exists")
-    except (ValueError, OSError, RuntimeError) as exc:
-        return Result("unverifiable", evidence, f"cannot inspect path: {exc}")
+    except ValueError as exc:
+        return Result("unverifiable", evidence, f"contract path rejected: {exc}", cause=Cause.CONTRACT)
+    except (OSError, RuntimeError) as exc:
+        return Result("unverifiable", evidence, f"cannot inspect workspace path: {exc}", cause=Cause.WORKSPACE)
 
 
 def regex_rule(check: dict[str, Any], workspace: Path) -> Result:
@@ -100,8 +106,14 @@ def regex_rule(check: dict[str, Any], workspace: Path) -> Result:
                 break
         excerpt = "\n".join(f"{number}: {line}" for number, line in matched_lines.items())
         return Result("pass", f"{evidence}\n{excerpt}" if excerpt else evidence, "pattern matched")
-    except (ValueError, OSError, RuntimeError, re.error) as exc:
-        return Result("unverifiable", evidence, f"cannot evaluate regex: {exc}")
+    except re.error as exc:
+        return Result("unverifiable", evidence, f"contract regex rejected: {exc}", cause=Cause.CONTRACT)
+    except UnicodeError as exc:
+        return Result("unverifiable", evidence, f"cannot decode workspace regex input: {exc}", cause=Cause.WORKSPACE)
+    except ValueError as exc:
+        return Result("unverifiable", evidence, f"contract path rejected: {exc}", cause=Cause.CONTRACT)
+    except (OSError, RuntimeError) as exc:
+        return Result("unverifiable", evidence, f"cannot read workspace regex input: {exc}", cause=Cause.WORKSPACE)
 
 
 def evaluate(

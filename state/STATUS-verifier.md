@@ -1,5 +1,8 @@
 ## Done
 
+- Added unittest discover (-s/-p/-t, -v/-q/-b/-f/-k), local module/dotted/file targets and pytest -x/-k/-rA/--tb=short/-p no:cacheprovider with option-aware operands, path/symlink containment, shell rejection and unchanged -c AST checks/Seatbelt isolation (.venv/bin/python -m pytest tests/verifier -q: 369 passed, 8 skipped in 4.74s).
+- Restricted feedback to fail and explicitly workspace-caused unverifiable items using internal workspace/contract/verifier/transport/budget categories; no actionable item yields null feedback with overall=fail preserved and no schema changes (.venv/bin/python -m pytest tests/verifier -q: 369 passed, 8 skipped; cause-category, mixed-status, missing-input, quality, budget and judge-result/delegation regressions).
+- Documented command support and retry causes in verifier/RULES.md, linked README, and wrote the change summary/Assumptions in verifier/CHANGES.md; added host passing/failing unittest discover tests (.venv/bin/python -m pytest tests/verifier -q: 369 passed, 8 skipped; all eight Seatbelt cases pending Claude's host run for this change).
 - Forwarded only captured control_call/control_cli_events lines in order on judge completion, failure, timeout and shutdown; added one compact sorted-key judge_delegation summary with launch/exit/EOF accounting facts and an explicit flush, preserving stdout/verdict/status semantics (.venv/bin/python -m pytest tests/verifier -q: 292 passed, 6 skipped in 3.94s; mocked judge children only).
 - Implemented D-3 human-review sampling from schema-validated report.json and listed SHA-256-pinned verdicts, with seed 42, task-type rounds, exact item evidence/reasons, final grading/outcome context, input/internal errors and path-only stdout; no graders or logs are opened (.venv/bin/python -m pytest tests/verifier -q: 292 passed, 6 skipped; synthetic report fixtures and a real sample module entry point).
 - Documented the exact stderr line protocol and all three verifier CLI commands in verifier/README.md; added the change summary and Assumptions in verifier/CHANGES.md (.venv/bin/python -m pytest tests/verifier -q: 292 passed, 6 skipped).
@@ -41,17 +44,23 @@
 
 ## Remaining
 
+- First priority, pending Claude's host run: all six existing Seatbelt tests and the two new passing/failing unittest discover cases. Host command: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. Historical host passes below do not verify this change; no sandbox-exec ran here.
+- Pending host integration: rerun the two-task proposed-system smoke and confirm unittest criteria execute and non-actionable unverifiable verdicts stop without spending remaining executor attempts. No network, nested Codex or live model calls ran here.
 - Pending host verification for this change: exercise the new judge_delegation/control_call/control_cli_events stderr protocol with the real controller and Role 5's parser, including failed/retried calls and timeout/budget paths. No network, nested Codex or live model calls ran here.
 - Pending host verification: observe real controller/Codex descendants and the 450-second verifier budget within Role 2's 480-second hook deadline, including children creating their own sessions. Claude's completed macOS EPERM/pipe-holding process-tree checks are recorded in Done; those specific checks are no longer pending.
 - Pending host verification: sample a completed proposed-system evaluation report after Role 5 writes it; synthetic schema-valid reports cover D-3 locally. Do not touch the host's in-progress evaluation.
 - Pending host verification: exercise Role 2's Stop/SessionStart loop, shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency. Live controller handoff acceptance is already verified as recorded in Done.
 - Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the controller judge CLI. The full-contract smoke helper invokes live judge calls; run only with host/live-call authorization.
 - D-2: complete broader command support, bounded output capture, deterministic-evidence policy and sandbox auditing. The Python-only macOS subset does not establish general destructive-operation prevention, read isolation, cross-platform support or complete SC-4/SC-5.
-- D-4: investigate measured misjudgments and write verifier/RULES.md when comparison evidence exists.
+- D-4: investigate further measured misjudgments after the host smoke. verifier/RULES.md now documents the reported live-smoke fixes and cause categories; broader comparison evidence remains pending.
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
 
+- Supersede the earlier blanket H3 retry policy: the user's live-smoke refinement retries fail items and workspace-caused unverifiable items only; contract/verifier/transport/budget defects cannot be repaired in an executor turn.
+- Carry explicit internal cause metadata through Execution/Result into reinstruct without serialized fields: preserve the verdict schema and valid judge reason/evidence while avoiding classification based on generated text.
+- Retain conservative non-actionable command timeouts and unknown causes: a deadline alone cannot prove a workspace defect, especially when capped by the remaining verification budget.
+- Parse selection expressions, discovery patterns and plugin disabling separately from paths: common test options must not be mistaken for workspace filenames, and arbitrary pytest plugins remain rejected.
 - Preserve raw captured accounting record order and emit/flush one summary per attempted delegation: Role 5 must bill child judge calls without changing verdict schemas or judgment semantics.
 - Track process launch, natural exit and complete stderr independently of verdict validity: nonzero exits may have complete accounting, while timeout, killed children, missing records and bounded-drain truncation cannot claim completeness.
 - Use the explicitly requested D-3 CLI from the role prompt and write DIR/verifier-sample.json with no new flags or shared schema: provide the frozen path-only stdout convention within verifier-owned files.
@@ -74,7 +83,7 @@
 - Preserve the original --handoff argument as a string for stdout: converting it to Path for display would normalize supplied relative path spelling.
 - Separate handoff input errors from validator infrastructure failures: unreadable/invalid input exits 1, while schema-loading and unexpected validator errors exit 2 without stdout.
 - Check done/remaining overlap after schema validation without a contract: contradictory states are detectable locally; contract membership, coverage and artifact existence need additional context.
-- Treat every non-pass item as unfinished for rule 6: the user's H3 instruction and frozen null-on-pass-or-exhaustion invariant supersede the previous status=fail-only interpretation, including contract-quality warnings.
+- Earlier H3 decision (superseded by this session): every non-pass item was included, including contract-quality warnings; the live smoke established these retries could be futile.
 - Keep the three-detail/count-rest overflow and 300-character format: the user explicitly requested preserving the existing policy.
 - Keep grouped IDs in one clause and stop extraction at exception phrases: this fixes both reported claim errors while retaining explicit negative predicates and conservative unmapped prose handling.
 - Mark only mechanically failed claimed criteria claimed_without_evidence: unverifiable is not proof of a failed assertion, unclaimed failures retain their own reason, and valid judge reasons remain unchanged.
@@ -90,7 +99,7 @@
 - .venv/bin/python -m pytest tests/verifier -q
 - .venv/bin/python -m verifier validate-handoff --handoff schemas/examples/handoff.json
 - git diff --check -- verifier tests/verifier state/STATUS-verifier.md
-- Host command: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v (the six Seatbelt checks are already verified by Claude; this command was not rerun here).
+- Host only, pending Claude for this change: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v (six existing Seatbelt tests plus two new unittest discover cases).
 - Host only with live-call authorization, pending: .venv/bin/python tests/verifier/smoke.py
 - Host only before merge, pending: .venv/bin/python -m pytest
 
@@ -104,14 +113,17 @@
 
 ## Assumptions
 
-- This session follows the user's judge-accounting, host-status and D-3 priority order. The requested sample command is authorized by the current task and role prompt; check/validate-handoff flags, shared schemas and hook interfaces remain unchanged.
+- Short option operands accept attached/separate spelling; unittest positional discovery START/PATTERN/TOP is also supported with the same path checks. Discovery patterns are filename globs, not directory operands.
+- Schema-valid judge uncertainty is treated as workspace review and retains the supplied reason/evidence. Delegation errors/timeouts are transport failures. A command timeout or unclassified failure is conservatively non-actionable.
+- Current host verification remains pending for all eight Seatbelt cases regardless of historical host results. Only .venv/bin/python -m pytest tests/verifier -q ran in this session; other roles' concurrent files and .git were not modified.
+- This session follows the user's unittest/pytest command support, actionable retry and host-pending STATUS priority order. This instruction supersedes role-prompt rule 6 and earlier H3 decisions; shared schemas, CLI flags and hook interfaces remain unchanged.
 - The role prompt does not specify sample filename, seed, review format or handling of small pools: use verifier-sample.json, seed 42, documented review JSON and up to n verdicts (including an explicit empty result). These choices are recorded in verifier/README.md and verifier/CHANGES.md for review.
 - Candidate verdict names follow the existing runner's verdict-N.json and prefixed/archived naming; plain verdict.json is also accepted. Absolute paths or report-relative paths must resolve inside the report directory. Duplicate references and hash/schema failures are input errors.
 - Sample units are verdict attempts, so tasks may repeat; final_grading_outcome is the task's final report grading, not a fabricated per-attempt hidden result. Invalid/time-out/error tasks can retain null grading.
 - Supplied host results are evidence from Claude reported by the user, not commands rerun here. They complete the specific Seatbelt, macOS EPERM/pipe-holding cleanup and live handoff acceptance items, but do not verify this session's new accounting protocol or live sampling.
 - The post-exit drain bound is 200 ms; any output still unavailable after that bound is omitted while preserving the completed child's own exit code. Actual same-group descendants are killed before this drain.
 - Same-state handoff entries may represent multiple artifacts or remaining steps; only contradictory done/remaining membership is rejected beyond the schema, without adding an unspecified uniqueness requirement.
-- Rule 6 failed items means status other than pass, as explicitly instructed; this replaces the prior contrary assumption. Up to three items receive details and further items are counted.
+- Re-instruction includes status=fail and explicitly workspace-caused unverifiable only. Up to three actionable items receive details and further actionable items are counted; no actionable items ends feedback before exhaustion.
 - Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
 - HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. Verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS defaults to 120 and HARNESS_VERIFY_BUDGET_SECONDS to 450; both must be finite and positive.
 - The two-second reserve covers graceful group termination. Post-KILL reaping uses at most two 0.1-second waits per direct child; verdict serialization and scheduling use the margin before the 480-second outer deadline.

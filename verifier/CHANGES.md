@@ -1,3 +1,46 @@
+# Verifier live-smoke fixes — 2026-10-23
+
+Unittest discovery and local module/dotted/file targets now run through the same
+Seatbelt dispatch as pytest. Discovery accepts -s/-p/-t and -v/-q/-b/-f/-k;
+pytest additionally accepts -x, -k EXPR, -rA, --tb=short and -p no:cacheprovider.
+Option operands are parsed by meaning, path containment includes symlinks,
+shell operators remain rejected and the existing -c AST checks are unchanged.
+The Seatbelt profile and environment are unchanged.
+
+Re-instruction now selects status=fail and explicitly workspace-caused
+unverifiable items. Internal cause categories distinguish workspace, contract,
+verifier, transport and budget without changing verdict fields. Missing local
+command input and valid judge uncertainty remain actionable; contract quality,
+unsupported commands, exhausted budgets and failed/timed-out judge delegation
+end retry feedback when no actionable items remain. Reasons retain specific
+causes; valid judge reasons/evidence remain unchanged. RULES.md documents command
+support, categories, conservative timeout handling and the existing feedback cap.
+This supersedes the earlier blanket H3 non-pass retry policy below.
+
+## Verification
+
+`.venv/bin/python -m pytest tests/verifier -q`: 369 passed, 8 skipped in 4.74s.
+New tests cover accepted options/targets, rejected operands/operators, symlink
+escapes, identical sandbox dispatch, cause categories, mixed verdicts and
+unverifiable-only retry decisions. Existing timeout/budget cleanup assertions
+now require null feedback while retaining all lifecycle/output checks.
+
+## Pending
+
+Claude must run all eight Seatbelt cases on the host: the six existing checks
+plus passing/failing unittest discover. Historical host evidence predates these
+changes. Live evaluation/controller/plugin integration and full-suite pre-merge
+verification remain pending. This session ran only verifier tests, with no
+sandbox-exec, network, nested Codex, model calls, staging or commits.
+
+## Assumptions
+
+- Short option operands may be attached or separate; positional unittest discovery arguments use the same containment checks as -s/-p/-t. Discovery patterns are filename globs, not directory paths.
+- A valid judge response is workspace review and keeps its reason/evidence unchanged. A command timeout alone cannot establish a workspace cause and does not retry; unknown causes also stop feedback.
+- The user's actionable retry refinement supersedes role-prompt rule 6 and earlier H3 history. Shared schema, CLI and hook interfaces remain unchanged.
+
+---
+
 # Verifier changes — 2026-10-23
 
 Judge delegation now forwards only child stderr records starting with

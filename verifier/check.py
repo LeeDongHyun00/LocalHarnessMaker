@@ -9,6 +9,7 @@ import sys
 import time
 from typing import Any, Callable
 
+from verifier.causes import Cause
 from verifier.claims import claimed_criteria, last_report
 from verifier.judge import judge_criterion, judge_timeout
 from verifier.processes import CLEANUP_SECONDS
@@ -52,20 +53,23 @@ def check_contract(
         claims = claimed_criteria(report, ids)
         quality_warning = not criteria or all(c["check"]["type"] == "llm_judge" for c in criteria)
         items = []
+        causes: dict[str, Cause] = {}
         if quality_warning:
             print("warning: contract has no mechanically verifiable success criteria", file=sys.stderr)
             # A diagnostic item is necessary because verdict.items has minItems=1.
             items = [
                 {"id": c["id"], "status": "unverifiable",
                  "evidence": "contract quality warning: no mechanical success criteria",
-                 "reason": "contract cannot be mechanically verified"}
+                 "reason": "contract quality warning: no mechanical success criteria"}
                 for c in criteria
             ] or [{"id": "contract-quality", "status": "unverifiable",
-                   "evidence": "success_criteria is empty", "reason": "contract cannot be verified"}]
+                   "evidence": "success_criteria is empty", "reason": "contract quality warning: success_criteria is empty"}]
+            causes.update({item["id"]: Cause.CONTRACT for item in items})
         else:
             for criterion in criteria:
                 remaining = deadline - clock() - CLEANUP_SECONDS
                 if remaining <= 0:
+                    causes[criterion["id"]] = Cause.BUDGET
                     items.append({
                         "id": criterion["id"], "status": "unverifiable",
                         "evidence": "criterion not started: HARNESS_VERIFY_BUDGET_SECONDS exhausted",
@@ -79,6 +83,7 @@ def check_contract(
                     result = judge_criterion(
                         criterion, workspace.resolve(), backend, timeout=min(timeout, remaining),
                     )
+                causes[criterion["id"]] = result.cause
                 command_seconds += result.command_duration
                 reason = result.reason
                 if mechanical and result.status == "fail" and criterion["id"] in claims:
@@ -88,7 +93,7 @@ def check_contract(
         verdict = {
             "items": items,
             "overall": "pass" if all(item["status"] == "pass" for item in items) else "fail",
-            "reinstruct_message": reinstruct(criteria, items, attempt, limit),
+            "reinstruct_message": reinstruct(criteria, items, attempt, limit, causes=causes),
             "attempt": attempt,
         }
         validate(verdict, "verdict.schema.json")

@@ -1,8 +1,10 @@
-"""Bounded, deterministic feedback for every non-pass verdict item."""
+"""Bounded, deterministic feedback for executor-actionable verdict items."""
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Mapping
+
+from verifier.causes import Cause
 
 
 def _short(text: str, limit: int) -> str:
@@ -12,11 +14,17 @@ def _short(text: str, limit: int) -> str:
 
 def reinstruct(
     criteria: list[dict[str, Any]], items: list[dict[str, Any]], attempt: int, limit: int,
+    *, causes: Mapping[str, Cause] | None = None,
 ) -> str | None:
     if attempt >= limit:
         return None
     descriptions = {c["id"]: c["description"] for c in criteria}
-    failed = [(n, item) for n, item in enumerate(items, 1) if item["status"] != "pass"]
+    # Unknown unverifiable causes fail closed: do not spend executor attempts on
+    # infrastructure. Only checks explicitly classified as workspace can retry.
+    causes = causes or {}
+    failed = [(n, item) for n, item in enumerate(items, 1)
+              if item["status"] == "fail" or (
+                  item["status"] == "unverifiable" and causes.get(item["id"]) == Cause.WORKSPACE)]
     if not failed:
         return None
     # At most three detailed entries fit; further failed items are counted.

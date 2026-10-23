@@ -156,6 +156,7 @@ def test_mixed_contract_delegates_only_judge(contract: dict[str, Any], criterion
     assert verdict["overall"] == ("pass" if status == "pass" else "fail")
     assert verdict["items"][1] == {"id": "SC-4", "status": status, "reason": judgment["reason"],
                                      "evidence": judgment["evidence"]}
+    assert (verdict["reinstruct_message"] is not None) == (status != "pass")
     assert len(calls) == 1
     assert calls[0][0][calls[0][0].index("--backend") + 1] == "local"
 
@@ -171,7 +172,7 @@ def test_all_judge_quality_warning_does_not_delegate(contract: dict[str, Any], c
     monkeypatch.setattr("verifier.judge.run_judge", forbidden)
     verdict = check_contract(contract, workspace, transcript, 1)
     assert verdict["overall"] == "fail" and verdict["items"][0]["status"] == "unverifiable"
-    assert verdict["reinstruct_message"] is not None
+    assert verdict["reinstruct_message"] is None
 
 
 @pytest.mark.parametrize("deadline", [None, "7.5"])

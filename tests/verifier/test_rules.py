@@ -103,3 +103,30 @@ def test_dispatch_and_unimplemented_judge(workspace: Path) -> None:
     judge = evaluate({"type": "llm_judge", "rubric": "review"}, workspace)
     assert judge.status == "unverifiable"
     assert "llm_judge" in judge.evidence
+
+
+@pytest.mark.parametrize("check,cause,reason", [
+    ({"type": "regex", "path": "missing", "pattern": "ok"}, "workspace", "workspace regex input"),
+    ({"type": "regex", "path": "report.txt", "pattern": "["}, "contract", "contract regex rejected"),
+    ({"type": "regex", "path": "../external", "pattern": "."}, "contract", "contract path rejected"),
+    ({"type": "file_exists", "path": "../external"}, "contract", "contract path rejected"),
+])
+def test_mechanical_unverifiable_causes(
+    workspace: Path, check: dict[str, Any], cause: str, reason: str,
+) -> None:
+    result = evaluate(check, workspace)
+    assert result.status == "unverifiable" and result.cause.value == cause
+    assert reason in result.reason
+
+
+@pytest.mark.parametrize("execution,cause", [
+    (Execution(1, stderr="ModuleNotFoundError: No module named 'app'"), "workspace"),
+    (Execution(4, stderr="ERROR: file or directory not found: tests/test_app.py"), "workspace"),
+    (Execution(error="sandbox unavailable; command not executed"), "verifier"),
+    (Execution(error="command timed out after 120 seconds"), "verifier"),
+    (Execution(), "verifier"),
+])
+def test_command_unverifiable_causes(workspace: Path, execution: Execution, cause: str) -> None:
+    result = command_rule({"command": "fixture", "expected": {"exit_code": 0}}, workspace,
+                          lambda command, root, timeout: execution)
+    assert result.status == "unverifiable" and result.cause.value == cause

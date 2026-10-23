@@ -97,9 +97,7 @@ def test_quality_warning(
     verdict = check_contract(contract, workspace, transcript, 1, forbidden)
     assert verdict["overall"] == "fail"
     assert all(i["status"] == "unverifiable" for i in verdict["items"])
-    assert verdict["reinstruct_message"] is not None
-    assert len(verdict["reinstruct_message"]) <= 300
-    assert "Items 1 are not done." in verdict["reinstruct_message"]
+    assert verdict["reinstruct_message"] is None
     assert ("contract-quality" if empty else "SC-4") == verdict["items"][0]["id"]
     assert "warning:" in capsys.readouterr().err
     validate(verdict, "verdict.schema.json")
@@ -151,3 +149,71 @@ def test_verifier_never_imports_controller() -> None:
             elif isinstance(node, ast.Call) and node.args:
                 if isinstance(node.func, ast.Name) and node.func.id == "__import__":
                     assert not (isinstance(node.args[0], ast.Constant) and str(node.args[0].value).startswith("controller"))
+
+
+@pytest.mark.parametrize("command,actionable,reason", [
+    ("python -m py_compile missing.py", True, "missing command input path"),
+    ("python -m unittest discover -s missing", True, "missing command input path"),
+    ("python -m unittest missing.TestCase.test_ok", True, "missing command input path"),
+    ("python -m pytest --unsupported", False, "unsupported command option"),
+    ("python -m unsupported", False, "unsupported Python invocation"),
+    ("python -m pytest /tmp/outside.py", False, "path outside workspace"),
+])
+def test_command_actionability_in_verdict(
+    command: str, actionable: bool, reason: str, contract: dict[str, Any], workspace: Path,
+    transcript: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    contract["success_criteria"] = [{"id": "SC-1", "description": "Tests pass", "check": {
+        "type": "command", "command": command, "expected": {"exit_code": 0}}}]
+    def forbidden(*args: Any, **kwargs: Any) -> None:
+        pytest.fail("validation must not launch any command")
+    monkeypatch.setattr("verifier.sandbox.run_owned", forbidden)
+    verdict = check_contract(contract, workspace, transcript, 1)
+    assert verdict["overall"] == "fail" and verdict["items"][0]["status"] == "unverifiable"
+    assert reason in verdict["items"][0]["reason"]
+    assert (verdict["reinstruct_message"] is not None) == actionable
+    validate(verdict, "verdict.schema.json")
+
+
+@pytest.mark.parametrize("failure", ["timeout", "launch", "schema"])
+def test_judge_transport_failures_do_not_retry(
+    failure: str, contract: dict[str, Any], workspace: Path, transcript: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import subprocess
+
+    contract["success_criteria"] = [{"id": "SC-1", "description": "File exists", "check": {
+        "type": "file_exists", "path": "report.txt"}}, contract["success_criteria"][3]]
+    def broken(*args: Any, **kwargs: Any) -> Any:
+        if failure == "timeout":
+            raise subprocess.TimeoutExpired("controller", 120)
+        if failure == "launch":
+            raise OSError("unavailable")
+        return subprocess.CompletedProcess(args[0], 0, "wrong output path\n", "")
+    monkeypatch.setattr("verifier.judge.run_judge", broken)
+    verdict = check_contract(contract, workspace, transcript, 1)
+    assert verdict["items"][1]["status"] == "unverifiable"
+    assert "judge delegation" in verdict["items"][1]["reason"]
+    assert {"timeout": "timed out", "launch": "unavailable", "schema": "stdout must contain"}[failure] in verdict["items"][1]["reason"]
+    assert verdict["overall"] == "fail" and verdict["reinstruct_message"] is None
+
+
+def test_mixed_verdict_retries_only_workspace_failure(
+    contract: dict[str, Any], workspace: Path, transcript: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    contract["success_criteria"] = [
+        {"id": "SC-1", "description": "Unsupported command", "check": {
+            "type": "command", "command": "python -m unsupported", "expected": {"exit_code": 0}}},
+        {"id": "SC-2", "description": "Missing output file", "check": {
+            "type": "file_exists", "path": "missing.txt"}},
+        contract["success_criteria"][3],
+    ]
+    def unavailable(*args: Any, **kwargs: Any) -> None:
+        raise OSError("controller unavailable")
+    monkeypatch.setattr("verifier.judge.run_judge", unavailable)
+    verdict = check_contract(contract, workspace, transcript, 1)
+    assert [item["status"] for item in verdict["items"]] == ["unverifiable", "fail", "unverifiable"]
+    message = verdict["reinstruct_message"]
+    assert message is not None and message.startswith("Items 2 are not done.")
+    assert "Unsupported command" not in message and "SC-4" not in message

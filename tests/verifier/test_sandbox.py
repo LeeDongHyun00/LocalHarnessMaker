@@ -126,3 +126,110 @@ def test_environment_does_not_leak_credentials(workspace: Path, monkeypatch: pyt
     monkeypatch.setenv("VERIFIER_TEST_SECRET", "do-not-forward")
     execution = run_command("python -c 'import os; print(os.environ.get(\"VERIFIER_TEST_SECRET\", \"absent\"))'", workspace)
     assert execution.stdout == "absent\n"
+
+
+@pytest.mark.parametrize("arguments", [
+    "", "discover -v", "discover -q -b -f -k health",
+    "discover -s tests -p 'test_*.py' -t . -v",
+    "discover -stests -p'test_*.py' -t. -khealth",
+    "discover tests 'test_*.py' .", "-v tests.test_health",
+    "tests.test_health.HealthTests", "tests.test_health.HealthTests.test_ok",
+    "-q -b -f -k '*ok*' tests/test_health.py", "./tests/test_health.py",
+])
+def test_unittest_arguments_accepted(workspace: Path, arguments: str) -> None:
+    (workspace / "tests").mkdir()
+    (workspace / "tests/test_health.py").write_text("import unittest\n")
+    command = "python -m unittest " + arguments
+    assert command_argv(command, workspace) == [sys.executable, "-m", "unittest", *shlex.split(arguments)]
+
+
+@pytest.mark.parametrize("arguments", [
+    "-x", "-k 'health and not slow'", "-rA --tb=short -p no:cacheprovider",
+    "-x -khealth -rA --tb=short -pno:cacheprovider tests/test_health.py::test_ok",
+])
+def test_pytest_common_options_accepted(workspace: Path, arguments: str) -> None:
+    (workspace / "tests").mkdir()
+    (workspace / "tests/test_health.py").write_text("def test_ok(): pass\n")
+    assert command_argv("python -m pytest " + arguments, workspace) == [
+        sys.executable, "-m", "pytest", *shlex.split(arguments)]
+
+
+@pytest.mark.parametrize("command", [
+    "python -m unittest discover -s ../outside", "python -m unittest discover -t /tmp",
+    "python -m unittest discover -s/tmp", "python -m unittest discover -t../outside",
+    "python -m unittest /tmp/test_health.py", "python -m unittest ../test_health.py",
+    "python -m unittest discover -p '../test_*.py'", "python -m unittest discover -p /tmp/test.py",
+    "python -m unittest discover . 'test_*.py' ../outside",
+    "python -m unittest discover . '../test_*.py'",
+    "python -m unittest discover -s", "python -m unittest discover -t",
+    "python -m unittest discover -p", "python -m unittest -k",
+    "python -m unittest --unknown", "python -m pytest -k", "python -m pytest -p",
+    "python -m pytest -p arbitrary_plugin", "python -m pytest --tb=long",
+    "python -m unittest discover;echo bad", "python -m unittest discover&&echo bad",
+    "python -m unittest discover | python -m unittest", "python -m pytest -k 'x' > report.txt",
+])
+def test_test_command_rejections_never_launch(
+    command: str, workspace: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def forbidden(*args: Any, **kwargs: Any) -> None:
+        pytest.fail("rejected command must not launch")
+    monkeypatch.setattr("verifier.sandbox.run_owned", forbidden)
+    execution = run_command(command, workspace)
+    assert execution.error is not None and execution.error.startswith("command rejected:")
+    assert execution.exit_code is None
+
+
+@pytest.mark.parametrize("arguments", ["discover -s escape", "discover -t escape", "escape/test_health.py",
+                                         "escape.test_health.HealthTests.test_ok"])
+def test_unittest_symlink_escape(workspace: Path, arguments: str) -> None:
+    (workspace / "escape").symlink_to(workspace.parent)
+    with pytest.raises(RejectedCommand, match="outside workspace"):
+        command_argv("python -m unittest " + arguments, workspace)
+
+
+@pytest.mark.parametrize("arguments", ["discover -s missing", "discover -t missing", "missing.py",
+                                         "missing.TestCase.test_ok"])
+def test_unittest_missing_input_is_workspace_cause(workspace: Path, arguments: str) -> None:
+    from verifier.causes import Cause
+
+    execution = run_command("python -m unittest " + arguments, workspace)
+    assert execution.cause == Cause.WORKSPACE
+    assert execution.error and "missing command input path" in execution.error
+
+
+@pytest.mark.parametrize("module", ["unittest discover -v", "pytest -x -k health -rA --tb=short -p no:cacheprovider"])
+@pytest.mark.parametrize("exit_code,status", [(0, "pass"), (1, "fail")])
+def test_test_commands_use_existing_seatbelt_profile(
+    module: str, exit_code: int, status: str, workspace: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sys, "platform", "darwin")
+    original_is_file = Path.is_file
+    monkeypatch.setattr(Path, "is_file", lambda path: str(path) == "/usr/bin/sandbox-exec" or original_is_file(path))
+    calls: list[list[str]] = []
+
+    def runner(argv: list[str], **kwargs: Any) -> subprocess.CompletedProcess[bytes]:
+        calls.append(argv)
+        assert argv[:3] == ["/usr/bin/sandbox-exec", "-p", seatbelt_profile(workspace)]
+        assert argv[3:] == [sys.executable, "-m", *shlex.split(module)]
+        assert kwargs["cwd"] == workspace and kwargs["env"]["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] == "1"
+        return subprocess.CompletedProcess(argv, exit_code, b"", b"OK\n" if exit_code == 0 else b"FAILED\n")
+
+    monkeypatch.setattr("verifier.sandbox.run_owned", runner)
+    result = command_rule({"command": "python -m " + module, "expected": {"exit_code": 0}}, workspace)
+    assert result.status == status and len(calls) == 1
+
+
+@macos
+@pytest.mark.parametrize("passing", [True, False], ids=["pass", "fail"])
+def test_real_unittest_discover(workspace: Path, passing: bool) -> None:
+    tests = workspace / "tests"
+    tests.mkdir()
+    (tests / "__init__.py").write_text("")
+    (tests / "test_health.py").write_text(
+        "import unittest\nclass HealthTests(unittest.TestCase):\n"
+        f"    def test_ok(self): self.assertTrue({passing!r})\n")
+    result = command_rule({"command": "python -m unittest discover -s tests -p 'test_*.py' -t . -v",
+                           "expected": {"exit_code": 0}}, workspace)
+    assert result.status == ("pass" if passing else "fail"), result.evidence
+    assert "Ran 1 test" in result.evidence
+    assert ("OK" if passing else "FAILED (failures=1)") in result.evidence

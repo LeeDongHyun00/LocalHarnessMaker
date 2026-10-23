@@ -223,7 +223,7 @@ def test_budget_includes_timeout_tree_cleanup(
     assert not tree.members and tree.now == pytest.approx(10)
     assert verdict["items"][0]["status"] == "unverifiable"
     assert "budget" in verdict["items"][1]["reason"]
-    assert verdict["reinstruct_message"]
+    assert verdict["reinstruct_message"] is None
 
 
 class ExitingGroupTree(Tree):
@@ -337,7 +337,7 @@ def _cli_exiting_group_case(
         first, second = verdict["items"]
         assert first["status"] == second["status"] == "unverifiable"
         assert first["reason"] == f"command timed out after {budget - 2:g} seconds"
-        assert "budget" in second["reason"] and verdict["reinstruct_message"]
+        assert "budget" in second["reason"] and verdict["reinstruct_message"] is None
         assert "cannot launch" not in json.dumps(verdict)
     else:
         assert code == 2 and captured.out == "" and not out.exists()
