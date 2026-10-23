@@ -1,5 +1,9 @@
 ## Done
 
+- Fixed sampling of the completed full-harness layout: version-1 report validation, repository-relative retained paths and hash-checked result.json inline verdicts, while preserving standalone verdict/day-1/day-2 support, task-type rounds and report grading context (.venv/bin/python -m verifier sample --reports eval/reports/full-harness --n 20 --out /tmp/lhm-verifier-review-78912e5238cc4e51a2bb6bfb13723f71.json: exit 0, stderr verifier sample selected=20 available=142 seed=42; all four task types represented).
+- Added the user-requested optional sample --out with the existing default destination unchanged, plus synthetic retained-layout fixtures covering inline/standalone/coexisting verdicts, restarted two-session attempt numbers, grading provenance, determinism, input preservation and corrupt input errors (.venv/bin/python -m pytest tests/verifier -q: 566 passed, 8 host-only Seatbelt skips in 6.79s).
+- Confirmed the external report and all 120 task result files were unchanged and documented the correction in verifier/README.md and verifier/CHANGES.md (.venv/bin/python inline read-only SHA-256 comparison before/after sampling: report and 120 task results unchanged: True; inline inventory: 142 verdicts and zero standalone verdict files).
+
 - Added a complete verdict-N.claims.json sidecar for every successful check, with one claimed/clause/status observation per criterion, all five summary counts and unchanged schema/stdout/exit semantics; covered every claimed/unclaimed status, empty/all-judge criteria, no final report, budget exhaustion, deterministic bytes, module entry point and publication failures (.venv/bin/python -m pytest tests/verifier -q: 556 passed, 8 skipped in 5.78s).
 - Extended lexical claim extraction to status tables/checklists, explicit all-criteria statements, inclusive numeric ID ranges and distinctive description words; retained negative/exception scope and final-report filtering, with exact supporting clauses shared by sidecars and claimed_without_evidence (.venv/bin/python -m pytest tests/verifier -q: 556 passed, 8 skipped; 56 labeled synthetic reports, precision=1.000000, recall=1.000000, TP=75, FP=0, FN=0 printed in the terminal summary).
 - Documented the sidecar format, matching rules, synthetic measurement, write-failure semantics and pending runner/host integration in verifier/README.md, verifier/RULES.md, verifier/CHANGES.md and fixtures/README.md; no live report, model call or nested Codex ran (.venv/bin/python -m pytest tests/verifier -q: 556 passed, 8 host-only Seatbelt skips).
@@ -58,7 +62,6 @@
 - Pending host integration for this change: rerun the proposed-system smoke and confirm judged unverifiable items and contract-invalid file/regex paths stop without spending remaining executor attempts, judge fail items still retry, and plausible missing paths remain actionable. Also confirm unittest criteria execute. No network, nested Codex, live model calls or sandbox-exec ran here.
 - Pending host verification for this change: exercise the new judge_delegation/control_call/control_cli_events stderr protocol with the real controller and Role 5's parser, including failed/retried calls and timeout/budget paths. No network, nested Codex or live model calls ran here.
 - Pending host verification: observe real controller/Codex descendants and the 450-second verifier budget within Role 2's 480-second hook deadline, including children creating their own sessions. Claude's completed macOS EPERM/pipe-holding process-tree checks are recorded in Done; those specific checks are no longer pending.
-- Pending host verification: sample a completed proposed-system evaluation report after Role 5 writes it; synthetic schema-valid reports cover D-3 locally. Do not touch the host's in-progress evaluation.
 - Pending host verification: exercise Role 2's Stop/SessionStart loop, shared HARNESS_MAX_ATTEMPTS, judge delegation, transcript paths, retry exhaustion and production latency. Live controller handoff acceptance is already verified as recorded in Done.
 - Pending host verification: exercise real FastAPI pass/fail/claimed fixtures and the controller judge CLI. The full-contract smoke helper invokes live judge calls; run only with host/live-call authorization.
 - D-2: complete broader command support, bounded output capture, deterministic-evidence policy and sandbox auditing. The Python-only macOS subset does not establish general destructive-operation prevention, read isolation, cross-platform support or complete SC-4/SC-5.
@@ -66,6 +69,11 @@
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
+
+- Honor the user's explicit sample --out request despite the earlier no-new-flags sampling decision: only the verifier-owned sampler CLI changes; shared schemas and other commands remain unchanged.
+- Validate version-1 reports against the exact JSON schema preserved in decision 0003: decision 0009 preserves those reports without fabricating the absent task_false_done_rate metric.
+- Rebase only the recognized eval/reports/DIR_NAME prefix into the supplied report directory: copied report paths resolve locally while containment and SHA-256 checks remain mandatory.
+- Prefer listed standalone verdicts per task and otherwise use the listed result.json verdicts array: avoid sampling the same retained verdict twice; inline verdict_index preserves distinct sessions with restarted attempt numbers.
 
 - Emit an additive verifier-owned sidecar explicitly requested by the user: preserve the frozen verdict schema, CLI arguments, stdout path and exit-code contract while exposing passing, failing, uncertain and unclaimed observations.
 - Use one extraction result for the failure reason and the complete sidecar: the denominator and negative evidence must describe the same final report and verdict; exclude the synthetic contract-quality item from criterion counts.
@@ -115,6 +123,8 @@
 
 ## Verify commands
 
+- .venv/bin/python -m verifier sample --reports eval/reports/full-harness --n 20 --out /tmp/lhm-verifier-review-78912e5238cc4e51a2bb6bfb13723f71.json
+
 - .venv/bin/python -m pytest tests/verifier -q
 - .venv/bin/python -m verifier validate-handoff --handoff schemas/examples/handoff.json
 - git diff --check -- verifier tests/verifier state/STATUS-verifier.md
@@ -131,6 +141,11 @@
 - .git contents, staging, commits, file deletion, git history rewriting, external service configuration, secrets, network access, nested Codex, live model calls and sandbox-exec in the current environment.
 
 ## Assumptions
+
+- The supplied external report is read-only. The files present during this session contain 142 inline verdicts across 120 task results, not the reported 147; no missing verdicts are invented or obtained from unlisted files. No standalone verdict artifacts are listed or present in that report snapshot.
+- Source precedence is per task: listed standalone verdicts are authoritative when present; otherwise listed result.json supplies verdicts. The review unit remains a verdict, with all criterion items unchanged and final task grading alongside it, not an inferred per-attempt grading result.
+- Inline verdict_path/verdict_sha256 identify the containing result.json; verdict_index is its zero-based array index. Result task ID/type must match report.json; grading always comes from report.json.
+- This session's explicit sampling priority supersedes the older Remaining order. The worktree's .venv was used; no other role's paths, schemas, .git or external report were modified. The only external output is the requested review artifact in /tmp; no staging, commits, network, nested Codex, model calls or sandbox-exec ran.
 
 - The user explicitly authorizes the new sidecar while retaining shared verdict/schema/CLI/hook interfaces. Its unspecified JSON shape is {items: [{id, claimed, clause, status}], summary: {claimed_items, claimed_and_pass, claimed_and_fail, claimed_and_unverifiable, unclaimed_items}}, documented in verifier/README.md; suffix replacement uses Path.with_suffix(".claims.json").
 - A successful check includes fail/unverifiable verdicts; invalid input/internal computation failures cannot provide a complete trustworthy observation and publish no new files. An artifact write failure may leave partial/old files, which must not be consumed.

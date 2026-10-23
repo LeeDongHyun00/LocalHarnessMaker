@@ -1,3 +1,48 @@
+# Real evaluation sampler correction — 2026-10-23
+
+The sampler now accepts version-1 reports using the exact schema preserved in
+decision 0003, alongside current version-2 reports. Repository-relative retained
+paths under eval/reports/DIR_NAME are rebased into the supplied report directory.
+Listed standalone verdict files remain supported, including day-1/day-2 names;
+when absent for a task, its listed result.json supplies inline verdicts. Every
+source is hash-checked and every verdict schema-validated. Standalone sources
+have precedence to avoid counting both copies. Inline source indexes retain
+separate sessions with identical attempt numbers. Final grading context always
+comes from report.json and criterion items remain unchanged.
+
+The explicitly requested optional --out writes the review outside a read-only
+report directory. Its default remains DIR/verifier-sample.json, with unchanged
+path-only stdout and exit-code conventions. README.md documents source paths,
+version handling and inline source indexes.
+
+## Verification
+
+`.venv/bin/python -m pytest tests/verifier -q`: 566 passed, 8 host-only Seatbelt
+skips in 6.79s. Synthetic retained-layout fixtures cover version 1, repository
+paths, inline/standalone/coexisting verdicts, restarted session attempt numbers,
+report grading provenance, deterministic rounds, unchanged inputs, hash/JSON/
+schema/identity failures, and the module entry point with --out. Existing tests
+retain version-2 reports, default output and containment/error coverage.
+
+`.venv/bin/python -m verifier sample --reports
+eval/reports/full-harness
+--n 20 --out /tmp/lhm-verifier-review-78912e5238cc4e51a2bb6bfb13723f71.json`
+returned exit 0, path-only stdout and
+`verifier sample selected=20 available=142 seed=42` on stderr. All four report
+task types are represented. Read-only SHA-256 comparisons confirmed report.json
+and all 120 task result files were unchanged. The snapshot has 142 inline
+verdicts and no standalone verdict files; the user-reported count was 147.
+
+## Assumptions
+
+- The user's explicit --out request authorizes this additive sampler flag; shared schemas, hooks and other CLI interfaces remain unchanged.
+- Listed standalone verdicts take precedence per task; inline verdict_path/verdict_sha256 identify result.json and verdict_index identifies the zero-based entry. No unlisted verdicts are discovered.
+- Final task grading is context for each sampled verdict, not evidence of per-attempt hidden grading. Its report value overrides any duplicated result.json grading.
+- Version-1 schema loading reads the existing decision record without modifying shared files or synthesizing a metric. The source report is read-only; the review artifact is in /tmp.
+- Only this worktree and its .venv were used. Eight host-only checks and the full-suite pre-merge run remain pending; no model/network calls, nested Codex, sandbox-exec, staging or commits ran.
+
+---
+
 # Complete claim observations — 2026-10-23
 
 Every successful verifier check now writes VERDICT.claims.json beside the

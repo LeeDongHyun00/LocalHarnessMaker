@@ -36,6 +36,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     sample = commands.add_parser("sample")
     sample.add_argument("--reports", required=True, type=Path)
     sample.add_argument("--n", type=int, default=20)
+    sample.add_argument("--out", type=Path)
     args = parser.parse_args(argv)
     if args.operation == "sample":
         try:
@@ -46,7 +47,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except Exception as exc:
             print(f"internal error: {type(exc).__name__}: {exc}", file=sys.stderr)
             return 2
-        output = args.reports / OUTPUT_NAME
+        output = args.out if args.out is not None else args.reports / OUTPUT_NAME
         try:
             output.write_text(json.dumps(review, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         except Exception as exc:

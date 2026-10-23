@@ -5,7 +5,7 @@ Run from the repository root with Python 3.11 or newer:
 ```text
 python -m verifier check --contract contract.json --workspace DIR --transcript PATH --attempt N --out verdict.json
 python -m verifier validate-handoff --handoff handoff.json
-python -m verifier sample --reports DIR --n 20
+python -m verifier sample --reports DIR --n 20 [--out FILE]
 ```
 
 Success prints exactly one output path followed by a newline. Logs go to stderr.
@@ -125,13 +125,24 @@ stdout. The verifier never imports the controller.
 ## Human review sample
 
 `sample` reads `DIR/report.json`, validates it offline against
-`schemas/evaluation-report.schema.json`, and reads only verdict artifacts listed
-in each task's `artifacts`. It recognizes `verdict.json`, `verdict-N.json` and
-runner-prefixed names such as `day1-verdict-N.json`, including archived paths.
-Absolute paths and paths relative to DIR are supported; verdicts must resolve
-inside DIR, including symlinks. Every listed verdict is SHA-256 checked and
-validated against the frozen verdict schema before sampling. Missing, changed,
-invalid or multiply listed verdicts, and duplicate task IDs, are input errors.
+`schemas/evaluation-report.schema.json` for version 2, or the original schema
+preserved in decision 0003 for version 1. Version 1 is identified by the absent
+`metrics.task_false_done_rate`; no metrics are added or inferred.
+
+The command reads verdict artifacts listed in each task's `artifacts`. It
+recognizes `verdict.json`, `verdict-N.json` and runner-prefixed names such as
+`day-1-verdict-N.json` and `day-2-verdict-N.json`, including archived paths.
+When a task has no listed standalone verdicts, it reads that task's listed
+`result.json` and uses its inline `verdicts` array. Standalone verdicts take
+precedence per task, so retained copies are counted once. Result task ID/type
+must match the report. Each source file is SHA-256 checked and every verdict is
+validated against the frozen verdict schema before sampling.
+
+Absolute paths, paths relative to DIR and repository-relative
+`eval/reports/DIR_NAME/...` paths are supported. Repository-relative paths are
+rebased into DIR, so a report copied from another checkout remains readable.
+Sources must resolve inside DIR, including symlinks. Missing, changed, invalid
+or multiply listed sources, and duplicate task IDs, are input errors.
 
 Selection uses the fixed seed 42, independently of the evaluation's seed.
 Candidates are sorted by task ID/artifact path, shuffled within each task type,
@@ -140,7 +151,9 @@ is one verdict attempt; a task can appear more than once. Up to `--n` verdicts
 are selected without replacement; `--n` defaults to 20 and must be positive.
 An empty verdict pool produces an empty sample, with its count logged on stderr.
 
-The output is `DIR/verifier-sample.json`; stdout contains that path and a newline.
+The default output is `DIR/verifier-sample.json`; `--out FILE` writes to the
+supplied path, allowing read-only source reports. The output parent must exist.
+Stdout contains only the output path and a newline.
 It records the seed, requested/available counts, report SHA-256 and selected
 verdicts. Each selection records task ID/type, artifact path/hash, attempt,
 verdict overall result, all item IDs/statuses/evidence/reasons unchanged, the
@@ -148,6 +161,9 @@ task's final `task_outcome`, `final_grading_outcome` and invalid reasons from th
 report. Missing grading remains null, including invalid/timeout/error tasks;
 it is never inferred as pass or fail. Earlier attempts are explicitly compared
 with the task's final grading, not an inferred attempt-specific hidden result.
+For inline verdicts, `verdict_path` and `verdict_sha256` identify the result file
+and `verdict_index` is the zero-based index in its `verdicts` array. This retains
+distinct sessions even when their attempt numbers restart.
 
 The command opens no grader source, grading copy, grading log or executor log.
 It does not rerun checks or call any model. Repeated runs on unchanged inputs
