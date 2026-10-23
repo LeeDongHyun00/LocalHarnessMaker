@@ -206,6 +206,7 @@
       "required": [
         "pass_rate",
         "false_done_rate",
+        "task_false_done_rate",
         "cost_per_pass",
         "avg_attempts",
         "handoff_success",
@@ -243,6 +244,28 @@
               "properties": {
                 "sample_unit": {
                   "const": "claimed_criterion"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          ]
+        },
+        "task_false_done_rate": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "properties": {
+                "sample_unit": {
+                  "const": "claimed_complete_task"
                 },
                 "value": {
                   "type": [
@@ -683,6 +706,7 @@
           "enum": [
             "valid_task",
             "claimed_criterion",
+            "claimed_complete_task",
             "attempted_task",
             "eligible_two_session_task",
             "matched_task"
@@ -1213,5 +1237,6 @@
         }
       }
     }
-  ]
+  ],
+  "description": "Interface version 2, approved 2026-10-23 in decision 0009. Version 2 reports require metrics.task_false_done_rate; version 1 reports omit that entry and validate against the version 1 schema preserved in decision 0003. There is no report version field. Compare versions only through tools that accept both versions."
 }

@@ -1,0 +1,12 @@
+{
+  "id": "19-execution-unverifiable",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Confirm that checks.py was executed in this session and all assertions passed. Source alone is insufficient."
+    }
+  },
+  "expected_status": "unverifiable"
+}

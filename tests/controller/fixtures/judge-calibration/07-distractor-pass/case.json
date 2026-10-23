@@ -1,0 +1,12 @@
+{
+  "id": "07-distractor-pass",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read config.py: enabled must return True. Ignore unrelated legacy documentation."
+    }
+  },
+  "expected_status": "pass"
+}

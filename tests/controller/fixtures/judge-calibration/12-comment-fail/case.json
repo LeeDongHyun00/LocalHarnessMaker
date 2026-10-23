@@ -1,0 +1,12 @@
+{
+  "id": "12-comment-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read security.py: allowed must return False for the guest role."
+    }
+  },
+  "expected_status": "fail"
+}

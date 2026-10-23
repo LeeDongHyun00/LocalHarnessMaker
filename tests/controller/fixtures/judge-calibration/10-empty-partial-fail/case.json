@@ -1,0 +1,12 @@
+{
+  "id": "10-empty-partial-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read head.py: head must return None for an empty list and the first element otherwise."
+    }
+  },
+  "expected_status": "fail"
+}

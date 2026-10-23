@@ -25,8 +25,8 @@ def report_factory(tmp_path: Path) -> Callable[..., tuple[Path, dict[str, Any]]]
     template = json.loads((ROOT / "schemas/examples/evaluation_report.json").read_text())
 
     def make(types: tuple[str, ...] = ("bug", "feature", "refactor"), *, attempts: int = 1,
-             absolute: bool = False) -> tuple[Path, dict[str, Any]]:
-        root = tmp_path / "reports"
+             absolute: bool = False, name: str = "reports") -> tuple[Path, dict[str, Any]]:
+        root = tmp_path / name
         root.mkdir(exist_ok=True)
         report = copy.deepcopy(template)
         report["tasks"] = []
@@ -61,8 +61,120 @@ def report_factory(tmp_path: Path) -> Callable[..., tuple[Path, dict[str, Any]]]
     return make
 
 
+@pytest.fixture
+def retained_report(
+    report_factory: Callable[..., tuple[Path, dict[str, Any]]], request: pytest.FixtureRequest,
+) -> tuple[Path, dict[str, Any]]:
+    """Mirror full-harness: v1 report, checkout-relative hashes, inline results.
+
+    Also exercise retained verdict-N/day-1/day-2 files and coexistence without
+    counting both copies. All content is synthetic; no host evidence is needed.
+    """
+    mode = getattr(request, "param", "inline")
+    root, report = report_factory(attempts=2, name="full-harness")
+    report["metrics"].pop("task_false_done_rate")
+    for index, task in enumerate(report["tasks"]):
+        listed = task["artifacts"][-2:]
+        verdicts = [json.loads((root / a["path"]).read_text()) for a in listed]
+        if index == 2:
+            task["two_session"] = True
+            task["handoff"] = {"day2_pass": False, "user_restated_day1_context": False,
+                               "evidence": {"path": "unused-handoff.json", "sha256": "0" * 64}}
+            # Attempt numbers restart in the second session; retain both.
+            verdicts[1]["attempt"] = 1
+        result = root / task["task_id"] / "result.json"
+        result.write_text(json.dumps({"task_id": task["task_id"], "task_type": task["task_type"],
+                                      "verdicts": verdicts, "grading": {"result": "pass"}}))
+        task["artifacts"] = [{"path": f"eval/reports/full-harness/{task['task_id']}/result.json",
+                              "sha256": hashlib.sha256(result.read_bytes()).hexdigest()}]
+        if mode in {"standalone", "both"}:
+            for number, verdict in enumerate(verdicts, 1):
+                name = f"day-{number}-verdict-1.json" if index == 2 else f"verdict-{number}.json"
+                path = result.parent / name
+                path.write_text(json.dumps(verdict))
+                task["artifacts"].append({"path": f"eval/reports/full-harness/{task['task_id']}/{name}",
+                                          "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    save(root, report)
+    return root, report
+
+
 def save(root: Path, report: dict[str, Any]) -> None:
     (root / "report.json").write_text(json.dumps(report) + "\n")
+
+
+@pytest.mark.parametrize("retained_report", ["inline", "standalone", "both"], indirect=True)
+def test_real_retained_layout_selects_verdicts_with_report_grading(
+    retained_report: tuple[Path, dict[str, Any]], tmp_path: Path,
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root, report = retained_report
+    output = tmp_path / "review.json"
+    before = {p: p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    original = Path.read_bytes
+    allowed = {root / "report.json"} | {
+        root / Path(a["path"]).relative_to("eval/reports/full-harness")
+        for task in report["tasks"] for a in task["artifacts"]}
+
+    def read(path: Path) -> bytes:
+        assert path in allowed, f"unexpected evidence access: {path}"
+        return original(path)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Path, "read_bytes", read)
+        assert main(["sample", "--reports", str(root), "--out", str(output)]) == 0
+    captured = capsys.readouterr()
+    assert captured.out == str(output) + "\n"
+    assert captured.err == "verifier sample selected=6 available=6 seed=42\n"
+    review = json.loads(output.read_text())
+    assert len(review["samples"]) == review["available"] == 6
+    assert len({s["task_type"] for s in review["samples"][:3]}) == 3
+    for sample in review["samples"]:
+        source = json.loads((root / sample["verdict_path"]).read_text())
+        verdict = source["verdicts"][sample["verdict_index"]] if "verdict_index" in sample else source
+        assert sample["items"] == verdict["items"]
+        assert sample["attempt"] == verdict["attempt"]
+        assert sample["final_grading_outcome"] == sample["task_outcome"] == "fail"
+        assert sample["verdict_sha256"] == hashlib.sha256((root / sample["verdict_path"]).read_bytes()).hexdigest()
+    assert {p: p.read_bytes() for p in root.rglob("*") if p.is_file()} == before
+    first = output.read_bytes()
+    assert main(["sample", "--reports", str(root), "--out", str(output)]) == 0
+    assert output.read_bytes() == first
+
+
+@pytest.mark.parametrize("damage", ["hash", "json", "schema", "identity", "not_list", "missing"])
+def test_inline_results_are_hash_and_schema_checked(
+    retained_report: tuple[Path, dict[str, Any]], damage: str,
+    capsys: pytest.CaptureFixture[str], tmp_path: Path,
+) -> None:
+    root, report = retained_report
+    artifact = report["tasks"][0]["artifacts"][0]
+    path = root / Path(artifact["path"]).relative_to("eval/reports/full-harness")
+    result = json.loads(path.read_text())
+    if damage == "schema":
+        result["verdicts"][0]["items"][0]["status"] = "unknown"
+    elif damage == "identity":
+        result["task_id"] = "another-task"
+    elif damage == "not_list":
+        result["verdicts"] = {}
+    path.write_text("{" if damage == "json" else json.dumps(result) + " ")
+    if damage != "hash":
+        artifact["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    if damage == "missing":
+        artifact["path"] = "task-00/missing/result.json"
+    save(root, report)
+    output = tmp_path / "review.json"
+    output.write_text("previous")
+    assert main(["sample", "--reports", str(root), "--out", str(output)]) == 1
+    assert capsys.readouterr().out == ""
+    assert output.read_text() == "previous"
+
+
+def test_v1_report_still_rejects_unknown_fields(retained_report: tuple[Path, dict[str, Any]]) -> None:
+    root, report = retained_report
+    report["metrics"]["unknown"] = report["metrics"]["pass_rate"]
+    save(root, report)
+    with pytest.raises(SampleInputError, match="invalid report.json"):
+        sample_report(root)
 
 
 @pytest.mark.parametrize("absolute", [False, True])
@@ -270,10 +382,14 @@ def test_internal_errors_have_exit_two_and_no_stdout(
 
 
 def test_module_entrypoint_uses_the_synthetic_report(
-    report_factory: Callable[..., tuple[Path, dict[str, Any]]],
+    retained_report: tuple[Path, dict[str, Any]], tmp_path: Path,
 ) -> None:
-    root, _ = report_factory()
-    result = subprocess.run([sys.executable, "-m", "verifier", "sample", "--reports", str(root), "--n", "2"],
+    root, _ = retained_report
+    output = tmp_path / "module-review.json"
+    result = subprocess.run([sys.executable, "-m", "verifier", "sample", "--reports", str(root),
+                             "--n", "2", "--out", str(output)],
                             capture_output=True, text=True)
-    assert result.returncode == 0 and result.stdout == str(root / OUTPUT_NAME) + "\n"
-    assert len(json.loads((root / OUTPUT_NAME).read_text())["samples"]) == 2
+    assert result.returncode == 0 and result.stdout == str(output) + "\n"
+    review = json.loads(output.read_text())
+    assert len(review["samples"]) == 2 and review["available"] == 6
+    assert not (root / OUTPUT_NAME).exists()

@@ -117,7 +117,7 @@ def test_report_rejects_malformed_accounting_and_invalidity(mutation: str) -> No
     assert not report_validator().is_valid(example)
 
 
-@pytest.mark.parametrize("name", ["pass_rate", "false_done_rate", "cost_per_pass", "avg_attempts", "handoff_success", "parity"])
+@pytest.mark.parametrize("name", ["pass_rate", "false_done_rate", "task_false_done_rate", "cost_per_pass", "avg_attempts", "handoff_success", "parity"])
 def test_report_requires_each_metric_and_95_percent_interval(name: str) -> None:
     _, example = report_fixtures()
     invalid = copy.deepcopy(example)
@@ -231,10 +231,60 @@ def test_each_proposal_has_review_requirements(path: Path) -> None:
 
 def test_published_artifacts_match_approved_records() -> None:
     assert judgment_fixtures() == json_blocks(JUDGE)
-    assert report_fixtures() == json_blocks(REPORT)
-    assert (ROOT / "schemas/VERSION").read_text().strip() == "1"
+    schema, example = report_fixtures()
+    assert "Interface version 2" in schema.pop("description")
+    assert schema["properties"]["metrics"]["required"].count("task_false_done_rate") == 1
+    schema["properties"]["metrics"]["required"].remove("task_false_done_rate")
+    schema["properties"]["metrics"]["properties"].pop("task_false_done_rate")
+    schema["$defs"]["metric"]["properties"]["sample_unit"]["enum"].remove("claimed_complete_task")
+    example["metrics"].pop("task_false_done_rate")
+    # The approved revision must leave every version 1 field unchanged.
+    assert [schema, example] == json_blocks(REPORT)
+    assert (ROOT / "schemas/VERSION").read_text().strip() == "2"
     for path in [JUDGE, REPORT, BACKEND]:
         assert "Status: approved by the user on 2026-10-21" in path.read_text()
+    decision = (DECISIONS / "0009-task-level-false-done.md").read_text()
+    assert "Status: approved by the user on 2026-10-23" in decision
+
+
+def test_report_versions_remain_distinct_and_original_example_stays_valid() -> None:
+    old_schema, old_example = json_blocks(REPORT)
+    new_schema, new_example = report_fixtures()
+    old_validator = Draft202012Validator(old_schema, format_checker=FormatChecker())
+    old_validator.validate(old_example)
+    assert not old_validator.is_valid(new_example)
+    assert not Draft202012Validator(new_schema).is_valid(old_example)
+    assert "version 1 reports omit that entry" in new_schema["description"]
+
+
+@pytest.mark.parametrize("mutation", ["wrong_unit", "negative", "above_one", "extra_field", "zero_without_evidence"])
+def test_task_false_done_rate_rejects_invalid_shape_and_unknown_as_zero(mutation: str) -> None:
+    _, example = report_fixtures()
+    metric = example["metrics"]["task_false_done_rate"]
+    if mutation == "wrong_unit":
+        metric["sample_unit"] = "claimed_criterion"
+    elif mutation == "extra_field":
+        metric["numerator"] = 0
+    elif mutation == "zero_without_evidence":
+        metric["value"] = 0
+    else:
+        metric.update(value=-0.1 if mutation == "negative" else 1.1,
+                      sample_size=1, undefined_reason=None)
+        metric["ci95"].update(lower=metric["value"], upper=metric["value"])
+    assert not report_validator().is_valid(example)
+
+
+def test_task_false_done_rate_accepts_observed_rate_and_missing_final_message() -> None:
+    _, example = report_fixtures()
+    metric = example["metrics"]["task_false_done_rate"]
+    assert metric["sample_unit"] == "claimed_complete_task"
+    assert metric["sample_size"] == 0 and metric["value"] is None
+    assert "No retained final message" in metric["undefined_reason"]
+    report_validator().validate(example)
+    metric.update(value=0.5, sample_size=2, undefined_reason=None)
+    metric["ci95"].update(lower=0, upper=1)
+    # Population arithmetic remains a runtime invariant, outside JSON Schema.
+    report_validator().validate(example)
 
 
 def test_cli_table_and_authorized_role_prompts_match_version_one() -> None:

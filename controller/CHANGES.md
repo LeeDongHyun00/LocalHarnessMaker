@@ -1,3 +1,49 @@
+# Judge calibration update — 2026-10-23
+
+Judge prompt v2 checks each rubric requirement against artifact paths and lines
+or symbols and records compact requirement evidence in the existing evidence
+field. Pass requires support for every requirement; fail requires an inspected
+contradiction; unverifiable identifies a required fact unavailable from the
+snapshot. File-based behavior and test assertions do not require execution
+unless the rubric explicitly demands it. Untrusted-data boundaries and the
+omitted-manifest rule remain in place. The previous prompt is preserved verbatim
+in prompts/judge-v1.md for comparison. Existing judgment schemas and public
+controller CLI flags are unchanged.
+
+Added 24 synthetic calibration workspaces and rubrics: 8 pass, 10 fail and
+6 unverifiable. They cover partial satisfaction, misleading comments, injected
+instructions, test source versus test execution, history/external facts and
+omitted content. No evaluation tasks or model-generated examples were read.
+Mock-backed tests exercise prompt assembly and schema parsing for every case,
+both versions, approval refusal, one-call failures and confusion accounting.
+
+The host-only command `python -m controller.measure_judge` previews a cost
+estimate and requires `--i-have-approval`. Use `--prompt-version v1` for before
+and `--prompt-version v2` for after, with distinct `--out` paths. Each version
+permits at most 24 codex_cli generations, one per case, with no repair/retry or
+HTTP fallback. Current planning estimates are USD 0.052800 per version and
+USD 0.105600 for both, not caps. Reports retain hashes, configuration, per-case
+judgments and accounting, accuracy, expected-status confusion matrix, errors,
+latency and API-equivalent cost. Errors count as misses; unknown costs stay null.
+See tests/controller/fixtures/judge-calibration/README.md for exact host commands.
+Validation: `.venv/bin/python -m pytest tests/controller -q` passed all 312
+tests in 14.40s. Both unapproved version previews exited 1 with the estimate
+and refusal, without calls. Live calibration, nested execution and host
+integration remain pending.
+
+## Assumptions
+
+- Synthetic fixture labels express the authored rubrics, not live calibration
+  results. Mocks prove plumbing only; no semantic accuracy improvement is claimed.
+- A visible contradiction determines fail even if another requirement needs
+  unavailable evidence. Missing implementation in a fully inspected file can
+  contradict a requirement; omitted content cannot establish absence.
+- The new measurement command is controller-local tooling authorized by this
+  task, not a change to the published controller judge CLI or shared interfaces.
+- Before/after comparison uses the preserved v1 option on identical fixtures and
+  host settings. Claude runs the approved batches on the host; no paid calls,
+  nested Codex, network or macOS sandbox-exec were attempted here.
+
 # Controller update — 2026-10-23
 
 Contract prompt v3 addresses the first smoke measurement's contract defects.

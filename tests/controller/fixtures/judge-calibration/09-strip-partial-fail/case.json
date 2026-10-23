@@ -1,0 +1,12 @@
+{
+  "id": "09-strip-partial-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read normalize.py: normalize must strip surrounding whitespace and lowercase the text."
+    }
+  },
+  "expected_status": "fail"
+}

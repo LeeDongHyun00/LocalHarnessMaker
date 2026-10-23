@@ -4,6 +4,53 @@ A verdict passes only when every item passes. Fail and unverifiable remain
 separate statuses, and both keep overall=fail. Re-instruction is an independent
 decision: stopping retries does not turn missing verification into a pass.
 
+## Completion claims
+
+Only the latest measured assistant `final_answer` message supplies claims.
+Earlier reports, user/tool messages, commentary, block quotes and fenced code
+are excluded. The transcript parser remains pinned to the published Codex
+`response_item` format. Extraction is deterministic and makes no model calls.
+
+A completion predicate and criterion reference must share a clause. Completion
+words include done, complete/completed, implemented, pass/passed/passing/passes,
+met, satisfied, fulfilled, verified, succeeded and successful. References are:
+
+- Exact, case-sensitive criterion IDs, including comma/and lists.
+- Inclusive same-prefix numeric ranges such as `SC-1 through SC-4`, `SC-1 to SC-4`, `SC-1–SC-4` and `SC-1 - SC-4`. Both endpoints must exist and be ascending; only existing contract IDs are selected.
+- Explicit collective statements such as `all success criteria are met`, `all criteria passed` or `every success criterion is satisfied`. Generic `all done` or `all tasks done` remains unmapped.
+- Description words, matched case-insensitively as whole words. Remove common function/contract words, numbers and completion words; require at least two remaining words (one for a one-word vocabulary), including at least one word unique among contract descriptions. Identical descriptions and shared words alone are ambiguous. There is no stemming, synonym or semantic paraphrase matching.
+
+Markdown tables use a `Status` or `Result` column and `ID`, `Criterion`,
+`Criterion ID`, `Description` or `Requirement` reference columns. Without a
+recognized reference header, use the first non-status column. Without a table
+header, infer a standalone positive status cell and use the first other column.
+Status words above and standalone OK, Success, ✓, ✔ or ✅ count as positive.
+Evidence columns supply neither completion predicates nor criterion references;
+a pending status with "previously passed" evidence stays unclaimed. Ordinary
+checklist rows such as `- SC-1: Passed` and checked `[x]`/`[X]` rows also count.
+Unchecked `[ ]` rows stay unclaimed even if their text says done.
+
+Retain scoped negatives: not/no/never, incomplete, unfinished, unverifiable,
+fail/failed/failing/fails, pending, remaining, blocked, todo, will/would/should/
+could/if, cannot/unable and negative contractions suppress the affected
+predicate. A leading negative suppresses the whole clause. Comma/and lists
+share a predicate, while an individual negative clears only its pending IDs.
+Exception/contrast words (`except`, `but`, `other than`, `apart from`, `besides`,
+`excluding`) stop positive extraction for the rest of the clause; named IDs or
+descriptions in that tail are excluded from any collective/range claim. An
+all-criteria statement with an unmapped exception is conservatively unclaimed.
+Any affirmative observation counts; repeated claims retain the first supporting
+clause rather than attempting to reconcile contradictory later statements.
+
+The observation contains the exact source clause, or entire table row,
+and final verdict status for every real criterion, plus claimed/unclaimed and
+claimed-by-status counts in `VERDICT.claims.json` (see [README.md](README.md)).
+Unclaimed clauses are empty. Only a mechanically failed claimed criterion gets
+reason `claimed_without_evidence`; passes, unverifiable results and valid judge
+reasons keep their existing semantics. Sidecar counts include judge statuses
+without rewriting their reasons. Claimed-and-unverifiable is uncertainty,
+separate from confirmed failed claims. The verdict schema remains unchanged.
+
 ## Commands
 
 Only direct Python invocations are accepted. Commands run with the existing

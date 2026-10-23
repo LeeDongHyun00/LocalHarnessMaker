@@ -10,7 +10,7 @@ import time
 from typing import Any, Callable
 
 from verifier.causes import Cause
-from verifier.claims import claimed_criteria, last_report
+from verifier.claims import claim_observations, extract_claims, last_report
 from verifier.judge import judge_criterion, judge_timeout
 from verifier.processes import CLEANUP_SECONDS
 from verifier.reinstruct import reinstruct
@@ -22,6 +22,7 @@ from verifier.schema import validate
 def check_contract(
     contract: dict[str, Any], workspace: Path, transcript: Path, attempt: int,
     runner: Runner = run_command, *, clock: Callable[[], float] = time.monotonic,
+    observations: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     started = clock()
     command_seconds = 0.0
@@ -50,7 +51,7 @@ def check_contract(
         ids = [criterion["id"] for criterion in criteria]
         if len(set(ids)) != len(ids):
             raise ValueError("success criterion IDs must be unique")
-        claims = claimed_criteria(report, ids)
+        claims = extract_claims(report, ids, {c["id"]: c["description"] for c in criteria})
         quality_warning = not criteria or all(c["check"]["type"] == "llm_judge" for c in criteria)
         items = []
         causes: dict[str, Cause] = {}
@@ -97,6 +98,8 @@ def check_contract(
             "attempt": attempt,
         }
         validate(verdict, "verdict.schema.json")
+        if observations is not None:
+            observations.update(claim_observations(criteria, claims, verdict))
         return verdict
     finally:
         elapsed = clock() - started

@@ -1,0 +1,12 @@
+{
+  "id": "22-history-unverifiable",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Confirm app.py is byte-for-byte unchanged from the previous session. No previous-session copy is supplied."
+    }
+  },
+  "expected_status": "unverifiable"
+}

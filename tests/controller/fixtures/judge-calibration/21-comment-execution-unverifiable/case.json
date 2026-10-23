@@ -1,0 +1,12 @@
+{
+  "id": "21-comment-execution-unverifiable",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Confirm actual test execution results from this session show all assertions passed; a source comment is not an execution record."
+    }
+  },
+  "expected_status": "unverifiable"
+}

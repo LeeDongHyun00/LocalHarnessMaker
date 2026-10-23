@@ -1,0 +1,12 @@
+{
+  "id": "13-stub-fail",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read total.py: total must return the sum of its integer list, including zero for an empty list."
+    }
+  },
+  "expected_status": "fail"
+}

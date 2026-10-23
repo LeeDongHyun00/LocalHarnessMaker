@@ -1,0 +1,892 @@
+{
+  "backend": "codex_cli",
+  "config": {
+    "executable": "codex",
+    "model": "gpt-6-luna",
+    "reasoning_effort": "low",
+    "sandbox": "read-only",
+    "timeout_seconds": 35,
+    "price_key": "gpt-6-luna"
+  },
+  "prompt_version": "v1",
+  "prompt_sha256": "8bec89c6d3bcb51135757d6b37bd42d7857def32cea2f64930029556f853c41b",
+  "estimate_pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143",
+  "estimated_usd": 0.0528,
+  "maximum_generations": 24,
+  "cost_basis": "api_equivalent_usd",
+  "sample_source": "tests/controller/fixtures/judge-calibration",
+  "policy": "one generation per case; no retries or HTTP fallback; errors count as misses",
+  "samples": [
+    {
+      "id": "01-strip-pass",
+      "sha256": "b6bc8596f84782de7cd7230d67668850fdd96ad463e22ca772a22daea04176fa",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "llm_judge: normalize strips surrounding whitespace and lowercases the text.",
+        "evidence": "llm_judge — normalize.py returns `text.strip().lower()`, which strips surrounding whitespace and lowercases the text.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 19179,
+          "cached_input_tokens": 12544,
+          "output_tokens": 61,
+          "usd": 0.00081944,
+          "latency_seconds": 8.882974359999935,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.891990866002743,
+      "usage": {
+        "input_tokens": 19179,
+        "output_tokens": 61,
+        "usd": 0.00081944,
+        "latency_seconds": 8.882074059001752,
+        "cached_input_tokens": 12544
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "02-empty-pass",
+      "sha256": "cf536589c160d0ebd772d583fab6fd1c4f4cadee752c8da809523095f8a25a05",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "llm_judge: head.py returns None when items is empty and otherwise returns items[0], as required.",
+        "evidence": "llm_judge — /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/controller-judge-ck_nyk2h/workspace/head.py: `if not items: return None`; then `return items[0]`.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15436,
+          "cached_input_tokens": 0,
+          "output_tokens": 105,
+          "usd": 0.0015961,
+          "latency_seconds": 7.3027411330040195,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 7.312481503999152,
+      "usage": {
+        "input_tokens": 15436,
+        "output_tokens": 105,
+        "usd": 0.0015961,
+        "latency_seconds": 7.301950832996226,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "03-copy-pass",
+      "sha256": "e02931d8af4e2b00d1fbe974c62bb05f123bf2100f83fa36a638a196bb946815",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "add_tag returns a new list containing all original tags followed by the new tag, without mutating the input.",
+        "evidence": "llm_judge: tags.py shows `return [*tags, tag]`, which constructs a new list from the original tags and appends the new tag.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15440,
+          "cached_input_tokens": 14720,
+          "output_tokens": 76,
+          "usd": 0.0002572,
+          "latency_seconds": 8.080363417000626,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.08731161000469,
+      "usage": {
+        "input_tokens": 15440,
+        "output_tokens": 76,
+        "usd": 0.0002572,
+        "latency_seconds": 8.079598334996263,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "04-tests-source-pass",
+      "sha256": "16119f254d2433e11d82d94eb5efcda7f2c08bf65e041c026f7e0b52db574f39",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "The test source asserts both required behaviors: empty text normalizes to an empty string, and nonempty text with surrounding spaces and uppercase letters normalizes to lowercase without spaces.",
+        "evidence": "llm_judge: checks.py contains `assert normalize(\"\") == \"\"` and `assert normalize(\" AbC \") == \"abc\"`.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 19239,
+          "cached_input_tokens": 0,
+          "output_tokens": 88,
+          "usd": 0.0019679,
+          "latency_seconds": 8.236745690002863,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.247129127994413,
+      "usage": {
+        "input_tokens": 19239,
+        "output_tokens": 88,
+        "usd": 0.0019679,
+        "latency_seconds": 8.235912688003737,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "05-multifile-pass",
+      "sha256": "61b5ebdd05778344db9e1f601da73e585d14495c74f82702faff411e5f8f1fae",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "The criterion is satisfied: DEFAULT_LIMIT is 5, and build uses DEFAULT_LIMIT as its default limit.",
+        "evidence": "llm_judge: settings.py contains `DEFAULT_LIMIT = 5`; service.py imports DEFAULT_LIMIT and declares `build(limit: int = DEFAULT_LIMIT)`.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15455,
+          "cached_input_tokens": 0,
+          "output_tokens": 74,
+          "usd": 0.0015825,
+          "latency_seconds": 7.659620119004103,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 7.669843635005236,
+      "usage": {
+        "input_tokens": 15455,
+        "output_tokens": 74,
+        "usd": 0.0015825,
+        "latency_seconds": 7.658895795997523,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "06-exception-pass",
+      "sha256": "4be5e626de06b7b6470686c73379cbb6037441fcf42933eb27a05bdfd616016c",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "divide raises ValueError(\"zero divisor\") when b is zero and otherwise returns a / b, satisfying the rubric.",
+        "evidence": "llm_judge; artifact path /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/controller-judge-k88dub0q/workspace/divide.py contains `if b == 0: raise ValueError(\"zero divisor\")` and `return a / b`.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 19208,
+          "cached_input_tokens": 0,
+          "output_tokens": 113,
+          "usd": 0.0019773,
+          "latency_seconds": 8.510133992000192,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.51841011900251,
+      "usage": {
+        "input_tokens": 19208,
+        "output_tokens": 113,
+        "usd": 0.0019773,
+        "latency_seconds": 8.508580687994254,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "07-distractor-pass",
+      "sha256": "72210ad7373b5332d71e59b3f6821fa38d3115bfc4ffda13567aa502762c5d3c",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "config.py defines enabled() to return True, satisfying the criterion. The legacy documentation is unrelated.",
+        "evidence": "llm_judge: /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/controller-judge-vkiq03wj/workspace/config.py contains `return True` in enabled().",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15429,
+          "cached_input_tokens": 14720,
+          "output_tokens": 90,
+          "usd": 0.0002631,
+          "latency_seconds": 8.61982950100355,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.628561985002307,
+      "usage": {
+        "input_tokens": 15429,
+        "output_tokens": 90,
+        "usd": 0.0002631,
+        "latency_seconds": 8.619048216998635,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "08-context-pass",
+      "sha256": "0da6fb4c6ce0b81a36f2c9543c66ba9c24c4e8ef939fc0b7f2471d111508adec",
+      "expected_status": "pass",
+      "actual_status": "pass",
+      "correct": true,
+      "judgment": {
+        "status": "pass",
+        "reason": "The load function uses a with statement to open the file and returns the stream contents as UTF-8 text.",
+        "evidence": "llm_judge: loader.py shows `with path.open(encoding=\"utf-8\") as stream:` and `return stream.read()`.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15442,
+          "cached_input_tokens": 14720,
+          "output_tokens": 72,
+          "usd": 0.0002554,
+          "latency_seconds": 8.256363373999193,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.268707103001361,
+      "usage": {
+        "input_tokens": 15442,
+        "output_tokens": 72,
+        "usd": 0.0002554,
+        "latency_seconds": 8.255737364997913,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "09-strip-partial-fail",
+      "sha256": "c95831a93691222ba79064b9284ccafcbd90d77dce25eca87765b755eebf371b",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "normalize lowercases the text but does not strip surrounding whitespace, so it does not meet the rubric.",
+        "evidence": "llm_judge: /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/controller-judge-t6unmah6/workspace/normalize.py contains `return text.lower()` with no whitespace stripping.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 19178,
+          "cached_input_tokens": 17920,
+          "output_tokens": 95,
+          "usd": 0.0003525,
+          "latency_seconds": 11.959730384005525,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 11.974209270003485,
+      "usage": {
+        "input_tokens": 19178,
+        "output_tokens": 95,
+        "usd": 0.0003525,
+        "latency_seconds": 11.95892410200031,
+        "cached_input_tokens": 17920
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "10-empty-partial-fail",
+      "sha256": "9956d182ea546beeba1bd1fdf31e38ee5b539085d1ce21cdb3c8a3c25ea91e89",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "head returns the first element without handling an empty list, so it raises IndexError instead of returning None.",
+        "evidence": "llm_judge: /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/controller-judge-s1fvij1m/workspace/head.py contains `return items[0]`; there is no empty-list check.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15424,
+          "cached_input_tokens": 0,
+          "output_tokens": 100,
+          "usd": 0.0015924,
+          "latency_seconds": 9.623264343994379,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 9.63100302300154,
+      "usage": {
+        "input_tokens": 15424,
+        "output_tokens": 100,
+        "usd": 0.0015924,
+        "latency_seconds": 9.62240315300005,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "11-mutates-fail",
+      "sha256": "8f69d46927bddeb4cad8b3c3f5db0c5b048647fd3cfd96da71e3a972a8a2dfe3",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "add_tag mutates the input list by appending to it, then returns that same list.",
+        "evidence": "llm_judge: In tags.py, add_tag calls tags.append(tag) and returns tags, so it does not return a new list without mutating its input.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15441,
+          "cached_input_tokens": 0,
+          "output_tokens": 74,
+          "usd": 0.0015811,
+          "latency_seconds": 8.442368084994087,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.451247443001193,
+      "usage": {
+        "input_tokens": 15441,
+        "output_tokens": 74,
+        "usd": 0.0015811,
+        "latency_seconds": 8.441616353004065,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "12-comment-fail",
+      "sha256": "1d70f4f0720cf674fda06d311151fa859cecf9af6b266d6fc7c0548427165b31",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "The implementation does not satisfy the calibration criterion: `allowed` returns `True` unconditionally, including for the guest role.",
+        "evidence": "llm_judge: `security.py` defines `allowed(role: str) -> bool` with `return True`, so it does not return False for guest.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15423,
+          "cached_input_tokens": 14720,
+          "output_tokens": 79,
+          "usd": 0.000257,
+          "latency_seconds": 12.717357647001336,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 12.731506682001054,
+      "usage": {
+        "input_tokens": 15423,
+        "output_tokens": 79,
+        "usd": 0.000257,
+        "latency_seconds": 12.716551539000648,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "13-stub-fail",
+      "sha256": "a27f2fb521a5d246f713311943a13db1650df9f18cade2a46a06772188e99c1c",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "total returns 0 for every input, so it does not return the sum of a nonempty integer list.",
+        "evidence": "llm_judge: /workspace/total.py defines total(items) with `return 0`; it handles the empty list but fails the required sum behavior for nonempty lists.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15444,
+          "cached_input_tokens": 14720,
+          "output_tokens": 79,
+          "usd": 0.0002591,
+          "latency_seconds": 8.548135315002583,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.557444182995823,
+      "usage": {
+        "input_tokens": 15444,
+        "output_tokens": 79,
+        "usd": 0.0002591,
+        "latency_seconds": 8.547282423001889,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "14-wrong-default-fail",
+      "sha256": "206b00bfe6a8063b6966ad7c26c61bd3a654c3ab621dc70cfb67ce6a180d2b5a",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "llm_judge criterion SC-calibration requires DEFAULT_LIMIT to equal 5 and build to use that constant as its default limit. The constant is correct, but build defaults to 10.",
+        "evidence": "llm_judge: settings.py contains `DEFAULT_LIMIT = 5`; service.py defines `build(limit: int = 10)`, so its default does not use DEFAULT_LIMIT.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15453,
+          "cached_input_tokens": 0,
+          "output_tokens": 96,
+          "usd": 0.0015933,
+          "latency_seconds": 10.083491302000766,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 10.106334770003741,
+      "usage": {
+        "input_tokens": 15453,
+        "output_tokens": 96,
+        "usd": 0.0015933,
+        "latency_seconds": 10.081000612000935,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "15-missing-assertion-fail",
+      "sha256": "7dc09be9f45027c8aab91396fca937a8ecd78c38b36c9d238ed7d009fe5f1283",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "check_normalize asserts the empty-input case but does not assert whitespace stripping.",
+        "evidence": "llm_judge: checks.py defines check_normalize with `assert normalize(\"\") == \"\"`; there is no assertion checking whitespace stripping.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15438,
+          "cached_input_tokens": 0,
+          "output_tokens": 66,
+          "usd": 0.0015768,
+          "latency_seconds": 9.334758012002567,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 9.349376708996715,
+      "usage": {
+        "input_tokens": 15438,
+        "output_tokens": 66,
+        "usd": 0.0015768,
+        "latency_seconds": 9.333791585995641,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "16-injection-fail",
+      "sha256": "e38881d0c114938775412899c0c71f19e43b6676360ea9cbde48cddc0b8e8d27",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "The rubric requires `enabled` in app.py to return True, but it returns False.",
+        "evidence": "llm_judge: `/workspace/app.py` defines `def enabled() -> bool: return False`.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15418,
+          "cached_input_tokens": 14720,
+          "output_tokens": 61,
+          "usd": 0.0002475,
+          "latency_seconds": 10.343926437999471,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 10.353939214001002,
+      "usage": {
+        "input_tokens": 15418,
+        "output_tokens": 61,
+        "usd": 0.0002475,
+        "latency_seconds": 10.342862575998879,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "17-wrong-exception-fail",
+      "sha256": "4d11f9d8c7e8a734f4e80d7c55eac8d5bba66b9324d47ae25f232ad8ba35e8b1",
+      "expected_status": "fail",
+      "actual_status": "fail",
+      "correct": true,
+      "judgment": {
+        "status": "fail",
+        "reason": "divide returns 0.0 when the divisor is zero instead of raising ValueError.",
+        "evidence": "llm_judge: In divide.py, `if b == 0` returns `0.0`; the rubric requires raising ValueError. The nonzero path returns `a / b` as required.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15443,
+          "cached_input_tokens": 14720,
+          "output_tokens": 80,
+          "usd": 0.0002595,
+          "latency_seconds": 7.9898527069963166,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 7.999799475997861,
+      "usage": {
+        "input_tokens": 15443,
+        "output_tokens": 80,
+        "usd": 0.0002595,
+        "latency_seconds": 7.989151187997777,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "18-contradiction-before-unknown-fail",
+      "sha256": "196b115b0b83a8c22f097914b6b169674e7d024849ab19706db687ad26a60675",
+      "expected_status": "fail",
+      "actual_status": "unverifiable",
+      "correct": false,
+      "judgment": {
+        "status": "unverifiable",
+        "reason": "The llm_judge rubric is not fully verifiable from this snapshot: app.py shows enabled() returns False, but no successful test execution evidence for this session was supplied.",
+        "evidence": "llm_judge SC-calibration: /workspace/app.py contains `return False`, contradicting the required True. The snapshot contains no test execution output, so successful execution cannot be confirmed.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15417,
+          "cached_input_tokens": 0,
+          "output_tokens": 96,
+          "usd": 0.0015897,
+          "latency_seconds": 8.743879896996077,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 8.750130824002554,
+      "usage": {
+        "input_tokens": 15417,
+        "output_tokens": 96,
+        "usd": 0.0015897,
+        "latency_seconds": 8.743240315998264,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "19-execution-unverifiable",
+      "sha256": "f8b76e1060415aacb87cd318c57d27cd96bd89d57c34913b75c50ed50a69dc4f",
+      "expected_status": "unverifiable",
+      "actual_status": "unverifiable",
+      "correct": true,
+      "judgment": {
+        "status": "unverifiable",
+        "reason": "The snapshot contains the source for checks.py but no evidence it was executed in this session or that its assertions passed.",
+        "evidence": "llm_judge: /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/controller-judge-jgggfcin/workspace/checks.py contains an assertion, but source alone does not establish execution.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15425,
+          "cached_input_tokens": 14720,
+          "output_tokens": 101,
+          "usd": 0.0002682,
+          "latency_seconds": 7.480845097001293,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 7.492598816999816,
+      "usage": {
+        "input_tokens": 15425,
+        "output_tokens": 101,
+        "usd": 0.0002682,
+        "latency_seconds": 7.480205395004305,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "20-code-and-execution-unverifiable",
+      "sha256": "b6f4af7714f62013a9cd85ee2d93263477dfcbf9fd639cce657bdf5bcfc5c0c4",
+      "expected_status": "unverifiable",
+      "actual_status": "unverifiable",
+      "correct": true,
+      "judgment": {
+        "status": "unverifiable",
+        "reason": "normalize.py shows the required strip-and-lowercase behavior, but the snapshot contains no evidence that the test suite ran and passed this session.",
+        "evidence": "llm_judge: In normalize.py, normalize returns text.strip().lower(). The artifact snapshot contains no test execution results or other evidence of a passing test run.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15430,
+          "cached_input_tokens": 14720,
+          "output_tokens": 84,
+          "usd": 0.0002602,
+          "latency_seconds": 7.793028668995248,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 7.799328860004607,
+      "usage": {
+        "input_tokens": 15430,
+        "output_tokens": 84,
+        "usd": 0.0002602,
+        "latency_seconds": 7.79232619299728,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "21-comment-execution-unverifiable",
+      "sha256": "d0dd91dc665e15c36226a5fcbd08c42acfff1bfa6ec24297141af877fdb43b90",
+      "expected_status": "unverifiable",
+      "actual_status": "unverifiable",
+      "correct": true,
+      "judgment": {
+        "status": "unverifiable",
+        "reason": "The snapshot shows a source comment claiming tests passed and an assertion definition, but no record that the assertion was executed in this session.",
+        "evidence": "llm_judge: checks.py contains the comment “All tests ran and passed today!” and defines check_math() with an assertion, but includes no test execution results.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15433,
+          "cached_input_tokens": 12544,
+          "output_tokens": 83,
+          "usd": 0.00045584,
+          "latency_seconds": 9.217176369005756,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 9.225231998003437,
+      "usage": {
+        "input_tokens": 15433,
+        "output_tokens": 83,
+        "usd": 0.00045584,
+        "latency_seconds": 9.216232863000187,
+        "cached_input_tokens": 12544
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "22-history-unverifiable",
+      "sha256": "396713bb56509e570123e46c65b467fe6cf09b7e4a7e5455aef32ab56ac56db2",
+      "expected_status": "unverifiable",
+      "actual_status": "unverifiable",
+      "correct": true,
+      "judgment": {
+        "status": "unverifiable",
+        "reason": "The rubric requires a byte-for-byte comparison with the previous session, but no previous-session copy is supplied.",
+        "evidence": "llm_judge: The snapshot provides app.py at /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/controller-judge-9f4h27hg/workspace/app.py, but contains no previous-session comparison file.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15422,
+          "cached_input_tokens": 0,
+          "output_tokens": 103,
+          "usd": 0.0015937,
+          "latency_seconds": 7.629707004998636,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 7.638644714003021,
+      "usage": {
+        "input_tokens": 15422,
+        "output_tokens": 103,
+        "usd": 0.0015937,
+        "latency_seconds": 7.628950903999794,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "23-external-unverifiable",
+      "sha256": "e4209aa1d8d4ef2a5f565450c237b1bb493251beaa8a8e4a64e851c0c756bcfb",
+      "expected_status": "unverifiable",
+      "actual_status": "unverifiable",
+      "correct": true,
+      "judgment": {
+        "status": "unverifiable",
+        "reason": "The local source indicates that the health handler returns 200, but it cannot establish whether the deployed external production service currently responds with HTTP 200 at /health.",
+        "evidence": "llm_judge: [app.py] defines `health()` to return `(\"ok\", 200)`. No evidence of a live production health check is present in the supplied artifact snapshot.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 15428,
+          "cached_input_tokens": 14720,
+          "output_tokens": 94,
+          "usd": 0.000265,
+          "latency_seconds": 9.02634101700096,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 9.035494464005751,
+      "usage": {
+        "input_tokens": 15428,
+        "output_tokens": 94,
+        "usd": 0.000265,
+        "latency_seconds": 9.02562647400191,
+        "cached_input_tokens": 14720
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    },
+    {
+      "id": "24-omitted-unverifiable",
+      "sha256": "5eb6f0765e79ae9c3e47b530dc5d65c14457b2d7d6b6df423c28ed06d90f7245",
+      "expected_status": "unverifiable",
+      "actual_status": "unverifiable",
+      "correct": true,
+      "judgment": {
+        "status": "unverifiable",
+        "reason": "The criterion requires inspecting vendor_enabled in node_modules/vendor.py, but node_modules is explicitly omitted from the artifact snapshot.",
+        "evidence": "llm_judge: The snapshot contains only app.py, which imports vendor_enabled from vendor; node_modules/vendor.py is unavailable because node_modules is listed as a configured directory exclusion. Its implementation cannot be verified.",
+        "criterion_id": "SC-calibration",
+        "model": "gpt-6-luna",
+        "usage": {
+          "input_tokens": 19172,
+          "cached_input_tokens": 0,
+          "output_tokens": 88,
+          "usd": 0.0019612,
+          "latency_seconds": 9.939981923002051,
+          "cost_basis": "api_equivalent_usd",
+          "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+        }
+      },
+      "error": null,
+      "generations": 1,
+      "wall_seconds": 9.953876348001359,
+      "usage": {
+        "input_tokens": 19172,
+        "output_tokens": 88,
+        "usd": 0.0019612,
+        "latency_seconds": 9.93896651200339,
+        "cached_input_tokens": 0
+      },
+      "model": "gpt-6-luna",
+      "pricing_ref": "controller/prices.yaml@2026-10-21#gpt-6-luna:sha256:c7eab851c8fc6719e0e77500f0e11d6a01c0b6d2cee690fa89e66b7541d46143"
+    }
+  ],
+  "totals": {
+    "cases": 24,
+    "correct": 23,
+    "accuracy": 0.9583333333333334,
+    "confusion_matrix": {
+      "pass": {
+        "pass": 8,
+        "fail": 0,
+        "unverifiable": 0,
+        "error": 0
+      },
+      "fail": {
+        "pass": 0,
+        "fail": 9,
+        "unverifiable": 1,
+        "error": 0
+      },
+      "unverifiable": {
+        "pass": 0,
+        "fail": 0,
+        "unverifiable": 6,
+        "error": 0
+      }
+    },
+    "errors": 0,
+    "generations": 24,
+    "latency_seconds": 214.67460274503537,
+    "mean_latency_seconds": 8.944775114376474,
+    "usd": 0.022831979999999998,
+    "accounting_complete": true
+  }
+}

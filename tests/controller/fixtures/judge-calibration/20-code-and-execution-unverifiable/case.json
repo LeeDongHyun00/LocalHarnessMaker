@@ -1,0 +1,12 @@
+{
+  "id": "20-code-and-execution-unverifiable",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read normalize.py: normalize must strip whitespace and lowercase text; also confirm the test suite ran and passed this session."
+    }
+  },
+  "expected_status": "unverifiable"
+}

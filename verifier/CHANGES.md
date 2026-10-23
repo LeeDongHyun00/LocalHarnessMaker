@@ -1,3 +1,96 @@
+# Real evaluation sampler correction — 2026-10-23
+
+The sampler now accepts version-1 reports using the exact schema preserved in
+decision 0003, alongside current version-2 reports. Repository-relative retained
+paths under eval/reports/DIR_NAME are rebased into the supplied report directory.
+Listed standalone verdict files remain supported, including day-1/day-2 names;
+when absent for a task, its listed result.json supplies inline verdicts. Every
+source is hash-checked and every verdict schema-validated. Standalone sources
+have precedence to avoid counting both copies. Inline source indexes retain
+separate sessions with identical attempt numbers. Final grading context always
+comes from report.json and criterion items remain unchanged.
+
+The explicitly requested optional --out writes the review outside a read-only
+report directory. Its default remains DIR/verifier-sample.json, with unchanged
+path-only stdout and exit-code conventions. README.md documents source paths,
+version handling and inline source indexes.
+
+## Verification
+
+`.venv/bin/python -m pytest tests/verifier -q`: 566 passed, 8 host-only Seatbelt
+skips in 6.79s. Synthetic retained-layout fixtures cover version 1, repository
+paths, inline/standalone/coexisting verdicts, restarted session attempt numbers,
+report grading provenance, deterministic rounds, unchanged inputs, hash/JSON/
+schema/identity failures, and the module entry point with --out. Existing tests
+retain version-2 reports, default output and containment/error coverage.
+
+`.venv/bin/python -m verifier sample --reports
+eval/reports/full-harness
+--n 20 --out /tmp/lhm-verifier-review-78912e5238cc4e51a2bb6bfb13723f71.json`
+returned exit 0, path-only stdout and
+`verifier sample selected=20 available=142 seed=42` on stderr. All four report
+task types are represented. Read-only SHA-256 comparisons confirmed report.json
+and all 120 task result files were unchanged. The snapshot has 142 inline
+verdicts and no standalone verdict files; the user-reported count was 147.
+
+## Assumptions
+
+- The user's explicit --out request authorizes this additive sampler flag; shared schemas, hooks and other CLI interfaces remain unchanged.
+- Listed standalone verdicts take precedence per task; inline verdict_path/verdict_sha256 identify result.json and verdict_index identifies the zero-based entry. No unlisted verdicts are discovered.
+- Final task grading is context for each sampled verdict, not evidence of per-attempt hidden grading. Its report value overrides any duplicated result.json grading.
+- Version-1 schema loading reads the existing decision record without modifying shared files or synthesizing a metric. The source report is read-only; the review artifact is in /tmp.
+- Only this worktree and its .venv were used. Eight host-only checks and the full-suite pre-merge run remain pending; no model/network calls, nested Codex, sandbox-exec, staging or commits ran.
+
+---
+
+# Complete claim observations — 2026-10-23
+
+Every successful verifier check now writes VERDICT.claims.json beside the
+unchanged verdict. Each real criterion has its claimed flag, first exact source
+clause (whole table row), and final verdict status. Summary counts partition
+claimed pass/fail/unverifiable and unclaimed items, supplying the denominator
+missing from negative-only claimed_without_evidence reasons. One extraction
+result drives both artifacts; no schema, CLI argument, stdout or exit-code
+meaning changes. Sidecar writes occur before verdict writes, after cleanup;
+failed invocations must not be consumed as a valid artifact pair.
+
+The extractor now recognizes status tables/checklists, explicit collective
+success statements, inclusive numeric ranges and distinctive description words.
+Scoped negatives, exceptions, fenced/quoted text filtering and last-final-report
+selection remain. Description matching is deterministic lexical overlap with
+an ambiguity guard, not semantic inference. README.md and RULES.md document the
+format, counts, matching and failure semantics for evaluation integration.
+
+## Verification
+
+`.venv/bin/python -m pytest tests/verifier -q`: 556 passed, 8 skipped in 5.78s.
+The terminal summary reports 56 labeled synthetic final reports,
+precision=1.000000, recall=1.000000, TP=75, FP=0, FN=0. Regressions cover all
+claim/status combinations, quality/budget outcomes, no final report, judge
+reason preservation, exact clauses, deterministic sidecars, standalone module
+execution, output failures and cleanup before publication. All eight skips are
+host-only Seatbelt checks. The first run exposed a test double that did not
+forward the new internal observation keyword; it now forwards injected kwargs.
+
+## Pending
+
+Claude's host run on a live harness report and Role 5 ingestion remain pending;
+the synthetic fixture does not measure live precision/recall or establish an
+aggregate false_done_rate. Existing sandbox, controller/plugin integration and
+full-suite pre-merge checks remain pending on the host. No network, nested Codex,
+model calls, sandbox-exec, staging or commits ran. Only owned paths changed;
+concurrent Role 3 files and the main checkout were left untouched.
+
+## Assumptions
+
+- The explicitly requested sidecar uses items with id/claimed/clause/status and a summary with the five requested counts; a .json suffix is replaced with .claims.json. No new shared schema is introduced.
+- Successful computations, including fail/unverifiable verdicts, publish observations. Invalid inputs/internal computation errors publish nothing; partial/older files from failed artifact writes are not valid outputs.
+- Only actual criteria count. Empty criteria produce zero counts; no final report means zero claims. Judged fail/unverifiable statuses are observed without rewriting their reasons.
+- Description matching requires two content words (one for a one-word vocabulary) and a word unique among criterion descriptions. An affirmative statement supplies a claim even if a later statement contradicts it; retain the first supporting clause.
+- The requested extractor work supersedes the previous IDs-only scope. Numeric ranges require known ascending same-prefix endpoints; explicit all-criteria statements with named exceptions exclude those criteria, while unmapped exceptions remain conservative.
+
+---
+
 # Verifier futile-retry fixes — 2026-10-23
 
 Judged items now receive re-instruction only for status=fail. An unverifiable

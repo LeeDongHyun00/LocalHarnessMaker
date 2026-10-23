@@ -1,0 +1,12 @@
+{
+  "id": "08-context-pass",
+  "criterion": {
+    "id": "SC-calibration",
+    "description": "Synthetic judge calibration criterion.",
+    "check": {
+      "type": "llm_judge",
+      "rubric": "Read loader.py: load must use a with statement to close the file and return UTF-8 text."
+    }
+  },
+  "expected_status": "pass"
+}
