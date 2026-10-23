@@ -451,3 +451,61 @@ schema fields were added. Successful stdout is `NEW` plus a newline; input
 refusals exit 1, internal errors exit 2. Runs without exit hashes, including the
 existing pilot B, can use read-only `eval.runner.reaudit` for diagnostics but
 require a host executor rerun before regrading is possible.
+
+## Baseline C and paired comparisons (2026-10-23)
+
+Decision 0007 scope supplied by the user: baseline C uses twenty single-session
+tasks, five per type and twenty distinct families. `eval/baselines/c-subset.json`
+records seed 0, the metadata-only procedure and the frozen population digest.
+`eval/tools/prepare_c.py` reproduces selection without reading runs or graders.
+The user fills the six fields of each skeleton in `eval/baselines/c/` once,
+following `eval/baselines/README.md`. Agents must leave `__HUMAN_FILL__` untouched.
+Templates cannot be revised after any C run starts.
+
+The optional config field `static_template_dir` is repository-relative or absolute
+and requires harness=false, control_backend=none. All selected TASK_ID.md files
+must be regular, nonempty UTF-8 files without `__HUMAN_FILL__`. Preflight happens
+before any executor/control call. The exact bytes enter the day-1 prompt in the
+same appended `Approved evaluation contract (benchmark runner authorization):`
+wrapper as harness guidance. No verifier, re-instruction or handoff runs. Each
+retained `static-template.md` is hash-pinned in per-task report artifacts; the
+checkpoint pins all selected template hashes at start and rejects resume drift,
+including changes to completed tasks. No paid C run can start with the skeletons.
+
+`eval/configs/full-c.yaml` orders the subset lexicographically and otherwise uses
+full A settings; its planning estimate is `eval/reports/full-c-estimate.md`.
+B and C declare optional `task_population` containing full A's 120 IDs. The runner
+fingerprints all population public inputs and external grader contents for
+metadata.task_set_sha256 and separately pins the selected-input digest in the
+checkpoint. Population IDs must uniquely contain every selected ID and all must
+be frozen. Only selected tasks execute. This lets subset reports share full A's
+verified full-population digest; old subset reports retain their historical
+subset digest and are refused rather than relabeled. Hosts need all population
+graders to verify that digest before running B or C.
+
+Compare completed reports without private graders or model calls:
+
+```sh
+.venv/bin/python -m eval.runner.compare eval/reports/full-harness/report.json eval/reports/full-a/report.json --out eval/reports/compare-a/
+.venv/bin/python -m eval.runner.compare eval/reports/full-harness/report.json eval/reports/full-b/report.json --out eval/reports/compare-b/
+.venv/bin/python -m eval.runner.compare eval/reports/full-harness/report.json eval/reports/full-c/report.json --out eval/reports/compare-c/
+```
+
+This separate command preserves existing CLI flags. It writes comparison.json
+and comparison.md and prints exactly the supplied output directory. Input errors
+exit 1, write errors exit 2. Inputs must validate against the report schema;
+comparisons refuse differing task-set digests, seeds, executor models, Codex
+versions (using compare_versions), cost basis or pricing. Effort may differ for B.
+Input report hashes, matched/excluded IDs and comparison direction are retained.
+Only tasks valid in both reports contribute to each side's pass_rate,
+cost_per_pass, avg_attempts and two-session handoff_success. Any invalid matched
+task marks the whole comparison diagnostic; comparison cost metrics use the
+matched valid intersection rather than the report's all-attempted-cost metric.
+Overall and per-type tables include sample sizes, paired task-cluster percentile
+bootstrap 95% intervals for left-minus-right pass rate, cost-per-pass difference
+and left/right cost-per-pass ratio, using the run seed and 10,000 resamples.
+Zero original/bootstrap denominators or unknown costs yield null with a reason.
+A comparison with no eligible two-session tasks has undefined handoff_success.
+Use A for the handoff comparison. Local Gemma and QLoRA are dropped; parity
+remains not measured. These changes have mocked evidence only; live harness
+compatibility and all host measurements remain pending.

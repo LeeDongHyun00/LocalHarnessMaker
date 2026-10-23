@@ -240,7 +240,7 @@ def build(config: dict[str, Any], state: dict[str, Any], tasks: list[dict[str, A
         print(f'Warning: run pricing snapshot {recorded_snapshot} differs from build snapshot {pricing["snapshot_id"]}', file=sys.stderr)
     models = {c["model"] for t in tasks for c in t["calls"] if c["purpose"] != "executor"}
     control_model = next(iter(models)) if len(models) == 1 and "unknown" not in models else None
-    if control_model is None:
+    if config["harness"] and control_model is None:
         print(f"Warning: control_model is null; observed control models: {sorted(models)}", file=sys.stderr)
     for task in tasks:
         reasons = task_version_reasons(task, version)

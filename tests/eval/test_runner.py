@@ -1626,3 +1626,74 @@ def test_multiple_control_models_warn_and_keep_metadata_null(setup: tuple[Path, 
     assert report['tasks'][0]['costs']['total_usd'] is None
     warning = capsys.readouterr().err
     assert 'another-model' in warning and 'gpt-6-luna' in warning
+
+
+def test_static_templates_pinned_injection_and_resume(setup: tuple[Path, Path, Path]) -> None:
+    from eval.runner.audit import digest
+    root, config, out = setup
+    templates = config.parent / 'templates'
+    templates.mkdir()
+    template = templates / 'bug-chunk-tail.md'
+    template.write_text('Task summary: fix chunk tail.\n')
+    cfg = json.loads(config.read_text())
+    cfg['static_template_dir'] = str(templates)
+    config.write_text(json.dumps(cfg))
+    executor = Executor()
+    prompts = []
+
+    def execute(argv: list[str], **kwargs: Any) -> ProcessResult:
+        if argv[0] == 'codex':
+            prompts.append(kwargs['stdin'])
+        return executor(argv, **kwargs)
+
+    report = json.loads(run(config, out, root, execute=execute, version=cfg['codex_version']).read_text())
+    original = (REPOSITORY / 'eval/tasks/bug-chunk-tail/prompt.md').read_text()
+    assert prompts == [original + '\n\nApproved evaluation contract (benchmark runner authorization):\n' + template.read_text()]
+    hashes = json.loads((out / 'checkpoint.json').read_text())['static_templates']
+    assert hashes == {'bug-chunk-tail': digest(template.read_bytes())}
+    assert {'path': str(out / 'bug-chunk-tail/static-template.md'), 'sha256': hashes['bug-chunk-tail']} in report['tasks'][0]['artifacts']
+    run(config, out, root, execute=execute, version=cfg['codex_version'])
+    assert executor.calls == 1
+    template.write_text('Changed after start')
+    with pytest.raises(ValueError, match='templates changed'):
+        run(config, out, root, execute=execute, version=cfg['codex_version'])
+    assert executor.calls == 1
+
+
+@pytest.mark.parametrize('content', [None, '__HUMAN_FILL__', ''])
+def test_static_templates_preflight_before_any_process(setup: tuple[Path, Path, Path], content: str | None) -> None:
+    root, config, out = setup
+    templates = config.parent / 'templates'
+    templates.mkdir()
+    if content is not None:
+        (templates / 'bug-chunk-tail.md').write_text(content)
+    cfg = json.loads(config.read_text())
+    cfg['static_template_dir'] = str(templates)
+    config.write_text(json.dumps(cfg))
+
+    def forbidden(*args: Any, **kwargs: Any) -> Any:
+        pytest.fail('Preflight launched a process')
+
+    with pytest.raises(ValueError, match='static template'):
+        run(config, out, root, execute=forbidden, version=forbidden)
+    assert not out.exists()
+
+
+def test_population_digest_separate_from_selected_inputs(setup: tuple[Path, Path, Path]) -> None:
+    from eval.runner.core import taskset_digest
+    root, config, out = setup
+    other = 'bug-fix-adjacent-runs'
+    (root / other).mkdir()
+    (root / other / 'test_private_synthetic.py').write_text('import unittest\n')
+    cfg = json.loads(config.read_text())
+    cfg['task_population'] = ['bug-chunk-tail', other]
+    config.write_text(json.dumps(cfg))
+    report = json.loads(run(config, out, root, execute=Executor(), version=cfg['codex_version']).read_text())
+    expected = taskset_digest({task: PrivateGraders.load(root, task, REPOSITORY) for task in cfg['task_population']})
+    checkpoint = json.loads((out / 'checkpoint.json').read_text())
+    assert report['metadata']['task_set_sha256'] == checkpoint['task_set_sha256'] == expected
+    assert checkpoint['selected_task_set_sha256'] != expected
+    assert [t['task_id'] for t in report['tasks']] == ['bug-chunk-tail']
+    (root / other / 'test_private_synthetic.py').write_text('import unittest\n# changed\n')
+    with pytest.raises(ValueError, match='task set differs'):
+        run(config, out, root, execute=Executor(), version=cfg['codex_version'])

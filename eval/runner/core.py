@@ -80,7 +80,7 @@ def load_config(path: Path) -> dict[str, Any]:
     config = json.loads(path.read_text())
     required = {"name", "model", "reasoning_effort", "harness", "control_backend", "reinstruction_limit",
                 "retry_limit", "seed", "codex_version", "tasks", "timeout_seconds", "grading_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds"} != required:
+    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population"} != required:
         raise ValueError("Config must contain exactly the documented baseline fields")
     if type(config["harness"]) is not bool:
         raise ValueError("harness must be boolean")
@@ -101,10 +101,19 @@ def load_config(path: Path) -> dict[str, Any]:
         raise ValueError("Task identifiers must be a nonempty unique list")
     if any(not isinstance(task, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", task) for task in config["tasks"]):
         raise ValueError("Unsafe task identifier")
+    population = config.get("task_population", config["tasks"])
+    if (not isinstance(population, list) or not population or
+            any(not isinstance(t, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", t) for t in population) or
+            len(set(population)) != len(population) or not set(config["tasks"]).issubset(population)):
+        raise ValueError("Task population must uniquely contain all selected task IDs")
     timeouts = config.get("task_timeout_seconds", {})
     if (not isinstance(timeouts, dict) or set(timeouts) - set(config["tasks"]) or
             any(type(v) not in {int, float} or not 0 < v <= 3600 for v in timeouts.values())):
         raise ValueError("Per-task timeouts must select configured tasks and be in (0, 3600]")
+    if "static_template_dir" in config:
+        if (config["harness"] or config["control_backend"] != "none" or
+                not isinstance(config["static_template_dir"], str) or not config["static_template_dir"]):
+            raise ValueError("Static templates require a standalone baseline and a directory")
     require_call_estimate(config)
     for key in ("name", "model", "codex_version"):
         if not isinstance(config[key], str) or not config[key]:
@@ -250,6 +259,9 @@ def run(
 ) -> Path:
     """Run or recover baseline tasks without relying on plugin hooks."""
     config = load_config(config_path)
+    from eval.runner.static_templates import load_templates
+    templates = load_templates(config, REPOSITORY)
+    template_hashes = {task: digest(content) for task, content in templates.items()}
     metadata = {
         task: json.loads((REPOSITORY / "eval/tasks" / task / "meta.json").read_text())
         for task in config["tasks"]
@@ -266,7 +278,15 @@ def run(
         raise ValueError("Installed Codex version differs from pinned configuration")
     private_by_task = {task: PrivateGraders.load(private_root, task, REPOSITORY) for task in config["tasks"]}
     fingerprint_cache = FingerprintCache()
-    task_set_hash = taskset_digest(private_by_task)
+    selected_hash = taskset_digest(private_by_task)
+    population = dict(private_by_task)
+    for task in config.get("task_population", []):
+        if task not in population:
+            meta = json.loads((REPOSITORY / "eval/tasks" / task / "meta.json").read_text())
+            if meta.get("frozen") is not True:
+                raise ValueError("Population includes unfrozen task")
+            population[task] = PrivateGraders.load(private_root, task, REPOSITORY)
+    task_set_hash = taskset_digest(population) if "task_population" in config else selected_hash
     # A private root must never appear in config or public task inputs.
     for task, private in private_by_task.items():
         public = REPOSITORY / "eval/tasks" / task
@@ -281,13 +301,18 @@ def run(
         state = json.loads(checkpoint.read_text())
         if state.get("report_schema") != "evaluation-report-v1":
             raise ValueError("Historical provisional checkpoint requires offline migration; use a fresh output directory")
+        if state.get("static_templates", {}) != template_hashes:
+            raise ValueError("Static templates changed since run start")
         if state["config_sha256"] != config_hash:
             raise ValueError("Resume configuration differs from checkpoint")
+        if state.get("selected_task_set_sha256", selected_hash) != selected_hash:
+            raise ValueError("Resume selected inputs differ from checkpoint")
         if state.get("task_set_sha256") != task_set_hash:
             raise ValueError("Resume task set differs from checkpoint")
     else:
         state = {"report_schema": "evaluation-report-v1", "run_id": uuid.uuid4().hex, "created_at": now(), "config_sha256": config_hash,
                  "task_set_sha256": task_set_hash, "config": config, "tasks": {},
+                 "static_templates": template_hashes, "selected_task_set_sha256": selected_hash,
                  "git_commit": current_commit(REPOSITORY),
                  "pricing_snapshot_id": json.loads((REPOSITORY / "eval/prices.yaml").read_text())["snapshot_id"]}
         write_json(checkpoint, state)
@@ -299,6 +324,11 @@ def run(
         public = REPOSITORY / "eval/tasks" / task_id
         task_out = out / task_id
         task_out.mkdir(exist_ok=True)
+        if task_id in templates:
+            retained = task_out / "static-template.md"
+            if retained.exists() and retained.read_bytes() != templates[task_id]:
+                raise ValueError("Retained static template changed")
+            retained.write_bytes(templates[task_id])
         entry = state["tasks"].get(task_id)
         if entry and entry.get("result"):
             continue
@@ -479,6 +509,8 @@ def run(
                         argv += ["-c", "developer_instructions=" + json.dumps(
                             "Approved evaluation contract (benchmark runner authorization):\n" +
                             (control_runtime / "contract.json").read_text())]
+                    elif day == 1 and task_id in templates:
+                        prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + templates[task_id].decode("utf-8")
                     elif config["harness"]:
                         prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + (control_runtime / "contract.json").read_text()
                 segment = {"attempt": index, "started_at": now(), "events": event_path.name, "stderr": stderr_path.name, "day": day, "cli_version": observed_version}

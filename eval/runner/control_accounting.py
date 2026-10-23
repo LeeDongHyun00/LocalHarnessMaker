@@ -47,7 +47,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
         delegations: list[dict[str, Any]] = []
         count_before = len(calls)
         for line in text.splitlines():
-            marker = next((m for m in ("control_call ", "judge_delegation ") if m in line), None)
+            marker = next((m for m in ("control_call ", "judge_delegation ") if line.startswith(m)), None)
             if marker is None:
                 continue
             try:
@@ -106,6 +106,19 @@ def control_calls(entry: dict[str, Any], task_id: str,
             contract_text = read(contract_name)
             if not delegations and contract_text:
                 criteria = json.loads(contract_text).get("success_criteria", [])
-                if any(c["check"]["type"] == "llm_judge" for c in criteria):
-                    complete = False
+                judges = [c for c in criteria if c["check"]["type"] == "llm_judge"]
+                if judges and len(judges) != len(criteria):
+                    verdict_text = read(str(Path(name).with_suffix(".json")))
+                    try:
+                        items = json.loads(verdict_text)["items"] if verdict_text else []
+                        by_id = {item["id"]: item for item in items}
+                        budget_skipped = all(
+                            by_id[c["id"]]["status"] == "unverifiable" and
+                            by_id[c["id"]]["evidence"] ==
+                            "criterion not started: HARNESS_VERIFY_BUDGET_SECONDS exhausted"
+                            for c in judges)
+                    except (ValueError, KeyError, TypeError):
+                        budget_skipped = False
+                    if not budget_skipped:
+                        complete = False
     return calls, total([c["usage"]["usd"] for c in calls]) if complete and streams else None

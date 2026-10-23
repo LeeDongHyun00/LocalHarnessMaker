@@ -874,3 +874,29 @@ new pilot-B executor run remain Claude's work.
 - Retained checkpoint/report evidence is trusted runner output. Regrading
   requires matching public/private task inputs and exact retained workspaces;
   it cannot establish exit-time integrity for an older run without hashes.
+
+## 2026-10-23 — C preparation, paired comparison and accounting review
+
+Prepared the seed-0 metadata-only twenty-task C subset, twenty unfilled human
+skeletons, fill-once rules, standalone config and planning estimate. Added static
+template preflight, exact harness-wrapper injection, report artifact hashes and
+checkpoint drift refusal. Optional full task populations let B/C reports verify
+the same frozen digest as full A while checkpointing selected inputs separately.
+
+Added `python -m eval.runner.compare LEFT RIGHT --out DIR`: schema/provenance
+checks, matched valid tasks, diagnostic invalid handling, overall/per-type
+metrics, paired 10,000-resample intervals, hash-pinned source reports and JSON /
+Markdown output. Existing run CLI flags and shared schemas are unchanged.
+
+Control markers now match only at line start. Zero-delegation accounting permits
+all-judge quality-warning contracts and pinned budget-skipped judge items;
+other missing judge evidence remains unknown. Standalone runs no longer warn
+about an absent control model. Harness estimates now use 15,000 input and 1,000
+output tokens per Luna generation ($0.002), based on supplied host observations.
+
+No public task, retained measurement, private grader, other checkout or git index
+was modified. Verification and remaining host work are recorded in STATUS-eval.
+
+Verification: `.venv/bin/python -m pytest tests/eval -q` — 649 passed in
+60.49s. Frozen task and pilot-report diffs are empty; no full repository suite
+was run in this session.

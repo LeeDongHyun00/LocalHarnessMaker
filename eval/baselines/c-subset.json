@@ -1,0 +1,107 @@
+{
+  "seed": 0,
+  "frozen_task_set_sha256": "b78913b04280f6696d419d2afdc96b152675973d82f05199ddef848986285d1f",
+  "procedure": "Read only sorted public */meta.json; exclude two_session. Iterate type strings lexicographically. Use one Python random.Random(0), shuffle ID-sorted candidates per type, greedily select first five whose family has not appeared in any stratum. Legacy bug-chunk-tail lacks family: use chunk-tail from its ID. Sort selected IDs lexicographically. No run evidence is read.",
+  "tasks": [
+    {
+      "task_id": "bug-chunk-tail",
+      "family": "chunk-tail",
+      "type": "bug_fix"
+    },
+    {
+      "task_id": "bug-fix-inclusive-range",
+      "family": "inclusive-range",
+      "type": "bug_fix"
+    },
+    {
+      "task_id": "bug-fix-parse-pairs",
+      "family": "parse-pairs",
+      "type": "bug_fix"
+    },
+    {
+      "task_id": "bug-fix-round-robin",
+      "family": "round-robin",
+      "type": "bug_fix"
+    },
+    {
+      "task_id": "bug-fix-window-slices",
+      "family": "window-slices",
+      "type": "bug_fix"
+    },
+    {
+      "task_id": "constrained-refactoring-adjacent-runs",
+      "family": "adjacent-runs",
+      "type": "constrained_refactoring"
+    },
+    {
+      "task_id": "constrained-refactoring-balanced-brackets",
+      "family": "balanced-brackets",
+      "type": "constrained_refactoring"
+    },
+    {
+      "task_id": "constrained-refactoring-interleave",
+      "family": "interleave",
+      "type": "constrained_refactoring"
+    },
+    {
+      "task_id": "constrained-refactoring-ordinal-labels",
+      "family": "ordinal-labels",
+      "type": "constrained_refactoring"
+    },
+    {
+      "task_id": "constrained-refactoring-word-counts",
+      "family": "word-counts",
+      "type": "constrained_refactoring"
+    },
+    {
+      "task_id": "feature-plus-test-flatten-once",
+      "family": "flatten-once",
+      "type": "feature_plus_test"
+    },
+    {
+      "task_id": "feature-plus-test-merge-counts",
+      "family": "merge-counts",
+      "type": "feature_plus_test"
+    },
+    {
+      "task_id": "feature-plus-test-pairwise-edges",
+      "family": "pairwise-edges",
+      "type": "feature_plus_test"
+    },
+    {
+      "task_id": "feature-plus-test-prefix-sums",
+      "family": "prefix-sums",
+      "type": "feature_plus_test"
+    },
+    {
+      "task_id": "feature-plus-test-rotate-left",
+      "family": "rotate-left",
+      "type": "feature_plus_test"
+    },
+    {
+      "task_id": "multiple-requirements-clamp-values",
+      "family": "clamp-values",
+      "type": "multiple_requirements"
+    },
+    {
+      "task_id": "multiple-requirements-interval-union",
+      "family": "interval-union",
+      "type": "multiple_requirements"
+    },
+    {
+      "task_id": "multiple-requirements-invert-groups",
+      "family": "invert-groups",
+      "type": "multiple_requirements"
+    },
+    {
+      "task_id": "multiple-requirements-partition-sign",
+      "family": "partition-sign",
+      "type": "multiple_requirements"
+    },
+    {
+      "task_id": "multiple-requirements-select-columns",
+      "family": "select-columns",
+      "type": "multiple_requirements"
+    }
+  ]
+}

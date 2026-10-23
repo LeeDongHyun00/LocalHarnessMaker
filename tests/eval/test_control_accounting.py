@@ -119,3 +119,40 @@ def test_new_config_estimates_match_and_changed_config_stops() -> None:
     assert smoke['reinstruction_limit'] == full['reinstruction_limit'] == 2
     with pytest.raises(ValueError, match='STOP-3'):
         require_call_estimate({**full, 'seed': 99})
+
+
+def test_embedded_markers_are_not_records(entry: dict[str, Any]) -> None:
+    retain(entry, 'contract.stderr', generation() +
+           'control_cli_events ' + json.dumps({'event': 'control_call {broken judge_delegation {'}) + '\n')
+    calls, usd = control_calls(entry, 'task', PRICES)
+    assert len(calls) == 1
+    assert usd == pytest.approx(.000132)
+
+
+@pytest.mark.parametrize('mode,expected', [('all_judge', 0), ('budget', 0), ('missing', None),
+                                         ('wrong_evidence', None), ('not_unverifiable', None),
+                                         ('partial_budget', None), ('bad_hash', None)])
+def test_zero_judge_delegations(entry: dict[str, Any], mode: str, expected: float | None) -> None:
+    root = Path(entry['runtime'])
+    criteria = [{'id': 'J1', 'check': {'type': 'llm_judge'}},
+                {'id': 'J2', 'check': {'type': 'llm_judge'}}]
+    if mode != 'all_judge':
+        criteria.append({'id': 'M', 'check': {'type': 'file_exists'}})
+    contract = root / 'contract.json'
+    contract.write_text(json.dumps({'success_criteria': criteria}))
+    entry['control_files']['contract.json'] = digest(contract.read_bytes())
+    retain(entry, 'verdict-1.stderr', '')
+    if mode != 'missing':
+        verdict = root / 'verdict-1.json'
+        items = [{'id': c['id'], 'status': 'unverifiable',
+                  'evidence': 'criterion not started: HARNESS_VERIFY_BUDGET_SECONDS exhausted'}
+                 for c in criteria]
+        if mode in {'wrong_evidence', 'partial_budget'}:
+            items[0]['evidence'] = 'judge failed'
+        if mode == 'not_unverifiable':
+            items[0]['status'] = 'pass'
+        verdict.write_text(json.dumps({'items': items}))
+        entry['control_files']['verdict-1.json'] = digest(verdict.read_bytes())
+        if mode == 'bad_hash':
+            verdict.write_text('{}')
+    assert control_calls(entry, 'task', PRICES) == ([], expected)
