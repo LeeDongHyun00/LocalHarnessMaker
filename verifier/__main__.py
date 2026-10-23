@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
-from typing import Sequence
+from typing import Any, Sequence
 
 from jsonschema import ValidationError
 
@@ -70,7 +70,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         with shutdown_scope():
             try:
-                serialized = _check(args)
+                serialized, claims = _check(args)
             except (ValueError, OSError, ValidationError) as exc:
                 print(f"input error: {exc}", file=sys.stderr)
                 return 1
@@ -83,18 +83,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     # Exiting shutdown_scope finishes cleanup and restores handlers. Publish
     # nothing until that exit has succeeded, including its final cleanup pass.
     try:
+        args.out.with_suffix(".claims.json").write_text(claims, encoding="utf-8")
         args.out.write_text(serialized, encoding="utf-8")
     except Exception as exc:
-        print(f"internal error: cannot write verdict: {exc}", file=sys.stderr)
+        print(f"internal error: cannot write verdict/claims: {exc}", file=sys.stderr)
         return 2
     print(args.out)
     return 0
 
 
-def _check(args: argparse.Namespace) -> str:
+def _check(args: argparse.Namespace) -> tuple[str, str]:
     contract = json.loads(args.contract.read_text(encoding="utf-8"))
-    verdict = check_contract(contract, args.workspace, args.transcript, args.attempt)
-    return json.dumps(verdict, indent=2, ensure_ascii=False) + "\n"
+    observations: dict[str, Any] = {}
+    verdict = check_contract(contract, args.workspace, args.transcript, args.attempt, observations=observations)
+    return (json.dumps(verdict, indent=2, ensure_ascii=False) + "\n",
+            json.dumps(observations, indent=2, ensure_ascii=False) + "\n")
 
 
 if __name__ == "__main__":

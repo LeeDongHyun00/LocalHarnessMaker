@@ -111,8 +111,10 @@ def test_cli_finishes_scope_before_writing_or_printing(
     path = workspace / "contract.json"
     path.write_text(json.dumps(contract))
     output = workspace / "verdict.json"
+    sidecar = output.with_suffix(".claims.json")
     if existing_output:
         output.write_text("previous verdict")
+        sidecar.write_text("previous claims")
 
     @contextmanager
     def broken_scope() -> Iterator[None]:
@@ -126,5 +128,7 @@ def test_cli_finishes_scope_before_writing_or_printing(
     assert "Traceback" not in captured.err
     if existing_output:
         assert output.read_text() == "previous verdict"
+        assert sidecar.read_text() == "previous claims"
     else:
         assert not output.exists()
+        assert not sidecar.exists()

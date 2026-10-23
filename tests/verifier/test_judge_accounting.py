@@ -151,7 +151,7 @@ def test_accounting_interleaves_with_elapsed_and_unstarted_budget_is_silent(
     # check_contract's default clock was bound at import; inject the same clock.
     from verifier.check import check_contract
     monkeypatch.setattr("verifier.__main__.check_contract",
-                        lambda *args: check_contract(*args, clock=lambda: child.now))
+                        lambda *args, **kwargs: check_contract(*args, **kwargs, clock=lambda: child.now))
     source, output = workspace / "contract.json", workspace / "verdict.json"
     source.write_text(json.dumps(contract))
     assert main(["check", "--contract", str(source), "--workspace", str(workspace),

@@ -17,6 +17,64 @@ Command support and actionable retry categories are documented in [RULES.md](RUL
 A failed verdict can have null reinstruct_message before retry exhaustion when
 only contract, verifier, budget or judge transport problems remain.
 
+## Claim observations
+
+Every successful `check` computation writes a companion file beside `--out`,
+replacing its suffix with `.claims.json`: `verdict-2.json` produces
+`verdict-2.claims.json`. Failed and unverifiable verdicts still produce this
+file. Stdout continues to contain only the verdict path and newline.
+
+```json
+{
+  "items": [
+    {"id": "SC-1", "claimed": true, "clause": "SC-1 passed.", "status": "pass"},
+    {"id": "SC-2", "claimed": false, "clause": "", "status": "fail"}
+  ],
+  "summary": {
+    "claimed_items": 1,
+    "claimed_and_pass": 1,
+    "claimed_and_fail": 0,
+    "claimed_and_unverifiable": 0,
+    "unclaimed_items": 1
+  }
+}
+```
+
+`items` contains exactly one observation per contract criterion, in contract
+order. `status` is copied from that criterion's verdict item, including judge,
+quality-warning and budget-exhausted outcomes. `clause` is the first supporting
+clause copied verbatim from the latest executor final report (the complete row
+for tables), with outer whitespace trimmed. It is empty for
+unclaimed criteria. No final report means all criteria are unclaimed. Empty
+criteria produce empty items and zero counts; the synthetic `contract-quality`
+verdict diagnostic is not a criterion and is excluded.
+
+The summary partitions all criteria:
+`claimed_items = claimed_and_pass + claimed_and_fail + claimed_and_unverifiable`;
+`claimed_items + unclaimed_items = len(success_criteria)`.
+It supplies the claim denominator without inferring claims from failure reasons.
+For verdict-based confirmed false claims, use `claimed_and_fail / claimed_items`
+when the denominator is positive. Preserve claimed-and-unverifiable separately:
+uncertainty does not establish a false claim. These are verifier observations,
+not trusted hidden-grader results or a measured evaluation-wide metric. The
+evaluation runner must ingest the sidecars before it can use these counts.
+
+Both artifacts are serialized from the same report observation and verdict,
+after child-process cleanup. The sidecar is written first, then the verdict;
+stdout is printed only after both writes succeed. An artifact write error exits
+2 with empty stdout. The two writes are not a filesystem transaction: consume
+neither artifact from an unsuccessful invocation, even if an older or partially
+written file remains. Input/internal computation errors do not publish files.
+The existing verdict schema, CLI arguments and exit-code meanings are unchanged.
+
+Matching includes ID lists/ranges, all-criteria statements, status rows and
+distinctive description words; see [RULES.md](RULES.md) for exact scope and
+negative/exception handling. The labeled synthetic fixture is
+`tests/verifier/fixtures/claim_reports.json`. Running
+`.venv/bin/python -m pytest tests/verifier -q` prints its micro precision/recall
+and TP/FP/FN in the terminal summary. Synthetic accuracy does not establish
+accuracy on live reports; Claude's live harness run remains pending.
+
 ## Judge accounting on stderr
 
 After each attempted judge delegation, `check` copies every captured child stderr

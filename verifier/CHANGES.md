@@ -1,3 +1,51 @@
+# Complete claim observations — 2026-10-23
+
+Every successful verifier check now writes VERDICT.claims.json beside the
+unchanged verdict. Each real criterion has its claimed flag, first exact source
+clause (whole table row), and final verdict status. Summary counts partition
+claimed pass/fail/unverifiable and unclaimed items, supplying the denominator
+missing from negative-only claimed_without_evidence reasons. One extraction
+result drives both artifacts; no schema, CLI argument, stdout or exit-code
+meaning changes. Sidecar writes occur before verdict writes, after cleanup;
+failed invocations must not be consumed as a valid artifact pair.
+
+The extractor now recognizes status tables/checklists, explicit collective
+success statements, inclusive numeric ranges and distinctive description words.
+Scoped negatives, exceptions, fenced/quoted text filtering and last-final-report
+selection remain. Description matching is deterministic lexical overlap with
+an ambiguity guard, not semantic inference. README.md and RULES.md document the
+format, counts, matching and failure semantics for evaluation integration.
+
+## Verification
+
+`.venv/bin/python -m pytest tests/verifier -q`: 556 passed, 8 skipped in 5.78s.
+The terminal summary reports 56 labeled synthetic final reports,
+precision=1.000000, recall=1.000000, TP=75, FP=0, FN=0. Regressions cover all
+claim/status combinations, quality/budget outcomes, no final report, judge
+reason preservation, exact clauses, deterministic sidecars, standalone module
+execution, output failures and cleanup before publication. All eight skips are
+host-only Seatbelt checks. The first run exposed a test double that did not
+forward the new internal observation keyword; it now forwards injected kwargs.
+
+## Pending
+
+Claude's host run on a live harness report and Role 5 ingestion remain pending;
+the synthetic fixture does not measure live precision/recall or establish an
+aggregate false_done_rate. Existing sandbox, controller/plugin integration and
+full-suite pre-merge checks remain pending on the host. No network, nested Codex,
+model calls, sandbox-exec, staging or commits ran. Only owned paths changed;
+concurrent Role 3 files and the main checkout were left untouched.
+
+## Assumptions
+
+- The explicitly requested sidecar uses items with id/claimed/clause/status and a summary with the five requested counts; a .json suffix is replaced with .claims.json. No new shared schema is introduced.
+- Successful computations, including fail/unverifiable verdicts, publish observations. Invalid inputs/internal computation errors publish nothing; partial/older files from failed artifact writes are not valid outputs.
+- Only actual criteria count. Empty criteria produce zero counts; no final report means zero claims. Judged fail/unverifiable statuses are observed without rewriting their reasons.
+- Description matching requires two content words (one for a one-word vocabulary) and a word unique among criterion descriptions. An affirmative statement supplies a claim even if a later statement contradicts it; retain the first supporting clause.
+- The requested extractor work supersedes the previous IDs-only scope. Numeric ranges require known ascending same-prefix endpoints; explicit all-criteria statements with named exceptions exclude those criteria, while unmapped exceptions remain conservative.
+
+---
+
 # Verifier futile-retry fixes — 2026-10-23
 
 Judged items now receive re-instruction only for status=fail. An unverifiable

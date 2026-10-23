@@ -1,5 +1,9 @@
 ## Done
 
+- Added a complete verdict-N.claims.json sidecar for every successful check, with one claimed/clause/status observation per criterion, all five summary counts and unchanged schema/stdout/exit semantics; covered every claimed/unclaimed status, empty/all-judge criteria, no final report, budget exhaustion, deterministic bytes, module entry point and publication failures (.venv/bin/python -m pytest tests/verifier -q: 556 passed, 8 skipped in 5.78s).
+- Extended lexical claim extraction to status tables/checklists, explicit all-criteria statements, inclusive numeric ID ranges and distinctive description words; retained negative/exception scope and final-report filtering, with exact supporting clauses shared by sidecars and claimed_without_evidence (.venv/bin/python -m pytest tests/verifier -q: 556 passed, 8 skipped; 56 labeled synthetic reports, precision=1.000000, recall=1.000000, TP=75, FP=0, FN=0 printed in the terminal summary).
+- Documented the sidecar format, matching rules, synthetic measurement, write-failure semantics and pending runner/host integration in verifier/README.md, verifier/RULES.md, verifier/CHANGES.md and fixtures/README.md; no live report, model call or nested Codex ran (.venv/bin/python -m pytest tests/verifier -q: 556 passed, 8 host-only Seatbelt skips).
+
 - Restricted judged-item re-instruction to status=fail; unverifiable judge reasons/evidence remain exact, overall=fail remains, and uncertainty uses no feedback detail/overflow slots, including mixed workspace failures (.venv/bin/python -m pytest tests/verifier -q: 476 passed, 8 skipped in 11.54s; mocked judge and direct feedback regressions at attempts 1–3).
 - Classified malformed file_exists/regex paths as contract-caused before filesystem access: prose/whitespace, separators, absolute/drive-qualified paths, any parent traversal and globs do not retry; plausible missing paths remain workspace-caused/actionable (.venv/bin/python -m pytest tests/verifier -q: 476 passed, 8 skipped in 11.54s; lexical-validation and assembled-verdict regressions).
 - Updated verifier/RULES.md and verifier/CHANGES.md with the measured futile-retry corrections, verification and explicit path-policy assumptions (.venv/bin/python -m pytest tests/verifier -q: 476 passed, 8 skipped; all eight skips are pending host Seatbelt verification).
@@ -48,7 +52,9 @@
 
 ## Remaining
 
-- First priority, pending Claude's host run: all six existing Seatbelt tests and the two new passing/failing unittest discover cases. Host command: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. Historical host passes below do not verify this change; no sandbox-exec ran here.
+- First priority, pending Claude: run claim extraction/sidecar generation on a live harness final report, manually compare every criterion claim/clause/status and reconcile summary counts; verify Role 5 ingestion supplies the false_done_rate denominator while preserving claimed-and-unverifiable separately. No live report or runner integration ran here; eval/ remains unchanged and synthetic accuracy does not measure live accuracy.
+
+- Pending Claude's host run: all six existing Seatbelt tests and the two new passing/failing unittest discover cases. Host command: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. Historical host passes below do not verify this change; no sandbox-exec ran here.
 - Pending host integration for this change: rerun the proposed-system smoke and confirm judged unverifiable items and contract-invalid file/regex paths stop without spending remaining executor attempts, judge fail items still retry, and plausible missing paths remain actionable. Also confirm unittest criteria execute. No network, nested Codex, live model calls or sandbox-exec ran here.
 - Pending host verification for this change: exercise the new judge_delegation/control_call/control_cli_events stderr protocol with the real controller and Role 5's parser, including failed/retried calls and timeout/budget paths. No network, nested Codex or live model calls ran here.
 - Pending host verification: observe real controller/Codex descendants and the 450-second verifier budget within Role 2's 480-second hook deadline, including children creating their own sessions. Claude's completed macOS EPERM/pipe-holding process-tree checks are recorded in Done; those specific checks are no longer pending.
@@ -60,6 +66,13 @@
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
+
+- Emit an additive verifier-owned sidecar explicitly requested by the user: preserve the frozen verdict schema, CLI arguments, stdout path and exit-code contract while exposing passing, failing, uncertain and unclaimed observations.
+- Use one extraction result for the failure reason and the complete sidecar: the denominator and negative evidence must describe the same final report and verdict; exclude the synthetic contract-quality item from criterion counts.
+- Use deterministic lexical description matching with at least two content words (one for a one-word vocabulary) and one word unique among criterion descriptions: reject ambiguous shared descriptions without model calls or inferred semantic paraphrases.
+- Preserve verbatim first supporting clauses/table rows and scoped negatives/exceptions: global claims exclude named exception-tail criteria, and an unmapped global exception supplies no claim.
+- Write the sidecar before the verdict after successful shutdown cleanup: a sidecar write failure preserves an existing verdict and returns internal exit 2 with no stdout; consumers must ignore both files from failed invocations because publication is not a two-file transaction.
+- Report micro precision/recall on all labeled synthetic report/criterion pairs in pytest's terminal summary: the fixture is repeatable extractor evidence, not a claim of live harness accuracy or an evaluation-wide false-done measurement.
 
 - Supersede the earlier workspace-judge retry rule: the user's first live measurement shows judge uncertainty can request evidence the workspace cannot contain; judged items retry only on fail and preserve unverifiable reasons without feedback.
 - Validate file/regex paths lexically before resolving them: malformed contract prose, multiple operands, absolute paths, parent traversal and globs cannot be repaired by executor workspace edits; plausible missing paths remain workspace causes.
@@ -119,6 +132,12 @@
 
 ## Assumptions
 
+- The user explicitly authorizes the new sidecar while retaining shared verdict/schema/CLI/hook interfaces. Its unspecified JSON shape is {items: [{id, claimed, clause, status}], summary: {claimed_items, claimed_and_pass, claimed_and_fail, claimed_and_unverifiable, unclaimed_items}}, documented in verifier/README.md; suffix replacement uses Path.with_suffix(".claims.json").
+- A successful check includes fail/unverifiable verdicts; invalid input/internal computation failures cannot provide a complete trustworthy observation and publish no new files. An artifact write failure may leave partial/old files, which must not be consumed.
+- Claim observations cover real contract criteria only, including judge uncertainty and budget/quality warnings. A missing final report yields zero claims; an empty criteria list yields zero counts, not the synthetic diagnostic as a criterion.
+- Completion is any affirmative observation in the final report, retaining its first exact supporting clause (whole table row), trimmed only at the edges. Later contradictory claims are not reconciled; there is no stemming/synonym inference. Description overlap thresholds and table/status equivalents are the documented deterministic policy.
+- Synthetic precision/recall counts criterion/report pairs. This session's 56 controlled reports have 75 positive labels; no live harness accuracy or numeric aggregate false_done_rate is claimed. Claude must verify live reports and Role 5 consumption on the host.
+
 - Criterion paths use conservative single-token literal syntax: whitespace-containing filenames, prose/operand separators (; , | &), glob/expansion characters (* ? [ ] { }) and Windows drive/root spellings are rejected even if the filesystem could store such names. Safe ./ prefixes and names such as ..report.txt remain plausible.
 - The user's futile-retry corrections take priority over Remaining's host checks and supersede the earlier workspace-judge retry rule and role-prompt rule 6. No shared schema, CLI or hook interface changes are needed.
 - This session is confined to the separate worktree and its .venv; only owned verifier implementation/docs/tests/STATUS paths are edited. .git is read-only, with no staging or commits; no main-checkout or live-evaluation work is performed.
@@ -133,7 +152,7 @@
 - The post-exit drain bound is 200 ms; any output still unavailable after that bound is omitted while preserving the completed child's own exit code. Actual same-group descendants are killed before this drain.
 - Same-state handoff entries may represent multiple artifacts or remaining steps; only contradictory done/remaining membership is rejected beyond the schema, without adding an unspecified uniqueness requirement.
 - Re-instruction includes status=fail and explicitly workspace-caused mechanical unverifiable only. Judged unverifiable items never retry. Up to three actionable items receive details and further actionable items are counted; no actionable items ends feedback before exhaustion.
-- Only explicit criterion IDs and done/completed/implemented/passing terms count. Generic completion prose and semantic paraphrases are not inferred; exception tails remain conservatively unclaimed.
+- Completion references now include IDs/lists/ranges, explicit all-criteria statements, status/checklist rows and distinctive description words per verifier/RULES.md. Generic all-done prose and semantic paraphrases remain unmapped; scoped negatives and exception tails remain conservative. This supersedes the earlier IDs-only assumption.
 - HARNESS_MAX_ATTEMPTS defaults to 3 and HARNESS_BACKEND to codex_cli when unset. Verifier-local HARNESS_JUDGE_TIMEOUT_SECONDS defaults to 120 and HARNESS_VERIFY_BUDGET_SECONDS to 450; both must be finite and positive.
 - The two-second reserve covers graceful group termination. Post-KILL reaping uses at most two 0.1-second waits per direct child; verdict serialization and scheduling use the margin before the 480-second outer deadline.
 - Cleanup reaches signalable owned POSIX groups. Per user instruction, group EPERM/ESRCH is treated as gone or unsignalable; fallback can address only the known live direct child. Injected tests model descendants already exiting at that race; Claude reported the real macOS EPERM/pipe-holding cleanup passed 10/10. Separate-session controller/Codex descendants still require host verification. A direct SIGKILL to the verifier is uncatchable and cannot execute Python shutdown handlers.

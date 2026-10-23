@@ -13,8 +13,17 @@ for this structure is `docs/hooks-contract.md` and its exec/TUI transcript
 excerpts. Unit tests read both captured excerpts and confirm `SECOND_REPLY`
 is the last report. Earlier final reports, commentary, tools and user text
 cannot supply claims for the latest report. Flat role/content fixtures are
-rejected. Explicit criterion IDs and completion terms are required; generic
-"all done" prose is not mapped to criteria.
+rejected. Criterion IDs, numeric ranges, explicit all-criteria statements,
+status/checklist rows and distinctive description words can supply claims;
+generic "all done" prose is not mapped to criteria. The lexical rules are in
+verifier/RULES.md.
+
+`claim_reports.json` contains labeled synthetic final-report text and criterion
+descriptions, covering positive and negative ID/list/range, collective,
+description, table and checklist cases. Each expected list is the set of claimed
+IDs, independent of the criterion's eventual check result. The verifier suite
+checks every case and prints micro precision/recall over criterion/report pairs,
+with TP/FP/FN. These controlled examples do not measure live-report accuracy.
 
 Run `.venv/bin/python tests/verifier/smoke.py` from the repository root. It
 runs the full unchanged shared contract in every workspace, validates each
