@@ -181,7 +181,7 @@ class PrivateGraders:
             return text
         except ValueError:
             if "\n" in text.rstrip("\n"):
-                return "".join(self.redact(line) for line in text.splitlines(keepends=True))
+                return "\n".join(self.redact(line) for line in text.split("\n"))
             return plain(text)
 
 
@@ -229,6 +229,8 @@ def normalize_line(line: str) -> str:
 def unwrap_shell(command: str) -> str:
     """Remove literal executor shell wrappers while preserving the inner syntax."""
     for _ in range(8):
+        if not re.match(r"^\s*(?:/[^\s]+/)?(?:zsh|bash|sh|dash)\s", command):
+            return command
         words = shlex.split(command)
         if (len(words) == 3 and Path(words[0]).name in {"zsh", "bash", "sh", "dash"}
                 and words[1] in {"-c", "-lc", "-cl"}):
@@ -274,17 +276,17 @@ def workspace_glob(pattern: Path, workspace: Path | None) -> bool:
     return canonical == allowed or canonical.startswith(allowed + "/")
 
 
-def shell_data_spans(command: str) -> list[tuple[int, int]]:
+def shell_data_spans(command: str, *, expansions: list[str] | None = None) -> list[tuple[int, int]]:
     """Locate heredoc bodies/delimiters and comments for shell-loop detection.
 
-    These spans only prevent interpreting data as new shell syntax. The legacy
-    operand, expansion and protected-path checks still inspect the original text.
-    Quoted arguments already remain single raw words in shell_tokens.
+    Bodies end at literal delimiter lines, regardless of quotes in their data.
+    Unquoted bodies return expansion text separately; protected-path checks
+    still inspect the original command. Quoted arguments stay single words.
     """
     if "<<" not in command and "#" not in command:
         return []
     spans: list[tuple[int, int]] = []
-    pending: list[tuple[str, bool]] = []
+    pending: list[tuple[str, bool, bool]] = []
     word = re.compile(r"(?:[^\s;&|()<>'\"\\]|\\.|'[^']*'|\"(?:[^\"\\]|\\.)*\")+", re.DOTALL)
     index = 0
     quote: str | None = None
@@ -325,28 +327,38 @@ def shell_data_spans(command: str) -> list[tuple[int, int]]:
             if match is not None:
                 delimiter = shlex.split(match.group())
                 if len(delimiter) == 1:
-                    pending.append((delimiter[0], strip_tabs))
+                    pending.append((delimiter[0], strip_tabs, any(ch in match.group() for ch in "\\'\"")))
                 index = match.end()
             continue
         elif ch == "\n" and pending:
             index += 1
-            for delimiter, strip_tabs in pending:
+            for delimiter, strip_tabs, quoted in pending:
                 start = index
+                found = False
                 while index < len(command):
                     end = command.find("\n", index)
                     end = len(command) if end < 0 else end + 1
+                    line_start = index
                     line = command[index:end].removesuffix("\n")
                     index = end
                     if (line.lstrip("\t") if strip_tabs else line) == delimiter:
+                        found = True
+                        if not quoted and expansions is not None:
+                            expansions.append(command[start:line_start])
                         break
+                if not found:
+                    raise ValueError("Unterminated heredoc")
                 spans.append((start, index))
             pending.clear()
             continue
         index += 1
+    if pending:
+        raise ValueError("Unterminated heredoc")
     return spans
 
 
-def literal_loop_tokens(tokens: list[tuple[str, str]], command: str) -> tuple[list[tuple[str, str]], bool]:
+def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
+                        data: list[tuple[int, int]] | None = None) -> tuple[list[tuple[str, str]], bool]:
     """Unroll one literal for loop, retaining uncertainty for every other form.
 
     This is operand extraction, not shell execution: inspect both sides of an
@@ -354,7 +366,7 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str) -> tuple[li
     Rejected forms retain their original tokens so concrete access still wins.
     """
     separators = {";", "&&", "||", "|", "&"}
-    data = shell_data_spans(command)
+    data = shell_data_spans(command) if data is None else data
     loops: list[int] = []
     offset = 0
     for i, (value, raw) in enumerate(tokens):
@@ -485,10 +497,18 @@ def command_operands(command: str, cwd: Path | None, *,
     unresolved = False
     try:
         command = unwrap_shell(command)
+        expansions: list[str] = []
+        spans = shell_data_spans(command, expansions=expansions)
+        # Shell quote parsing never enters a heredoc body. Keep line positions
+        # while removing data and delimiters from operand extraction.
+        for start, end in reversed(spans):
+            command = command[:start] + re.sub(r"[^\n]", " ", command[start:end]) + command[end:]
+        unresolved = any("$" in body or "`" in body for body in expansions)
         tokens = shell_tokens(command)
     except ValueError:
         return [], True
-    tokens, unresolved = literal_loop_tokens(tokens, command)
+    tokens, loop_unknown = literal_loop_tokens(tokens, command, data=spans)
+    unresolved |= loop_unknown
     if any("$" in raw or "`" in raw for _, raw in tokens):
         unresolved = True
     if re.search(r"(?:base64|xxd|openssl).*\|.*(?:sh|bash|python|perl|ruby)\b", command):
@@ -732,7 +752,14 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
     return combined
 
 
+def interrupted_logs(runtime: Path, segments: list[dict[str, Any]]) -> set[Path]:
+    """Exempt only the absent terminal of explicitly interrupted captures."""
+    return {runtime / segment["events"] for segment in segments
+            if segment.get("exit_code") == -2 and segment.get("interrupted") is True}
+
+
 def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion: bool = True,
+               interrupted_paths: set[Path] | None = None,
                workspace: Path | None = None, repository: Path | None = None,
                grading_roots: tuple[Path, ...] = (),
                fingerprint_cache: FingerprintCache | None = None) -> dict[str, Any]:
@@ -770,7 +797,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
         native = False
         if not data or not data.endswith(b"\n"):
             errors.append(f"empty_or_truncated_log:{path.name}")
-        for number, line in enumerate(data.decode("utf-8", errors="replace").splitlines(), 1):
+        for number, line in enumerate(data.decode("utf-8", errors="replace").removesuffix("\n").split("\n"), 1):
             try:
                 event = json.loads(line)
                 if not isinstance(event, dict) or not isinstance(event.get("type"), str):
@@ -988,7 +1015,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                                 "evidence_sha256": digest(line.encode()), "redacted_evidence":
                                 "Private location reached executor context through native metadata." if metadata else
                                 "Observed protected access; see external stream hash."})
-        if require_completion and not native and not terminal:
+        if require_completion and not native and not terminal and path not in (interrupted_paths or set()):
             errors.append(f"missing_terminal_event:{path.name}")
     if require_completion and (pending_calls or pending_items):
         errors.append("unfinished_tool_events")

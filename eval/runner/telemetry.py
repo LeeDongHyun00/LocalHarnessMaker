@@ -10,7 +10,7 @@ def records(path: Path) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     if not path.is_file():
         return events
-    for line in path.read_text(errors="replace").splitlines():
+    for line in path.read_text(errors="replace").split("\n"):
         try:
             value = json.loads(line)
         except ValueError:

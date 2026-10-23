@@ -13,8 +13,9 @@ import uuid
 
 from eval.metrics import compute, total
 from eval.runner import core
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, digest
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
 from eval.runner.process import ProcessResult, run_process
+from eval.runner.signals import stop_signals
 from eval.runner.reaudit import InputParser
 from eval.runner.report import build_task, validate
 
@@ -26,7 +27,8 @@ def audit_code_version() -> dict[str, str]:
 
 
 def regrade(private_root: Path, source: Path, out: Path, *,
-            execute: Callable[..., ProcessResult] = run_process) -> Path:
+            execute: Callable[..., ProcessResult] = run_process,
+            _fresh_tasks: frozenset[str] = frozenset()) -> Path:
     """Reuse executor evidence and accounting; execute only the trusted grade() path."""
     source, out = source.resolve(), out.resolve()
     if out.exists() or out.is_relative_to(source) or source.is_relative_to(out):
@@ -42,7 +44,10 @@ def regrade(private_root: Path, source: Path, out: Path, *,
             any(e.get('phase') != 'finished' or e.get('pid') for e in entries.values())):
         raise ValueError("Regrade requires a complete finished version-1 run")
     # Never reconstruct an exit hash from today's workspace for a historical run.
-    if any(not re.fullmatch(r'[0-9a-f]{64}', e.get('workspace_exit_sha256', '')) for e in entries.values()):
+    if not _fresh_tasks <= set(entries):
+        raise ValueError("Regrade refused: unknown fresh task")
+    if any(not re.fullmatch(r'[0-9a-f]{64}', e.get('workspace_exit_sha256', ''))
+           for task, e in entries.items() if task not in _fresh_tasks):
         raise ValueError("Regrade refused: runner-recorded workspace exit hash missing; rerun the executor on the host")
     if not isinstance(config, dict) or set(config.get('tasks', [])) != set(entries):
         raise ValueError("Regrade requires the runner-recorded configuration")
@@ -69,9 +74,11 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     for task, entry in entries.items():
         runtime = Path(entry['runtime'])
         if (not runtime.is_absolute() or out.is_relative_to(runtime.resolve()) or
-                runtime.resolve().is_relative_to(out) or not entry['segments'] or any(
+                runtime.resolve().is_relative_to(out) or (not entry['segments'] and task not in _fresh_tasks) or any(
                     Path(s['events']).name != s['events'] for s in entry['segments'])):
             raise ValueError("Invalid retained runtime manifest or output location")
+        if task in _fresh_tasks:
+            continue  # Fresh reruns never reuse the source workspace or grading.
         if old_by_id[task]['two_session'] and not (
                 old_by_id[task]['outcome'] == 'invalid' and not entry.get('day2_observation') and
                 not any(s.get('day') == 2 for s in entry['segments'])):
@@ -93,11 +100,15 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     for old_task in original['tasks']:
         task = old_task['task_id']
         entry, private = entries[task], private_by_task[task]
+        if task in _fresh_tasks:
+            (out / task).mkdir()
+            tasks.append(copy.deepcopy(old_task))
+            continue
         runtime = Path(entry['runtime'])
         workspace = runtime / 'workspace'
         paths = [runtime / segment['events'] for segment in entry['segments']]
         paths.extend(sorted((runtime / 'codex-home/sessions').rglob('*.jsonl')))
-        audit = audit_retained_logs(paths, private, retained_context=entry.get("retained_audit_context"), workspace=workspace, repository=core.REPOSITORY,
+        audit = audit_retained_logs(paths, private, interrupted_paths=interrupted_logs(runtime, entry["segments"]), retained_context=entry.get("retained_audit_context"), workspace=workspace, repository=core.REPOSITORY,
                            grading_roots=core.audit_roots(runtime), fingerprint_cache=cache)
         previous = entry['result']['grader_access_audit']
         manifest = lambda logs: Counter((log['name'], log['sha256'], log['bytes']) for log in logs)
@@ -182,7 +193,11 @@ def main() -> int:
     parser.add_argument('--out', type=Path, required=True)
     try:
         args = parser.parse_args()
-        regrade(args.private_root, args.source, args.out)
+        with stop_signals(args.out):
+            regrade(args.private_root, args.source, args.out)
+    except KeyboardInterrupt:
+        print('Regrade interrupted; stop diagnostics retained', file=sys.stderr)
+        return 130
     except FileNotFoundError:
         print('Regrade input error: retained evidence unavailable', file=sys.stderr)
         return 1

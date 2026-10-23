@@ -16,6 +16,7 @@ from eval.metrics import compute, total
 from eval.runner import core, harness, reaudit, regrade
 from eval.runner.audit import PrivateGraders, digest
 from eval.runner.process import ProcessResult, run_process
+from eval.runner.signals import stop_signals
 from eval.runner.control_accounting import control_calls
 from eval.runner.report import artifact, validate
 
@@ -237,11 +238,15 @@ def main() -> int:
     parser.add_argument('--out', type=Path, required=True)
     try:
         args = parser.parse_args()
-        continue_day2(args.private_root, args.source, args.out)
+        with stop_signals(args.out):
+            continue_day2(args.private_root, args.source, args.out)
     except (ValueError, FileNotFoundError, KeyError):
         print('Continuation input error: eligible retained evidence or pinned configuration unavailable', file=sys.stderr)
         return 1
-    except (core.IncompleteRun, KeyboardInterrupt):
+    except KeyboardInterrupt:
+        print('Continuation interrupted; stop diagnostics retained', file=sys.stderr)
+        return 130
+    except core.IncompleteRun:
         print('Continuation halted; fresh output retains incomplete evidence for host review', file=sys.stderr)
         return 2
     except Exception:

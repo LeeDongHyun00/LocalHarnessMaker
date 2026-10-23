@@ -1,7 +1,6 @@
 """Minimal baseline runner with durable execution segments and private grading."""
 
 from datetime import datetime, timezone
-from functools import partial
 import json
 import os
 from pathlib import Path
@@ -20,7 +19,7 @@ import uuid
 from eval.runner import harness
 from eval.runner.publication import checkout_text
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, digest, executor_environment
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, interrupted_logs, digest, executor_environment
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.telemetry import collect, collect_runs, native_token_delta, native_token_totals, records, session_id
@@ -387,11 +386,16 @@ def run(
                 raise ValueError("Existing ChatGPT login is required")
             (codex_home / "auth.json").symlink_to(auth.resolve())
             entry = {"runtime": str(runtime), "phase": "ready", "segments": []}
+            if task_id in state.get("fresh_reruns", {}):
+                entry["rerun_history"] = state["fresh_reruns"][task_id]
             state["tasks"][task_id] = entry
             write_json(checkpoint, state)
         runtime = Path(entry["runtime"])
         workspace, codex_home = runtime / "workspace", runtime / "codex-home"
-        audit = partial(audit_retained_logs, retained_context=entry.get("retained_audit_context"), _audit=audit_logs)
+        def audit(paths: list[Path], private: PrivateGraders, **kwargs: Any) -> dict[str, Any]:
+            return audit_retained_logs(paths, private, retained_context=entry.get("retained_audit_context"),
+                                       interrupted_paths=interrupted_logs(runtime, entry["segments"]),
+                                       _audit=audit_logs, **kwargs)
         guard = harness.ControlFiles(runtime, entry.setdefault("control_files", {}),
                                      lambda: write_json(checkpoint, state))
         if entry.get("pid"):
@@ -450,6 +454,8 @@ def run(
             control_error = entry.get("control_error")
             if config["harness"] and not blocked and not execution_finished:
                 try:
+                    if not entry["segments"]:
+                        guard.recover_prelaunch(control_runtime, REPOSITORY)
                     guard.verify()
                 except harness.HarnessError as exc:
                     entry["control_invalid_reason"] = exc.invalid_reason
@@ -593,6 +599,7 @@ def run(
                     interrupted = True
                     entry["phase"] = "interrupted"
                     final_process = ProcessResult(-2)
+                    segment["interrupted"] = True
                 segment.update({"exited_at": now(), "exit_code": final_process.returncode,
                                 "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
                 entry.pop("pid", None)

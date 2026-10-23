@@ -1,3 +1,37 @@
+# Restart recovery, selective reruns and audit precision — 2026-10-23
+
+Exempt only missing terminal events in explicitly interrupted executor segments;
+retain every other inconclusive rule in run, re-audit and regrade. Reuse valid
+manifest-pinned pre-launch contracts and archive verified partial preparation
+without deleting evidence. SIGINT/SIGTERM retain stop diagnostics and exit 130
+without a traceback, including control preparation and executor cleanup.
+
+Add `eval.runner.rerun_invalid` with the requested private-root/source/output/
+reason selector. Require infrastructure causes, re-audit before selection,
+refuse access matches and changed manifests, and start eligible tasks in fresh
+runtimes. Regrade unselected tasks from retained evidence. Retain prior costs
+once, propagate unknown accounting, and pin per-task/run rerun provenance.
+
+Use newline-only JSONL framing in audit, native telemetry, control accounting,
+limit detection and redaction. Find heredoc boundaries before shell tokenization;
+quoted body data cannot corrupt parsing of later compile/test commands.
+Regression coverage includes mixed raw-regex quotes/backslashes, Unicode line
+separators, hard restarts, pre-launch files, signals, rerun refusal, provenance,
+source immutability and accounting across resume/regrade.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1092 passed in
+103.45s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- eval/tasks eval/tasks-v2 eval/reports` — exit 0.
+No task files, retained reports, report schemas or existing CLI flags changed.
+
+## Assumptions
+
+- The supplied four host failures are infrastructure/parser cases without access
+  attempts. Host artifacts and private graders are unavailable here; recovery is
+  verified using synthetic retained runs and mocked model/executor calls.
+- Fresh reruns require a completed source report; halted checkpoint-only runs
+  use the existing resume path first. Host outcome recovery remains pending.
+
 # Version 2 candidate pilot and executor service tier — 2026-10-23
 
 Add optional task_root and service_tier configuration. Keep default v1 hashes,

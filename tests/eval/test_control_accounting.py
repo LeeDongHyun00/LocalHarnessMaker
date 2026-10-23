@@ -224,3 +224,16 @@ def test_control_accounting_rejects_links_within_runtime_and_escapes(tmp_path: P
             str(runtime / name) if location == 'absolute' else '../runtime/' + name: value
             for name, value in entry['control_files'].items()}
     assert control_calls(entry, 'task', PRICES) == ([], None)
+
+
+@pytest.mark.parametrize('logged_call', [False, True])
+def test_unicode_separators_inside_control_jsonl_values(entry: dict[str, Any], logged_call: bool) -> None:
+    events = json.dumps({'type': 'error', 'message': 'NEL\u0085LS\u2028PS\u2029 at capacity'},
+                        ensure_ascii=False) + '\n'
+    text = 'control_cli_events ' + json.dumps({'model': 'gpt-6-luna', 'events': events}, ensure_ascii=False) + '\n'
+    if logged_call:
+        text += generation(status='error', input_tokens=None, cached_input_tokens=None, output_tokens=None)
+    retain(entry, 'control-interruptions/unicode/contract.stderr', text, code=2)
+    calls, cost = control_calls(entry, 'task', PRICES)
+    assert len(calls) == 1 and cost == 0
+    assert calls[0]['usage']['input_tokens'] == 0

@@ -163,8 +163,9 @@ def test_interrupted_turn_resumes_same_session_before_grading(setup: tuple[Path,
         run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2")
     assert not (out / "report.json").exists()
     second = json.loads(run(config, out, root, execute=executor, version="codex-cli 0.162.0-alpha.17.2").read_text())
-    # Recovery cannot erase the interrupted stream's incomplete audit evidence.
-    assert second["tasks"][0]["outcome"] == "invalid"
+    # Only the interrupted stream's missing terminal is exempted.
+    assert second["tasks"][0]["outcome"] == "pass"
+    assert second["tasks"][0]["grader_access_audit"]["status"] == "clean"
     assert second["tasks"][0]["attempts"] == 2
     assert executor.calls == 2
 

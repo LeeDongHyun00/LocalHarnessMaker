@@ -50,7 +50,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
         delegations: list[dict[str, Any]] = []
         count_before = len(calls)
         pending_events: dict[str, Any] | None = None
-        lines = text.splitlines()
+        lines = text.split("\n")
         # Each CLI transport emits its events immediately before its control_call.
         # If interrupted before that accounting line, retain the capacity call too.
         expanded: list[str] = []
@@ -59,7 +59,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
             if ("control_cli_events " in line or line == "") and pending_line:
                 envelope = json.loads(pending_line.split("control_cli_events ", 1)[1])
                 try:
-                    events = [json.loads(row) for row in envelope.get("events", "").splitlines()]
+                    events = [json.loads(row) for row in envelope.get("events", "").removesuffix("\n").split("\n")]
                 except (ValueError, AttributeError):
                     events = []
                 if any(e.get("type") in {"error", "turn.failed"} and "at capacity" in str(e).lower()
@@ -114,7 +114,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
                       for k in ("input_tokens", "cached_input_tokens", "output_tokens")}
             if backend == "codex_cli" and isinstance(pending_events, dict):
                 try:
-                    events = [json.loads(row) for row in pending_events.get("events", "").splitlines()]
+                    events = [json.loads(row) for row in pending_events.get("events", "").removesuffix("\n").split("\n")]
                 except (ValueError, AttributeError):
                     events = []
                 if capacity_refusal_without_items([e for e in events if isinstance(e, dict)]):

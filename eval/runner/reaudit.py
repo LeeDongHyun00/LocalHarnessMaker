@@ -9,7 +9,7 @@ import sys
 from typing import Any
 
 from eval.runner import core
-from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, digest
+from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
 
 
 class InputParser(argparse.ArgumentParser):
@@ -46,7 +46,7 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
                 raise ValueError("Invalid retained runtime manifest")
             paths = [runtime / segment["events"] for segment in segments]
             paths.extend(sorted((runtime / "codex-home/sessions").rglob("*.jsonl")))
-            audit = audit_retained_logs(paths, private, retained_context=entry.get("retained_audit_context"), workspace=workspace, repository=core.REPOSITORY,
+            audit = audit_retained_logs(paths, private, interrupted_paths=interrupted_logs(runtime, entry["segments"]), retained_context=entry.get("retained_audit_context"), workspace=workspace, repository=core.REPOSITORY,
                                grading_roots=core.audit_roots(runtime), fingerprint_cache=fingerprint_cache)
             errors = {error.split(":", 1)[0] for error in audit["errors"]}
             labels = sorted({match["marker"] for match in audit["matches"]})

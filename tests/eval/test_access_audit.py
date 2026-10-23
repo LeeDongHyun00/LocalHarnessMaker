@@ -240,7 +240,7 @@ def test_python_heredoc_preserves_pre_loop_audit(tmp_path: Path, private: Privat
     # Disable only the new transformation to retain the pre-change operand and
     # path checks as the reference. Log bytes and all evidence stay identical.
     with monkeypatch.context() as previous:
-        previous.setattr("eval.runner.audit.literal_loop_tokens", lambda tokens, command: (tokens, False))
+        previous.setattr("eval.runner.audit.literal_loop_tokens", lambda tokens, command, **kwargs: (tokens, False))
         expected = audit_loop_record(tmp_path, private, command, workspace, form)
     assert expected["status"] == "clean", expected
     actual = audit_loop_record(tmp_path, private, command, workspace, form)
@@ -252,7 +252,7 @@ def test_python_heredoc_preserves_pre_loop_audit(tmp_path: Path, private: Privat
     ("unquoted_delimiter", "clean"), ("escaped_delimiter", "clean"),
     ("tab_stripped", "clean"), ("multiple_heredocs", "clean"),
     ("quoted_argument", "clean"), ("here_string", "clean"), ("comment", "clean"),
-    ("shell_shaped_data", "inconclusive"), ("unquoted_expansion", "inconclusive"),
+    ("shell_shaped_data", "clean"), ("unquoted_expansion", "inconclusive"),
     ("private_data", "access_detected"),
 ])
 def test_shell_data_preserves_pre_loop_audit(tmp_path: Path, private: PrivateGraders,
@@ -275,7 +275,7 @@ def test_shell_data_preserves_pre_loop_audit(tmp_path: Path, private: PrivateGra
     }
     command = "/bin/zsh -lc " + shlex.quote(commands[case])
     with monkeypatch.context() as previous:
-        previous.setattr("eval.runner.audit.literal_loop_tokens", lambda tokens, command: (tokens, False))
+        previous.setattr("eval.runner.audit.literal_loop_tokens", lambda tokens, command, **kwargs: (tokens, False))
         expected = audit_loop_record(tmp_path, private, command, workspace, form)
     assert expected["status"] == status, expected
     actual = audit_loop_record(tmp_path, private, command, workspace, form)

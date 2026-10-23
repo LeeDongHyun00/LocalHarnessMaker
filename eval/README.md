@@ -584,6 +584,66 @@ refusals exit 1, internal errors exit 2. Runs without exit hashes, including the
 existing pilot B, can use read-only `eval.runner.reaudit` for diagnostics but
 require a host executor rerun before regrading is possible.
 
+## Restart recovery and infrastructure-only reruns (2026-10-23)
+
+Resume the original `eval run` command with the same config and output directory
+for a checkpoint interrupted by a host restart. Segments explicitly recorded as
+`exit_code=-2, interrupted=true` retain their bytes and access checks; only their
+missing terminal event is exempt. The completed resume retains its own terminal
+evidence. Malformed/truncated records, missing logs, unsupported events,
+unresolved operands and unfinished tool events remain inconclusive. Re-audit
+and regrade apply the same narrow exception to retained segments.
+
+Before any executor segment exists, resume verifies the runner's control-file
+manifest. A schema-valid pinned contract is reused. Pinned incomplete contract
+outputs and accounting move into `control-interruptions/` before regeneration;
+changed files, symlinks and unowned outputs remain errors. No source evidence is
+deleted. SIGINT and SIGTERM write their signal name and exit code to
+`run-diagnostics.json`, clean up the current child, and exit 130 without a
+traceback. The original signal reason survives checkpoint cleanup.
+
+For a completed source report with infrastructure-invalid tasks, use a fresh
+output directory on the host:
+
+```sh
+.venv/bin/python -m eval.runner.rerun_invalid --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW --reasons control_cli_error,execution_interrupted,incomplete_access_audit
+```
+
+The comma-separated selector matches recorded invalid reasons. Eligibility also
+requires causal evidence of a runner control failure, an explicitly interrupted
+segment, restart-related missing logs, or capacity exhaustion. Consequent missing
+settings/session/version/handoff observations can accompany these causes.
+Unexplained audit errors, audit-precision-only invalidity, ordinary failures and
+timeouts never select a new executor outcome. A selected access match, whether
+historical or newly observed, refuses the operation before any call. Changed
+retained log/control manifests also refuse recovery. Interrupted/capacity-limited
+checkpoints without a complete report use ordinary resume first.
+
+Selected tasks start from public starter workspaces in fresh external runtimes;
+source workspaces and grading copies never enter the executor. Unselected tasks
+are re-audited/regraded just as with `regrade`, preserving original accounting.
+All unselected source exit hashes and full input/config/pricing/version pins
+must validate. Selected pre-launch failures need no invented exit hash. Fresh
+attempt/segment counts describe the new execution; original segments, logs and
+artifact hashes remain referenced in each task's `rerun-provenance.json`.
+
+Prior calls/costs are retained once, fresh call IDs have a separate namespace,
+and unknown prior costs stay null. `rerun-invalid.json`, per-task provenance and
+diagnostics record source run/report/checkpoint hashes, implementation hashes,
+requested/actual reasons, selected IDs, fresh runtimes and added calls/costs.
+Checkpoint resume and subsequent regrade preserve that accounting. The report
+schema and existing CLI flags are unchanged. Success prints `NEW` plus a newline;
+input refusals exit 1, internal/incomplete execution exits 2, signals exit 130.
+The existing cost-estimate/spending checks still apply before host calls.
+
+JSONL framing uses only the newline character, so U+0085, U+2028 and U+2029 inside
+JSON strings remain data in executor/native streams, control envelopes,
+telemetry, limit detection and redaction. Shell operand extraction identifies
+heredoc delimiter lines before tokenizing the surrounding commands. Quotes and
+backslashes inside a quoted heredoc cannot consume following compile/test
+commands. Unquoted expansions remain unresolved, and original protected-path
+checks still inspect the entire command.
+
 ## Continuing an audit-recoverable day 2
 
 On the host, use this separate command when the original runner stopped before

@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 from eval.runner.core import IncompleteRun, run
+from eval.runner.signals import stop_signals
 
 
 class InputParser(argparse.ArgumentParser):
@@ -32,7 +33,11 @@ def main() -> int:
         print("Set LHM_PRIVATE_GRADERS in the trusted parent environment", file=sys.stderr)
         return 1
     try:
-        output = run(args.config, args.out, Path(value))
+        with stop_signals(args.out):
+            output = run(args.config, args.out, Path(value))
+    except KeyboardInterrupt:
+        print("Run interrupted; checkpoint and stop diagnostics retained", file=sys.stderr)
+        return 130
     except IncompleteRun as exc:
         print(str(exc), file=sys.stderr)
         return 2

@@ -105,6 +105,14 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     executor_usd = total([c["usage"]["usd"] for c in calls])
     controls, control_usd = control_calls(entry, result["task_id"], pricing) if config["harness"] else ([], 0)
     calls.extend(controls)
+    history = entry.get("rerun_history")
+    if history:
+        for call in calls:
+            call["call_id"] = f'{result["task_id"]}-rerun-{history["rerun_id"]}-{call["call_id"]}'
+        calls = history["calls"] + calls
+        control_usd = (None if history["control_usd"] is None or control_usd is None else
+                       total([c["usage"]["usd"] for c in calls if c["purpose"] != "executor"]))
+        executor_usd = total([c["usage"]["usd"] for c in calls if c["purpose"] == "executor"])
     # The verdict exposes negative done claims, but not the complete claim denominator.
     # Until a full claim observation is available, emit no measured claims and keep
     # false_done_rate undefined rather than treating unobserved claims as zero errors.

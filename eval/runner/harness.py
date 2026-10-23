@@ -10,7 +10,7 @@ from time import sleep
 from typing import Any, Callable
 import uuid
 
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator, FormatChecker, ValidationError
 
 from eval.runner.audit import digest
 from eval.runner.limits import BACKOFF_SECONDS, CapacityError, UsageLimitError, capacity_message, usage_limit_message
@@ -75,6 +75,29 @@ class ControlFiles:
         with path.open("x") as stream:
             stream.write(content)
         self.remember(path)
+
+    def recover_prelaunch(self, directory: Path, repository: Path) -> None:
+        """Reuse a valid pinned contract, or archive pinned partial preparation.
+
+        Call only before this task has ever launched an executor. Unpinned or
+        changed files still fail the ordinary producer checks.
+        """
+        self.verify()
+        contract = directory / "contract.json"
+        if str(contract.relative_to(self.runtime)) in self.hashes:
+            try:
+                Draft202012Validator(json.loads((repository / "schemas/contract.schema.json").read_text()),
+                                     format_checker=FormatChecker()).validate(json.loads(contract.read_text()))
+                return
+            except (ValueError, ValidationError):
+                # Invalid pinned bytes are an unfinished producer output.
+                # Keep them and their accounting in the interruption archive.
+                pass
+        paths = [self.runtime / name for name in self.hashes
+                 if (self.runtime / name).parent == directory and
+                 (self.runtime / name).name.startswith("contract.")]
+        if paths:
+            self.archive_interruption(paths)
 
     def recovery(self, operation: str, message: str, wait: int | None) -> None:
         """Pin recovery evidence alongside the interrupted control operation."""
