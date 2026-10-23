@@ -135,3 +135,36 @@ State of r5-full-002: no final report and no Commit plan. The working tree holds
 Claude re-ran the review reproductions against the unfinished tree with mocked executors: evidence publishing no longer takes files from the workspace or through symlinks (F1, R5-TS-2); regrade accepts runs with invalid two-session tasks and keeps timeouts as timeouts (R5-TS-3, R5-TS-4); a runner crash during a session resumes instead of raising KeyError (R5-TS-5); a day-1 timeout or executor error now continues to day 2 (R5-TS-1), so the reviewers' old expectation of a halt no longer applies. F2 (pre-created day-2 contract) and the STOP-3 count were not re-checked. The full configurations are on codex-cli 0.163.0-alpha.11.1.
 
 Nothing from this job is committed. It needs Codex to finish: the failing test, F2 and STOP-3 verification, STATUS, CHANGES and a Commit plan.
+
+## 2026-10-23: scope approval, full baseline A and harness preparation
+
+The usage window restarted early (0 percent at 02:00 UTC). r5-full-003 finished the interrupted two-session work (b04f9b0). r5-compat-001 added the 0.163 thread_settings_applied record and the usage-limit halt (c0c9bb3). The 0.163 two-session smoke was then valid and passed (9a997e3). Integration review 1 is docs/weekly/2026-10-27.md.
+
+12. Scope (user decision, 2026-10-23): all five proposals in integration review 1 are approved. Local Gemma and QLoRA are dropped, and parity is reported as not measured. C runs on a stratified 20-task subset whose templates the user fills. B runs on the 100 single-session tasks only. The schedule is W1 to W3, and an API key is a fallback only. The user also said usage limits are no longer a concern: continue to completion up to, but not including, the local LLM stage. Role 1 records this as decision 0007.
+
+Full baseline A started at 02:26 UTC from b9ac131: eval/configs/full-a.yaml, 120 tasks, 140 executor sessions, codex-cli 0.163.0-alpha.11.1. Logs are in codex-bridge/outbox/run-full-a/.
+
+Two operating rules follow from how the runner works:
+- The report records `git rev-parse HEAD` and reads eval/prices.yaml when it is built, at the end of the run. Claude therefore commits nothing on main while a measurement runs. Verified job results wait and are committed after the run's report. Role 5 now records the commit at run start (r5-harness-001).
+- A measurement must not see code changes in the paths it uses: eval/ for every run, plus controller/ and verifier/ for harness runs, because the runner launches them as fresh subprocesses. Role 5 works in a separate git worktree (../lhm-r5-harness, branch r5/harness-smoke, its own .venv) while a run is in progress. A shared venv would not isolate it, because the editable install maps every package to the main checkout.
+
+Jobs during the run:
+- r2-cont-006: adds 0.163 to plugin/VERIFIED_VERSIONS.json, records the host checks in STATUS, and prepares the real two-session handoff demo (plugin/two_session_demo.py). Host: tests/plugin 200 passed, 1 skipped. Commit held.
+- r1-cont-004: decision 0007, plan and role prompt wording. Host: tests/lead 96 passed. Commit held.
+
+Gap found while preparing the harness smoke: harness-mode reports leave control costs and control_model null, so the harness's cost_per_pass would be null. Judge calls inside `verifier check` discard the controller's control_call usage lines. The controller logs one control_call line per generation, including retries and the fallback. Two jobs fix this without any interface change:
+- r4-cont-006 forwards the judge children's control_call and control_cli_events lines on stderr, with one judge_delegation summary line per criterion.
+- r5-harness-001 prices every control call from those lines with eval/prices.yaml, keeps unknown usage null, and adds the harness smoke, full harness and reduced B configurations with their STOP-3 estimates.
+
+Host verification of the three jobs (commits held until full A is reported):
+- r3-cont-004 (controller): tests/controller 153 passed. Decision 0007 is applied: the local selector stays, and the contract exit-2 behavior is unchanged. It adds `python -m controller.measure_contracts`, a 30-sample codex_cli measurement gated by --i-have-approval; it estimates 0.066 USD and Claude runs it after the commits.
+- r4-cont-006 (verifier): tests/verifier 298 passed on the host, the six Seatbelt tests included. A live `verifier check` with one file_exists and one llm_judge criterion passed in 7 s. Its stderr carried the real controller control_call line (gpt-6-luna, 15442 input, 58 output tokens, 0.0015732 USD) and the summary `judge_delegation {"accounting_complete":true,...,"outcome":"completed"}`. It also adds `verifier sample`.
+- r5-harness-001 (eval, worktree): tests/eval 621 passed in the worktree venv. Its parser read the live verifier stderr above: one judge call priced at 0.0015732 USD from eval/prices.yaml, the controller's own figure. Setting accounting_complete to false gave null. Configs: smoke-harness, with 2 tasks and reinstruction_limit 2; full-harness, which is full A with harness true, codex_cli and reinstruction_limit 2; and full-b, now the 100 single-session tasks. Committed on branch r5/harness-smoke as 9c81ecb. Review notes went to r5-baseline-c-001: markers matched anywhere in a line, zero delegations treated as incomplete for all-judge contracts, a spurious control_model warning for non-harness runs, and estimates that assume 5000 input tokens per control call against about 15000 measured.
+
+Full A attempt 1 halted at 03:00 UTC after 40 of 120 tasks. Task two-session-pairwise-edges failed on day 2 after 74 s with exit 1. Its --json stream ended with the following error and turn.failed events:
+
+    Selected model is at capacity. Please try a different model.
+
+The runner recorded the task as outcome "error", an audit-clean valid failure, and stopped with STOP-E1. 39 of the 40 finished tasks passed. A capacity error is a service condition, not a model outcome, and the runner has no rule for it yet. Counting it would understate A, so the attempt is kept as diagnostic evidence only: eval/reports/full-a-attempt1/, with no report.json. Full A restarts from scratch after the Role 5 fix (r5-capacity-001). Claude's leak scan of the attempt found 0 private markers and 0 distinctive grader lines, with 717 lines indexed at family-level sharing.
+
+After the held commits (879245e, 53cb8a9, 605b970, 4f23d59) and the cherry-picked Role 5 commits (f2e8d9e, 1b945de), the full suite on main gives 1396 passed and 1 skipped (the opt-in live Codex test).
