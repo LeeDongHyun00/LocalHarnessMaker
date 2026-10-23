@@ -375,3 +375,14 @@ All four ran on the Fast tier and passed host verification, ownership and secret
 
 - The user approved the report-schema revision for task_false_done_rate, with numerator and denominator over valid tasks. Role 1 (r1-cont-008) published it: schemas/VERSION 2, the metric required in the metrics object, sample unit claimed_complete_task, decision 0009 finalized, interfaces and the Role 5 prompt updated. Host: 104 lead tests passed and all schemas and examples validate. Because the new metric is required, version 1 reports no longer validate against the current schema, and the running harness v2 reads the schema from main when it builds its report. Claude therefore moved the change off main into the dev/reinforce branch (5697ae5) until the run ends. Role 5's implementation brief requires every report reader to validate against the version a report declares.
 - Judge calibration on Role 3's 24 synthetic cases, live through codex_cli with gpt-6-luna: prompt v1 23 of 24 correct (one fail judged unverifiable), 0.0228 USD; prompt v2 24 of 24, 0.0107 USD; mean latency 8.9 and 8.7 s. The set does not reproduce the live false fails seen in harness v1, so it is too easy; cases drawn from the real failure modes follow once harness v2 is complete.
+
+## Recovery and audit fixes verified (r5-recovery-001, branch r5/v2 at 9ba06d5)
+
+Claude's old-versus-new audit comparison over 369 retained finished tasks (pilot-a, pilot-b, full-a-attempt1, smoke-harness-3, full-a, full-b, the in-progress full-harness):
+
+| Code | Clean | Inconclusive | Matched access |
+|---|---|---|---|
+| main (55e1f56) | 363 | 6 | 0 |
+| r5/v2 (9ba06d5) | 366 | 3 | 0 |
+
+Fixed: full-a two-session-balanced-brackets (literal string expression), full-b multiple-requirements-line-endings (JSONL split on Unicode separators), full-harness multiple-requirements-round-robin (heredoc with quoted regex). No regression. The 3 remaining are the restart-interrupted full-b segment, which rerun_invalid handles, and the two code-mode shapes queued as r5-audit-004 (a backtick literal and a const array of commands). tests/eval: 1092 passed.
