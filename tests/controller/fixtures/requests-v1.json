@@ -36,12 +36,16 @@
     "ambiguous": true,
     "summary": "Repair the tests after identifying the failing suite.",
     "assumptions": [
-      "The failing suite and intended behavior must be identified before approval."
+      "The failing suite and intended behavior must be identified before approval.",
+      "Assume standard unittest discovery from the workspace root; the runner and collection need review before approval."
     ],
     "constraint": "Preserve the intended behavior rather than weakening assertions.",
     "check": {
-      "type": "llm_judge",
-      "rubric": "Require evidence identifying the failing suite and showing its failures resolved without weakened assertions."
+      "type": "command",
+      "command": "python -m unittest discover",
+      "expected": {
+        "exit_code": 0
+      }
     }
   },
   {
@@ -123,11 +127,13 @@
     "prompt": "Add greet.py that prints hello followed by a newline. Verify python greet.py exits 0 and stdout is exactly hello plus a newline.",
     "ambiguous": false,
     "summary": "Add greet.py with the specified exact output.",
-    "assumptions": [],
+    "assumptions": [
+      "Translate the unsupported direct script command into python -c with runpy, preserving script execution and expected output."
+    ],
     "constraint": "Print hello followed by one newline.",
     "check": {
       "type": "command",
-      "command": "python greet.py",
+      "command": "python -c 'import runpy; runpy.run_path(\"greet.py\", run_name=\"__main__\")'",
       "expected": {
         "exit_code": 0,
         "stdout": "hello\n"
@@ -144,8 +150,8 @@
     ],
     "constraint": "Do not modify source code or dependencies.",
     "check": {
-      "type": "llm_judge",
-      "rubric": "Compare docs/usage.md with the supplied CLI example and verify that source and dependencies were preserved; missing example is unverifiable."
+      "type": "file_exists",
+      "path": "docs/usage.md"
     }
   },
   {
@@ -158,8 +164,8 @@
     ],
     "constraint": "Do not choose a license on the user’s behalf.",
     "check": {
-      "type": "llm_judge",
-      "rubric": "Require approved missing context for Create LICENSE.txt with the supplied license text. and evidence meeting it; missing approval or evidence is unverifiable."
+      "type": "file_exists",
+      "path": "LICENSE.txt"
     }
   },
   {

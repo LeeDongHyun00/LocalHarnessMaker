@@ -1,5 +1,9 @@
 ## Done
 
+- Confirmed owned-path patch whitespace is clean; no staging or commit was performed (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
+- Implemented contract prompt v2 with request-grounded mechanical checks, py_compile, supported unittest/pytest discovery and explicit inference assumptions; retained schemas, CLI flags, analyze.py metadata and injection data blocks (.venv/bin/python -m pytest tests/controller -q: 176 passed in 1.98s).
+- Added one targeted quality regeneration for schema-valid contracts lacking mechanical criteria when lexical file/module/function/test hints exist; regressions cover persistent failure, schema retries, shared fallback budget, summed accounting and injection boundaries (.venv/bin/python -m pytest tests/controller -q: 176 passed in 1.98s).
+- Updated authored golden responses and added offline unittest fixtures without changing the original 30 measurement request texts/IDs; refreshed controller/CHANGES.md and this handoff (.venv/bin/python -m pytest tests/controller -q: 176 passed in 1.98s).
 - Applied approved decision 0007 to LOCAL.md and this handoff: D-3 local Gemma 4 12B and D-5 QLoRA are dropped, local comparison/parity is not measured, and the retained local selector/configuration/fail-closed behavior is unchanged (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
 - Added the opt-in host-only D-4 command, a single-generation backend and an internal CLI backend-factory injection; it measures all 30 authored requests, captures control_call cost/latency, summarizes schema validity/assumptions/check types/llm_judge share, and reports cheap_api not measured (.venv/bin/python -m pytest tests/controller -q: 153 passed in 1.85s, including approval refusal, 30 mocked CLI invocations, no regeneration/fallback, and unknown-accounting regressions).
 - Recorded Claude's user-supplied 2026-10-22 primary gpt-6-luna verification: contract, judge and handoff all produced schema-valid outputs; contract 15.6 s idle/20.0 s concurrent, judge 14.4 s, handoff 13.2 s informed the 35 s deadline committed as 0d57e36; details and command evidence follow below (user-supplied host report: all three commands exit 0; not rerun here).
@@ -29,7 +33,7 @@
 
 ## Remaining
 
-- Pending host execution, D-4: Claude runs `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4.json --i-have-approval` after explicit batch approval. It prints 30 maximum calls and estimated API-equivalent USD 0.066000 first (17,000 input/1,000 output tokens per call, current snapshot, no cache discount; estimate is not a cap). One generation per sample, no regeneration or fallback; inspect the summary for failed samples and missing accounting. cheap_api is not measured; local comparison is dropped by decision 0007. Live SC-1/SC-2 quality, SC-4 targets and SC-5 semantic injection resistance remain unmeasured.
+- Pending after-measurement, D-4: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-after.json --i-have-approval` on the host under existing batch authorization. Compare llm_judge share and contracts without mechanical criteria against controller/evidence/2026-10-23-d4-before.json (user-supplied before: 30/30 schema-valid; 39 criteria = 4 command, 10 file_exists, 13 regex, 12 llm_judge; 11 judge-only contracts, 26 without command checks). The evidence file is untouched. The unchanged single-call measurement records required quality retries as failed samples; include those failures in interpretation rather than claiming improved quality from successful outputs alone. The batch previews 30 maximum calls and estimated API-equivalent USD 0.066000, not a cap. HTTP is unmeasured; local comparison is dropped. Live prompt v2 quality, SC-1/SC-2, SC-4 targets and SC-5 semantic injection resistance remain pending.
 - Pending host verification: configured HTTP fallback with an environment key, production hook guard and retry-budget integration under the 35 s deadlines, and Role 2's 120 s handoff budget. The three primary codex_cli commands and live contract/handoff demo are already completed host checks, as recorded in Done. Network, nested Codex, live model calls and macOS sandbox-exec are unavailable here and were not attempted.
 - Pending host verification, D-1: measure API-equivalent control cost against an executor baseline and empirically calibrate effort v1 from task outcomes. Existing thresholds have only synthetic/fixture calibration; no exact tokenizer dependency is presently needed.
 - D-2 library population requires verified, permitted provenance; do not gather executor/paid-model output for training without the STOP-C3 terms review. The curated seed library is intentionally empty.
@@ -37,12 +41,14 @@
 
 ## Decisions
 
+- Supersede the prior record-only criterion observation with the user's contract-quality priority: prompt v2 proposes objective checks from request facts and records inferred choices for review instead of treating unknown workspace details as grounds for judge-only contracts.
+- Limit quality repair to one regeneration within the existing three-call budget: persistent judge-only contracts fail explicitly; schema retries and fallback cannot create additional paid slots.
+- Keep measure_contracts single-call and preserve its original 30 prompts: the host comparison can assess first-generation prompt quality; production retry recovery is covered offline and still needs host verification.
 - Apply decision 0007: D-3 local Gemma 4 12B and D-5 QLoRA are dropped, not deferred; retain version 1 local selector and fail-closed behavior without local-control measurements.
 - Keep the current honest contract exit 2 with unknown started-CLI usage: integration review 1 and the user's instruction settle this policy; no interface revision is planned or pending.
 - Measure codex_cli alone for D-4: an internal factory calls the existing contract CLI implementation with a direct single-call CLI adapter; production routing, retries and interfaces remain unchanged. HTTP requires a key and is reported not measured. Only fixture request text is sent, and outputs are not retained as cases or training data.
 
 - Raise both cloud per-call deadlines from 25 s to 35 s per Claude's user-approved revision: the repeated host contract call passed in 20.0 s with four Codex jobs sharing the subscription, versus 15.6 s idle. A 25 s deadline leaves only 5 s headroom under measured load, and this Mac has no API key for HTTP fallback after timeout. Three calls plus approximately 1 s startup each take 3 * (35 + 1) = 108 s, within judge's unchanged 120 s budget and handoff's revised 120 s budget being implemented by Role 2. Observed 15.6–20.0 s contract calls fit the plugin's approved 30 s budget; the plugin cuts off at 30 s even though the controller permits 35 s. Completion under further load and three contract attempts are not guaranteed. Keep the local 30 s deadline unchanged.
-- Record the live criterion choice as a D-4 observation only: the current contract template already prefers command/file_exists/regex and reserves llm_judge for requirements objective checks cannot express; no prompt, fixture or frozen schema changes are warranted by this record-only request.
 - Zero usage applies only before inference could start: constructor failure and runner spawn OSError spend no tokens; output handling after runner return cannot reset unknown usage to zero.
 - Retain contract exit 2 after a started CLI leaves unknown usage, even when HTTP fallback succeeds: non-null cost_estimate cannot honestly represent the total under the approved schema; no revision is planned.
 - Execute the user's priority order: approved backend routing, judge and handoff precede effort v1, retrieval and the mock-only local adapter.
@@ -59,7 +65,7 @@
 
 - .venv/bin/python -m pytest tests/controller -q
 - git diff --check -- controller tests/controller state/STATUS-controller.md
-- Pending host, approved D-4 batch only: .venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4.json --i-have-approval
+- Pending host, approved D-4 batch only: .venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-after.json --i-have-approval
 - Preview only (refuses calls with exit 1): .venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4.json
 - Pending before merge: full repository test suite, coordinated with the owning roles.
 
@@ -74,6 +80,9 @@
 
 ## Assumptions
 
+- Unspecified Python test runners may be proposed as standard unittest discovery for review, without asserting the project uses unittest or that discovery collects tests; explicit unittest/pytest facts take precedence.
+- Mechanical sufficiency means at least one command/file_exists/regex criterion for this gate; lexical hints are deliberately limited and do not prove semantic coverage, verifier acceptance or test collection.
+- The before-run statistics are supplied by the user; no live measurement was run here. Original measurement prompts remain unchanged and the new unittest samples are offline-only fixtures.
 - The 30 authored requests-v1 samples are the D-4 population, avoiding duplicate inclusion of the original ten requests. The summary compares codex_cli samples only; it is not the evaluation-report interface and does not claim a cross-backend comparison.
 - D-4 planning allowances of 17,000 input and 1,000 output tokens per call approximate earlier host usage with output headroom; they are overridable estimates, not billing limits. Missing per-call accounting leaves summary costs null.
 - The demo result and commit 0d57e36 attribution are user-supplied facts; no plugin evidence, evaluation task or live service was read to independently reproduce them.

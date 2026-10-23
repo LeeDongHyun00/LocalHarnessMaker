@@ -1,7 +1,8 @@
-"""Version-one contract prompting and bounded validation retries."""
+"""Version-two contract prompting and bounded validation retries."""
 
 import copy
 import json
+import re
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -37,6 +38,29 @@ def build_messages(
     ]
 
 
+def mechanical_request_hints(request: str) -> list[str]:
+    """Recognize objective anchors in request text without inspecting a workspace.
+
+    These are lexical hints for a quality retry, never asserted workspace facts.
+    The original request stays in its escaped data block; feedback is code-owned.
+    """
+    hints: list[str] = []
+    if re.search(
+        r"(?<![\w])(?:[\w-]+/)*(?:[\w-]+\.[A-Za-z][\w-]*|\.[A-Za-z][\w-]*)"
+        r"|\b(?:README|LICENSE|Dockerfile|Makefile)\b"
+        r"|\bfile\s+[`'\"][A-Za-z_][\w/-]*[`'\"]", request,
+    ):
+        hints.append("named files or modules")
+    if re.search(
+        r"\b(?:functions?|methods?|def|modules?)\s+[`'\"]?[A-Za-z_]\w*"
+        r"|\b[A-Za-z_]\w*\s*\(", request, re.IGNORECASE,
+    ):
+        hints.append("named functions or modules")
+    if re.search(r"\b(?:tests?|testing|pytest|unittest)\b", request, re.IGNORECASE):
+        hints.append("tests")
+    return hints
+
+
 def generate_contract(
     request: str, backend: Backend, *, handoff: dict[str, Any] | None = None,
     examples: list[dict[str, Any]] | None = None,
@@ -58,6 +82,8 @@ def generate_contract(
         model_schema["properties"].pop(field)
         model_schema["required"].remove(field)
     messages = build_messages(request, handoff, examples)
+    hints = mechanical_request_hints(request)
+    quality_regenerated = False
     total_input = total_output = 0
     total_cost = Decimal(0)
     for attempt in range(3):
@@ -79,7 +105,31 @@ def generate_contract(
             "input_tokens": total_input, "output_tokens": total_output, "usd": float(total_cost)
         }
         if invalid is None and validator.is_valid(contract):
-            return contract
+            mechanical = any(item["check"]["type"] in {"command", "file_exists", "regex"}
+                             for item in contract["success_criteria"])
+            if not hints or mechanical:
+                return contract
+            if quality_regenerated or attempt == 2:
+                raise InvalidGeneration(
+                    "Contract quality gate: no mechanical success criteria for "
+                    + ", ".join(hints)
+                )
+            quality_regenerated = True
+            messages.append({"role": "system", "content": (
+                "Contract quality gate: the request mentions " + ", ".join(hints) + ". "
+                "The preceding contract contained no mechanical success criterion. "
+                "Regenerate the complete object with command, file_exists or regex checks "
+                "grounded in the request. Use py_compile for named Python files; use the "
+                "named test command, or standard discovery when tests are mentioned. "
+                "For named functions, check the named definition or specified behavior "
+                "where its location is known; otherwise propose test discovery and record "
+                "the unknown location. Follow only the allowed command forms in the "
+                "original system prompt. List every inferred path/runner/discovery choice "
+                "under assumptions for user review. Reserve llm_judge for scope/style or "
+                "requirements objective checks cannot express. Include command criteria "
+                "in verification. Do not add reasoning_effort or cost_estimate."
+            )})
+            continue
         if attempt < 2:
             messages.append({"role": "system", "content": (
                 "The preceding generation failed JSON or schema validation. Regenerate the "

@@ -1,0 +1,6 @@
+[
+  {"request":"Fix normalize in text/clean.py. Existing tests use unittest; run python -m unittest discover -s tests -p 'test_*.py' -v.","command":"python -m unittest discover -s tests -p 'test_*.py' -v","assumption":"Assume paths are relative to the approved workspace and unittest discovery finds the existing tests."},
+  {"request":"Fix the function normalize; add tests.","command":"python -m unittest discover","assumption":"The function location is unknown; assume standard unittest discovery pending user review."},
+  {"request":"Repair parser.py and run python -m pytest -q -x -k 'parse and not slow' tests/test_parser.py.","command":"python -m pytest -q -x -k 'parse and not slow' tests/test_parser.py","assumption":"Assume the named paths are workspace-relative and pytest is installed."},
+  {"request":"Fix parse in parser.py. Existing tests use unittest; run python -m unittest -q tests.test_parser.","command":"python -m unittest -q tests.test_parser","assumption":"Assume tests.test_parser is importable in the approved workspace."}
+]
