@@ -8,7 +8,7 @@ shared schema. Historical reports in `reports/baseline-a-first-task/` remain
 unaltered provisional evidence; they have not been reclassified as approved
 reports or rerun.
 
-## Version 2 candidate population
+## Version 2 frozen public population
 
 [DESIGN.md](tasks-v2/DESIGN.md) specifies the separate harder population before
 construction: 20 families × 5 task variants. The unchanged pilot contains
@@ -53,9 +53,27 @@ STOP-3 estimates: [A](reports/full-v2-a-estimate.md),
 [B](reports/full-v2-b-estimate.md), [harness](reports/full-v2-harness-estimate.md).
 These are workload scenarios priced at the existing Fast snapshot, not caps or
 measurements. Dynamic judge criteria require a revised harness estimate.
-All metadata remains frozen=false: the runner refuses full execution before
-Claude's host validation and the separate freeze. No live evaluation was run in
-this worktree; the calibration results above were supplied by the user.
+All 100 meta.json files now have frozen=true (2026-10-24); only that flag
+changed in public task files. User-supplied host validation passed: 100 distinct
+grader directories, zero public private markers, 2,994 killed independent
+mutants, 6 recorded equivalents and zero survivors. The full configs pass the
+public freeze check and select the same complete population digest, including
+B through task_population. No live evaluation was run in this worktree.
+
+The final digest is pending external grader contents. On the host main checkout
+after transferring these exact changes, run:
+
+```sh
+.venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"
+```
+
+This read-only command prints counts by type/family and runner-compatible
+public-plus-private hashes without model or grader execution. It uses tracked
+public inputs, external test_*.py contents and the existing v2 root namespace;
+see [freeze procedure](tasks-v2/DESIGN.md#final-digest-procedure-host-required).
+Role 1 publishes docs/eval-freeze-v2.md from that final output. A public-only or
+pre-freeze candidate hash cannot substitute for it. Spending approval remains
+required before host runs.
 
 `task_root` is an optional config field, default `eval/tasks`; v2 selects
 `eval/tasks-v2`. It is a canonical repository-relative public directory under

@@ -1,5 +1,11 @@
 ## Done
 
+- Verified the final eval package and freeze scope, updated README/CHANGES and this handoff; no staging, model calls or private-root access (`.venv/bin/python -m pytest tests/eval -q`: 1664 passed in 331.06s; exact authorized scope audit: PASS, 110 paths, six STATUS headings, zero staged paths; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0).
+
+- Froze all 100 v2 public metadata files on 2026-10-24, changing only frozen=false to true; confirmed the complete 20-family population, authorized scope, no v1 changes and zero staged paths (inline HEAD byte-comparison/scope audit: PASS, 100 metadata files).
+- Verified existing full-v2 configs retain calibration=false, Fast priority and codex-cli 0.163.0-alpha.11.1 and pass real runner freeze gates/select the 100-task population using synthetic graders; updated matched estimates without changing cost scenarios (`.venv/bin/python -m pytest tests/eval/test_v2_support.py -q`: 35 passed in 6.22s).
+- Prepared and tested read-only host digest procedure using core.configured_digest/core.taskset_digest, including inventory, B's separate selected digest, sensitivity to private bytes and safe errors; documented public freeze date and pending host digest/Role 1 record in DESIGN.md, README and CHANGES (`.venv/bin/python -m pytest tests/eval/test_freeze_v2.py -q`: 2 passed in 37.59s; private contents unavailable here, final digest not computed).
+
 - Implemented and documented all three requested host follow-ups: trusted published workspace recovery without artifact pins, inferred CLI default executor tiers, and interrupted missing-usage replacement with named refusals. Added regressions for successful recovery, repeated regrade, copied/retained audits, fresh day-2 costs, unknown historical pricing and refusal boundaries (`.venv/bin/python -m pytest tests/eval -q`: 1662 passed in 357.51s; focused published-copy boundary checks: 12 passed in 14.66s).
 - Verified the final eligibility diagnostic refinement, including direct missing-marker rejection and CLI stderr condition reporting (`.venv/bin/python -m pytest tests/eval/test_unaccounted_recovery.py::test_unaccounted_refuses_other_causes_before_calls tests/eval/test_unaccounted_recovery.py::test_unaccounted_cli_conventions tests/eval/test_unaccounted_recovery.py::test_unaccounted_marker_eligibility -q`: 21 passed in 28.73s).
 - Updated README, CHANGES and this handoff; confirmed all changes stay in authorized paths on r5/v2, frozen tasks/reports are untouched and nothing is staged (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; inline authorized-path/frozen-file/branch/STATUS-heading check: PASS, 15 paths, zero staged paths).
@@ -49,7 +55,7 @@
 
 ## Remaining
 
-- Host/Claude: validate the full unfrozen v2 candidate and its private companion files, review per-task corpus warnings, then perform the separate freeze through Role 1. Keep all 100 meta.json files frozen=false until that step.
+- Host/Claude: transfer this public freeze to the main checkout and run `.venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"` there with the existing external graders. Send its complete 100-task digest, type/family counts and 2026-10-24 freeze date to Role 1 for docs/eval-freeze-v2.md. Digest computation and publication remain pending; do not use an earlier candidate/public-only hash.
 - Host only, after validation/freeze and spending approval: transfer the full-v2 A/B/harness configs and matched Fast estimates to the main checkout. This worktree must not run executor/controller/judge models. Re-estimate dynamic judge slots before a harness batch.
 - Host/Claude: transfer this session's three recovery/accounting fixes, retry full-harness rerun_invalid using the committed published workspace copies, retry full-a two-session-balanced-brackets continuation and full-b-regrade feature-plus-test-partition-sign rerun_unaccounted. Review comparison counts, inferred model-default tiers, fresh accounting and replacement provenance. This worktree produced synthetic regression evidence only; no actual task was re-audited or rerun here.
 - Host/Claude: retain the earlier pending re-audit of the v2 pilot reservations task using its original pinned inputs and the literal-loop fix.
@@ -67,6 +73,9 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Freeze public metadata now and defer final digest computation to the host: the user approved decision 0008 and supplied passing host validation, but external grader contents are unavailable in this sandbox.
+- Reuse the runner's tracked-input content digest with the existing v2 namespace: v1 stays unchanged and all full configs already select the complete population, with B retaining its separate 80-task selection.
 
 - Use the trusted published workspace copy only when legacy workspace artifact pins are absent: the supplied full-harness report contains no workspace artifact entries, but its grading-time copy is committed. Preserve both original pins and the reference copy through recovery.
 - Infer known CLI model defaults only for unrequested executor tiers: omitted/null tiers mean Standard for gpt-6.1-sol and priority for gpt-6-luna; record the inference and keep explicitly requested tiers subject to native verification. Do not change control accounting or historical costs.
@@ -119,6 +128,9 @@
 
 ## Verify commands
 
+- Host/main checkout after transferring the freeze: .venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"
+- .venv/bin/python -m pytest tests/eval/test_freeze_v2.py tests/eval/test_v2_support.py -q
+
 - .venv/bin/python -m pytest tests/eval/test_telemetry.py tests/eval/test_continue_day2.py -q
 - .venv/bin/python -m pytest tests/eval/test_v2_support.py -q
 - Worktree validation certification: .venv/bin/python "$LHM_PRIVATE_GRADERS/finalize_expansion.py"
@@ -146,9 +158,12 @@
 - No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Model and executor integration checks must use mocks.
 - Never publish private-root paths, grader/reference contents or mutation sources. Validation publication contains task IDs and numbers only.
 - Never execute/resume Codex in a grading copy, grade invalid tasks, fabricate unknown accounting or waive malformed/unsupported/unresolved audit evidence through a later success.
-- Keep C skeletons unfilled until the user authors them and the v2 candidate unfrozen until calibration review and the approved freeze procedure.
+- Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The user-supplied host validation passed for 100 tasks / 100 distinct grader directories, zero shared graders, zero private markers, and independent 30-mutant-per-task results of 2,994 killed / 6 recorded equivalents / zero survivors. This session did not rerun that validation or locate private storage.
+- The public freeze date is 2026-10-24. Final digest computation needs the exact transferred tracked public inputs and external grader bytes on the host; no digest can be fabricated from this sandbox. No live calls or model spending are authorized here.
 
 - This recovery session uses only this worktree's .venv, mocks and synthetic retained evidence; network, nested Codex, live model calls and actual private grader storage are unavailable. Only eval/, tests/eval/ and this STATUS file may change; .git remains read-only.
 - The full-harness published workspace copy in commit c1207c9, full-a continuation result (117 pass/3 fail) and full-b-regrade interruption/resume accounting gap are user-supplied host observations. Their repair and resulting host metrics remain unmeasured here.
