@@ -4,7 +4,7 @@ Read AGENTS.md at the repository root first. This file is your contract.
 
 ## Goal
 
-Build the generators that turn a request (plus the previous handoff and similar past cases) into a contract that validates against the contract schema, and turn a session transcript into a handoff document that validates against the handoff schema. Three backend selectors share one interface: codex_cli is primary using gpt-6-luna through the logged-in CLI; cheap_api is HTTP fallback using that same model; local Gemma 4 12B is stage two. Never guess: anything unknown goes into assumptions. Facts (token counts, cost, reasoning effort) are computed by code, never by the model.
+Build the generators that turn a request (plus the previous handoff and similar past cases) into a contract that validates against the contract schema, and turn a session transcript into a handoff document that validates against the handoff schema. Three backend selectors share one interface: codex_cli is primary using gpt-6-luna through the logged-in CLI; cheap_api is HTTP fallback using that same model; local remains a version 1 selector, but Gemma 4 12B implementation and measurement are dropped by [decision 0007](../docs/decisions/0007-scope-cuts.md). Never guess: anything unknown goes into assumptions. Facts (token counts, cost, reasoning effort) are computed by code, never by the model.
 
 ## Ownership
 
@@ -27,16 +27,16 @@ publication does not establish live backend availability or implemented CLIs.
 
 - D-1, due 2026-10-27: backends/base.py, primary codex_cli backend and cheap_api fallback (same gpt-6-luna, JSON Schema output). Golden tests mock subprocess and HTTP, including the shared three-call budget, fallback transition and child environment guard. analyze.py reasoning effort rules version 1, based on request length, number of files mentioned, whether tests are required, and the number of distinct requirements. Document the rules in controller/prompts/effort-rules.md.
 - D-2, due 2026-11-03: contract_gen complete. Case retrieval from case_library/ (contracts that passed verification stored as JSONL; BM25 retrieval of the top 3 as examples; embeddings optional). Prompt template version 1. CLI contract. Template principle: make checklist items command, file_exists or regex whenever possible; llm_judge is the last resort.
-- D-3, due 2026-11-06: local backend. Serve Gemma 4 12B with vLLM or llama.cpp and apply JSON Schema constrained decoding. The same golden tests pass. Record the serving method and memory requirements in controller/LOCAL.md.
-- D-4, due 2026-11-10: handoff_gen, judge, and the complete CLI. Internal comparison of primary codex_cli, HTTP cheap_api and local on the 30 samples in tests/controller/fixtures/: schema pass rate, number of assumptions, latency, cost.
-- D-5, optional, due 2026-11-13, only if time remains: QLoRA training script that uses the case library, and a comparison of output quality with and without retrieved examples.
+- D-3, dropped by [decision 0007](../docs/decisions/0007-scope-cuts.md), approved 2026-10-23: local Gemma 4 12B backend, serving and constrained-decoding work.
+- D-4, due 2026-11-10: handoff_gen, judge, and the complete CLI. Internal comparison of primary codex_cli and HTTP cheap_api on the 30 samples in tests/controller/fixtures/: schema pass rate, number of assumptions, latency, cost.
+- D-5, dropped by [decision 0007](../docs/decisions/0007-scope-cuts.md), approved 2026-10-23: optional QLoRA training and its quality comparison.
 
 ## Success criteria
 
 - SC-1: all implemented backends produce schema-valid output for 100 percent of the 10 inputs in schemas/examples/ and tests/controller/fixtures/.
 - SC-2: on ambiguous request samples, assumptions is never empty. Report the ratio in the test log. An empty list on an ambiguous request means the model is guessing.
 - SC-3: a test proves that reasoning_effort and cost_estimate are overwritten by analyze.py and never taken from model output.
-- SC-4: a log line records the API-equivalent USD cost and latency of every control model call. Targets: cost under 5 percent of the executor call; local latency under 30 seconds.
+- SC-4: a log line records the API-equivalent USD cost and latency of every control model call. Targets: cost under 5 percent of the executor call; the former local latency target is out of scope under decision 0007.
 - SC-5: the user's request text is wrapped as a data block in the prompt (prompt injection defense). The template tests include an injection sample such as "ignore previous instructions" and show it has no effect on the contract.
 - SC-6: the controller package never imports the verifier package.
 
@@ -44,7 +44,7 @@ publication does not establish live backend availability or implemented CLIs.
 
 1. pytest tests/controller
 2. python -m controller contract --prompt schemas/examples/prompt.json --handoff none --cases controller/case_library/seed --backend codex_cli --out /tmp/c.json, then validate /tmp/c.json against schemas/contract.schema.json with the jsonschema library.
-3. Repeat with explicit --backend cheap_api when its environment key is configured, and with --backend local at stage two. Validate judge input/output fixtures against their published schemas; record missing accounting as unknown. No paid batches of ten or more without the required estimate/approval.
+3. Repeat with explicit --backend cheap_api when its environment key is configured. Local verification is dropped by decision 0007; the selector is retained. Validate judge input/output fixtures against their published schemas; record missing accounting as unknown. No paid batches of ten or more without the required estimate/approval.
 
 ## Stop and escalate conditions
 

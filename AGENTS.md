@@ -7,7 +7,7 @@ This file lives at the repository root. Every Codex session reads it automatical
 LocalHarnessMaker is a Codex plugin (three hooks plus one skill) that makes GPT-6.1 Sol finish tasks completely, follow the user's intent, and continue work across sessions.
 
 How it works:
-1. A cheap control model (a low-cost API model, or a local Gemma 4 12B) turns the user's request into a contract: goal, constraints, success criteria, verification commands, stop conditions, explicit assumptions.
+1. A cheap control model (a low-cost API model; local Gemma 4 12B was dropped by decision 0007) turns the user's request into a contract: goal, constraints, success criteria, verification commands, stop conditions, explicit assumptions.
 2. The executor model (GPT-6.1 Sol inside Codex) shows the contract, waits for approval, then does the work.
 3. A verifier checks the result against the contract's success criteria and re-instructs the executor on unmet items only, up to a fixed number of attempts.
 4. At the end of a session a handoff document is generated and injected into the next session.
@@ -109,8 +109,9 @@ to JSON Schema. Decision 0003 specifies metric units and runtime invariants.
 Backend is required and accepts exactly codex_cli, cheap_api or local. Primary
 workflow/config selects codex_cli using gpt-6-luna through the existing CLI
 login. cheap_api uses the same gpt-6-luna through HTTP Responses API with an
-environment API key. Local Gemma 4 12B remains stage two and is never a hidden
-cloud fallback. Names, endpoints, executables and deadlines are configurable.
+environment API key. Local Gemma 4 12B implementation and measurement are
+dropped by decision 0007; the local selector remains unchanged and is never a
+hidden cloud fallback. Names, endpoints, executables and deadlines are configurable.
 Do not copy auth.json or derive HTTP credentials from the CLI login.
 
 For codex_cli, transport unavailability/failure/deadline expiry may transition

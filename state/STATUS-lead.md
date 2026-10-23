@@ -1,5 +1,8 @@
 ## Done
 
+- Published user-approved decision 0007 dated 2026-10-23 and aligned plan, controller/eval prompts and AGENTS.md wording: local Gemma/QLoRA dropped, parity not measured, C user-filled on 20 stratified tasks paired with harness, B single-session only, approved W1–W3 schedule and cap-only executor API-key fallback; no interface or eval changes (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 9.16s; `git diff --check -- AGENTS.md docs/decisions/0007-scope-cuts.md docs/plan.md prompts/03-controller-engineer.md prompts/05-eval-engineer.md state/STATUS-lead.md`: exit 0, no output).
+- Recorded integration review 1 as written by Claude on 2026-10-23 in docs/weekly/2026-10-27.md; its lead inventory confirms D-3 was done earlier and decision 0006 was already published; host results are attributed, not rerun here (`rg -n 'Prepared by Claude|1 Lead' docs/weekly/2026-10-27.md`: lines 3 and 11 identify author/date and completed deliverables).
+
 - Published user-approved decision 0006 and aligned AGENTS.md section 3.3, the hook contract verified-version list, plugin prompt and plan; retained all measured hook samples and marked 0.163.0-alpha.11.1 pending Claude's host probe, without interface changes (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 15.86s; `git diff --check -- AGENTS.md docs/decisions/0006-codex-version-policy.md docs/hooks-contract.md docs/plan.md prompts/02-plugin-engineer.md state/STATUS-lead.md`: exit 0, no output).
 
 - Completed D-3 by recording the 2026-10-22 version 1 evaluation freeze at 7cdaf3b in docs/eval-freeze.md: all 120 task IDs, per-task counts, supplied digest and attributed Claude host validation/mutation evidence, immutable-version rule and family-cluster reporting decision; replaced only the plan source citation with the Notion page (inline public freeze inventory checks: 120 frozen version-1 tasks, 120 matching validation rows and expected test counts; `.venv/bin/python -m pytest tests/lead -q`: 96 passed in 19.81s).
@@ -16,9 +19,9 @@
 
 ## Remaining
 
-- Host follow-up for decision 0006: Claude must probe hooks on 0.163.0-alpha.11.1 and run a one-task audit compatibility smoke before any large run. Keep the version pending until evidence is published; owning roles implement version recording, verified-version history and mid-run change detection. No host verification was run in this offline session.
+- Follow up decision 0006 with owning roles: integration review 1 reports the 0.163 hook probe and valid two-session smoke completed on the host; Role 2 still needs to publish 0.163 in VERIFIED_VERSIONS.json. Track version recording/history and mid-run detection through owning-role evidence. No host verification was rerun here.
 
-- D-4, next on 2026-10-27: read the four engineer STATUS files and review runtime evidence against version 1 interfaces; write the integration review with blockers, conflicts, schedule risks and scope-cut proposals. Repeat on 2026-11-03 and 2026-11-10; monitor interface blockers for the two-day limit. Reconcile the historical pending items below with current host evidence.
+- D-4: integration review 1 was written early by Claude on 2026-10-23 in docs/weekly/2026-10-27.md; refresh on 10/27 if needed, then review on 11/03 and 11/10. Monitor interface blockers for the two-day limit and reconcile historical runtime pending items below with attributed host evidence. Keep this session away from docs/weekly/ and the running eval/.
 - Owning roles must implement and demonstrate version 1 runtime behavior: controller judge/handoff and shared-budget routing, all-hook HARNESS_NESTED bypass, verifier judgment delegation, and schema-valid evaluation report production. Shared contract publication is complete; runtime completion is not claimed.
 - Review production handoff-save point, nullable transcript handling, other SessionStart sources, persisted trust and retry/approval behavior with Role 2. Startup probe evidence does not establish these remaining behaviors.
 - D-5, by 2026-11-13: update README.md for verified installation/demo, write docs/architecture.md and docs/demo.md, and verify the two-session demo in a fresh clone with retained evidence.
@@ -28,6 +31,9 @@
 
 ## Decisions
 
+- Adopt decision 0007, approved 2026-10-23, superseding the historical local-stage and optional-training decisions below: complete all remaining approved work before the local LLM stage; usage limits are no longer a concern, while executor API billing remains a cap-block fallback only.
+- Apply the current session's documentation-only scope: update decision 0007, plan, prompts 03/05, the planned-local wording in AGENTS.md and lead STATUS; leave the host evaluation and all runtime/interfaces unchanged.
+
 - Adopt user-approved decision 0006 dated 2026-10-22: versions may change without holding or rollback; record run/session versions, compare same-version reports only, require a fresh hook probe and one-task audit smoke after changes, stop on mid-run changes and retain verified-version evidence.
 - Limit this continuation to decision 0006, AGENTS.md section 3.3, conflicting version-policy wording in the hook contract/plugin prompt/plan and this STATUS: the user explicitly authorized these owned paths without any interface change.
 
@@ -36,14 +42,17 @@
 - Treat FILE1/FILE2/FILE3 as decisions 0002/0003/0004: those are the three proposals immediately preceding the user's explicit approval and implementation request.
 - Publish version 1 on 2026-10-21: the user approved the bundle and explicitly requested VERSION=1 before the planned 2026-10-24 freeze.
 - Preserve approved schema/example content exactly: active artifacts match the JSON blocks in the approved records; existing contract/verdict/handoff shapes remain unchanged.
-- Use gpt-6-luna via logged-in codex_cli as primary, same-model cheap_api fallback and local Gemma as stage two: the user's approved model/transport order.
+- Use gpt-6-luna via logged-in codex_cli as primary, same-model cheap_api fallback and local Gemma as stage two (historical; local stage dropped by decision 0007): the earlier approved model/transport order.
 - Use audited external private graders in fresh post-exit copies and invalidate observed access/inconclusive capture: the user's STOP-E4 decision replaces the earlier deny-read prerequisite without claiming filesystem isolation.
 - Keep role-prompt edits limited to session authorization: the earlier interface session authorized prompts 03/05; this continuation authorizes the D-3 path in prompt 01 and wording only in prompt 04. Runtime packages and other STATUS files remain untouched.
 - Leave staging and commits to the host: this session has read-only .git and explicit instructions not to stage or commit; concurrent role changes remain outside the commit plan.
 - Use importlib collection rather than test-package markers: the user explicitly selected this fix and prohibited __init__.py additions in other roles’ test directories.
-- Retain both schedule sources without resolution: the supplied Notion schedule and role prompt commitments differ on analyzer timing and optional QLoRA.
+- Retain the historical analyzer timing disagreement: decision 0007 resolves the QLoRA disagreement by dropping training and supersedes conflicting measurement dates with the approved W1–W3 windows.
 
 ## Verify commands
+
+- git diff --check -- AGENTS.md docs/decisions/0007-scope-cuts.md docs/plan.md prompts/03-controller-engineer.md prompts/05-eval-engineer.md state/STATUS-lead.md
+- rg -n 'Prepared by Claude|1 Lead' docs/weekly/2026-10-27.md
 
 - git diff --check -- AGENTS.md docs/decisions/0006-codex-version-policy.md docs/hooks-contract.md docs/plan.md prompts/02-plugin-engineer.md state/STATUS-lead.md
 
@@ -61,12 +70,14 @@
 ## Do not touch
 
 - Version 1 interfaces without new user approval, a decision record and a version increment.
-- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation authorizes only the named shared version-policy texts and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
+- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation authorizes only decision 0007, plan, prompts 03/05, planned-local wording in AGENTS.md and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
 - Existing harness/, experiments/, scripts/, legacy tests and unrelated user edits.
 - No git add -A, broad staging, foreign-path commit, deletion, history rewrite, hook registration or external configuration change.
 - Keep the canonical hook contract and captured evidence; never replace measured evidence with a placeholder or claim production behavior from startup probes.
 
 ## Assumptions
+
+- No additional scope assumption: decision 0007 approval and the usage-limit clarification are explicit user instructions dated 2026-10-23. Integration review 1 is attributed Claude host evidence; this offline documentation session does not independently verify its measurements.
 
 - Decision 0006 uses the user-supplied host facts, corroborated by the existing CLAUDE.md section 2 and host-verification decision 11; no new assumption about 0.163.0-alpha.11.1 compatibility or runtime implementation is made.
 

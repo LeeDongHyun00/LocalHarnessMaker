@@ -15,7 +15,7 @@ Forbidden: editing controller/ or verifier/. Sharing task set contents with Role
 
 Version 1 is approved in AGENTS.md section 3 and decisions 0002–0004.
 
-1. Call other roles only through their CLIs. The runner owns contract injection, verification, re-instruction and handoff independently of hooks. Primary control backend is codex_cli with gpt-6-luna; cheap_api HTTP fallback uses the same model, and local Gemma remains stage two. Pass the explicit backend selection and account for actual fallback transport.
+1. Call other roles only through their CLIs. The runner owns contract injection, verification, re-instruction and handoff independently of hooks. Primary control backend is codex_cli with gpt-6-luna; cheap_api HTTP fallback uses the same model, and local Gemma implementation and measurement are dropped by decision 0007 without removing the selector. Pass the explicit backend selection and account for actual fallback transport.
 2. Executor calls retain codex exec "PROMPT" --sandbox workspace-write --json -o FILE and codex exec resume SESSION_ID "REINSTRUCT_MESSAGE". Every executor/resume child inherits HARNESS_NESTED=1 from a copied child environment so plugin hooks exit before any work. Do not mutate the parent environment. Confirm applied model/effort from installed-version evidence; retain complete events and hashes from all attempts/resumes.
 3. Public eval/tasks/ID/ contains prompt.md, workspace/, expected.json and meta.json. Private graders live outside the repository and public workspaces, not in a sibling hidden_tests/ directory. A trusted process copies them into a fresh grading copy only after executor/spawned work termination. Never run/resume Codex in a grading copy or expose grader contents to controller/executor.
 4. Apply the approved STOP-E4 access audit to every --json stream: canonical private source/copy paths, aliases/traversal and tool-access events, including denied attempts. Any access invalidates the task and aggregate report; missing/malformed/truncated/unsupported capture or unresolved operands yields inconclusive and invalid. Assistant-only path prose is not an access. A clean audit is observed cleanliness, not a read-denial claim.
@@ -26,10 +26,12 @@ Version 1 is approved in AGENTS.md section 3 and decisions 0002–0004.
 ## Deliverables
 
 - D-1, due 2026-10-24: minimal runner that executes one task with codex exec and grades it with external private graders in a post-exit trusted copy. Take the record from Role 2 on whether hooks fire under codex exec and reflect it in the runner design. Default design: the runner itself performs contract injection, verification and resume, without relying on hooks.
-- D-2, due 2026-10-27: task set version 1 frozen. At least 100 tasks across the types bug fix, feature plus test, multiple requirements, and constrained refactoring. Plus 20 two-session tasks (day 1 prompt, then day 2 prompt). Sources: written by hand, or adapted from issues in small open-source repositories. Every task has hidden tests. Run baselines A (Sol medium alone) and B (Sol max alone) on a 10-task pilot first, report the cost, and run the full set after approval.
-- D-3, due 2026-11-03: baseline C (static template: eval/baselines/template.md filled once by a human per task) and the proposed system with primary codex_cli and separately recorded cheap_api fallback, first measurement, report version 1.
-- D-4, due 2026-11-10: measurement with the local control backend, handoff success rate, and the table of 20 human-reviewed samples.
-- D-5, due 2026-11-13: final report in eval/reports/final/ with tables and charts for pass rate, false done rate, cost per pass, attempts, and parity; results split by task type; sample sizes and bootstrap confidence intervals.
+- D-2, due 2026-10-27: task set version 1 frozen. At least 100 tasks across the types bug fix, feature plus test, multiple requirements, and constrained refactoring. Plus 20 two-session tasks (day 1 prompt, then day 2 prompt). Sources: written by hand, or adapted from issues in small open-source repositories. Every task has hidden tests. Run baselines A (Sol medium alone) and B (Sol max alone) on a 10-task pilot first, report the cost, and run the approved scope after approval: A on the full set and B on the 100 single-session tasks only (decision 0007).
+- D-3, due 2026-11-03: baseline C on a stratified 20-task subset (5 per task type, 20 different families; eval/baselines/template.md filled once per task by the user, never Claude, to keep the evaluator independent) and the proposed system with primary codex_cli and separately recorded cheap_api fallback, first measurement, report version 1. Compare the harness with C on the same 20 tasks, paired (decision 0007).
+- D-4, due 2026-11-10: handoff success rate comparing the harness with A, and the table of 20 human-reviewed samples. Local-control measurement is dropped by decision 0007.
+- D-5, due 2026-11-13: final report in eval/reports/final/ with tables and charts for pass rate, false done rate, cost per pass, attempts, and parity reported as not measured under decision 0007; results split by task type; sample sizes and bootstrap confidence intervals.
+
+Decision 0007 sets the run schedule: W1 through 2026-10-30, harness-mode smoke and full A; W2 through 2026-11-06, full harness and C; W3 through 2026-11-13, B and final analysis. These windows supersede conflicting original measurement due dates above. Usage limits are no longer a concern; continue through completion before the local LLM stage. An OPENAI_API_KEY for executor codex exec is only a fallback if the subscription cap blocks a run.
 
 ## Metric definitions (metrics.py)
 
@@ -38,7 +40,7 @@ Version 1 is approved in AGENTS.md section 3 and decisions 0002–0004.
 - cost_per_pass: executor plus all control API-equivalent USD for all attempted tasks, including invalid/failed/retried/fallback calls, divided by passing valid tasks; sample_size counts all attempted tasks.
 - avg_attempts: mean executor attempts per valid task; controller regenerations affect costs, not executor attempt counts.
 - handoff_success: eligible valid two-session tasks passing without restated day-1 context divided by eligible valid two-session tasks; retain observation evidence.
-- parity: local-control pass_rate minus cheap_api-control pass_rate on matched valid tasks with identical task set, seed, executor model/effort and Codex version. Hash-pin comparator report. Selecting primary codex_cli does not redefine this metric.
+- parity: local-control pass_rate minus cheap_api-control pass_rate on matched valid tasks with identical task set, seed, executor model/effort and Codex version. Hash-pin comparator report. Selecting primary codex_cli does not redefine this metric. Decision 0007 drops local measurement: retain the field with null value/bounds and an undefined_reason stating it was not measured; the paired harness-versus-C comparison is separate.
 
 Each metric has value, sample_size, sample_unit, ci95 and undefined_reason.
 Use a seeded task-cluster percentile bootstrap, default 10000/minimum 1000
@@ -54,7 +56,7 @@ validity=invalid; clean-subset metrics are diagnostic only, not headline results
 
 - SC-1: the runner executes one task end to end without human intervention and writes a result JSON. It supports retry, timeout, failure isolation, and resume after interruption.
 - SC-2: the task set hash is recorded in docs/eval-freeze.md and the set never changes afterwards. A change requires a separate version 2.
-- SC-3: every configuration runs on the same task set, the same seed and the same Codex version, and the run metadata is stored in the report.
+- SC-3: comparisons use matched tasks, the same seed and the same Codex version, with run metadata stored in the report. Under decision 0007, B uses only the 100 single-session tasks, C and its paired harness comparison use the same stratified 20-task subset, and handoff_success compares the harness with A.
 - SC-4: the report states sample sizes and confidence intervals, and splits results by task type.
 - SC-5: before any full run, a 10-task pilot is run and its cost estimate is reported and approved.
 - SC-6: five baseline A results are re-checked by hand and the absence of grader errors is recorded.
