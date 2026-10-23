@@ -8,6 +8,7 @@ must never be named test_*.py. Only counts and content hashes are published.
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
+import re
 from pathlib import Path
 import shutil
 import tempfile
@@ -37,12 +38,28 @@ def apply_reference(reference: Path, workspace: Path) -> None:
         shutil.copy2(origin, destination)
 
 
+def public_task(task_id: str) -> Path:
+    """Locate globally unique versioned IDs without adding CLI flags."""
+    root = "eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks"
+    public = core.task_directory({"task_root": root}) / task_id
+    if Path(task_id).name != task_id or not public.is_dir() or public.is_symlink():
+        raise ValueError("Unknown task")
+    return public
+
+
+def safe_task_id(task_id: str) -> str:
+    """Keep failure output limited to known public task identifiers."""
+    try:
+        public_task(task_id)
+    except (OSError, TypeError, ValueError):
+        return 'unknown'
+    return task_id
+
+
 def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
     """Exercise the exact trusted runner grader on two independent public copies."""
-    if task_id not in {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir() if p.is_dir()}:
-        raise ValueError("Unknown task")
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
-    public = core.REPOSITORY / 'eval/tasks' / task_id
+    public = public_task(task_id)
     expected = json.loads((public / 'expected.json').read_text())
     with tempfile.TemporaryDirectory(prefix='lhm-grader-validation-', dir=private.root) as temporary:
         runtime = Path(temporary)
@@ -55,15 +72,26 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
                 apply_reference(private.root / '.references' / task_id, workspace)
             result = core.grade(workspace, private, runtime, runtime / f'{label}.log',
                                 expected, 30, run_process, retention_root=runtime / "grading-copies")
+            if label == 'reference' and task_id.startswith('v2-'):
+                coverage = json.loads((private.root / task_id / 'coverage.json').read_text())
+                requirements = set(re.findall(r"(?m)^([RD][0-9]+)\.", (public / 'prompt.md').read_text() +
+                    ((public / 'day2.md').read_text() if (public / 'day2.md').exists() else '')))
+                observed = (runtime / 'reference.log').read_text()
+                covered = {key for key, tests in coverage.items() if isinstance(tests, list) and tests and
+                           all(isinstance(test, str) and test + ')' in observed for test in tests)}
+                result['coverage'] = {'requirement_count': len(requirements),
+                                      'covered_requirement_count': len(requirements & covered),
+                                      'uncovered_requirement_count': len(requirements - covered)}
             results.append(result)
     baseline, reference = results
     valid = (baseline['result'] == 'fail' and baseline['failed_tests'] >= 1
              and baseline.get('total_tests') == expected['expected_test_count']
-             and reference['result'] == 'pass' and reference['failed_tests'] == 0)
+             and reference['result'] == 'pass' and reference['failed_tests'] == 0
+             and reference.get('coverage', {}).get('uncovered_requirement_count', 0) == 0)
     return {'task_id': task_id, 'public_passed': baseline['passed_tests'],
             'public_failed': baseline['failed_tests'], 'reference_passed': reference['passed_tests'],
             'reference_failed': reference['failed_tests'], 'valid_count': int(valid),
-            'grader_sha256': [digest(p.read_bytes()) for p in private.files]}
+            'grader_sha256': [digest(p.read_bytes()) for p in private.files], **reference.get('coverage', {})}
 
 
 def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
@@ -74,11 +102,14 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
     and public specification hashes. A survivor is never automatically equivalent.
     """
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
-    public = core.REPOSITORY / 'eval/tasks' / task_id
+    public = public_task(task_id)
     reference = private.root / '.references' / task_id
     files = json.loads((reference / 'application.json').read_text())['files']
     expected = json.loads((public / 'expected.json').read_text())
-    specification = digest((public / 'prompt.md').read_bytes() + (public / 'expected.json').read_bytes())
+    specification_bytes = (public / 'prompt.md').read_bytes() + (public / 'expected.json').read_bytes()
+    if task_id.startswith('v2-') and (public / 'day2.md').is_file():
+        specification_bytes += (public / 'day2.md').read_bytes()
+    specification = digest(specification_bytes)
     records = private.root / '.mutation-records'
     records.mkdir(mode=0o700, exist_ok=True)
     equivalence_path = records / (task_id + '.equivalences.json')
@@ -126,6 +157,22 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
     return counts
 
 
+def validation_digest(private_by_task: dict[str, PrivateGraders], config: dict[str, Any]) -> str:
+    """Hash unfrozen v2 candidate bytes offline; runner still requires tracked frozen inputs."""
+    if config.get('task_root') != 'eval/tasks-v2':
+        return core.configured_digest(private_by_task, config)
+    hashes = {}
+    for task, private in private_by_task.items():
+        public = public_task(task)
+        paths = sorted(p for p in public.rglob('*')
+                       if not {'__pycache__', '.pytest_cache'} & set(p.parts) and p.is_file())
+        if not paths or any(p.is_symlink() for p in public.rglob('*')):
+            raise ValueError('Candidate requires regular files')
+        hashes[task] = {'public': [[str(p.relative_to(public)), digest(p.read_bytes())] for p in paths],
+                        'graders': sorted(digest(p.read_bytes()) for p in private.files)}
+    return digest(json.dumps({'task_root': config['task_root'], 'tasks': hashes}, sort_keys=True).encode())
+
+
 def main() -> int:
     """Print task identifiers, counts and hashes only, even on setup failures."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -142,7 +189,7 @@ def main() -> int:
             try:
                 return mutate_task(args.private_root, task, args.mutants)
             except Exception:
-                return {'task_id': task if task in {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir()} else 'unknown',
+                return {'task_id': safe_task_id(task),
                         'killed': 0, 'survived': 0, 'recorded_equivalent': 0, 'error_count': 1}
         accepted = True
         with ThreadPoolExecutor(max_workers=4) as pool:
@@ -156,7 +203,7 @@ def main() -> int:
         try:
             row = validate_task(args.private_root, task)
         except Exception:
-            row = {'task_id': task if task in {p.name for p in (core.REPOSITORY / 'eval/tasks').iterdir()} else 'unknown',
+            row = {'task_id': safe_task_id(task),
                    'valid_count': 0}
         print(json.dumps(row, sort_keys=True), flush=True)
         valid += row['valid_count']
@@ -164,9 +211,12 @@ def main() -> int:
                                'invalid_count': len(tasks) - valid}
     if valid == len(tasks):
         try:
-            summary['task_set_sha256'] = core.taskset_digest({
+            roots = {public_task(task).parent.relative_to(core.REPOSITORY).as_posix() for task in tasks}
+            if len(roots) != 1:
+                raise ValueError("Validation hash requires one task set")
+            summary['task_set_sha256'] = validation_digest({
                 task: PrivateGraders.load(args.private_root, task, core.REPOSITORY) for task in tasks
-            })
+            }, {"task_root": roots.pop()})
         except Exception:
             summary['hash_error_count'] = 1
     print(json.dumps(summary, sort_keys=True))

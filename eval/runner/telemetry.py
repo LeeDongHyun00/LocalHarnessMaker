@@ -29,7 +29,7 @@ def session_id(paths: list[Path]) -> str | None:
     return None
 
 
-def collect(event_paths: list[Path], native_paths: list[Path], model: str, effort: str) -> dict[str, Any]:
+def collect(event_paths: list[Path], native_paths: list[Path], model: str, effort: str, service_tier: str | None = None) -> dict[str, Any]:
     """Extract token counts, applied effort and account-wide plan snapshots."""
     events = [event for path in event_paths for event in records(path)]
     native = [event for path in native_paths for event in records(path)]
@@ -43,6 +43,11 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
     settings_source = " + ".join((["native_session_jsonl.turn_context"] if contexts else []) +
                                  (["native_session_jsonl.event_msg.thread_settings_applied"] if applied else []))
     verified = bool(observed) and all(p == {"model": model, "effort": effort} for p in observed)
+    tier_verified = service_tier is None or (bool(applied) and
+        all(isinstance(p, dict) and p.get("service_tier") == service_tier for p in applied) and
+        all(p["service_tier"] == service_tier for p in contexts if "service_tier" in p))
+    if service_tier is not None:
+        verified = verified and tier_verified
     totals: dict[str, int] = {}
     for event in events:
         if event.get("type") == "turn.completed":
@@ -55,13 +60,23 @@ def collect(event_paths: list[Path], native_paths: list[Path], model: str, effor
         if event.get("type") == "event_msg" and event.get("payload", {}).get("type") == "token_count"
         and event["payload"].get("rate_limits") is not None
     ]
-    tiers = {p.get("service_tier", "standard") for p in contexts}
-    pricing_tier = next(iter(tiers)) if len(tiers) == 1 else "unknown" if tiers else "standard"
+    if service_tier is None:
+        tiers = {p.get("service_tier", "standard") for p in contexts}
+    else:
+        values = [p["service_tier"] for p in [*contexts, *applied]
+                  if isinstance(p, dict) and "service_tier" in p]
+        tiers = {value if isinstance(value, str) else "unknown" for value in values}
+    pricing_tier = (next(iter(tiers)) if len(tiers) == 1 else "unknown" if tiers or service_tier is not None
+                    else "standard")
     return {
         "pricing_evidence": {"tier": pricing_tier,
-                             "basis": "native turn_context when present; otherwise Standard baseline assumption"},
+                             "basis": ("native applied settings and explicit turn_context tiers" if service_tier is not None else
+                                       "native turn_context when present; otherwise Standard baseline assumption")},
         "settings_evidence": {"verified": verified, "source": settings_source or "native_session_jsonl",
                               "observed": observed,
+                              **({"requested_service_tier": service_tier, "service_tier_verified": tier_verified,
+                                  "observed_service_tiers": [p.get("service_tier") if isinstance(p, dict) else None for p in applied]}
+                                 if service_tier is not None else {}),
                               "exec_json_exposes_effort": any("reasoning_effort" in event or "effort" in event for event in events)},
         "usage": {"billing_basis": "chatgpt_subscription", "tokens": totals or None, "billed_usd": None,
                   "plan_usage": {"availability": "account_snapshots" if snapshots else "unavailable",

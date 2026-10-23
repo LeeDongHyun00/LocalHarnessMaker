@@ -166,3 +166,61 @@ def test_mutation_requires_passing_reference_control(synthetic: tuple[Path, Path
     (private / '.references/synthetic/example.py').write_text('def answer() -> int: return 0\n')
     with pytest.raises(ValueError, match='control'):
         validate_graders.mutate_task(private, 'synthetic', 10)
+
+
+@pytest.fixture
+def synthetic_v2(synthetic: tuple[Path, Path]) -> tuple[Path, Path]:
+    import shutil
+    private, old = synthetic
+    public = core.REPOSITORY / 'eval/tasks-v2/v2-synthetic'
+    shutil.copytree(old, public)
+    shutil.copytree(private / 'synthetic', private / 'v2-synthetic')
+    shutil.copytree(private / '.references/synthetic', private / '.references/v2-synthetic')
+    (public / 'prompt.md').write_text('R1. Return the specified synthetic answer.\n')
+    (private / 'v2-synthetic/coverage.json').write_text(json.dumps({'R1': ['Checks.test_answer']}))
+    return private, public
+
+
+def test_v2_validation_checks_executed_requirement_mapping(synthetic_v2: tuple[Path, Path]) -> None:
+    private, public = synthetic_v2
+    row = validate_graders.validate_task(private, 'v2-synthetic')
+    assert row['valid_count'] == 1
+    assert row['covered_requirement_count'] == row['requirement_count'] == 1
+    assert row['uncovered_requirement_count'] == 0
+    (public / 'day2.md').write_text('D1. Preserve the earlier answer.\n')
+    row = validate_graders.validate_task(private, 'v2-synthetic')
+    assert row['valid_count'] == 0 and row['uncovered_requirement_count'] == 1
+    coverage = private / 'v2-synthetic/coverage.json'
+    coverage.write_text(json.dumps({'R1':['Checks.test_answer'], 'D1':['Checks.never_executed']}))
+    assert validate_graders.validate_task(private, 'v2-synthetic')['valid_count'] == 0
+    coverage.write_text(json.dumps({'R1':['Checks.test_answer'], 'D1':['Checks.test_answer']}))
+    assert validate_graders.validate_task(private, 'v2-synthetic')['valid_count'] == 1
+
+
+def test_candidate_validation_hash_tracks_uncommitted_bytes(synthetic_v2: tuple[Path, Path]) -> None:
+    from eval.runner.audit import PrivateGraders
+    private, public = synthetic_v2
+    graders = {'v2-synthetic': PrivateGraders.load(private, 'v2-synthetic', core.REPOSITORY)}
+    config = {'task_root':'eval/tasks-v2'}
+    first = validate_graders.validation_digest(graders, config)
+    (public / 'prompt.md').write_text('R1. Changed specification.\n')
+    assert first != validate_graders.validation_digest(graders, config)
+    (public / 'untracked.txt').write_text('candidate bytes')
+    second = validate_graders.validation_digest(graders, config)
+    (public / 'untracked.txt').write_text('changed bytes')
+    assert second != validate_graders.validation_digest(graders, config)
+
+
+def test_v2_mutation_equivalence_expires_when_day2_changes(synthetic_v2: tuple[Path, Path]) -> None:
+    private, public = synthetic_v2
+    grader = next((private / 'v2-synthetic').glob('test_*.py'))
+    grader.write_text(grader.read_text().replace('self.assertEqual(answer(), 42)', 'self.assertIsInstance(answer(), int)'))
+    (public / 'day2.md').write_text('D1. Keep the answer.\n')
+    assert validate_graders.mutate_task(private, 'v2-synthetic', 10)['survived'] == 1
+    records = private / '.mutation-records'
+    survivor = next(item for item in json.loads((records / 'v2-synthetic.review.json').read_text())
+                    if item['outcome'] == 'survived')
+    (records / 'v2-synthetic.equivalences.json').write_text(json.dumps({survivor['id']:{'reason':'Synthetic equivalence only'}}))
+    assert validate_graders.mutate_task(private, 'v2-synthetic', 10)['recorded_equivalent'] == 1
+    (public / 'day2.md').write_text('D1. Changed specification.\n')
+    assert validate_graders.mutate_task(private, 'v2-synthetic', 10)['recorded_equivalent'] == 0

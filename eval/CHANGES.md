@@ -1,3 +1,29 @@
+# Version 2 candidate pilot and executor service tier — 2026-10-23
+
+Add optional task_root and service_tier configuration. Keep default v1 hashes,
+CLI defaults, frozen tasks and report schema unchanged. Select public inputs,
+full populations, freeze checks, digests, regrade and day-2 observations from
+the configured root. Namespace nondefault-root digests so compare rejects
+cross-set reports. Pass explicit tiers on every executor launch and verify
+native applied settings per process; missing/different tier invalidates before
+grading. Retain tier requests and evidence in checkpoints and diagnostics.
+
+Write the v2 design before constructing a 4-family, 20-task unfrozen pilot.
+Public packages include regression tests, constraints and generated verification
+artifacts; private graders, references, requirement coverage and mutation reviews
+remain external. Candidate validation supports explicit v2 IDs and untracked
+candidate hashing without relaxing frozen-input execution. Mutation equivalence
+records include day-2 specification bytes. Publish only per-task numerical
+validation results in reports/pilot-v2-validation.md.
+
+Add pilot-v2-a configuration and the 24-launch STOP-3 estimate. Priority pricing
+is unavailable in the pinned offline snapshot; retain null costs and require
+host verification before spending. Calibration, candidate freeze and the planned
+remaining 16 families are pending. No live model calls, staging or commits.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1058 passed in
+122.14s. `git diff --exit-code -- eval/tasks` — exit 0.
+
 # Literal JavaScript expressions and day-2 continuation — 2026-10-23
 
 Decode quoted string expressions using literal concatenation and literal

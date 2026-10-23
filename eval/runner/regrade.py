@@ -54,13 +54,13 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     if (any(state.get(key) != metadata[key] for key in ('run_id', 'config_sha256', 'task_set_sha256')) or
             any(config.get(key) != metadata[field] for key, field in config_metadata.items())):
         raise ValueError("Regrade refused: source report and checkpoint provenance differ")
-    private_by_task = {task: PrivateGraders.load(private_root, task, core.REPOSITORY) for task in entries}
+    private_by_task = {task: PrivateGraders.load(private_root, task, core.REPOSITORY, task_root=config.get("task_root")) for task in entries}
     population = dict(private_by_task)
     for task in config.get('task_population', []):
         if task not in population:
-            population[task] = PrivateGraders.load(private_root, task, core.REPOSITORY)
-    if (core.taskset_digest(population) != state['task_set_sha256'] or
-            core.taskset_digest(private_by_task) != state.get('selected_task_set_sha256', state['task_set_sha256'])):
+            population[task] = PrivateGraders.load(private_root, task, core.REPOSITORY, task_root=config.get("task_root"))
+    if (core.configured_digest(population, config) != state['task_set_sha256'] or
+            core.configured_digest(private_by_task, config) != state.get('selected_task_set_sha256', state['task_set_sha256'])):
         raise ValueError("Regrade refused: public/private task inputs differ from the source run")
     if out.is_relative_to(private_root.resolve()) or private_root.resolve().is_relative_to(out):
         raise ValueError("Regrade output must be separate from private grader storage")
@@ -75,7 +75,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         if old_by_id[task]['two_session'] and not (
                 old_by_id[task]['outcome'] == 'invalid' and not entry.get('day2_observation') and
                 not any(s.get('day') == 2 for s in entry['segments'])):
-            if not core.valid_day2_observation(entry, core.REPOSITORY / 'eval/tasks' / task):
+            if not core.valid_day2_observation(entry, core.task_directory(config) / task):
                 raise ValueError("Regrade refused: two-session exit hashes or day-2 observation missing")
         observed = core.workspace_digest(runtime / 'workspace')
         expected = entry['workspace_exit_sha256']
@@ -134,7 +134,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
             scratch = Path(tempfile.mkdtemp(prefix='lhm-eval-regrade-'))
             result['grading'] = core.grade(
                 workspace, private, scratch, task_out / 'grading.log',
-                json.loads((core.REPOSITORY / 'eval/tasks' / task / 'expected.json').read_text()),
+                json.loads((core.task_directory(config) / task / 'expected.json').read_text()),
                 config['grading_timeout_seconds'], execute)
             if core.workspace_digest(workspace) != entry['workspace_exit_sha256']:
                 raise ValueError(f"Regrade refused: workspace changed during grading for {task}")
@@ -164,6 +164,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     validate(report, core.REPOSITORY)
     core.write_json(out / 'checkpoint.json', new_state)
     core.write_json(out / 'run-diagnostics.json', {
+        'task_root': config.get('task_root', 'eval/tasks'), 'service_tier': config.get('service_tier'),
         'source': str(source), 'source_report_sha256': digest(source_bytes),
         'audit_code_version': audit_code_version(), 'workspace_hash_checks': checks})
     text = json.dumps(report, indent=2) + '\n'

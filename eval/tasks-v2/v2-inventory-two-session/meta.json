@@ -1,0 +1,10 @@
+{
+  "id": "v2-inventory-two-session",
+  "type": "multiple_requirements",
+  "family": "inventory",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

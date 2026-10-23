@@ -1,0 +1,10 @@
+{
+  "id": "v2-inventory-bug-fix",
+  "type": "bug_fix",
+  "family": "inventory",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 2,
+  "frozen": false
+}

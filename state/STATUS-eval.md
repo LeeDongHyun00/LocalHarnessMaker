@@ -1,54 +1,49 @@
 ## Done
 
-- Resolved quoted JavaScript literal expressions using concatenation and literal replace/replaceAll chains, preserving first-occurrence, replacement-dollar, escape and UTF-16 semantics; synthetic native patch/private-path/near-miss regressions pass (`.venv/bin/python -m pytest tests/eval -q`: 1023 passed in 97.92s).
-- Added the host continuation command with strict audit-only eligibility, copied-workspace exit-hash verification, normal runner day-2 orchestration, exact prompt bytes, fresh sessions, post-exit grading, retained accounting and continuation provenance (`.venv/bin/python -m pytest tests/eval -q`: 1023 passed in 97.92s).
-- Preserved separate historical/new audit contexts with log/workspace hash checks; covered source immutability, protected source access, changed evidence, copy corruption, symlinks, version drift, known control costs and regrading other tasks once; retained re-audit/regrade support includes configured population hashes (`.venv/bin/python -m pytest tests/eval/test_continue_day2.py -q`: 33 passed in 15.15s; final `.venv/bin/python -m pytest tests/eval -q`: 1023 passed in 97.92s).
-- Updated eval README/CHANGES and this handoff; frozen public tasks and retained reports remain unchanged (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- eval/tasks eval/reports`: exit 0).
+- Added optional task_root with the historical eval/tasks default, per-set population/freeze/digest handling, cross-set comparison refusal, and selected-root regrade/day-2/audit support; added optional service_tier on all executor launches with per-process native applied-tier verification and explicit invalidation (final `.venv/bin/python -m pytest tests/eval -q`: 1058 passed in 122.14s).
+- Wrote eval/tasks-v2/DESIGN.md before construction; built four families, twenty unfrozen tasks, public regression workspaces and external graders/references; retained numbered requirement coverage and actual generated verification reports (offline eval.runner.validate_graders.validate_task over all configured v2 IDs: 20 valid, 245 reference checks passed, 20 starters rejected, 252/252 requirements covered; eval/reports/pilot-v2-validation.md).
+- Exhaustively graded all current AST mutants, strengthening specification-derived checks where needed; privately reviewed and hash-bound equivalent cases (offline eval.runner.validate_graders.mutate_task with limit 100000 over all 20 v2 IDs: 1090 killed, 10 equivalent, 0 unclassified survivors; 20/20 starter public regressions and 20/20 reference verification commands passed).
+- Added eval/configs/pilot-v2-a.yaml and its STOP-3 estimate: full A model/effort, priority, pinned Codex version, 900/1800-second per-process deadlines, retry_limit 0 and 24 planned launches; updated eval README/CHANGES (candidate/config tests in final `.venv/bin/python -m pytest tests/eval -q`: 1058 passed in 122.14s).
+- Preserved the previously committed literal-JavaScript audit and day-2 continuation work and version 1 public inputs (`git diff --exit-code -- eval/tasks`: exit 0; prior `.venv/bin/python -m pytest tests/eval -q`: 1023 passed in 97.92s).
 
 ## Remaining
 
-- Host: re-audit full A using this worktree's audit implementation and the real retained logs/private root. The user reports full A at a21eda2: 120 tasks, 115 pass, 3 fail, 2 invalid; these outcomes were not inspected or rewritten here.
-- Host: run `.venv/bin/python -m eval.runner.continue_day2 --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/full-a --out eval/reports/full-a-continued` with the recorded CLI version, pricing and approved spending workflow. It should regrade rotate-left and continue balanced-brackets only if all real day-1 logs are now clean. Confirm selection, hashes, timestamps/gap, added costs and the final full report; no historical cleanliness or recovered pass is claimed here.
-- Preserve the main checkout's in-progress full harness/full B runs. Transfer this worktree's changes only when the host operator can do so without changing code under active runs.
-- The user fills all twenty C skeletons once from public inputs before C starts; agents must never fill them or revise them from outcomes. B/C must fingerprint all 120 population graders.
-- Host: complete live capacity/timeout recovery and Role 3/4 integration verification; finish C, reduced B and full harness under the approved workflow. Keep interrupted historical runs as evidence.
-- Run paired harness comparisons with A (120), B (100 singles), C (20 singles), and handoff_success with A. Complete done-claim observations, five valid pilot-A human reviews and twenty-sample reporting. Local Gemma/QLoRA remain dropped; parity is not measured.
-- Run the full repository suite once before merge on the host. Only eval tests were authorized here. Do not stage or commit in this session; use the final Commit plan.
+- Host: review the v2 candidate and priority pricing, commit it, apply an explicitly reviewed candidate freeze and obtain spending approval before the 24-session baseline-A calibration. No executor/controller/judge call was made here. Target roughly 30–70%; revise difficulty across entire families/types, retain every candidate and never select/drop tasks by individual pilot outcome.
+- After calibration: build the remaining sixteen planned families, validate the resulting full population, and publish its separate freeze through Role 1. All current v2 metadata remains frozen=false as requested.
+- Preserve main-checkout measurements. Transfer this worktree only when the host can avoid changing code under active runs; do not reinterpret v1 outcomes as matched v2 quality evidence.
+- Host: retain the earlier re-audit/day-2 continuation follow-up, C authored once by the user, reduced B and harness measurement workflow, paired comparisons, five pilot-A reviews and twenty-sample reporting. No host outcome recovery is claimed in this worktree.
+- Run the full repository suite once before merge on the host. Only tests/eval was run here. No staging or commits; use the final Commit plan.
 
 ## Decisions
 
-- Resolve only quoted literals, literal concatenation/parentheses and replace/replaceAll with two quoted literal arguments: all other expressions remain inconclusive, and resolved text uses existing operand/patch-target auditing.
-- Continue only tasks with exactly incomplete_access_audit and missing_two_session_handoff_observation, no prior detected access or day-2 observation, consistent day-1 evidence and a clean current re-audit: a new successful session cannot erase unsupported historical evidence.
-- Reuse the normal runner from a copied checkpoint and fresh external runtime: version checks, model/effort, deadlines, retry limits, exact day2.md bytes, harness controls and nested guard retain their recorded behavior.
-- Preserve the original config byte hash as source provenance and separately hash its materialized semantic copy: no original raw config bytes are fabricated.
-- Audit copied historical logs using their original workspace context and pinned bytes/workspace hash; audit new logs against the new workspace with the source runtime protected: moving logs must not create false historical matches or exempt new accesses.
-- Regrade every other task before day-2 execution, using fresh trusted grading copies and unchanged accounting: selected tasks lack day-2 evidence and are not graded during that pass.
-- Account new control streams separately with continuation call IDs: filename ordering can shift old ordinal IDs, so source calls/costs are retained and new calls counted once. Unknown accounting remains null.
-- Record continuation source/code/config hashes, both days' timestamps, gap, copy check and added calls/costs in diagnostic/task artifacts: shared report schemas and existing CLI flags remain unchanged.
-- Preserve prior heredoc/literal-loop auditing, private grading publication, checkout-relative references, capacity recovery and C-template decisions: no task/report or unrelated implementation changes were made.
+- Keep default v1 digest bytes and absent-tier CLI behavior: optional config fields do not migrate old reports or alter frozen task files.
+- Namespace nondefault-root digests and select inputs consistently for execution/recovery: reports from different task sets must not compare, and population fingerprints must cover the selected set.
+- Verify service_tier from native thread_settings_applied for every executor process, including fresh day 2 and resumed/retried launches: a request or turn_context alone is insufficient; missing/different evidence invalidates before grading.
+- Keep priority costs null under the existing Standard-only snapshot: the historical Standard average is a workload proxy, not verified priority pricing.
+- Publish numerical validation by task ID only: private graders, references, coverage and mutation rationale remain external. V2 equivalences bind day-2 bytes as well as reference/specification identities.
+- Preserve task-cluster statistics in the approved schema and family metadata in the public population: family sensitivity analysis is planned without changing the shared report interface.
 
 ## Verify commands
 
 - .venv/bin/python -m pytest tests/eval -q
-- .venv/bin/python -m pytest tests/eval/test_continue_day2.py -q
+- .venv/bin/python -m pytest tests/eval/test_v2_support.py tests/eval/test_validate_graders.py tests/eval/test_telemetry.py -q
 - git diff --check -- eval tests/eval state/STATUS-eval.md
-- git diff --exit-code -- eval/tasks eval/reports
-- Host only: .venv/bin/python -m eval.runner.reaudit --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/full-a
-- Host only: .venv/bin/python -m eval.runner.continue_day2 --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/full-a --out eval/reports/full-a-continued
+- git diff --exit-code -- eval/tasks
+- Host/offline: .venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_GRADERS" --tasks CONFIGURED_V2_IDS
+- Host/offline mutation validation: add --mutants 100000 to the preceding command; CONFIGURED_V2_IDS means all twenty IDs in eval/configs/pilot-v2-a.yaml, not the literal placeholder.
 
 ## Do not touch
 
-- Edit only eval/, tests/eval/ and state/STATUS-eval.md in r5/harness-smoke with its own .venv. Do not access/change the main checkout while full harness/full B run there; preserve other roles' work.
-- Frozen eval/tasks/, retained eval/reports/, controller/, verifier/, plugin/, schemas, existing CLI flags, root configuration and other roles' paths. Never share task contents with Role 3.
-- .git is read-only: no staging, commits, history rewrites or file deletion.
-- No live executor/controller/judge calls, network, nested Codex, macOS sandbox-exec or real private-root lookup here. All new grader/path fixtures are synthetic.
-- Never execute Codex in a grading copy, copy old grading artifacts into continued runtimes, expose grader contents to controller/executor context, backfill exit hashes or relabel report digests.
-- Source runs and source runtimes are immutable during regrade/continuation. Incomplete continuation output requires host review; the fresh-output command does not resume it automatically.
-- Keep C skeletons unfilled until the user authors them; do not revise templates after C starts.
+- Work only in r5/v2 with this worktree's .venv; edit only eval/, tests/eval/, this status file and authorized external private storage. Preserve the main checkout and other roles' work.
+- Frozen eval/tasks/, version 1 graders, retained historical reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
+- .git is read-only: no staging, commits, history rewrites or project-file deletion.
+- No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Mock executor/control operations; ordinary local trusted grader/reference subprocesses are permitted.
+- Never execute or resume Codex in a grading copy, publish private locations/content, fabricate accounting or clear incomplete historical audit evidence through a later successful session.
+- Keep C skeletons unfilled until the user authors them; do not revise templates after C starts. Keep all v2 task metadata unfrozen until a reviewed host candidate-freeze step.
 
 ## Assumptions
 
-- Full-A totals, the rotate-left fix and balanced-brackets failure shape are user-provided host evidence. Actual retained logs/private graders were unavailable; regression results do not establish recovered historical outcomes.
-- The retained checkpoint supplies the recorded semantic configuration, and the host provides its matching CLI version, pinned pricing snapshot and existing login. Source config/report provenance remains pinned while the normalized config copy has a separate hash.
-- The user's worktree/main-checkout split supersedes older instructions to run full A in this session. No live calls, real regrade/continuation, staging or commits were performed.
-- A clean access audit means no access was observed in supported retained evidence; it does not prove filesystem isolation.
+- Full A's 115/120 outcome, including 100/100 singles, is user-supplied context; no retained host result was inspected or rewritten here. Version 2 quality and its target difficulty remain unmeasured.
+- Deadlines apply to each executor process: 900 seconds for a single-session task and 1800 seconds per day/process of a two-session task.
+- The current offline price snapshot covers Standard only. No priority rate is inferred, and the STOP-3 estimate leaves priority USD unknown pending host verification.
+- Final-response honesty still requires retained executor-event observation; the generated public verification artifact and reproduced counts cannot independently prove when a command ran.

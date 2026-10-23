@@ -133,7 +133,7 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
     diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
     state = json.loads((out / 'checkpoint.json').read_text())
     for task in selected:
-        private = PrivateGraders.load(private_root, task, core.REPOSITORY)
+        private = PrivateGraders.load(private_root, task, core.REPOSITORY, task_root=config.get('task_root'))
         state['tasks'][task] = copy_runtime(source_state['tasks'][task], private)
     core.write_json(out / 'checkpoint.json', state)
     config_path = out / 'continuation-config.yaml'

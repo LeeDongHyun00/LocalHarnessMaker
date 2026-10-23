@@ -36,7 +36,8 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
         errors: set[str] = set()
         labels: list[str] = []
         try:
-            private = PrivateGraders.load(private_root, task, core.REPOSITORY)
+            private = PrivateGraders.load(private_root, task, core.REPOSITORY,
+                                          task_root=state.get('config', {}).get('task_root'))
             runtime = Path(entry["runtime"])
             workspace = runtime / "workspace"
             segments = entry["segments"]

@@ -8,6 +8,58 @@ shared schema. Historical reports in `reports/baseline-a-first-task/` remain
 unaltered provisional evidence; they have not been reclassified as approved
 reports or rerun.
 
+## Version 2 candidate pilot
+
+[DESIGN.md](tasks-v2/DESIGN.md) specifies the separate harder population before
+construction: 20 planned families × 5 task variants. The unfrozen pilot contains
+ledger, reservations, routing and inventory, with four single-session types and
+one two-session task per family (20 tasks, 24 executor sessions). Each task has
+seven production modules, public regressions, 12 numbered requirements (15 over
+two sessions), explicit constraints and a protected verification command.
+Final graders and references remain external. No version 1 public task or grader
+is changed. [Validation counts](reports/pilot-v2-validation.md) contain task IDs
+and numbers only.
+
+`task_root` is an optional config field, default `eval/tasks`; v2 selects
+`eval/tasks-v2`. It is a canonical repository-relative public directory under
+`eval/`. Task population, selected/population digests, freeze checks, grading,
+resume/regrade and exact day-2 validation use the selected root. V1's default
+digest format is preserved; other roots are included in the digest namespace.
+The existing compare command refuses different task-set hashes, including
+cross-version comparisons. IDs are unique across sets and v2 IDs start `v2-`.
+
+`service_tier` is optional. Omit it to leave the CLI default in effect. When set,
+every executor launch, retry, resume and fresh day-2 session passes
+`-c service_tier="VALUE"`. Each process needs matching native
+`event_msg.thread_settings_applied.thread_settings.service_tier` evidence;
+context-only evidence does not verify the tier. Missing/different evidence adds
+`executor_service_tier_missing_or_different` and prevents grading. Checkpoint
+config, segment verification, task telemetry and run diagnostics retain the
+request and observations. The shared report schema and CLI flags are unchanged.
+The pinned Standard-only price snapshot cannot price priority: those costs stay
+null, including invalid attempts, until a verified versioned price is available.
+
+[pilot-v2-a.yaml](configs/pilot-v2-a.yaml) uses full A's gpt-6.1-sol / medium,
+priority, Codex 0.163.0-alpha.11.1, zero retries and 900-second process deadlines
+(1800 seconds per process for two-session tasks).
+[STOP-3 estimate](reports/pilot-v2-a-estimate.md) bounds 24 planned executor
+launches; it separates the historical Standard workload proxy from unknown
+priority USD. No live pilot was run in this worktree. The frozen-input runner
+continues to reject frozen=false tasks and untracked task inputs. Host review,
+a reviewed candidate freeze/commit and spending approval precede calibration.
+Target baseline A at roughly 30–70%; revise design across whole families/types,
+never select or drop individual tasks by pilot outcome. Preserve all candidates.
+
+The existing `eval.runner.validate_graders` command accepts explicit v2 IDs in
+`--tasks`; `--tasks all` retains its v1 meaning. V2 validation checks a private
+requirement-to-executed-test manifest, references and failing starters through
+the normal trusted grading path. It can hash untracked candidate bytes offline;
+that is not a run freeze. `--mutants 100000` exceeds the current complete AST
+mutation population for each pilot task. Mutation source/reviews and hash-bound
+equivalence rationales remain external; the v2 specification hash includes day 2.
+Public regression and reference verification commands run separately, without
+executors, controllers, judges, network or timing-dependent assertions.
+
 The frozen command is `python -m eval run --config FILE --out DIR`.
 Successful stdout is exactly the supplied output directory plus a newline;
 exit codes are 0 for computed reports (including invalid tasks), 1 for input
@@ -18,8 +70,8 @@ they are not silently relabeled as version 1. A later successful session cannot 
 retained streams; every stream must pass the current access audit.
 
 Private graders must already exist outside the repository, supplied through
-`LHM_PRIVATE_GRADERS` in the trusted parent environment. This session does not
-create them. Each task's external directory contains `test_*.py`; optional
+`LHM_PRIVATE_GRADERS` in the trusted parent environment. Construction and
+offline reference/mutation validation are separate from executor runs. Each task's external directory contains `test_*.py`; optional
 `audit-names.json` lists historical filenames. Only after all executor work
 exits and the access/settings audit passes does the runner copy graders into
 a fresh trusted grading copy under the separate temporary

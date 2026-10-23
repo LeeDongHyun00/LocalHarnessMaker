@@ -34,7 +34,7 @@ class PrivateGraders:
     public_root: Path | None = None
 
     @classmethod
-    def load(cls, root: Path, task_id: str, repository: Path) -> "PrivateGraders":
+    def load(cls, root: Path, task_id: str, repository: Path, *, task_root: str | None = None) -> "PrivateGraders":
         resolved = root.expanduser().resolve()
         if resolved.is_relative_to(repository.resolve()) or repository.resolve().is_relative_to(resolved):
             raise ValueError("Private grader root must be outside and separate from the repository")
@@ -51,7 +51,7 @@ class PrivateGraders:
         if not isinstance(names, list) or any(not isinstance(name, str) or Path(name).name != name for name in names):
             raise ValueError("Historical grader aliases must be bare filenames")
         return cls(resolved, files, (str(root.expanduser().absolute()),), tuple(names),
-                   repository / "eval/tasks")
+                   repository / (task_root or ("eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks")))
 
     def line_fingerprints(self, cache: "FingerprintCache | None" = None) -> set[str]:
         """Return hidden-line hashes, optionally sharing an invocation snapshot."""

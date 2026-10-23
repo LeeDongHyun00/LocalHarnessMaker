@@ -82,8 +82,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
         invalid.append("missing_executor_session_id")
     handoff = None
     if meta["two_session"]:
-        from eval.runner.core import valid_day2_observation, REPOSITORY
-        if not valid_day2_observation(entry, REPOSITORY / "eval/tasks" / result["task_id"]):
+        from eval.runner.core import valid_day2_observation, task_directory
+        if not valid_day2_observation(entry, task_directory(config) / result["task_id"]):
             if "missing_two_session_handoff_observation" not in invalid:
                 invalid.append("missing_two_session_handoff_observation")
         elif (out / "handoff-evidence.json").is_file():
