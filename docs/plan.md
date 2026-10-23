@@ -24,7 +24,7 @@ codex exec is only a fallback if the subscription cap blocks a run.
 | W2, through 11/06 | Full harness and C on a stratified 20-task subset: 5 per task type, 20 different families. The user fills the 20 templates once; Claude does not, preserving evaluator independence. Compare harness and C on the same 20 tasks, paired. |
 | W3, through 11/13 | B on the 100 single-session tasks only and final analysis. Compare handoff_success between harness and A. |
 
-## Version 2 evaluation schedule (approved 2026-10-23)
+## Version 2 evaluation schedule (updated 2026-10-24)
 
 Version 1 stays frozen and its results remain reported. The user-supplied
 full A result (`eval/reports/full-a`, commit `a21eda2`, codex-cli
@@ -35,13 +35,20 @@ than the historical weekly headings that follow.
 
 | Window | Work and gate |
 |---|---|
-| W2, through 11/06 | Role 5 builds `eval/tasks-v2/` with `v2-` IDs and separate private graders; validates that every hidden test follows from the public prompt; calibrates on A only toward roughly 30–70% pass rate. Adjust difficulty at the design level, never select/drop tasks based on individual pilot outcomes. Then freeze with a separate record and digest before any full run. Role 1 publishes the supplied freeze evidence. |
-| W2 and W3, through 11/13 | Run A, B and the harness fresh on frozen version 2, retaining decision 0007's comparison scopes. No harness change after the freeze may use version 2 results. |
+| Freeze gate, completed 10/24 | Version 2 frozen at main commit `9097281`: 100 tasks, 20 families of 5, including 20 two-session tasks. Role 1 publishes the supplied Claude host evidence and digest in [the version 2 freeze record](eval-freeze-v2.md). |
+| W2, through 11/06 | Run full A, B and harness measurements fresh on frozen version 2, retaining decision 0007's comparison scopes: A and harness on all 100 tasks; B on the 80 single-session tasks. No harness change after the freeze may use version 2 results. |
 | By 11/13 | Finish final analysis; report version 1 and version 2 separately, disclose which version 1 runs informed the 10/23 harness fixes, and retain tier evidence and pinned Standard-rate API-equivalent costs. |
 
 Version 2 uses multi-file packages, explicit requirements/constraints and
 two-session work that depends on day-1 decisions without user restatement
-on day 2. Task count and exact freeze date await Role 5's evidence.
+on day 2. The freeze record attributes validation and A-only calibration
+to Claude's 10/24 host verification: the pilot pass rate was 0.789 on 19 valid
+tasks (CI 0.579–0.947), with task-level false done on 4 of 13
+claimed-complete tasks. The remaining 16 families were designed harder;
+no task was selected or dropped on its pilot outcome. All tasks share one
+16-requirement template over a 7-module package, so results measure dense,
+interacting explicit requirements rather than varied task shapes.
+Version 2 never changes; any task-set change requires version 3.
 Codex development jobs and every version 2 evaluation configuration use
 `service_tier = "priority"` (Fast). Record and verify the effective tier
 from native session settings and state it in reports for like-for-like
@@ -121,4 +128,4 @@ Notion reserves 11/11–11/13 for final experiments, human checks, fixes and doc
 - The supplied export is the design baseline for this document; no live Notion access or external factual verification is implied.
 - Dates are copied as calendar dates; weekday labels are omitted. Deliverables shown here are commitments, not completion claims, except the recorded early interface freeze.
 - Role support work in week 4 maps Notion's shared stabilization/rehearsal tasks to existing ownership; it creates no new interface or role deliverable.
-- D-3 and the task-set freeze record were completed earlier; no new measurement is inferred from this scope update.
+- Version 2 freeze facts are supplied Claude host findings from 2026-10-24 at main commit `9097281`; this documentation update does not rerun or independently verify evaluation. W2 full runs are the user's current priority, superseding the earlier W2/W3 timing.
