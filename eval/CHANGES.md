@@ -1,3 +1,21 @@
+# Version 2 baseline B population regression — 2026-10-24
+
+Confirm full-v2-b.yaml already lists all 100 tasks in task_population, in
+full-v2-a order, while selecting only the 80 single-session tasks for execution.
+Add a synthetic-grader regression that computes the real configured digests
+for A, B and harness and requires population equality while preserving B's
+distinct selected-task digest. No config or frozen task bytes change.
+
+Update B's estimate with the user-supplied host population digest
+12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041
+and distinguish its 80-task selection digest. The host digest was not recomputed
+here; no private grader root or live models were accessed. Costs are unchanged.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1665 passed in
+295.50s. Scope/config/STATUS audit passes for four authorized changed paths,
+unchanged frozen tasks/configs, six STATUS headings and zero staged/untracked
+paths. `git diff --check` passes.
+
 # Version 2 public freeze — 2026-10-24
 
 Freeze all 100 v2 meta.json files by changing only frozen=false to true after

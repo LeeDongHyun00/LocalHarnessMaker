@@ -12,6 +12,28 @@ from eval.runner import core
 from eval.runner.audit import PrivateGraders
 
 
+def test_full_v2_configurations_share_population_digest(tmp_path: Path) -> None:
+    configs = [core.load_config(core.REPOSITORY / f'eval/configs/full-v2-{name}.yaml')
+               for name in ('a', 'b', 'harness')]
+    tasks = configs[0]['tasks']
+    assert len(tasks) == len(set(tasks)) == 100
+    assert configs[1]['task_population'] == tasks == configs[2]['tasks']
+    single_session = [task for task in tasks if not json.loads(
+        (core.task_directory(configs[0]) / task / 'meta.json').read_text())['two_session']]
+    assert configs[1]['tasks'] == single_session and len(single_session) == 80
+
+    # Use synthetic grader bytes only; never load the host's private grader root.
+    source = tmp_path / 'test_synthetic.py'
+    source.write_text('# synthetic population digest fixture\n')
+    graders = {task: PrivateGraders(tmp_path, (source,)) for task in tasks}
+    population_digests = [core.configured_digest(
+        {task: graders[task] for task in config.get('task_population', config['tasks'])}, config,
+    ) for config in configs]
+    assert len(set(population_digests)) == 1
+    selected_b = {task: graders[task] for task in configs[1]['tasks']}
+    assert core.configured_digest(selected_b, configs[1]) != population_digests[1]
+
+
 def test_host_digest_matches_runner_and_changes_with_private_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -1,5 +1,7 @@
 ## Done
 
+- Verified the evaluation package including the new real-digest population agreement regression using this worktree's .venv and synthetic graders; made no live model calls or actual private-root access (`.venv/bin/python -m pytest tests/eval -q`: 1665 passed in 295.50s).
+- Confirmed B already has A's ordered 100-task population and selects only 80 tasks; updated its estimate with the supplied host digests, added population-digest regression coverage and preserved all frozen inputs (inline scope/config/STATUS audit: PASS, four authorized changed paths, six STATUS headings, zero staged/untracked paths; `git diff --check`: exit 0; `git diff --exit-code -- eval/tasks eval/tasks-v2 schemas controller verifier plugin`: exit 0).
 - Verified the final eval package and freeze scope, updated README/CHANGES and this handoff; no staging, model calls or private-root access (`.venv/bin/python -m pytest tests/eval -q`: 1664 passed in 331.06s; exact authorized scope audit: PASS, 110 paths, six STATUS headings, zero staged paths; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0).
 
 - Froze all 100 v2 public metadata files on 2026-10-24, changing only frozen=false to true; confirmed the complete 20-family population, authorized scope, no v1 changes and zero staged paths (inline HEAD byte-comparison/scope audit: PASS, 100 metadata files).
@@ -55,7 +57,7 @@
 
 ## Remaining
 
-- Host/Claude: transfer this public freeze to the main checkout and run `.venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"` there with the existing external graders. Send its complete 100-task digest, type/family counts and 2026-10-24 freeze date to Role 1 for docs/eval-freeze-v2.md. Digest computation and publication remain pending; do not use an earlier candidate/public-only hash.
+- Host/Claude: publish the user-supplied host population digest 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, type/family counts and 2026-10-24 freeze date through Role 1 in docs/eval-freeze-v2.md. The supplied B digest 3af558f5f0993bcac598c4f71772b14e884ea54a106a4988b2dd3d2f23a12b09 identifies only its 80-task selection. This worktree already has B's ordered 100-task task_population; ensure the main checkout uses it for report population identity. No host digest was recomputed here.
 - Host only, after validation/freeze and spending approval: transfer the full-v2 A/B/harness configs and matched Fast estimates to the main checkout. This worktree must not run executor/controller/judge models. Re-estimate dynamic judge slots before a harness batch.
 - Host/Claude: transfer this session's three recovery/accounting fixes, retry full-harness rerun_invalid using the committed published workspace copies, retry full-a two-session-balanced-brackets continuation and full-b-regrade feature-plus-test-partition-sign rerun_unaccounted. Review comparison counts, inferred model-default tiers, fresh accounting and replacement provenance. This worktree produced synthetic regression evidence only; no actual task was re-audited or rerun here.
 - Host/Claude: retain the earlier pending re-audit of the v2 pilot reservations task using its original pinned inputs and the literal-loop fix.
@@ -74,6 +76,7 @@
 
 ## Decisions
 
+- Preserve full-v2-b.yaml unchanged because its requested ordered 100-task task_population already exists: strengthen actual digest regression coverage and clarify population versus selection in the estimate instead of changing frozen inputs.
 - Freeze public metadata now and defer final digest computation to the host: the user approved decision 0008 and supplied passing host validation, but external grader contents are unavailable in this sandbox.
 - Reuse the runner's tracked-input content digest with the existing v2 namespace: v1 stays unchanged and all full configs already select the complete population, with B retaining its separate 80-task selection.
 
@@ -128,6 +131,7 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/eval/test_freeze_v2.py::test_full_v2_configurations_share_population_digest -q
 - Host/main checkout after transferring the freeze: .venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"
 - .venv/bin/python -m pytest tests/eval/test_freeze_v2.py tests/eval/test_v2_support.py -q
 
@@ -152,6 +156,7 @@
 
 ## Do not touch
 
+- Current population follow-up: touch only eval/configs/, eval/reports/full-v2-b-estimate.md, eval/CHANGES.md, tests/eval/ and state/STATUS-eval.md; preserve every frozen task, grader, schema and CLI flag. Do not access the actual private grader root.
 - Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. The current user instruction authorizes new private v2 companion files and validation records; preserve v1 graders, archived originals, other checkouts and other roles' paths.
 - Frozen v1 public tasks/graders, retained v1 reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or project-file deletion.
@@ -162,6 +167,7 @@
 
 ## Assumptions
 
+- Current checkout is r5/v2 at 45dc71a (observed), rather than the user-described 9097281; it already contains B's complete task_population. The supplied host digests are host observations, not reproduced with synthetic graders. No new assumptions about task contents or host reports are made.
 - The user-supplied host validation passed for 100 tasks / 100 distinct grader directories, zero shared graders, zero private markers, and independent 30-mutant-per-task results of 2,994 killed / 6 recorded equivalents / zero survivors. This session did not rerun that validation or locate private storage.
 - The public freeze date is 2026-10-24. Final digest computation needs the exact transferred tracked public inputs and external grader bytes on the host; no digest can be fabricated from this sandbox. No live calls or model spending are authorized here.
 
