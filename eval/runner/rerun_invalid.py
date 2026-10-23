@@ -25,7 +25,7 @@ from eval.runner.workspace_verification import verify as verify_workspace
 
 
 REASONS = frozenset({
-    'control_cli_error', 'runner_control_file_preexisting', 'execution_interrupted',
+    'control_cli_error', 'control_timeout', 'runner_control_file_preexisting', 'execution_interrupted',
     'incomplete_access_audit', 'missing_executor_session_id', 'executor_settings_unverified',
     'missing_cli_version_evidence', 'missing_two_session_handoff_observation',
     'executor_service_tier_missing_or_different', 'capacity_exhausted',
@@ -50,7 +50,7 @@ def eligible(task: dict[str, Any], entry: dict[str, Any], audit: dict[str, Any])
     segments = entry.get('segments', [])
     interrupted = [s for s in segments if s.get('exit_code') == -2 and s.get('interrupted') is True]
     no_launch = not segments
-    control = 'control_cli_error' in reasons and bool(entry.get('control_error'))
+    control = bool(reasons & {'control_cli_error', 'control_timeout'}) and bool(entry.get('control_error'))
     capacity = bool(entry.get('infrastructure_stop') and
                     'at capacity' in entry['infrastructure_stop'].lower() and
                     any(s.get('capacity_error') for s in segments))

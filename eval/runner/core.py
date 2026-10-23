@@ -838,8 +838,8 @@ def run(
                 control_error = entry["control_error"] = str(exc)
         invalid = []
         if control_error:
-            invalid.append("control_cli_error")
             specific = entry.get("control_invalid_reason")
+            invalid.append("control_timeout" if specific == "control_timeout" else "control_cli_error")
             if specific and specific not in invalid:
                 invalid.append(specific)
         observation = entry.get("day2_observation")

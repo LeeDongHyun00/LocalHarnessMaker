@@ -1,5 +1,7 @@
 ## Done
 
+- Added exact multi-file code-mode patch regressions, canonical private-path checks for every header, variable-built patch rejection and process-pattern handling; classified structured control deadlines as control_timeout across backend configurations, retaining invalidity and infrastructure recovery eligibility. Used only this worktree's .venv, mocks and synthetic graders (`.venv/bin/python -m pytest tests/eval -q`: 1722 passed in 369.66s).
+- Updated CHANGES and this handoff; verified the exact authorized worktree scope, frozen inputs/reports/interfaces, STATUS headings and unstaged state (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; inline scope audit: PASS, 10 exact authorized paths, r5/v2, six STATUS headings, zero staged paths).
 - Implemented shared default-tier control pricing, preserved completed-task accounting/artifact bytes during recovery, and added per-snapshot provenance hashes with mixed Standard/Fast validation. Verified invalid and unaccounted one-task reruns, checkpoint reuse, repeated regrades, fresh day-2 control pins and tamper refusals with mocks and synthetic graders (`.venv/bin/python -m pytest tests/eval -q`: 1690 passed in 313.94s).
 - Updated CHANGES and this handoff and verified the authorized worktree scope, frozen inputs/reports/interfaces, STATUS format and unstaged state (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; inline scope audit: PASS, 11 exact authorized paths, r5/v2, six STATUS headings, zero staged paths, no report-copy path in changed files).
 - Confirmed the supplied recovered3 copy has three unpriced fresh control calls despite pinned stderr and token counts, plus 119 stale pricing-provenance artifact hashes on retained tasks; the selected task's provenance hash matches. Read only the supplied copy and did not access host runtimes or private grader storage (inline read-only report/checkpoint/stderr/hash inspection: 119 retained mismatches, selected mismatch=false).
@@ -60,6 +62,7 @@
 
 ## Remaining
 
+- Host/Claude: transfer the audit-shape and control-timeout changes, then re-audit the two retained v2 records with original pinned inputs. The supplied multi-file literal already resolves in this checkout; the new regressions pin that behavior and every header target. Review control_timeout classification once Role 3 emits control_failure reason=deadline. No host outcome or report was repaired here.
 - Host/Claude: transfer the recovery pricing/provenance fix and regenerate full-harness recovery from its original pinned source, then regrade that new output. Review inferred Luna priority costs, every referenced snapshot pin and unchanged historical spending. The supplied recovered3 copy already has stale hashes; do not waive or replace historical artifact pins. Offline mocked coverage is not a repaired host report or newly measured cost_per_pass.
 - Host/Claude: publish the user-supplied host population digest 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, type/family counts and 2026-10-24 freeze date through Role 1 in docs/eval-freeze-v2.md. The supplied B digest 3af558f5f0993bcac598c4f71772b14e884ea54a106a4988b2dd3d2f23a12b09 identifies only its 80-task selection. This worktree already has B's ordered 100-task task_population; ensure the main checkout uses it for report population identity. No host digest was recomputed here.
 - Host only, after validation/freeze and spending approval: transfer the full-v2 A/B/harness configs and matched Fast estimates to the main checkout. This worktree must not run executor/controller/judge models. Re-estimate dynamic judge slots before a harness batch.
@@ -80,6 +83,9 @@
 
 ## Decisions
 
+- Preserve the existing literal multi-file patch decoder and audit every extracted header: the supplied literal already resolves, while variable-built patch text must remain inconclusive.
+- Exempt static process-name operands only for pkill, pgrep and killall: their regular expressions select processes; shell expansions, redirections and other commands retain conservative handling.
+- Use structured deadline evidence rather than configuration to classify failed control calls: control_timeout replaces the generic reason while preserving invalidity, pinned evidence and infrastructure recovery eligibility.
 - Resolve control tiers with the executor's existing resolver: explicit control_call.service_tier takes precedence; omitted/null values use known model defaults and disclose the inference in pricing_evidence.
 - Preserve completed task accounting and artifact bytes during recovery report construction: rebuilding unselected tasks had overwritten pricing-provenance files while wrappers retained their old hashes.
 - Hash each referenced pricing snapshot independently in eval-owned call provenance and verify references against the full metadata catalog: historical Standard and fresh Fast calls can coexist without a schema or CLI change, while actual hash mismatches still fail.
@@ -138,6 +144,8 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/eval/test_host_audit_shapes.py tests/eval/test_control_failures.py -q
+- .venv/bin/python -m pytest tests/eval/test_runner.py::test_control_failure_deadline_classification tests/eval/test_restart_recovery.py::test_rerun_prelaunch_control_failure_needs_no_exit_hash -q
 - .venv/bin/python -m pytest tests/eval/test_recovery_pricing.py tests/eval/test_control_accounting.py tests/eval/test_v2_metrics_pricing.py -q
 - .venv/bin/python -m pytest tests/eval/test_freeze_v2.py::test_full_v2_configurations_share_population_digest -q
 - Host/main checkout after transferring the freeze: .venv/bin/python -m eval.freeze_v2 --private-root "$LHM_PRIVATE_GRADERS"
@@ -164,8 +172,8 @@
 
 ## Do not touch
 
-- Current population follow-up: touch only eval/configs/, eval/reports/full-v2-b-estimate.md, eval/CHANGES.md, tests/eval/ and state/STATUS-eval.md; preserve every frozen task, grader, schema and CLI flag. Do not access the actual private grader root.
-- Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. The current user instruction authorizes new private v2 companion files and validation records; preserve v1 graders, archived originals, other checkouts and other roles' paths.
+- Current audit follow-up: touch only eval/, tests/eval/ and state/STATUS-eval.md; preserve frozen task files, retained reports, shared schemas and existing CLI flags. Do not access the actual private grader root.
+- Work only in r5/v2 with this worktree's .venv; edit repository files only under eval/, tests/eval/ and this status file. Preserve private companions, v1 graders, archived originals, other checkouts and other roles' paths; this session authorizes repository edits only.
 - Frozen v1 public tasks/graders, retained v1 reports, schemas, controller/, verifier/, plugin/, root configuration and existing CLI flags. Never share task contents with Role 3.
 - .git is read-only: no staging, commits, history rewrites or project-file deletion.
 - No live executor/controller/judge calls, network, nested Codex or macOS sandbox-exec in this session. Model and executor integration checks must use mocks.
@@ -175,6 +183,7 @@
 
 ## Assumptions
 
+- This offline audit session consumes Role 3 deadline diagnostics as a control_failure line followed by a JSON object with reason=deadline. The two reported inconclusive host shapes are user-supplied observations; this checkout already resolves the supplied multi-file literal. Only this worktree's .venv, synthetic graders/logs and mocked model transports are used; no host re-audit, model calls or actual private-root access is claimed.
 - This session's reported full-harness outcome (valid, 119 pass/1 fail) is supplied host evidence. The supplied read-only copy confirms the accounting and stale-artifact symptoms only; host regeneration and repaired aggregate costs remain unmeasured. Use this worktree's .venv and mocks only, with no actual private grader root, network or model calls.
 - Current checkout is r5/v2 at 45dc71a (observed), rather than the user-described 9097281; it already contains B's complete task_population. The supplied host digests are host observations, not reproduced with synthetic graders. No new assumptions about task contents or host reports are made.
 - The user-supplied host validation passed for 100 tasks / 100 distinct grader directories, zero shared graders, zero private markers, and independent 30-mutant-per-task results of 2,994 killed / 6 recorded equivalents / zero survivors. This session did not rerun that validation or locate private storage.
