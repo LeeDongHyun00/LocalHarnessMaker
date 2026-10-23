@@ -82,7 +82,8 @@ def copy_runtime(entry: dict[str, Any], private: PrivateGraders) -> dict[str, An
         raise ValueError('Continuation runtime must be separate from repository, source and private storage')
     shutil.copytree(workspace, runtime / 'workspace', symlinks=True)
     expected = entry['workspace_exit_sha256']
-    if core.workspace_digest(runtime / 'workspace') != expected or core.workspace_digest(workspace) != expected:
+    if (core.matching_workspace_digest_version(runtime / 'workspace', entry) is None or
+            core.matching_workspace_digest_version(workspace, entry) is None):
         raise ValueError('Continuation refused: copied day-1 workspace exit hash mismatch')
     for name in names:
         target = runtime / name
@@ -100,6 +101,8 @@ def copy_runtime(entry: dict[str, Any], private: PrivateGraders) -> dict[str, An
     copied['retained_audit_context'] = {
         'runtime': str(old), 'copied_runtime': str(runtime), 'workspace': str(workspace),
         'workspace_exit_sha256': expected,
+        **({'workspace_digest_version': entry['workspace_digest_version']}
+           if 'workspace_digest_version' in entry else {}),
         'grading_roots': [str(p) for p in core.audit_roots(old)],
         'logs': {str(runtime / name): digest((old / name).read_bytes()) for name in logs}}
     return copied

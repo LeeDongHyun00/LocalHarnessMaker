@@ -95,6 +95,9 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         paths.extend(sorted((runtime / 'codex-home/sessions').rglob('*.jsonl')))
         if not safe_source(runtime, runtime) or any(not safe_source(p, runtime) for p in paths):
             raise ValueError('Unsafe retained evidence')
+        if ("workspace_exit_sha256" in entry and
+                core.matching_workspace_digest_version(runtime / 'workspace', entry) is None):
+            raise ValueError('Workspace exit hash mismatch')
         audit = audit_retained_logs(paths, private, retained_context=entry.get('retained_audit_context'),
                                     interrupted_paths=interrupted_logs(runtime, entry['segments']),
                                     workspace=runtime / 'workspace', repository=core.REPOSITORY,

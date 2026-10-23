@@ -666,6 +666,37 @@ refusals exit 1, internal errors exit 2. Runs without exit hashes, including the
 existing pilot B, can use read-only `eval.runner.reaudit` for diagnostics but
 require a host executor rerun before regrading is possible.
 
+## Workspace digest versions (2026-10-23)
+
+New checkpoint task entries and completed executor segments record
+`workspace_digest_version: 2` alongside `workspace_exit_sha256`. Version 2
+hashes paths, file contents, modes and symlink targets, excluding `__pycache__/`,
+`*.pyc`, `*.pyo`, `.pytest_cache/`, `.mypy_cache/`, `.ruff_cache/` and
+`.hypothesis/` at any depth. Trusted grading and published workspace copies
+use the same exclusions. Version 1 retains the original complete manifest.
+
+Regrade, day-2 continuation (including the copy and retained audit context),
+infrastructure reruns, re-audit and republication check an existing workspace
+pin with its recorded algorithm. Unversioned pins may match either version 1
+or version 2. Unknown versions and mismatches under both algorithms are refused
+(or reported inconclusive by re-audit). Read-only re-audit and republication
+still support historical entries without a workspace pin; regrade and day-2
+continuation require one. Selected infrastructure reruns may lack a pin after
+an interruption or pre-launch failure, but any existing pin must match.
+No recovery command rewrites a historical hash or infers one from current bytes.
+A historical v1 pin that included caches can still fail both algorithms after
+cache changes; version fallback cannot reconstruct that original manifest.
+Regrade diagnostics record which algorithm matched.
+
+In harness mode, each attempt's workspace pin is recorded after its verifier
+checks finish, including failed/interrupted checks and recovered pending
+verification. Executor capture hashes remain pinned before verification.
+The runner launches the verifier with `-B` and a copied environment containing
+`PYTHONDONTWRITEBYTECODE=1`. Python command arguments inside the verifier belong
+to Role 4 and are not rewritten by the runner. The current verifier already sets
+that environment variable for command children, but explicit `py_compile` and
+test tools can still write caches; digest exclusions provide the safeguard.
+
 ## Restart recovery and infrastructure-only reruns (2026-10-23)
 
 Resume the original `eval run` command with the same config and output directory

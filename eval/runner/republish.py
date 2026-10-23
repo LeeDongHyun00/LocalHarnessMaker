@@ -113,6 +113,9 @@ def republish(private_root: Path, out: Path, runtime_root: Path | None = None, *
                 runtime.resolve().is_relative_to(private_root.resolve()) or
                 private_root.resolve().is_relative_to(runtime.resolve())):
             raise ValueError('Unsafe retained runtime or destination')
+        if ("workspace_exit_sha256" in entry and
+                core.matching_workspace_digest_version(runtime / 'workspace', entry) is None):
+            raise ValueError('Workspace exit hash mismatch')
         private = PrivateGraders.load(private_root, task_id, core.REPOSITORY,
                                       task_root=state['config'].get('task_root'))
         segments = entry['segments']

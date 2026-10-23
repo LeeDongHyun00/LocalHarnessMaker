@@ -1,3 +1,31 @@
+# Versioned workspace digests and post-verifier pins — 2026-10-23
+
+Exclude bytecode and Python tool caches from new v2 workspace digests and use
+the same ignore patterns for trusted/published workspace copies. Record
+workspace_digest_version in checkpoint task/segment pins. Preserve the exact v1
+algorithm; match unversioned historical pins under v1 or v2 without rewriting
+them. Enforce the recorded algorithm throughout regrade, day-2 copying and
+retained audit contexts, infrastructure reruns, re-audit and republication.
+Unknown versions and unmatched existing pins fail closed. Historical read-only
+operations without a workspace pin retain their previous behavior.
+
+Record harness workspace pins after verifier checks, including error and
+pending-verification recovery paths. Launch verifier Python with -B and
+PYTHONDONTWRITEBYTECODE=1 without changing the parent environment. Inner command
+arguments are verifier-owned; cache exclusions also cover explicit compilation
+and tool caches. Preserve executor capture timing, shared report schemas, CLI
+flags, frozen tasks and retained reports.
+
+Add offline regressions for cache-only changes, source/mode/link changes,
+legacy v1 compatibility, version selection, unreadable directories,
+post-verifier retry timing and recovery consumer checks. Models are mocked;
+no retained host run was repaired here.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1510 passed in
+142.90s; digest regressions — 34 passed in 9.75s. Authorized-path and STATUS
+heading checks passed; `git diff --check -- eval tests/eval state/STATUS-eval.md`
+exited 0.
+
 # Explicit recovery of unpinned executor captures — 2026-10-23
 
 Add optional `--allow-unpinned` to republication. Recover only regular
