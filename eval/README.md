@@ -851,3 +851,52 @@ shared schema or source reports. Derived reports can add version 2 evidence
 without model calls or grading invalid tasks. Compare includes task-level false
 done only when both sources carry it; otherwise it reports shared metrics only.
 Calibration status survives recovery through pinned task artifacts/diagnostics.
+
+## Repairing missing published evidence (2026-10-23)
+
+Publication checks links only at/below the runtime or source root. System
+aliases above that boundary, including macOS `/var` → `/private/var`, are allowed.
+Links at the root, links inside it and traversal remain rejected. Control-file
+accounting, day-2 copying, infrastructure reruns and static-template reads use
+the same boundary rule. Normal workspace publication keeps its existing rule:
+only a completed post-exit grading result permits the workspace copy.
+
+On the host, restore a finished run in place without model calls or grading:
+
+```sh
+.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN
+.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN
+```
+
+The optional backup layout is `BACKUP/RUN/TASK`; pass the directory containing
+its task directories. Both checkpoint.json and report.json must already exist,
+all configured tasks must be finished with no active PID, and checkpoint/report
+identity and segment metadata must agree. Version 1 and 2 reports are supported.
+Run this only after the host runner has exited; it is not a concurrent repair.
+
+All tasks are checked before the first write. Every control-file pin and the
+complete executor/native audit-log manifest must match, including log sizes.
+Only runner-allowlisted controls and hash-pinned executor captures are published,
+using the same text decoding, private-path redaction and destination layout as
+normal publication. Nested interruption archives retain their directory layout.
+Unlisted files, workspaces, authentication files and grading copies are never
+copied. Existing destination bytes or artifact hashes that disagree cause
+refusal; identical files are reused. Repeating a successful command is harmless.
+
+Historical segments in the checked-in full-A/full-B/smoke reports have no
+stderr or final-message hash, contrary to the recovery brief's assumption.
+Those files are counted as `unpinned` and skipped, even if still present in the
+runtime/backup. Control stderr is already pinned and can be restored. New
+executor segments record `evidence_sha256` for events, stderr and any final
+message immediately after process exit. Hashes are never backfilled from
+unverified historical bytes. Missing or mismatched *pinned* files cause refusal.
+
+Success prints JSON rows containing only task IDs and `published`, `existing`,
+`unpinned` counts, followed by totals. Errors are generic and contain no paths
+or source contents. Input errors exit 1; internal errors exit 2. Only per-task
+`artifacts` entries in report.json change; hashes there describe the redacted
+published bytes, while historical external raw-log references remain intact.
+Checkpoint, result/classification artifacts, metrics, costs, validity and all
+other report fields stay unchanged. Restoring a final message does not recompute
+historical completion classifications or metrics. No host repair was run in
+this sandbox; Claude owns republication of the five retained runs.

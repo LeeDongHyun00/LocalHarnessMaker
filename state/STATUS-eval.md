@@ -1,5 +1,9 @@
 ## Done
 
+- Fixed publication and related boundary checks to allow symlinked system ancestors while rejecting runtime/source-root links, inner links and traversal; covered explicit aliased-parent publication, control guard/accounting, static templates, day-2 copying and infrastructure reruns (`.venv/bin/python -m pytest tests/eval -q`: 1448 passed in 132.21s).
+- Added offline `eval.runner.republish` with original/backup runtimes, all-task hash/manifest preflight, normal redaction/layout, conflicting-output refusal, idempotence, v1/v2 support, counts/task-ID output and artifact-only report updates; verified no workspace copying or subprocess/model execution (`.venv/bin/python -m pytest tests/eval -q`: 1448 passed in 132.21s).
+- Added future per-segment capture hashes and explicit unpinned counts/skips for historical executor stderr/finals; verified old files are not adopted and report metrics/classifications remain unchanged (`.venv/bin/python -m pytest tests/eval -q`: 1448 passed in 132.21s).
+- Updated eval/README.md and eval/CHANGES.md with host recovery commands, backup layout and historical limitations; preserved frozen tasks, retained reports, schemas, existing access/performance probes and other roles' paths (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; `git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md`: exit 0; branch/scope check: r5/v2, authorized paths only).
 - Added per-line first-occurrence provenance across executor/native captures; verified authored writes followed by cat/tests are clean, output-first text remains detected after copying, and private-path/unsupported-evidence checks remain fail closed (`.venv/bin/python -m pytest tests/eval -q`: 1406 passed in 138.46s)
 - Added strict timestamp and session-scoped duplicate-result alignment, retained/fresh shared provenance, accumulated-history runner decisions and recovery implementation hashing; verified mocked retry/verification behavior and ambiguous/session-reuse cases (`.venv/bin/python -m pytest tests/eval -q`: 1406 passed in 138.46s)
 - Added optional .corpus/ assertion-overlap warnings with per-task and summary counts; verified v1/v2 warning-only validity/exit behavior, missing corpora, deduplication and continued rejection of public assertion copies (`.venv/bin/python -m pytest tests/eval -q`: 1406 passed in 138.46s)
@@ -21,6 +25,8 @@
 
 ## Remaining
 
+- Host/Claude: review and transfer this publication fix, then run `.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN [--runtime-root BACKUP/RUN]` for full-a, full-b, full-harness, smoke-harness-3 and pilot-v2-a. Each backup directory contains TASK subdirectories. This sandbox did not access host backups/private storage or repair retained reports.
+- Host/Claude: review each republication's unpinned counts. Sampled historical checkpoints lack executor stderr/final hashes; those captures are deliberately skipped. Do not backfill historical pins from today's files or recompute classifications/metrics as part of publication repair.
 - Host/Claude: review and transfer this first-occurrence follow-up at a safe boundary, then re-audit retained calibration evidence using the original hash-pinned graders. Earlier public/generic-only changes are committed according to the user; this session claims no host re-audit result.
 - Host/Claude: supply executor-written Python tests under private .corpus/ storage, run ordinary grader validation and review warning counts by task ID. The actual corpus is pending; synthetic tests are not a measurement of its contents.
 - Review repository changes through the final Commit plan. Do not stage or commit here, modify private storage, or run live models. Corpus warnings must never waive public-input validation failures or access-audit evidence.
@@ -33,6 +39,9 @@
 
 ## Decisions
 
+- Check symlinks only at/below the runtime/source boundary: macOS /var is a system alias above the runtime, while root/inner links and traversal must still fail closed.
+- Preflight every republication task and refuse conflicting destination bytes/pins before writing: restore only hash-verified allowlisted evidence, preserve all report fields except per-task artifacts, and never copy a workspace in this command.
+- Count historical executor stderr/finals without retained pins as unpinned rather than adopting them: sampled checkpoints contradict the recovery brief's blanket hash claim. New executor segments pin captures at exit; no retrospective hashes are fabricated.
 - Exempt a qualifying fingerprint only when literal tool-input authorship provably precedes every output occurrence: later copying cannot erase an output-first match, and current workspace contents never establish historical authorship.
 - Reconcile streams with record order, strict timezone-aware timestamps and session-scoped command/result anchors: equal-count ordered repetitions can align, while missing identity, unequal repetitions and ambiguous chronology retain the match.
 - Share provenance across retained/fresh audit contexts without sharing their filesystem permissions: path checks, retained hashes and malformed/incomplete evidence remain independent and fail closed.
@@ -58,6 +67,8 @@
 
 ## Verify commands
 
+- Host/finished run only: .venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN
+- .venv/bin/python -m pytest tests/eval/test_republish.py tests/eval/test_publication_runtime.py -q
 - .venv/bin/python -m pytest tests/eval -q
 - Host after corpus supply: .venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_GRADERS" --tasks TASK_IDS
 - git diff --check -- eval tests/eval state/STATUS-eval.md
@@ -77,6 +88,9 @@
 
 ## Assumptions
 
+- The five runtime backups and their RUN/TASK layout are user-supplied host facts. No private grader root or backup was located or accessed in this session; tests use synthetic graders and mocked executors.
+- Republication runs after all host runner activity exits. Existing raw external log references stay historical; backup selection relocates reads without migrating executor segment fields.
+- The sampled full-a, full-b and smoke-harness-3 checkpoint entries pin controls and audited logs, but contain no executor stderr/final hashes. This is repository evidence, and the command reports those files as unpinned instead of assuming their integrity.
 - Claude reports 22 private grader assertion lines matching executor-written tests across the 20 pilot tasks, with no public-input occurrence. This is a user-supplied host finding; the actual .corpus/ will be supplied later. All new regression evidence uses synthetic files/logs and mocked executors/controllers/verifiers.
 - Earlier changes were committed by Claude as reported by the user. This follow-up remains unstaged/uncommitted, with no actual grader/corpus revision or live evaluation performed here.
 - Recorded order is required to establish authorship. Untimed records without a session-scoped duplicate anchor cannot borrow an arbitrary other stream's ordering; such output retains its match.

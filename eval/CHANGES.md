@@ -1,3 +1,48 @@
+# macOS evidence publication and offline republication — 2026-10-23
+
+Bound symlink checks to the runtime/source root. Permit system aliases above
+that boundary; reject root/inner links and traversal. Share the check across
+publication, control guards/accounting, day-2 copy validation, infrastructure
+reruns and static templates. Preserve the existing workspace publication rule.
+
+Add `python -m eval.runner.republish --private-root P --out REPORT_DIR
+[--runtime-root BACKUP]` for completed v1/v2 runs. Preflight all tasks against
+checkpoint control pins, executor/native audit hashes and byte counts, segment
+metadata and existing publication pins/bytes. Restore only allowlisted redacted
+evidence from recorded runtimes or BACKUP/TASK, retain the normal flattened
+day-2/interruption layout, and update only per-task report artifact entries.
+Never invoke models/graders, copy workspaces or rewrite checkpoints, metrics,
+costs, results or task-completion classifications. Success output contains only
+counts and task IDs; input failures contain no paths or evidence contents.
+
+The sampled historical full-A/full-B/smoke checkpoints do not pin executor
+stderr/final bytes. Count those captures as unpinned and skip them; do not
+fabricate retrospective hashes. Pinned controls (including control stderr) and
+audited events remain restorable. New executor segments pin events, stderr and
+any final message immediately on exit in internal evidence_sha256 manifests.
+
+Synthetic regressions create an explicit symlinked parent, rather than relying
+on pytest's resolved tmp_path. Cover normal runner publication/pins, continuation
+copying, infrastructure reruns, static templates, backup-only recovery, v1/v2,
+redaction/newlines, repeated runs, unchanged non-artifact report fields,
+workspace exclusion, all-task preflight, altered/missing evidence, inner links,
+manifest links and conflicting destinations/artifact references.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1448 passed in
+132.21s. `git diff --check -- eval tests/eval state/STATUS-eval.md` and
+`git diff --exit-code -- tests/eval/test_access_audit.py tests/eval/test_audit_performance.py eval/tasks eval/tasks-v2 eval/reports schemas controller verifier plugin prompts AGENTS.md` — exit 0. Branch/scope check: r5/v2; only authorized paths changed.
+No retained report, frozen public task, private storage or other checkout was
+modified; no live executor/controller/judge call was made.
+
+## Assumptions
+
+- Claude owns the five host republications and the external BACKUP/RUN/TASK
+  layout. Host backups and private graders were unavailable in this sandbox.
+- A historical file without a retained pin cannot be verified merely because
+  it exists in a backup. Its contents must not be adopted as trusted evidence.
+- Republication runs after all host runner activity has stopped; it preserves
+  historical raw external references and does not migrate executor segments.
+
 # First-occurrence fingerprints and executor corpus warnings — 2026-10-23
 
 Track each qualifying fingerprint's first tool-input/output provenance across

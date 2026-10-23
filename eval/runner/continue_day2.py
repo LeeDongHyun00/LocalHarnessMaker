@@ -20,6 +20,7 @@ from eval.runner.process import ProcessResult, run_process
 from eval.runner.signals import stop_signals
 from eval.runner.control_accounting import control_calls
 from eval.runner.report import artifact, validate
+from eval.runner.publication import safe_source
 
 
 RECOVERABLE = {'incomplete_access_audit', 'missing_two_session_handoff_observation'}
@@ -49,6 +50,8 @@ def copy_runtime(entry: dict[str, Any], private: PrivateGraders) -> dict[str, An
     """Copy workspace and allowlisted public evidence; never copy grading artifacts."""
     old = Path(entry['runtime'])
     workspace = old / 'workspace'
+    if not safe_source(workspace, old) or not workspace.is_dir():
+        raise ValueError('Continuation refused: unsafe workspace root')
     # Absolute/outward links could let a new executor mutate retained evidence.
     for path in workspace.rglob('*'):
         if path.is_symlink() and (Path(os.readlink(path)).is_absolute() or

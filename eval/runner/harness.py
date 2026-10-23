@@ -39,9 +39,8 @@ class ControlFiles:
 
     def safe(self, path: Path) -> bool:
         """Reject links at the file and every parent below the runtime."""
-        return (path.is_relative_to(self.runtime) and
-                not any(p.is_symlink() for p in (path, *path.parents)
-                        if p == self.runtime or p.is_relative_to(self.runtime)))
+        from eval.runner.publication import safe_source
+        return safe_source(path, self.runtime)
 
     def verify(self) -> None:
         """Compare retained inputs with the runner's in-memory manifest before use."""

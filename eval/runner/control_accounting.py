@@ -9,6 +9,7 @@ from eval.metrics import total
 from eval.runner.pricing import select
 from eval.runner.audit import digest
 from eval.runner.limits import capacity_refusal_without_items
+from eval.runner.publication import safe_source
 
 
 def control_calls(entry: dict[str, Any], task_id: str,
@@ -24,8 +25,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
     def read(name: str) -> str | None:
         path = runtime / name
         if (Path(name).is_absolute() or not path.is_relative_to(runtime) or ".." in Path(name).parts or
-                not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)
-                                          if p == runtime or p.is_relative_to(runtime)) or
+                not path.is_file() or not safe_source(path, runtime) or
                 digest(path.read_bytes()) != pinned.get(name)):
             return None
         return path.read_text(errors="replace")

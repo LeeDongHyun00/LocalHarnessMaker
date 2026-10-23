@@ -17,7 +17,7 @@ from typing import Any, Callable
 import uuid
 
 from eval.runner import harness
-from eval.runner.publication import checkout_text
+from eval.runner.publication import checkout_text, control_target, review_bytes, safe_source
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, interrupted_logs, digest, executor_environment
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
@@ -212,10 +212,10 @@ def taskset_digest(private_by_task: dict[str, PrivateGraders], task_root: str = 
     return digest(json.dumps(payload, sort_keys=True).encode())
 
 
-def publish(source: Path, destination: Path, private: PrivateGraders) -> None:
+def publish(source: Path, destination: Path, private: PrivateGraders, *, source_root: Path | None = None) -> None:
     """Retain original logs externally and publish a redacted review copy."""
-    if source.is_file() and not any(p.is_symlink() for p in (source, *source.parents)):
-        destination.write_text(checkout_text(private.redact(source.read_text(errors="replace"))))
+    if source.is_file() and safe_source(source, source_root if source_root is not None else source.parent):
+        destination.write_bytes(review_bytes(source.read_bytes(), private))
 
 
 def grading_summary(text: str) -> str:
@@ -610,6 +610,11 @@ def run(
                     segment["interrupted"] = True
                 segment.update({"exited_at": now(), "exit_code": final_process.returncode,
                                 "timed_out": final_process.timed_out, "latency_seconds": time.monotonic() - start})
+                # Pin captures before verification/grading; historical hashes are never backfilled.
+                segment["evidence_sha256"] = {
+                    path.name: digest(path.read_bytes())
+                    for path in (event_path, stderr_path, runtime / f"final-{index}.md")
+                    if guard.safe(path) and path.is_file()}
                 entry.pop("pid", None)
                 native_changed = [p for p in (codex_home / "sessions").rglob("*.jsonl")
                                   if native_before.get(p) != digest(p.read_bytes())]
@@ -741,24 +746,20 @@ def run(
                      {"token_count", "thread_settings_applied"})]
         (task_out / "session-evidence.jsonl").write_text(checkout_text(private.redact("".join(json.dumps(e) + "\n" for e in selected))))
         for segment, path in zip(entry["segments"], event_paths):
-            publish(path, task_out / path.name, private)
-            publish(runtime / segment["stderr"], task_out / segment["stderr"], private)
+            publish(path, task_out / path.name, private, source_root=runtime)
+            publish(runtime / segment["stderr"], task_out / segment["stderr"], private, source_root=runtime)
             final = runtime / f'final-{segment["attempt"]}.md'
             if final.exists():
-                publish(final, task_out / final.name, private)
+                publish(final, task_out / final.name, private, source_root=runtime)
         # Only the explicit runner manifest is eligible. Never search workspace.
         for name, expected_hash in guard.hashes.items():
             evidence = runtime / name
+            target = control_target(evidence, runtime, task_out)
             if (guard.safe(evidence) and evidence.is_file() and
                     digest(evidence.read_bytes()) == expected_hash and
-                    (evidence.name in {"contract.json", "handoff.json", "recovery.json"} or
-                     re.fullmatch(r"verdict-[0-9]+\.json", evidence.name) or evidence.name.endswith(".control.json") or
-                     re.fullmatch(r"(?:contract|verdict-[0-9]+|handoff|handoff-validation)\.std(?:out|err)", evidence.name))):
-                target = (task_out / evidence.relative_to(runtime) if evidence.is_relative_to(runtime / "control-interruptions")
-                          else task_out / (evidence.parent.name + "-" + evidence.name
-                                           if evidence.parent != runtime else evidence.name))
+                    target is not None):
                 target.parent.mkdir(parents=True, exist_ok=True)
-                publish(evidence, target, private)
+                publish(evidence, target, private, source_root=runtime)
         if infrastructure_stop:
             stop_reason = private.redact("STOP-E1: " + ("capacity error" if "at capacity" in infrastructure_stop.lower() else "usage limit") + "; run remains resumable. " + infrastructure_stop)
             break

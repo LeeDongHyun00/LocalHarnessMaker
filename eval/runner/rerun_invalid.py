@@ -18,6 +18,7 @@ from eval.runner.control_accounting import control_calls
 from eval.runner.reaudit import InputParser
 from eval.runner.report import artifact, validate
 from eval.runner.signals import stop_signals
+from eval.runner.publication import safe_source
 
 
 REASONS = frozenset({
@@ -92,6 +93,8 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         private = PrivateGraders.load(private_root, task['task_id'], core.REPOSITORY, task_root=config.get('task_root'))
         paths = [runtime / s['events'] for s in entry['segments']]
         paths.extend(sorted((runtime / 'codex-home/sessions').rglob('*.jsonl')))
+        if not safe_source(runtime, runtime) or any(not safe_source(p, runtime) for p in paths):
+            raise ValueError('Unsafe retained evidence')
         audit = audit_retained_logs(paths, private, retained_context=entry.get('retained_audit_context'),
                                     interrupted_paths=interrupted_logs(runtime, entry['segments']),
                                     workspace=runtime / 'workspace', repository=core.REPOSITORY,
