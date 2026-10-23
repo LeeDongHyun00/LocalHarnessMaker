@@ -1,5 +1,8 @@
 ## Done
 
+- Verified the complete eval package, CLI help and authorized scope for the accounting-replacement/partial-usage change; updated README and CHANGES without altering retained reports, frozen tasks, shared schemas or existing CLI flags (`.venv/bin/python -m pytest tests/eval -q`: 1551 passed in 161.86s; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; authorized-path/frozen-file/STATUS-heading/branch check: passed, r5/v2).
+- Added a separate rerun_unaccounted operation that selects valid tasks with interruption-only missing executor usage, replaces their outcome/accounting in pristine sessions, regrades the rest and retains replaced outcomes/calls/costs/segments with an explicit accounting policy in task/run provenance; existing rerun_invalid accumulation remains unchanged (`.venv/bin/python -m pytest tests/eval/test_partial_usage.py tests/eval/test_unaccounted_recovery.py tests/eval/test_restart_recovery.py -q`: 72 passed in 27.91s; `.venv/bin/python -m pytest tests/eval -q`: 1551 passed in 161.86s).
+- Added timestamp-bounded cumulative partial_usage recovery for interrupted segment/result/checkpoint/telemetry evidence and replacement provenance, with explicit lower-bound labeling and no cost use; covered interruption, hard restart/resume, later native records and ambiguous pricing observations (`.venv/bin/python -m pytest tests/eval/test_partial_usage.py tests/eval/test_unaccounted_recovery.py tests/eval/test_restart_recovery.py -q`: 72 passed in 27.91s).
 - Verified the complete evaluation package after the digest/timing changes and preserved frozen tasks, retained reports, shared interfaces and other roles' files (`.venv/bin/python -m pytest tests/eval -q`: 1510 passed in 142.90s; `git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; authorized-path/STATUS-heading check: passed, branch r5/v2).
 - Added cache-excluding workspace digest v2, unchanged v1 matching and recorded checkpoint pin versions across regrade, day-2 copy/retained context, infrastructure reruns, re-audit and republication; unmatched or unknown-version existing pins fail closed (`.venv/bin/python -m pytest tests/eval/test_workspace_digest.py -q`: 34 passed in 9.75s).
 - Moved attempt workspace pinning after verifier checks, including pending/error paths; launched verifier Python with -B and PYTHONDONTWRITEBYTECODE=1 in a copied environment, preserving pre-verification capture pins (`.venv/bin/python -m pytest tests/eval/test_workspace_digest.py -q`: 34 passed in 9.75s; existing runner/continuation/re-audit/republication suite: 251 passed in 237.26s).
@@ -32,6 +35,8 @@
 
 ## Remaining
 
+- Host/Claude: review and transfer the unaccounted-cost replacement operation, then use `.venv/bin/python -m eval.runner.rerun_unaccounted --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW` on the completed valid full-B regrade. Recover the full-harness invalid restart casualty through the existing flow first, then apply the sibling operation to any eligible valid interruption-only accounting gap. This worktree did not access those runtimes or run live calls.
+- Host/Claude: disclose selected task IDs, source outcomes, exact infrastructure causes and accounting_policy=replace_with_fresh_session from rerun-unaccounted.json/task rerun-provenance.json in final comparisons. Historical spending remains archived (and unknown where originally unknown), excluded from the replacement report's totals. Never use partial_usage to complete costs or retry a quality failure without an accounting interruption.
 - Host/Claude: review and transfer the workspace digest fix, then retry retained full-harness recovery using the original hash-pinned inputs. This worktree did not access host workspaces/private graders or repair reports. Unversioned hashes must match current retained bytes under v1 or v2; a v1 pin that included subsequently changed caches can still match neither and must remain refused. Never replace the historical pin with a current digest.
 - Host/Claude: review and transfer this opt-in republication follow-up, then restore historical stderr/finals using `.venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN --allow-unpinned` for the intended retained runs. Review run-diagnostics.json.republication.artifacts and published_unpinned counts. This sandbox did not access host backups/private storage or repair retained reports.
 - Host/Claude: review each republication's remaining unpinned counts for missing captures. The default still skips unpinned files; the explicit flag restores only stderr/finals and labels their current published-content hashes. Never backfill historical checkpoint pins. Any later task_false_done_rate/classification refresh remains separate retained-evidence work, with no new models or grading of invalid tasks.
@@ -47,6 +52,10 @@
 
 ## Decisions
 
+- Add a sibling operation with separate replacement accounting: the user needs a fully accounted baseline trial, while existing invalid-task recovery must continue retaining its prior spending.
+- Require all unknown executor calls to have missing usage, infrastructure segment markers and supported pinned pricing; reject missing controls/prices, unmarked gaps, access matches and unresolved audits: reruns must target infrastructure accounting casualties only.
+- Recover a missing hard-restart exit price capture only from timestamp-bounded native applied settings: a later resume's tier cannot justify the interrupted process's pricing. Explicit unknown/ambiguous captures remain refused.
+- Store last native cumulative counters per interrupted rollout as lower-bound partial_usage only: session cumulatives can include earlier processes and cannot establish complete segment costs.
 - Hash source paths, contents, modes and link targets while excluding all requested bytecode/tool caches in v2: verification and tools generate these caches after executor exit; trusted grading and published workspace copies now share the exclusion patterns.
 - Honor explicit digest versions and try v1/v2 only for entries without a version: keep exact historical v1 manifests and reject unknown algorithms or unmatched pins without silently migrating evidence.
 - Refresh the current attempt pin after verifier completion even on failed/pending checks: prevent verifier workspace writes from immediately invalidating retained evidence while keeping executor capture pins at exit.
@@ -84,6 +93,8 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/eval/test_partial_usage.py tests/eval/test_unaccounted_recovery.py tests/eval/test_restart_recovery.py -q
+- Host/completed valid report only: .venv/bin/python -m eval.runner.rerun_unaccounted --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW
 - .venv/bin/python -m pytest tests/eval/test_workspace_digest.py -q
 - Host/explicit historical-capture recovery: .venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN --allow-unpinned
 - Host/finished run only: .venv/bin/python -m eval.runner.republish --private-root "$LHM_PRIVATE_GRADERS" --out eval/reports/RUN --runtime-root BACKUP/RUN
@@ -107,6 +118,9 @@
 
 ## Assumptions
 
+- Full B's 100/100 pass and its interrupted feature-plus-test-partition-sign accounting gap, plus the analogous full-harness gap after casualty recovery, are user-supplied host observations. This offline worktree claims no repaired host metrics and uses synthetic private graders plus mocked executors/controllers/judges only.
+- The user explicitly authorizes replacing the selected task's entire original trial accounting with the fresh trial's. Replaced historical spending is provenance evidence, not a known total or zero, and final comparisons must disclose this policy.
+- partial_usage and rerun provenance are eval-owned checkpoint/artifact metadata; no new shared report fields or changes to existing CLI flags are needed. Missing or unbounded native timestamps cannot establish per-process evidence.
 - The reported 104/120 full-harness mismatches, task-exit modification times and dual-interpreter bytecode caches are user-supplied host observations; this offline worktree did not inspect or repair those runtimes. Existing historical hashes are never rewritten, even if a cache-only history cannot be reconstructed.
 - workspace_digest_version is evaluation-owned checkpoint/runtime metadata, not a new shared report field; shared schemas and CLI flags remain unchanged. Segments without an exit pin after executor interruption do not claim a digest version or historical hash.
 - The requested per-artifact provenance field is represented in run-diagnostics.json.republication.artifacts; report artifact references retain the frozen path/sha256 shape. The schema prohibition remains in force.

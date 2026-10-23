@@ -1,3 +1,34 @@
+# Replacement of interruption-only accounting gaps — 2026-10-23
+
+Add `eval.runner.rerun_unaccounted` for finished reports containing valid tasks
+with null executor costs caused by recorded infrastructure interruptions. Use
+the existing fresh-runtime/regrade engine, replace selected outcome/accounting,
+and preserve old spending and outcomes in hash-referenced provenance. Keep the
+existing `rerun_invalid` policy of accumulating prior spending unchanged.
+
+Select only missing executor usage with interruption/capacity evidence, clean
+historical/current audits, known control costs, supported pinned prices, and
+unchanged retained inputs/logs/control/workspaces. Refuse other null-cost causes,
+recoverable complete usage and every access match. A missing hard-restart exit
+pricing capture requires independently timestamp-bounded native applied tier
+records; later resume settings cannot establish the interrupted process's price.
+Regrade every unselected task and retain any fresh quality failure. Record task
+IDs, reasons, replaced outcomes/calls/costs/segments, replacement policy and
+fresh outcomes/costs in per-task provenance and run diagnostics.
+
+Retain the last timestamp-bounded native cumulative counters per interrupted
+rollout as `partial_usage` in segment/result/checkpoint/telemetry evidence and
+replacement provenance. Label them cumulative-session lower bounds and never
+use them for costs. Recover them before resume and during retained regrade;
+new interrupted native deltas are never promoted to complete billable usage.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1551 passed in
+161.86s. Focused partial-usage/replacement/restart regressions — 72 passed in
+27.91s before the final missing-pin case. `git diff --check -- eval tests/eval
+state/STATUS-eval.md` exited 0; authorized-path/frozen-file/STATUS-heading/branch
+checks passed. Models and executors are mocked; no host report, private grader storage, frozen task, shared schema,
+existing CLI flag or other checkout is changed. No staging or commits.
+
 # Versioned workspace digests and post-verifier pins — 2026-10-23
 
 Exclude bytecode and Python tool caches from new v2 workspace digests and use

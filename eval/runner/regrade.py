@@ -18,13 +18,14 @@ from eval.runner.process import ProcessResult, run_process
 from eval.runner.signals import stop_signals
 from eval.runner.reaudit import InputParser
 from eval.runner.report import build_task, validate
+from eval.runner.telemetry import recover_partial_usage
 
 
 def audit_code_version() -> dict[str, str]:
     """Pin the audit implementation, including uncommitted parser changes."""
     directory = Path(__file__).parent
     return {name: digest((directory / name).read_bytes())
-            for name in ('audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py')}
+            for name in ('audit.py', 'javascript.py', 'fingerprint_history.py', 'regrade.py', 'telemetry.py')}
 
 
 def regrade(private_root: Path, source: Path, out: Path, *,
@@ -122,6 +123,14 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         if audit['errors'] and audit['status'] == 'clean':
             audit['status'] = 'inconclusive'
         result = copy.deepcopy(entry['result'])
+        if audit['status'] == 'clean':
+            recover_partial_usage(entry['segments'], [p for p in paths if p not in
+                                  {runtime / s['events'] for s in entry['segments']}])
+            new_state['tasks'][task]['segments'] = copy.deepcopy(entry['segments'])
+            result['segments'] = copy.deepcopy(entry['segments'])
+            for run, segment in zip(result.get('executor_runs', []), entry['segments']):
+                if 'partial_usage' in segment:
+                    run['partial_usage'] = copy.deepcopy(segment['partial_usage'])
         result['grader_access_audit'] = audit
         result['invalid_reasons'] = [reason for reason in result['invalid_reasons']
                                      if reason not in {'incomplete_access_audit', 'grader_access_detected'}]

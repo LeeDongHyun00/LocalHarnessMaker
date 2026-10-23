@@ -749,6 +749,55 @@ schema and existing CLI flags are unchanged. Success prints `NEW` plus a newline
 input refusals exit 1, internal/incomplete execution exits 2, signals exit 130.
 The existing cost-estimate/spending checks still apply before host calls.
 
+For a completed, valid task whose executor cost is unknown after an
+infrastructure interruption, use the separate replacement operation:
+
+```sh
+.venv/bin/python -m eval.runner.rerun_unaccounted --private-root "$LHM_PRIVATE_GRADERS" --from eval/reports/SOURCE --out eval/reports/NEW
+```
+
+This command selects valid tasks only when every executor accounting gap has
+missing token counts and a recorded `interrupted=true`, `exit_code=-2`, capacity
+refusal, or recovery following a capacity refusal. It requires clean historical
+and current audits, unchanged log/control/workspace pins, known control costs,
+and a supported pinned price for each missing-usage call. Missing pricing or
+observed tiers, ordinary unmarked usage gaps, stale accounting with recoverable
+complete usage, and all access matches refuse selection. If a hard restart
+prevented the exit pricing capture, timestamp-bounded native applied settings
+must independently prove the tier and pinned price; a later resume's settings
+cannot supply that evidence. Existing ambiguous or unknown tier captures remain
+refused. Unsupported/malformed evidence is never waived.
+
+Each selected task starts once in a pristine public workspace, with all ordinary
+retry/audit/grading rules. Its outcome, attempts, calls and costs replace the old
+task's in the new report; a fresh failure remains a failure. Every other task is
+re-audited and regraded from retained evidence with its original accounting.
+Source reports, checkpoints and runtimes are not rewritten. This differs from
+`rerun_invalid`, which continues to include prior spending in its accounting.
+
+`rerun-unaccounted.json`, `run-diagnostics.json.rerun_unaccounted`, and each
+selected task's hash-referenced `rerun-provenance.json` record selected IDs,
+source outcome/calls/costs/segments/artifact references, exact infrastructure
+causes, source hashes, fresh outcome and added calls/costs. The provenance states
+`accounting_policy=replace_with_fresh_session`: replaced historical spending is
+archived there, excluded from replacement report totals, and remains unknown
+when originally unknown. Final comparisons must disclose the task IDs, reasons
+and replacement policy. Resume and later regrade retain this accounting and
+provenance. Existing CLI flags and the shared report schema are unchanged.
+
+Interrupted native `token_count.info.total_token_usage` observations are retained
+as segment `partial_usage` in checkpoint/result evidence and per-process
+telemetry, or in `source_segments` of replacement provenance. Recovery runs on
+ordinary interruption/resume and during retained regrade/replacement. For each
+rollout it records the last cumulative counters inside the segment's recorded
+time bounds, including reasoning counters without adding them to output tokens.
+These are explicitly labeled lower bounds of cumulative session usage and may
+include earlier processes. Missing/naive timestamps or absent valid counters
+produce no invented observation; later resume records are excluded. Partial
+usage never supplies billable tokens, fills an unknown cost, or changes retained
+accounting. New interrupted native counters are not saved as complete
+`native_usage`.
+
 JSONL framing uses only the newline character, so U+0085, U+2028 and U+2029 inside
 JSON strings remain data in executor/native streams, control envelopes,
 telemetry, limit detection and redaction. Shell operand extraction identifies
