@@ -1,5 +1,9 @@
 ## Done
 
+- Prepared host-only plugin.handoff_failure_demo day1/day2/check for real retry exhaustion and separately injected handoff generation/validation failures, with offline evidence rejection tests and documented Claude steps. Added portable export for future captures and kept committed evidence unchanged (.venv/bin/python -m pytest tests/plugin -q: 219 passed, 1 opt-in live test skipped in 20.38s; git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
+
+- Recorded Claude's real two-session host demonstration on 2026-10-23 at de38626, retained in plugin/evidence/2026-10-23-two-session/ and committed as 4fa9ec2. Day 1 waited for approval, created result.txt, passed the real verifier at attempt 1 with zero re-instructions and saved a validated handoff retaining the random release label. Day 2 used a new session in the same project, received exactly that handoff in SessionStart/model context, used the label in its contract without user restatement and verified followup.txt after approval (.venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session: approval_gates=true, context_visible=true, new_session=true, saved_handoff_validated=true, session_start_injected=true, user_restatement_needed=false, overall=pass).
+
 - Prepared plugin.two_session_demo day1/day2/check with isolated real-mode sessions, a random day-1 decision, fixed follow-up without restatement, retained CLI-validation output/hash and an offline injection/context/artifact checker; documented host steps in plugin/DEMO-SCENARIO.md and README. Synthetic positive/negative fixtures and injected launch tests cover new-thread then approval routing; no live demo was run (.venv/bin/python -m pytest tests/plugin -q: 200 passed, 1 opt-in live test skipped in 14.35s).
 - Verified --check accepts the newly registered 0.163.0-alpha.11.1 using an isolated installer and injected version probe; unverified-version diagnostics remain covered with a separate fake version (.venv/bin/python -m pytest tests/plugin -q: 200 passed, 1 skipped in 14.35s).
 
@@ -48,12 +52,16 @@
 
 ## Remaining
 
-- Claude runs the prepared real two-session pass-path demo on the host using plugin/DEMO-SCENARIO.md, retaining plugin/evidence/DATE-two-session/ and requiring the offline checker to pass. Preparation and offline fixtures do not establish live D-4/D-5 success.
-- Separate host checks remain for exhaustion handoff injection, failed generation/validation preventing stale injection, persisted hook trust, bundled-binary discovery, unrelated-project silence and macOS sandbox isolation. The completed README temporary-home install/--check and real-mode demo are no longer pending.
+- Claude runs plugin.handoff_failure_demo day1/day2/check separately for exhaustion, generation and validation after host evaluation capacity is available, following plugin/DEMO-SCENARIO.md. Export future evidence with plugin.export_demo_evidence and rerun the matching checker on the portable copy. These new lifecycle checks are prepared with offline tests; live outcomes remain pending.
+- Separate host checks remain for persisted hook trust, bundled-binary discovery, unrelated-project silence and macOS sandbox isolation. The completed README temporary-home install/--check, real-mode demo and two-session pass-path demonstration are no longer pending.
 - Pending host measurement: revised Stop 660s / check 480s / handoff 120s / validation 5s budgets and Role 4's internal 450s verifier budget, plus contract cutoff at 30s inside 40s despite the controller's 35s deadline. SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants remains separate from the completed host SIGTERM/SIGHUP/child-exit checks.
 - Before merge: coordinating role runs the full suite once. This job runs only tests/plugin; .git is read-only and all work remains unstaged/uncommitted. Do not disturb the in-progress host evaluation or edit eval/, controller/ or verifier/.
 
 ## Decisions
+
+- Use HARNESS_MAX_ATTEMPTS=1 in copied demo child environments and one deliberately impossible mechanical criterion: exhaustion needs no paid re-instruction loop, while real Stop saves remaining work for a fresh session.
+- Inject generation/validation failures only at the selected CLI boundary through a temporary interpreter wrapper: keep the real hooks, task verification and fresh day-2 SessionStart, with validation failure occurring only after real pending-handoff generation.
+- Retain raw future captures outside the repository and export placeholder paths to fresh evidence directories: preserve original raw bytes, document the transformation and recompute the exported saved-handoff validation hash. Existing committed evidence is unchanged.
 
 - Prepare the two real sessions as separate host commands with a random day-1 release-label decision and a fixed day-2 prompt omitting that label: this makes approval and recovery reviewable before further live calls.
 - Require real saved-handoff CLI validation plus local schema validation, exact SessionStart/model-context matching, distinct threads, both approval gates, passing verdicts and exact follow-up bytes: offline fixtures validate the checker without claiming live D-4/D-5 success.
@@ -82,6 +90,11 @@
 
 ## Verify commands
 
+- Host only, one scenario/stage at a time: .venv/bin/python -m plugin.handoff_failure_demo day1 --scenario exhaustion --out /tmp/lhm-DATE-exhaustion --scripted-approval
+- Host only: .venv/bin/python -m plugin.handoff_failure_demo day2 --scenario exhaustion --out /tmp/lhm-DATE-exhaustion
+- Offline: .venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out /tmp/lhm-DATE-exhaustion (repeat with generation/validation and distinct directories).
+- Future captures: .venv/bin/python -m plugin.export_demo_evidence --source /tmp/lhm-DATE-exhaustion --out plugin/evidence/DATE-exhaustion; then rerun the matching offline checker.
+
 - Host only: .venv/bin/python -m plugin.two_session_demo day1 --out plugin/evidence/DATE-two-session
 - Host only: .venv/bin/python -m plugin.two_session_demo day2 --out plugin/evidence/DATE-two-session
 - Offline after host capture: .venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/DATE-two-session
@@ -106,6 +119,10 @@
 - Never infer real task success, control-model latency, actual cost, fork/clear behavior, real handoff success or installed packaging from synthetic fixture verdicts.
 
 ## Assumptions
+
+- Claude's supplied host run/commit account is accepted as host evidence and corroborated by the retained offline checker; this session performed no live Codex/model calls, installation, network access, staging or commit.
+- The failure demonstrations deliberately inject CLI errors, rather than asserting a naturally occurring provider/validation failure. Their seed is synthetic old context; their lifecycle, controller generation where not intercepted, verification and executor sessions are real host operations still to be run.
+- Day 2 only needs to reach approval to demonstrate handoff receipt or stale-context absence. It is not a claim that remaining work was completed. Future evidence is committed only after portable export/review; raw operational capture remains host-local.
 
 - The user's supplied host results and commits are accepted as host evidence; only the probe/demo evidence audits and plugin tests were rerun here. No live Codex, model, network, sandbox-exec or real-home installation ran.
 - The requested two-session preparation covers the pass path. Exhaustion, stale-context rejection and persisted trust retain separate host checks; the demo proves receipt and success without user restatement, not exclusive causal reliance on the handoff.

@@ -74,8 +74,99 @@ can add calls. Before a batch of ten or more paid calls, report its host cost
 estimate under STOP-3. No cost or live success is claimed by this preparation.
 Do not overwrite an attempted day or delete its temporary files; retain failures.
 
+Claude completed the pass-path host run on 2026-10-23 at de38626; retained
+evidence is plugin/evidence/2026-10-23-two-session/ (commit 4fa9ec2). Its offline
+checker passes all flags above.
+
 The evidence establishes receipt of the handoff and successful follow-up without
 user restatement. It does not prove that the model relied exclusively on that
 context: day-1 files still exist in the shared workspace, and tool access is not
 isolated by this demo. Exhaustion, stale-handoff rejection, persisted trust and
 macOS sandbox isolation remain separate host checks.
+
+## Remaining handoff checks for Claude (host only)
+
+These scripts are prepared, not live-verified. Wait until the host evaluation is
+finished before using model capacity. Use raw captures outside the checkout and
+fresh directories for every scenario; never overwrite a failed capture. All
+commands below run from the repository. The same compatibility/login/isolation
+prerequisites as the pass demonstration apply. The scripts check the CLI identity
+between stages. No production hook, controller or verifier interface is changed.
+
+Run each numbered command separately, reviewing its output before the next.
+`--scripted-approval` is optional for unattended Claude runs and sends only
+`approve` after displaying the captured contract.
+
+### Exhaustion
+
+1. `.venv/bin/python -m plugin.handoff_failure_demo day1 --scenario exhaustion --out /tmp/lhm-DATE-exhaustion --scripted-approval`
+2. Show day1/request-state/contract.json: exactly one command criterion,
+   `python -c 'raise SystemExit(1)'`, expected exit 0. The script refuses approval
+   if the real controller changes it. After approval the executor must honestly
+   leave this intentionally impossible check unmet. HARNESS_MAX_ATTEMPTS=1 is set
+   only in the child environment. Show the real fail verdict at attempt 1,
+   session phase `exhausted`, Stop systemMessage listing unmet IDs, and validated
+   handoff.remaining containing those same IDs. There are zero re-instructions.
+3. `.venv/bin/python -m plugin.handoff_failure_demo day2 --scenario exhaustion --out /tmp/lhm-DATE-exhaustion`
+4. Show distinct session IDs, unchanged project/home, and exact saved-handoff
+   context in SessionStart and the developer transcript. Day 2 stops at approval;
+   no second approval or completion is needed to establish receipt.
+5. `.venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out /tmp/lhm-DATE-exhaustion`
+   Require overall=pass, remaining_injected=true, new_session=true,
+   approval_gates=true and stale_injected=false.
+
+### Stale context after generation or validation failure
+
+Run this sequence twice, replacing MODE with `generation` and then `validation`,
+using a separate raw directory for each. Do not combine them into a paid batch.
+
+1. `.venv/bin/python -m plugin.handoff_failure_demo day1 --scenario MODE --out /tmp/lhm-DATE-MODE --scripted-approval`
+2. Show previous-handoff.json: a valid demo seed containing
+   `obsolete-release-context`. This is explicitly seeded old context, not a
+   claimed previous live outcome. The real task creates result.txt and passes
+   the real verifier. A temporary interpreter wrapper delegates all calls to
+   the real Python except the selected boundary: generation returns exit 2 from
+   `controller handoff` without a model call; validation lets generation finish,
+   then returns exit 2 only for `verifier validate-handoff` on handoff.pending.*.
+   Current-handoff validation at SessionStart is never intercepted. Show
+   faults.jsonl, the Stop error, unchanged handoff.stale.*.json bytes, absent
+   handoff.json, and (validation case) retained generated pending handoff.
+   This demonstrates real lifecycle handling of an injected CLI failure; it
+   does not claim a natural provider outage or invalid model response occurred.
+3. `.venv/bin/python -m plugin.handoff_failure_demo day2 --scenario MODE --out /tmp/lhm-DATE-MODE`
+   Day 2 launches a new session with the real interpreter and no injected fault.
+   Show SessionStart output=null, no HARNESS_HANDOFF in the developer transcript,
+   archived previous bytes still present and no current handoff. Stop at approval.
+4. `.venv/bin/python -m plugin.handoff_failure_demo check --scenario MODE --out /tmp/lhm-DATE-MODE`
+   Require overall=pass, new_session=true, approval_gates=true,
+   remaining_injected=false and stale_injected=false.
+
+A no-retry scenario uses three executor launches and two contract generations;
+exhaustion/validation add one handoff generation, generation failure adds none.
+Mechanical verification and handoff validation make no model calls. Regeneration,
+fallback or unexpected judge criteria can add calls. Inspect contracts before
+approval, keep each stage separate, and report a cost estimate before any batch
+of ten or more paid calls (STOP-3). No measured dollar cost is claimed here.
+
+## Portable evidence for future demonstrations
+
+Keep raw captures and temporary homes on the host, outside the checkout. Before
+committing any future evidence, export a fresh portable copy (including future
+pass-path two-session demos):
+
+```
+.venv/bin/python -m plugin.export_demo_evidence --source /tmp/lhm-DATE-exhaustion --out plugin/evidence/DATE-exhaustion
+.venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out plugin/evidence/DATE-exhaustion
+```
+
+Use the matching checker/scenario for the other demonstrations; for a pass demo
+use `plugin.two_session_demo check`. The exporter replaces checkout, user home,
+temporary home, workspace and evidence prefixes with `${REPO}`, `${HOME}`,
+`${DEMO}`, `${CODEX_HOME}`, `${WORKSPACE}` and `${EVIDENCE}` consistently in
+metadata, commands, logs and embedded contexts, including canonical path aliases.
+It records the transformation and recomputes the saved-handoff validation hash
+for exported bytes. Keep the unmodified raw capture for original-byte provenance;
+the portable copy is an explicitly transformed artifact. Review exports for any
+additional host-specific paths before committing. Do not resume an exported
+capture: operational metadata is in the raw host capture. Existing committed
+evidence, including 2026-10-23-two-session, stays unchanged.

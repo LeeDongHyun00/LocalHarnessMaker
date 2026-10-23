@@ -120,7 +120,8 @@ def prepare(out: Path, run: Runner = run_group, mode: str = "stub") -> dict[str,
     return metadata
 
 
-def launch(metadata: dict[str, Any], stage: str, run: Runner = run_group) -> None:
+def launch(metadata: dict[str, Any], stage: str, run: Runner = run_group,
+           extra_env: dict[str, str] | None = None) -> None:
     """Launch exactly one executor process per stage; hooks own verification."""
     out = Path(metadata["out"])
     child_env = dict(os.environ)
@@ -133,6 +134,7 @@ def launch(metadata: dict[str, Any], stage: str, run: Runner = run_group) -> Non
     if metadata.get("mode") == "real":
         child_env.pop("HARNESS_STUB", None)
         child_env["HARNESS_BACKEND"] = "codex_cli"
+    child_env.update(extra_env or {})
     command = [metadata.get("codex", "codex"), "--no-daemon", "--dangerously-bypass-hook-trust", "exec"]
     if stage == "approval":
         command += ["resume", metadata["thread_id"]]

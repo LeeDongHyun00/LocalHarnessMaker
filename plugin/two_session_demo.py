@@ -28,11 +28,11 @@ def records(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text().splitlines()]
 
 
-def capture(metadata: dict[str, Any], stage: str) -> None:
+def capture(metadata: dict[str, Any], stage: str, *, allow_stop_error: bool = False) -> None:
     """Retain state and the transcript named by this day's own hook events."""
     out, workspace = Path(metadata['out']), Path(metadata['workspace'])
     events = records(out / 'hooks.jsonl')
-    if not events or any(e['error'] is not None for e in events):
+    if not events or any(e['error'] is not None and not (allow_stop_error and e['event'] == 'Stop') for e in events):
         raise ValueError('missing or failed hooks')
     transcript = Path(next(e['input']['transcript_path'] for e in events
                            if e['input'].get('transcript_path')))
