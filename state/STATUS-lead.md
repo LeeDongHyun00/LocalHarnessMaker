@@ -1,5 +1,9 @@
 ## Done
 
+- Wrote D-5 install-through-demo README, architecture and recorded-demo guide from code and committed evidence, including explicit evidence limits, deadlines/shutdown, evaluation boundaries and a pending fresh-clone host checklist (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 4.22s; `git diff --check -- README.md docs/architecture.md docs/demo.md state/STATUS-lead.md`: exit 0, no output).
+- Rechecked all five committed demonstrations offline: single-session approval/real verification/handoff; new-session context without user restatement; exhaustion remaining-work injection; and no stale context after injected generation/validation failures (`.venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real`: overall=pass, approval_gate=true, real_task_verified=true, synthetic=false, attempts=1, reinstructions=0; `.venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session`: overall=pass, saved_handoff_validated/session_start_injected/context_visible/new_session/approval_gates=true, user_restatement_needed=false; `.venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out plugin/evidence/2026-10-23-exhaustion`: overall=pass, remaining_injected=true, stale_injected=false; matching generation and validation checker commands: both overall=pass, remaining_injected=false, stale_injected=false).
+- Closed the version-registry publication follow-up: 0.163.0-alpha.11.1 is in plugin/VERIFIED_VERSIONS.json at commit 53cb8a9, alongside the original 0.162 history; no registry edit or live probe was performed here (`git show 53cb8a9:plugin/VERIFIED_VERSIONS.json`: entries for codex-cli 0.162.0-alpha.17.2 and codex-cli 0.163.0-alpha.11.1 with evidence directories).
+
 - Published user-approved decision 0007 dated 2026-10-23 and aligned plan, controller/eval prompts and AGENTS.md wording: local Gemma/QLoRA dropped, parity not measured, C user-filled on 20 stratified tasks paired with harness, B single-session only, approved W1–W3 schedule and cap-only executor API-key fallback; no interface or eval changes (`.venv/bin/python -m pytest tests/lead -q`: 96 passed in 9.16s; `git diff --check -- AGENTS.md docs/decisions/0007-scope-cuts.md docs/plan.md prompts/03-controller-engineer.md prompts/05-eval-engineer.md state/STATUS-lead.md`: exit 0, no output).
 - Recorded integration review 1 as written by Claude on 2026-10-23 in docs/weekly/2026-10-27.md; its lead inventory confirms D-3 was done earlier and decision 0006 was already published; host results are attributed, not rerun here (`rg -n 'Prepared by Claude|1 Lead' docs/weekly/2026-10-27.md`: lines 3 and 11 identify author/date and completed deliverables).
 
@@ -19,20 +23,23 @@
 
 ## Remaining
 
-- Follow up decision 0006 with owning roles: integration review 1 reports the 0.163 hook probe and valid two-session smoke completed on the host; Role 2 still needs to publish 0.163 in VERIFIED_VERSIONS.json. Track version recording/history and mid-run detection through owning-role evidence. No host verification was rerun here.
+- Pending Claude host acceptance for D-5/SC-4: execute the fresh-clone checklist in docs/demo.md (clone, venv, disposable installation/--check, committed offline evidence checkers, schema validation, full suite and a fresh typed-approval real demo); retain log/commit/version and all skip/xfail reasons. Documentation and existing-capture audits are complete; fresh-clone acceptance is not done.
+- Track decision 0006 run/session version recording, one-task audit smoke and mid-run detection through owning-role evidence. Registry publication is complete at 53cb8a9; registry membership alone does not prove all runtime version-policy behavior.
 
 - D-4: integration review 1 was written early by Claude on 2026-10-23 in docs/weekly/2026-10-27.md; refresh on 10/27 if needed, then review on 11/03 and 11/10. Monitor interface blockers for the two-day limit and reconcile historical runtime pending items below with attributed host evidence. Keep this session away from docs/weekly/ and the running eval/.
-- Owning roles must implement and demonstrate version 1 runtime behavior: controller judge/handoff and shared-budget routing, all-hook HARNESS_NESTED bypass, verifier judgment delegation, and schema-valid evaluation report production. Shared contract publication is complete; runtime completion is not claimed.
-- Review production handoff-save point, nullable transcript handling, other SessionStart sources, persisted trust and retry/approval behavior with Role 2. Startup probe evidence does not establish these remaining behaviors.
-- D-5, by 2026-11-13: update README.md for verified installation/demo, write docs/architecture.md and docs/demo.md, and verify the two-session demo in a fresh clone with retained evidence.
+- Owning-role integration follow-up: code now contains controller judge/handoff and shared-budget routing, hook nested guards and verifier delegation; the recorded demos establish only their exercised paths. Review remaining host integration/accounting evidence separately; do not infer complete evaluation validity from these demonstrations.
+- Review persisted trust, nullable transcript/other SessionStart paths and terminal-closure/nested descendant shutdown with owning roles. Pass, exhaustion and injected generation/validation handoff paths now have committed demo evidence; the controller uses bounded subprocess.run without its own process-group cleanup owner.
 - D-6, by 2026-11-15: write docs/slides/ and docs/qa.md with all four required questions.
 - Pending host verification: opt-in real Codex integration, nested codex exec/live model calls, and six macOS Seatbelt tests cannot run in this noninteractive sandbox. Two external private-grader fixture tests also await trusted grader configuration. The full run skipped nine tests total; legacy top-level suites and remote CI were not run.
 - Role 5 expected failure: tests/eval/test_runner.py::test_stop_e1_partial_report_is_invalid_with_counts reports that aggregate-only halt invalidity would require a frozen-schema revision. Recorded only; no schema or eval change was made by this lead session.
 
 ## Decisions
 
+- Use the current user scope for D-5: edit only README.md, docs/architecture.md, docs/demo.md and this STATUS; do not stage/commit, run foreign tests, call models or disturb the host evaluation.
+- Distinguish committed host captures, offline rechecks and pending fresh-clone acceptance: passing saved-evidence audits are not a new live run or persisted-trust/shutdown proof.
+
 - Adopt decision 0007, approved 2026-10-23, superseding the historical local-stage and optional-training decisions below: complete all remaining approved work before the local LLM stage; usage limits are no longer a concern, while executor API billing remains a cap-block fallback only.
-- Apply the current session's documentation-only scope: update decision 0007, plan, prompts 03/05, the planned-local wording in AGENTS.md and lead STATUS; leave the host evaluation and all runtime/interfaces unchanged.
+- Historical decision-0007 session scope: update decision 0007, plan, prompts 03/05, the planned-local wording in AGENTS.md and lead STATUS; leave the host evaluation and all runtime/interfaces unchanged.
 
 - Adopt user-approved decision 0006 dated 2026-10-22: versions may change without holding or rollback; record run/session versions, compare same-version reports only, require a fresh hook probe and one-task audit smoke after changes, stop on mid-run changes and retain verified-version evidence.
 - Limit this continuation to decision 0006, AGENTS.md section 3.3, conflicting version-policy wording in the hook contract/plugin prompt/plan and this STATUS: the user explicitly authorized these owned paths without any interface change.
@@ -50,6 +57,15 @@
 - Retain the historical analyzer timing disagreement: decision 0007 resolves the QLoRA disagreement by dropping training and supersedes conflicting measurement dates with the approved W1–W3 windows.
 
 ## Verify commands
+
+- .venv/bin/python -m pytest tests/lead -q
+- git diff --check -- README.md docs/architecture.md docs/demo.md state/STATUS-lead.md
+- .venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real
+- .venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session
+- .venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out plugin/evidence/2026-10-23-exhaustion
+- .venv/bin/python -m plugin.handoff_failure_demo check --scenario generation --out plugin/evidence/2026-10-23-generation
+- .venv/bin/python -m plugin.handoff_failure_demo check --scenario validation --out plugin/evidence/2026-10-23-validation
+- git show 53cb8a9:plugin/VERIFIED_VERSIONS.json
 
 - git diff --check -- AGENTS.md docs/decisions/0007-scope-cuts.md docs/plan.md prompts/03-controller-engineer.md prompts/05-eval-engineer.md state/STATUS-lead.md
 - rg -n 'Prepared by Claude|1 Lead' docs/weekly/2026-10-27.md
@@ -70,12 +86,15 @@
 ## Do not touch
 
 - Version 1 interfaces without new user approval, a decision record and a version increment.
-- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation authorizes only decision 0007, plan, prompts 03/05, planned-local wording in AGENTS.md and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
+- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. This continuation edits only README.md, docs/architecture.md, docs/demo.md and lead STATUS; do not edit CLAUDE.md, docs/weekly/ or docs/handoff/.
 - Existing harness/, experiments/, scripts/, legacy tests and unrelated user edits.
 - No git add -A, broad staging, foreign-path commit, deletion, history rewrite, hook registration or external configuration change.
 - Keep the canonical hook contract and captured evidence; never replace measured evidence with a placeholder or claim production behavior from startup probes.
 
 ## Assumptions
+
+- No new product or interface assumption: this session documents current code and committed evidence only. Fresh-clone and live acceptance are assigned to Claude on the host after the active evaluation finishes; no result is inferred in advance.
+- No PR was requested; these decisions, assumptions and documented verification results are the change summary for a future PR description. The commit plan contains only the four documentation/status paths edited here.
 
 - No additional scope assumption: decision 0007 approval and the usage-limit clarification are explicit user instructions dated 2026-10-23. Integration review 1 is attributed Claude host evidence; this offline documentation session does not independently verify its measurements.
 
