@@ -1,0 +1,1099 @@
+{
+  "status": "valid",
+  "invalid_matched_tasks": [],
+  "matched_task_ids": [
+    "bug-chunk-tail",
+    "bug-fix-adjacent-runs",
+    "bug-fix-balanced-brackets",
+    "bug-fix-clamp-values",
+    "bug-fix-common-prefix",
+    "bug-fix-flatten-once",
+    "bug-fix-inclusive-range",
+    "bug-fix-interleave",
+    "bug-fix-interval-union",
+    "bug-fix-invert-groups",
+    "bug-fix-last-index",
+    "bug-fix-line-endings",
+    "bug-fix-merge-counts",
+    "bug-fix-pairwise-edges",
+    "bug-fix-parse-pairs",
+    "bug-fix-partition-sign",
+    "bug-fix-prefix-sums",
+    "bug-fix-rotate-left",
+    "bug-fix-round-robin",
+    "bug-fix-select-columns",
+    "bug-fix-stable-unique",
+    "bug-fix-strip-prefix",
+    "bug-fix-unique-permutations",
+    "bug-fix-window-slices",
+    "bug-fix-word-counts",
+    "constrained-refactoring-adjacent-runs",
+    "constrained-refactoring-balanced-brackets",
+    "constrained-refactoring-clamp-values",
+    "constrained-refactoring-common-prefix",
+    "constrained-refactoring-flatten-once",
+    "constrained-refactoring-inclusive-range",
+    "constrained-refactoring-interleave",
+    "constrained-refactoring-interval-union",
+    "constrained-refactoring-invert-groups",
+    "constrained-refactoring-last-index",
+    "constrained-refactoring-line-endings",
+    "constrained-refactoring-merge-counts",
+    "constrained-refactoring-ordinal-labels",
+    "constrained-refactoring-pairwise-edges",
+    "constrained-refactoring-parse-pairs",
+    "constrained-refactoring-partition-sign",
+    "constrained-refactoring-prefix-sums",
+    "constrained-refactoring-rotate-left",
+    "constrained-refactoring-round-robin",
+    "constrained-refactoring-select-columns",
+    "constrained-refactoring-stable-unique",
+    "constrained-refactoring-strip-prefix",
+    "constrained-refactoring-unique-permutations",
+    "constrained-refactoring-window-slices",
+    "constrained-refactoring-word-counts",
+    "feature-plus-test-adjacent-runs",
+    "feature-plus-test-balanced-brackets",
+    "feature-plus-test-clamp-values",
+    "feature-plus-test-common-prefix",
+    "feature-plus-test-flatten-once",
+    "feature-plus-test-inclusive-range",
+    "feature-plus-test-interleave",
+    "feature-plus-test-interval-union",
+    "feature-plus-test-invert-groups",
+    "feature-plus-test-last-index",
+    "feature-plus-test-line-endings",
+    "feature-plus-test-merge-counts",
+    "feature-plus-test-ordinal-labels",
+    "feature-plus-test-pairwise-edges",
+    "feature-plus-test-parse-pairs",
+    "feature-plus-test-partition-sign",
+    "feature-plus-test-prefix-sums",
+    "feature-plus-test-rotate-left",
+    "feature-plus-test-round-robin",
+    "feature-plus-test-select-columns",
+    "feature-plus-test-stable-unique",
+    "feature-plus-test-strip-prefix",
+    "feature-plus-test-unique-permutations",
+    "feature-plus-test-window-slices",
+    "feature-plus-test-word-counts",
+    "multiple-requirements-adjacent-runs",
+    "multiple-requirements-balanced-brackets",
+    "multiple-requirements-clamp-values",
+    "multiple-requirements-common-prefix",
+    "multiple-requirements-flatten-once",
+    "multiple-requirements-inclusive-range",
+    "multiple-requirements-interleave",
+    "multiple-requirements-interval-union",
+    "multiple-requirements-invert-groups",
+    "multiple-requirements-last-index",
+    "multiple-requirements-line-endings",
+    "multiple-requirements-merge-counts",
+    "multiple-requirements-ordinal-labels",
+    "multiple-requirements-pairwise-edges",
+    "multiple-requirements-parse-pairs",
+    "multiple-requirements-partition-sign",
+    "multiple-requirements-prefix-sums",
+    "multiple-requirements-rotate-left",
+    "multiple-requirements-round-robin",
+    "multiple-requirements-select-columns",
+    "multiple-requirements-stable-unique",
+    "multiple-requirements-strip-prefix",
+    "multiple-requirements-unique-permutations",
+    "multiple-requirements-window-slices",
+    "multiple-requirements-word-counts",
+    "two-session-adjacent-runs",
+    "two-session-balanced-brackets",
+    "two-session-clamp-values",
+    "two-session-common-prefix",
+    "two-session-flatten-once",
+    "two-session-inclusive-range",
+    "two-session-interleave",
+    "two-session-interval-union",
+    "two-session-invert-groups",
+    "two-session-last-index",
+    "two-session-line-endings",
+    "two-session-merge-counts",
+    "two-session-pairwise-edges",
+    "two-session-partition-sign",
+    "two-session-prefix-sums",
+    "two-session-rotate-left",
+    "two-session-stable-unique",
+    "two-session-strip-prefix",
+    "two-session-window-slices",
+    "two-session-word-counts"
+  ],
+  "excluded_left": [],
+  "excluded_right": [],
+  "direction": "left minus right; ratio left / right",
+  "pricing_note": "Historical costs are retained; additional tier snapshots do not reprice old calls.",
+  "cost_scope": "Tasks valid in both reports only; diagnostic if any matched task is invalid.",
+  "confidence": {
+    "seed": 0,
+    "resamples": 10000,
+    "level": 0.95,
+    "method": "task_cluster_percentile_bootstrap"
+  },
+  "overall": {
+    "left": {
+      "pass_rate": {
+        "value": 0.9916666666666667,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.975,
+          "upper": 1.0,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "cost_per_pass": {
+        "value": 0.04348512756302521,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.03955353967584034,
+          "upper": 0.04780943379943503,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "avg_attempts": {
+        "value": 1.225,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 1.1416666666666666,
+          "upper": 1.3166666666666667,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "task_false_done_rate": {
+        "value": 0.0,
+        "sample_size": 20,
+        "sample_unit": "claimed_complete_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.0,
+          "upper": 0.0,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "task_false_done_counts": {
+        "numerator": 0,
+        "denominator": 20,
+        "excluded_task_ids": [],
+        "exclusions": {},
+        "undefined_outcomes": {}
+      },
+      "handoff_success": {
+        "value": 0.95,
+        "sample_size": 20,
+        "sample_unit": "matched_valid_two_session_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.85,
+          "upper": 1.0,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      }
+    },
+    "right": {
+      "pass_rate": {
+        "value": 0.975,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.9416666666666667,
+          "upper": 1.0,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "cost_per_pass": {
+        "value": 0.03290155555555556,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.029836920584033613,
+          "upper": 0.03628186197186295,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "avg_attempts": {
+        "value": 1.1666666666666667,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 1.1,
+          "upper": 1.2333333333333334,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "task_false_done_rate": {
+        "value": 0.045454545454545456,
+        "sample_size": 22,
+        "sample_unit": "claimed_complete_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.0,
+          "upper": 0.15,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "task_false_done_counts": {
+        "numerator": 1,
+        "denominator": 22,
+        "excluded_task_ids": [],
+        "exclusions": {},
+        "undefined_outcomes": {}
+      },
+      "handoff_success": {
+        "value": 0.85,
+        "sample_size": 20,
+        "sample_unit": "matched_valid_two_session_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.7,
+          "upper": 1.0,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      }
+    },
+    "paired": {
+      "pass_rate_difference": {
+        "value": 0.01666666666666672,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": -0.016666666666666607,
+          "upper": 0.050000000000000044,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "cost_per_pass_difference": {
+        "value": 0.01058357200746965,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 0.008565470030294486,
+          "upper": 0.01268534114406779,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "cost_per_pass_ratio": {
+        "value": 1.3216739095997718,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": 1.2563236349922735,
+          "upper": 1.3875272524183764,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      },
+      "task_false_done_rate_difference": {
+        "value": -0.045454545454545456,
+        "sample_size": 120,
+        "sample_unit": "matched_valid_task",
+        "ci95": {
+          "level": 0.95,
+          "lower": -0.15,
+          "upper": 0.0,
+          "method": "task_cluster_percentile_bootstrap"
+        },
+        "undefined_reason": null
+      }
+    }
+  },
+  "by_task_type": {
+    "bug_fix": {
+      "left": {
+        "pass_rate": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.030383191200000003,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.028085964799999998,
+            "upper": 0.03311597706,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "No claimed-complete tasks with final evidence."
+        },
+        "task_false_done_counts": {
+          "numerator": 0,
+          "denominator": 0,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      },
+      "right": {
+        "pass_rate": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.022229248,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.020920168000000003,
+            "upper": 0.023646428,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "No claimed-complete tasks with final evidence."
+        },
+        "task_false_done_counts": {
+          "numerator": 0,
+          "denominator": 0,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      },
+      "paired": {
+        "pass_rate_difference": {
+          "value": 0.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.0,
+            "upper": 0.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_difference": {
+          "value": 0.008153943200000003,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.005347547840000001,
+            "upper": 0.01117970832,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_ratio": {
+          "value": 1.366811472884733,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.2308326193938341,
+            "upper": 1.5204901322975972,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate_difference": {
+          "value": null,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      }
+    },
+    "constrained_refactoring": {
+      "left": {
+        "pass_rate": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.038575583999999996,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.03602975588,
+            "upper": 0.041759817240000004,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.04,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.12,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "No claimed-complete tasks with final evidence."
+        },
+        "task_false_done_counts": {
+          "numerator": 0,
+          "denominator": 0,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      },
+      "right": {
+        "pass_rate": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.027153728,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.0257588724,
+            "upper": 0.0286226876,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "No claimed-complete tasks with final evidence."
+        },
+        "task_false_done_counts": {
+          "numerator": 0,
+          "denominator": 0,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      },
+      "paired": {
+        "pass_rate_difference": {
+          "value": 0.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.0,
+            "upper": 0.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_difference": {
+          "value": 0.011421855999999998,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.008218799079999999,
+            "upper": 0.015017003539999999,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_ratio": {
+          "value": 1.4206367538188494,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.2920820436004505,
+            "upper": 1.566625176864147,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate_difference": {
+          "value": null,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      }
+    },
+    "feature_plus_test": {
+      "left": {
+        "pass_rate": {
+          "value": 0.9777777777777777,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.9333333333333333,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.05802351636363636,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.04919943352222222,
+            "upper": 0.06794518131602066,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.488888888888889,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.3333333333333333,
+            "upper": 1.6666666666666667,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": 0.0,
+          "sample_size": 20,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.0,
+            "upper": 0.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_counts": {
+          "numerator": 0,
+          "denominator": 20,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": 0.95,
+          "sample_size": 20,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.85,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        }
+      },
+      "right": {
+        "pass_rate": {
+          "value": 0.9333333333333333,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.8444444444444444,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.04638291428571428,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.03913222568181818,
+            "upper": 0.05514482353205127,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.4444444444444444,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.3111111111111111,
+            "upper": 1.6,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": 0.045454545454545456,
+          "sample_size": 22,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.0,
+            "upper": 0.15,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_counts": {
+          "numerator": 1,
+          "denominator": 22,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": 0.85,
+          "sample_size": 20,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.7,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        }
+      },
+      "paired": {
+        "pass_rate_difference": {
+          "value": 0.0444444444444444,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": -0.0444444444444444,
+            "upper": 0.1333333333333333,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_difference": {
+          "value": 0.011640602077922078,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.006565705634971333,
+            "upper": 0.01702165768604651,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_ratio": {
+          "value": 1.2509674576767016,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.1305313311632863,
+            "upper": 1.3682857857060573,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate_difference": {
+          "value": -0.045454545454545456,
+          "sample_size": 45,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": -0.15,
+            "upper": 0.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        }
+      }
+    },
+    "multiple_requirements": {
+      "left": {
+        "pass_rate": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.035909043200000004,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.03184889332,
+            "upper": 0.04096855866,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.16,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.36,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "No claimed-complete tasks with final evidence."
+        },
+        "task_false_done_counts": {
+          "numerator": 0,
+          "denominator": 0,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      },
+      "right": {
+        "pass_rate": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass": {
+          "value": 0.026673008,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.0255277724,
+            "upper": 0.027799705200000004,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "avg_attempts": {
+          "value": 1.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.0,
+            "upper": 1.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "claimed_complete_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "No claimed-complete tasks with final evidence."
+        },
+        "task_false_done_counts": {
+          "numerator": 0,
+          "denominator": 0,
+          "excluded_task_ids": [],
+          "exclusions": {},
+          "undefined_outcomes": {}
+        },
+        "handoff_success": {
+          "value": null,
+          "sample_size": 0,
+          "sample_unit": "matched_valid_two_session_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      },
+      "paired": {
+        "pass_rate_difference": {
+          "value": 0.0,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.0,
+            "upper": 0.0,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_difference": {
+          "value": 0.009236035200000003,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 0.005077671339999998,
+            "upper": 0.0143443381,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "cost_per_pass_ratio": {
+          "value": 1.3462689772372132,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": 1.1883791714308651,
+            "upper": 1.5433696291893688,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": null
+        },
+        "task_false_done_rate_difference": {
+          "value": null,
+          "sample_size": 25,
+          "sample_unit": "matched_valid_task",
+          "ci95": {
+            "level": 0.95,
+            "lower": null,
+            "upper": null,
+            "method": "task_cluster_percentile_bootstrap"
+          },
+          "undefined_reason": "Zero denominator or missing accounting."
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "path": "eval/reports/full-harness-final3/report.json",
+      "sha256": "6d3216f0bd1f47650f847024ce648ef5bd8938ded1630aff58bd5bb3d2f404ae"
+    },
+    {
+      "path": "eval/reports/full-a-final3/report.json",
+      "sha256": "4eb0e78dc067f0460d08bad3b18dd68768be935c7539eb65ce7b5be1cc064647"
+    }
+  ]
+}
