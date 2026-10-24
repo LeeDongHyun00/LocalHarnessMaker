@@ -18,7 +18,7 @@ from typing import Any
 from eval.runner import core
 from eval.runner.audit import PrivateGraders, digest, normalize_line, public_inputs
 from eval.runner.process import run_process
-from eval.runner.mutations import mutations
+from eval.runner.mutations import Mutation, mutations
 
 
 def apply_reference(reference: Path, workspace: Path) -> None:
@@ -41,7 +41,8 @@ def apply_reference(reference: Path, workspace: Path) -> None:
 
 def public_task(task_id: str) -> Path:
     """Locate globally unique versioned IDs without adding CLI flags."""
-    root = "eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks"
+    root = ("eval/tasks-v3" if task_id.startswith("v3-") else
+            "eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks")
     public = core.task_directory({"task_root": root}) / task_id
     if Path(task_id).name != task_id or not public.is_dir() or public.is_symlink():
         raise ValueError("Unknown task")
@@ -75,10 +76,13 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
                 apply_reference(private.root / '.references' / task_id, workspace)
             result = core.grade(workspace, private, runtime, runtime / f'{label}.log',
                                 expected, 30, run_process, retention_root=runtime / "grading-copies")
-            if label == 'reference' and task_id.startswith('v2-'):
+            if label == 'reference' and task_id.startswith(('v2-', 'v3-')):
                 coverage = json.loads((private.root / task_id / 'coverage.json').read_text())
-                requirements = set(re.findall(r"(?m)^([RD][0-9]+)\.", (public / 'prompt.md').read_text() +
-                    ((public / 'day2.md').read_text() if (public / 'day2.md').exists() else '')))
+                pattern = r"(?m)^([A-Z][A-Z0-9_-]*[0-9])\." if task_id.startswith("v3-") else r"(?m)^([RD][0-9]+)\."
+                specification = (public / 'prompt.md').read_text()
+                if (public / 'day2.md').is_file():
+                    specification += '\n' + (public / 'day2.md').read_text()
+                requirements = set(re.findall(pattern, specification))
                 observed = (runtime / 'reference.log').read_text()
                 covered = {key for key, tests in coverage.items() if isinstance(tests, list) and tests and
                            all(isinstance(test, str) and test + ')' in observed for test in tests)}
@@ -91,7 +95,8 @@ def validate_task(private_root: Path, task_id: str) -> dict[str, Any]:
              and baseline.get('total_tests') == expected['expected_test_count']
              and reference['result'] == 'pass' and reference['failed_tests'] == 0
              and reference.get('coverage', {}).get('uncovered_requirement_count', 0) == 0
-             and (not task_id.startswith('v2-') or overlap['shared_assertion_line_count'] == 0))
+             and (not task_id.startswith('v3-') or reference.get('coverage', {}).get('requirement_count', 0) > 0)
+             and (not task_id.startswith(('v2-', 'v3-')) or overlap['shared_assertion_line_count'] == 0))
     return {'task_id': task_id, 'public_passed': baseline['passed_tests'],
             'public_failed': baseline['failed_tests'], 'reference_passed': reference['passed_tests'],
             'reference_failed': reference['failed_tests'], 'valid_count': int(valid),
@@ -139,7 +144,13 @@ def public_overlap(private: PrivateGraders, public: Path) -> dict[str, int]:
     Counts include occurrences across grader files; assertion spans include
     multiline assert statements and unittest assert* calls, including helpers.
     """
-    public_lines = {normalize_line(line) for text in public_inputs(public) for line in text.splitlines()}
+    inputs = public_inputs(public)
+    if public.name.startswith('v3-'):
+        inputs = [text for root in ('tasks', 'tasks-v2', 'tasks-v3')
+                  for task in ((core.REPOSITORY / 'eval' / root).iterdir()
+                               if (core.REPOSITORY / 'eval' / root).is_dir() else ())
+                  if task.is_dir() for text in public_inputs(task)]
+    public_lines = {normalize_line(line) for text in inputs for line in text.splitlines()}
     shared = shared_assertions = 0
     for source in private.files:
         text = source.read_text()
@@ -162,13 +173,19 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
     private = PrivateGraders.load(private_root, task_id, core.REPOSITORY)
     public = public_task(task_id)
     reference = private.root / '.references' / task_id
-    if task_id.startswith('v2-') and public_overlap(private, public)['shared_assertion_line_count']:
-        raise ValueError('V2 grader assertions must be independent of public lines')
+    if task_id.startswith(('v2-', 'v3-')) and public_overlap(private, public)['shared_assertion_line_count']:
+        raise ValueError('Versioned grader assertions must be independent of public lines')
     files = json.loads((reference / 'application.json').read_text())['files']
     expected = json.loads((public / 'expected.json').read_text())
     specification_bytes = (public / 'prompt.md').read_bytes() + (public / 'expected.json').read_bytes()
-    if task_id.startswith('v2-') and (public / 'day2.md').is_file():
+    if task_id.startswith(('v2-', 'v3-')) and (public / 'day2.md').is_file():
         specification_bytes += (public / 'day2.md').read_bytes()
+    if task_id.startswith('v3-'):
+        specification_bytes = json.dumps([
+            (path.relative_to(public).as_posix(), digest(path.read_bytes()))
+            for path in sorted(public.rglob('*')) if path.is_file()
+            and not {'__pycache__', '.pytest_cache'} & set(path.parts)
+        ], sort_keys=True).encode() + b''.join(path.read_bytes() for path in private.files)
     specification = digest(specification_bytes)
     records = private.root / '.mutation-records'
     records.mkdir(mode=0o700, exist_ok=True)
@@ -194,6 +211,25 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
                 original = (reference / source).read_text()
                 candidates.extend((target, digest(original.encode()), mutation)
                                   for mutation in mutations(original))
+        v3 = task_id.startswith('v3-')
+        generated = len(candidates)
+        if v3:
+            targeted_root = private.root / '.mutants' / task_id
+            manifest = targeted_root / 'manifest.json'
+            if manifest.exists():
+                for item in json.loads(manifest.read_text())['mutations']:
+                    target, source = item['target'], targeted_root / item['source']
+                    if (targeted_root.is_symlink() or targeted_root.parent.is_symlink()
+                            or not targeted_root.resolve().is_relative_to(private.root.resolve())
+                            or Path(item['source']).is_absolute() or target not in files.values() or source.is_symlink() or not source.is_file()
+                            or not source.resolve().is_relative_to(targeted_root.resolve())):
+                        raise ValueError('Unsafe targeted mutation')
+                    original = next(reference / key for key, value in files.items() if value == target)
+                    candidates.append((target, digest(original.read_bytes()),
+                                       Mutation(source.read_text(), 'targeted', 0, '', '')))
+        if v3:
+            counts.update(generated=generated, executed=0, unexecuted=max(0, len(candidates) - limit),
+                          error_count=0, targeted=len(candidates) - generated)
         for number, (target, original_hash, mutation) in enumerate(candidates[:limit]):
             workspace = runtime / str(number)
             shutil.copytree(public / 'workspace', workspace,
@@ -205,10 +241,20 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
             identity = digest((target + overlay_hash + mutation.sha256 + specification).encode())
             record = equivalences.get(identity, {})
             equivalent = isinstance(record, dict) and isinstance(record.get('reason'), str) and bool(record['reason'].strip())
-            # Nontermination violates the same behavior as a failed assertion.
+            if v3:
+                equivalent = equivalent and isinstance(record.get('reviewer'), str) and bool(record['reviewer'].strip())
+            # Historical validation counts timeouts as kills; v3 leaves them unresolved below.
             killed = bool(result.get('timed_out')) or (result['result'] == 'fail' and result['failed_tests'] > 0)
             outcome = 'killed' if killed else 'recorded_equivalent' if equivalent and result['result'] == 'pass' else 'survived'
-            counts[outcome] += 1
+            if v3:
+                resolved = (not result.get('timed_out') and result.get('total_tests') == expected['expected_test_count']
+                            and result['result'] in {'pass', 'fail'})
+                counts['executed'] += int(resolved)
+                counts['error_count'] += int(not resolved)
+                if not resolved:
+                    outcome = 'unresolved'
+            if outcome != 'unresolved':
+                counts[outcome] += 1
             reviews.append({'id': identity, 'target': target, 'reference_sha256': original_hash,
                             'mutant_sha256': mutation.sha256, 'specification_sha256': specification,
                             'kind': mutation.kind, 'line': mutation.line, 'before': mutation.before,
@@ -218,8 +264,8 @@ def mutate_task(private_root: Path, task_id: str, limit: int) -> dict[str, Any]:
 
 
 def validation_digest(private_by_task: dict[str, PrivateGraders], config: dict[str, Any]) -> str:
-    """Hash unfrozen v2 candidates offline; execution still requires tracked inputs."""
-    if config.get('task_root') != 'eval/tasks-v2':
+    """Hash unfrozen versioned candidates offline; execution still requires tracked inputs."""
+    if config.get('task_root') not in {'eval/tasks-v2', 'eval/tasks-v3'}:
         return core.configured_digest(private_by_task, config)
     hashes = {}
     for task, private in private_by_task.items():
@@ -255,7 +301,12 @@ def main() -> int:
         with ThreadPoolExecutor(max_workers=4) as pool:
             for row in pool.map(measure, tasks):
                 denominator = row['killed'] + row['survived']
-                accepted &= not row.get('error_count') and denominator > 0 and row['killed'] / denominator >= 0.90
+                if row['task_id'].startswith('v3-'):
+                    accepted &= (not row.get('error_count') and not row.get('unexecuted')
+                                 and row.get('generated', 0) > 0 and row.get('targeted', 0) > 0
+                                 and row['survived'] == 0)
+                else:
+                    accepted &= not row.get('error_count') and denominator > 0 and row['killed'] / denominator >= 0.90
                 print(json.dumps(row, sort_keys=True), flush=True)
         return 0 if accepted else 1
     valid = corpus_warnings = corpus_shared = 0

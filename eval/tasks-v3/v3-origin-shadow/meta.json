@@ -1,0 +1,10 @@
+{
+  "id": "v3-origin-shadow",
+  "type": "bug_fix",
+  "domain": "configuration",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

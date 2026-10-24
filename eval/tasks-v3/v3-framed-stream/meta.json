@@ -1,0 +1,10 @@
+{
+  "id": "v3-framed-stream",
+  "type": "bug_fix",
+  "domain": "text_protocol",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

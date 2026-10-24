@@ -1,7 +1,10 @@
 # Version 3 task design — 2026-10-25
 
-Design only: no task inputs, graders, references, author notes or freeze digest
-exist for this population yet. The user-approved
+Construction checkpoint: nine `bug_fix` candidates are authored and remain
+unfrozen; the other 45 tasks are pending. See [validation](VALIDATION.md) and
+[structure comparison](STRUCTURE-REVIEW.md). The 54-task design below is retained.
+The user approved interface v3 on 2026-10-25 and separately authorized candidate
+authoring; task freeze still requires host validation. The user-approved
 [v3 direction](../../docs/handoff/2026-10-25-v3-direction.md), especially sections
 3 and 5, supersedes the old Role 5 A/B/contract-harness plan for this work.
 The [host findings](../../docs/weekly/2026-10-21-host-verification.md) dated
@@ -41,7 +44,8 @@ task with renamed entities, redesign one before calibration.
 ## Task inventory
 
 The structures and evidence below define distinct authoring targets. Concrete
-fixtures and all oracle values will be written later and kept out of this file.
+fixtures and oracle values belong to the task inputs or trusted storage and are
+kept out of this inventory.
 
 ### bug_fix
 
@@ -222,8 +226,8 @@ If full A misses 60–85%, disclose the miss without replacing easy tasks.
 
 ## Grader acceptance rules
 
-Construction and validation are future host work; no private root is needed
-for this design. For every task require: reference passes all checks; untouched
+Offline construction and validation are authorized for the current candidates;
+independent host review and freeze remain separate work. For every task require: reference passes all checks; untouched
 starter fails at least one substantive requirement; every requirement has
 executed hidden coverage, including tests, constraints and day-1/day-2 carryover.
 Feature-test deliverables must run and expose a relevant regression: merely
@@ -322,7 +326,8 @@ quality loss. No claim is measured in this session.
 ## Assumptions
 
 - 54 tasks, balanced shapes and the 20-task sampling allocation are design
-  choices within the approved range; they are not constructed or validated yet.
+  choices within the approved range; only the nine bug-fix candidates have been
+  constructed in this checkpoint. The complete population remains pending.
 - The plugin contract in AGENTS.md will define exact artifact paths and schemas.
   Question-only pause/resume, hook provenance and report revision binding must
   be confirmed before implementation; no shared interface is changed here.

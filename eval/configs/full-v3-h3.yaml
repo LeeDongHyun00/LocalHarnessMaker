@@ -1,9 +1,8 @@
 {
   "template_status": "draft_not_approved",
-  "warning": "Design template only. The current runner has no plugin mode; harness=true currently selects the legacy loop. Do not unwrap/run this template. Obtain STOP-3 approval after implementation and freeze.",
+  "warning": "Partial unfrozen candidate inventory; not approved for execution. Current runner has no H3 plugin mode. Complete all 54 tasks, validate on the host, freeze, pin runtime and obtain STOP-3 approval before running.",
   "design_reference": "eval/tasks-v3/DESIGN.md",
   "estimate_reference": "eval/reports/full-v3-h3-estimate.md",
-  "tasks_placeholder": "Insert the same complete ordered frozen 54-task v3 manifest in A and H3; no tasks exist yet.",
   "run_config": {
     "name": "full-v3-h3",
     "task_root": "eval/tasks-v3",
@@ -16,7 +15,17 @@
     "retry_limit": 0,
     "seed": 0,
     "codex_version": "PIN_AFTER_V3_HOOK_COMPATIBILITY_PROBE",
-    "tasks": null,
+    "tasks": [
+      "v3-cancelled-deadline",
+      "v3-cycle-witness",
+      "v3-framed-stream",
+      "v3-histogram-merge",
+      "v3-incremental-fanout",
+      "v3-origin-shadow",
+      "v3-quoted-record",
+      "v3-savepoint-unwind",
+      "v3-wide-column"
+    ],
     "timeout_seconds": 900,
     "grading_timeout_seconds": 30,
     "calibration": false
@@ -40,11 +49,24 @@
     "clarification_resumes_per_ambiguous_task": 1,
     "clarification_responder": "frozen_author_note_only_after_eligible_hook_question",
     "day2_delivery": "plugin_SessionStart_ledger_injection_no_runner_memory",
-    "task_count": 54,
-    "two_session_tasks": 9,
-    "required_sessions": 63,
+    "task_count": 9,
+    "two_session_tasks": 0,
+    "required_sessions": 9,
     "pricing_snapshot": "openai-fast-short-2026-10-23-v1",
     "pricing_snapshot_sha256": "PIN_EXISTING_SNAPSHOT_BYTES_BEFORE_RUN",
     "population_sha256": "PIN_AFTER_PUBLIC_PRIVATE_AND_AUTHOR_NOTE_FREEZE"
+  },
+  "construction_status": {
+    "complete_shapes": [
+      "bug_fix"
+    ],
+    "candidate_task_count": 9,
+    "remaining_task_count": 45,
+    "planned_task_count": 54,
+    "planned_two_session_task_count": 9,
+    "planned_session_count": 63,
+    "frozen": false,
+    "independent_host_validation": "pending",
+    "calibration": "pending_disjoint_material_and_approved_host_pilot"
   }
 }

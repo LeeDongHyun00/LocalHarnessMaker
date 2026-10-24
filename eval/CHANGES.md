@@ -1,3 +1,48 @@
+# Version 3 bug-fix construction — 2026-10-25
+
+Author and offline-validate all nine `bug_fix` candidates. Each includes its own
+public API, implementation structure, prompt, smoke test, metadata and grading
+command descriptor; three retain separate reusable module boundaries. Metadata
+stays `frozen=false`. Private references, graders, derivation/coverage maps,
+mutants and hash-bound equivalence reviews remain outside the repository.
+
+Extend existing offline grader tooling for v3 task discovery, requirement
+namespaces, coverage and candidate hashing. Reject shared assertion lines across
+all public task versions. V3 mutation acceptance requires the complete generated
+plus targeted population, zero survivors/errors/unexecuted mutants and explicit
+reviewed equivalences; timeouts remain unresolved. Preserve historical acceptance,
+report schema and existing flags. Add synthetic regression tests for these gates.
+
+[Validation](tasks-v3/VALIDATION.md): 9/9 references pass, 9/9 starters fail,
+30/30 requirements covered, 50 reference checks, 350 generated plus 18 targeted
+mutants executed, 352 killed, 16 equivalent and zero survivors/errors. Shared
+assertion lines and corpus warnings: zero across 994 distinct retained executor
+files (2,754 examined occurrences). Public smoke tests pass 9/9. Record 36 author
+pair comparisons; independent host review remains pending.
+
+Both wrapped A/H3 config lists contain exactly these nine unfrozen candidates,
+with 45 remaining tasks and the planned 54/63 task/session totals. They remain
+not approved. Refresh STOP-3 scenarios to A: 9 workloads, $1.458000; H3: 18 Sol
+workloads plus 18 Luna calls, $3.060720 (36 combined units). Full-population
+scenarios remain separately labeled. No paid calls, staging or commits occurred.
+
+Validation commands: `.venv/bin/python -m pytest tests/eval -q` — 2123 passed
+in 467.32s. Three cases were added after full-run collection; the final
+`.venv/bin/python -m pytest tests/eval/test_v3_grader_validation.py tests/eval/test_validate_graders.py -q`
+run passed 45 tests in 16.58s, including those cases and all modified validator
+gates. `git diff --check` and the frozen-input/interface scope check exited 0.
+
+## Assumptions
+
+- The user's supplied 2026-10-25 interface approval authorizes task construction;
+  shared interface files remain untouched. Task freeze requires host validation.
+- The user permits completion by whole shape. Only `bug_fix` is authored and
+  offline-validated here; the other five shapes, all ambiguity notes/matchers and
+  all day-2 inputs remain pending.
+- Ten disjoint calibration tasks and the approved A-only pilot remain pending;
+  the 60–85% target is unmeasured. Author pair review does not establish the
+  independent reviewer acceptance required before freeze.
+
 # Version 3 evaluation design — 2026-10-25
 
 Replace the session's v2-recovery priority with the user-approved v3 design.

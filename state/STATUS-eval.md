@@ -1,49 +1,53 @@
 ## Done
 
-- Drafted the v3 population and plugin-mode runner design, plus non-runnable A/H3 config and estimate templates; current runner behavior is unchanged (`.venv/bin/python` inline design audit: PASS, 54 unique task briefs, six shapes × nine, 18 domains × three, both templates rejected by strict loader, 63-session/261-budget-unit arithmetic).
-- Preserved the earlier per-request context-pricing implementation as historical work; v2 harness recovery is stopped by the user's 2026-10-25 direction (prior session `.venv/bin/python -m pytest tests/eval -q`: 2115 passed in 388.16s; this is historical evidence, not this session's result).
-- Verified the unchanged evaluation package and design-only scope; updated CHANGES and this handoff (`.venv/bin/python -m pytest tests/eval -q`: 2115 passed in 523.80s; `git diff --check`: exit 0; inline scope/STATUS audit: PASS, eight exact authorized paths, r5/v2, worktree .venv, six headings, zero staged/deleted paths, v3 DESIGN only; frozen inputs/reports/interfaces unchanged).
+- Authored the complete `bug_fix` shape as nine independent v3 candidates, with public inputs, smoke tests and `frozen=false` metadata; other shapes are unbuilt (inline inventory/config audit: 9 candidates, 9 unfrozen, two wrapped configs rejected, zero staged/deleted paths).
+- Validated all nine private graders against references and untouched starters; retained requirement derivations and coverage privately (`.venv/bin/python -m eval.runner.validate_graders`, nine IDs in eval/tasks-v3/VALIDATION.md, trusted root supplied externally: exit 0, 9 valid/0 invalid, 50 reference checks pass, all nine starters fail, 30/30 requirements covered).
+- Exhausted the generated and declared targeted mutation populations and retained hash-bound semantic reviews privately (`.venv/bin/python -m eval.runner.validate_graders --mutants 10000`, same nine IDs: exit 0, 350 generated + 18 targeted = 368 executed, 352 killed, 16 equivalent, 0 survivors/errors/unexecuted).
+- Enforced public assertion independence and scanned the retained executor corpus; recorded an author structure-comparison table without claiming independent reviewer acceptance (validator: 0 shared assertion lines, 994 distinct corpus files from 2,754 examined occurrences, 0 corpus warnings; eval/tasks-v3/STRUCTURE-REVIEW.md: 36 pairs × three axes, independent host pairs 0).
+- Filled both not-approved configs with the actual nine-task candidate list and updated partial/full STOP-3 scenarios; documented validation and pending gates in README, CHANGES and DESIGN (inline config audit: matching nine IDs, 9 required sessions, no second sessions; A 9 workloads/$1.458000, H3 18 Sol + 18 Luna/$3.060720/36 combined units; both strict loader refusals).
+- Verified public starter smoke tests and v3 tooling regression tests (inline per-task `python -m unittest discover -s . -p test_*.py -v`: 9/9 public smoke passes; `.venv/bin/python -m pytest tests/eval -q`: 2123 passed in 467.32s; final targeted validator run: 45 passed in 16.58s, including three cases added after full-run collection).
 
 ## Remaining
 
-- Role 1/2: confirm the approved v3 artifact contract in AGENTS.md and referenced schemas, including question-only pause/resume, hook-write provenance, ledger injection receipts and report/workspace revision binding. This design deliberately leaves exact artifact paths there; do not implement a competing interface.
-- After that contract and implementation authorization: implement plugin mode within existing CLI entry points, with production exec/resume compatibility evidence, isolated Codex homes, hook-only author-note replies, artifact audit/collection, Luna accounting and existing report artifact references. Current harness=true still means the legacy external loop.
-- In a separately authorized authoring session: create disjoint calibration material and the 54 independent v3 tasks, references, external graders and author-note/matcher data; enforce every validation gate in eval/tasks-v3/DESIGN.md. No task files or private data exist for v3 in this worktree yet.
-- On the host after a separate pilot estimate/approval: calibrate A on disjoint tasks, manually review five pilot outputs, then validate/freeze the held-out population and all matcher/scoring/runtime/pricing pins through Role 1. Do not tune on held-out outcomes.
-- Replace draft task/version/hash placeholders, recompute STOP-3 bounds and report costs for user approval before A/H3 full runs; collect the preregistered 20-task human review. B is dropped; C is optional and separately scoped/estimated.
-- Before merge, the host runs the full repository suite once. This session runs only tests/eval. Do not resume the stopped v2 harness recovery; historical v1/v2 evidence remains unchanged.
+- Continue authoring by complete shape: `feature_plus_test`, then `constrained_refactoring`, `multiple_requirements`, `two_session`, `ambiguous_requirement`; nine tasks each, 45 remaining. Keep the DESIGN inventory and domain balance. Preserve private coverage/reference/mutation validation and zero-survivor acceptance for each added shape.
+- Author the ten disjoint calibration tasks and obtain the separate host pilot estimate/approval before A calls. Manually review five pilot outputs. The 60–85% target is unmeasured; do not select or tune held-out tasks using A/H3 outcomes.
+- Complete all ambiguity author notes, deterministic question matchers and positive/unrelated fixtures privately, with exactly one omitted public policy axis per task. All nine ambiguity tasks are currently unbuilt. Complete all day-2 prompts and executable carryover coverage when authoring the two-session shape.
+- Claude performs independent architecture/data-flow/failure-mechanism and public-to-hidden derivation review, including the recorded 36 author pairs and comparisons across all 54 tasks; host validation precedes a separate task freeze. No independent reviewer acceptance or frozen digest is claimed here.
+- Implement and host-probe plugin mode after Role 1/2's production contract/implementation is available: provenance, question pause/resume, ledger injection/revision binding, artifact audit and pinned accounting. Current `harness=true` remains legacy orchestration. Do not replace hooks with runner control calls.
+- After all 54 tasks are validated, replace the partial nine-task config lists with the complete identical ordered inventory and recompute/pin task/runtime/pricing identities and STOP-3 estimates. Obtain spending approval before ten-plus-call batches. No paid calls are authorized by these drafts.
+- Run the full repository suite once on the host before merge; this session verifies only tests/eval. Do not resume stopped v2 recovery or alter historical task inputs, graders or reports.
 
 ## Decisions
 
-- Prioritize the approved 2026-10-25 v3 direction: it supersedes this STATUS file's former v2 harness-recovery queue, and leaves retained reports/frozen inputs intact.
-- Use 54 distinct briefs, nine per shape and three per domain: independent structures address v2's homogeneous task ceiling while keeping 45 single-session tasks and nine two-session tasks (63 work sessions).
-- Deliver a fixed author note only on an eligible hook-table question: A has no hook and gets no reply, even to executor prose; disclose and separately analyze this information advantage.
-- Design against the artifact contract in AGENTS.md: Role 1 owns paths/schemas, and pause/resume/provenance confirmation is an implementation prerequisite rather than an interface edit here.
-- Wrap both configs and leave tasks null: the existing strict loader must reject these not-approved templates and cannot accidentally run legacy harness orchestration as H3.
-- Budget two Luna calls per logical work session with no model retries/fallback and one executable-failure retry only: H3's draft reserves 135 executor workloads plus 126 Luna calls, including nine clarification resumes; actual costs come from complete native/JSONL usage once.
-- Record human-review results through existing artifact path/hash references: shared report metrics/schema/flags remain unchanged; pre-retry reports retain their assessed revision and missingness is disclosed.
+- Finish whole shapes: the user explicitly permits a shape-complete partial session, so this checkpoint completes nine bug-fix tasks rather than leaving a scattered partial population.
+- Use distinct parsers, transaction ownership, heap scheduling, Unicode layout, graph traversal, layered provenance, dependency snapshots and bucket aggregation: task implementations have independent structures and failure mechanisms, with no template family or shared error namespace.
+- Keep every candidate unfrozen and configs wrapped/not approved: interface-v3 approval supplied by the user does not establish task acceptance, calibration, runnable H3 or spending approval.
+- Exhaust all 350 generated and 18 targeted mutants, reviewing 16 semantic equivalences privately: v3 acceptance requires zero survivors/errors/unexecuted; timeouts are unresolved and the historical 90% threshold is insufficient.
+- Separate author pair review from independent host review: the 36-pair table is a construction aid, and cannot satisfy DESIGN's independent reviewer requirement by itself.
+- List only the nine constructed candidates in both configs: absent tasks must not appear as runnable inventory; retain the planned 54 tasks/63 sessions and explicit 45-task remainder separately.
 
 ## Verify commands
 
 - `.venv/bin/python -m pytest tests/eval -q`
-- `.venv/bin/python` inline design audit: task/shape/domain counts, template JSON/YAML and loader refusal, session/call/cost arithmetic.
-- `.venv/bin/python` inline scope/STATUS audit: eight exact paths, branch r5/v2, local .venv, six ordered headings, no staged/deleted files and no v3 task inputs.
+- `.venv/bin/python -m pytest tests/eval/test_v3_grader_validation.py tests/eval/test_validate_graders.py -q`
+- `.venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_V3" --tasks TASK_IDS` (trusted parent supplies the external root; expand TASK_IDS from eval/tasks-v3/VALIDATION.md).
+- `.venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_V3" --tasks TASK_IDS --mutants 10000`
+- Inline inventory/config/scope audit: matching candidate IDs, unfrozen metadata, wrapped config refusal, allowed paths, no private-path bytes, no staged/deleted files.
 - `git diff --check`
-- `git diff --exit-code -- eval/tasks eval/tasks-v2 eval/configs/full-v2-a.yaml eval/configs/full-v2-b.yaml eval/configs/full-v2-harness.yaml eval/prices.yaml schemas controller verifier plugin prompts AGENTS.md tests/eval`
+- `git diff --exit-code -- eval/tasks eval/tasks-v2 eval/prices.yaml schemas controller verifier plugin prompts AGENTS.md`
 
 ## Do not touch
 
-- Only eval/, tests/eval/ and state/STATUS-eval.md may change; use this r5/v2 worktree and its .venv. Do not edit other role paths or other checkouts.
-- Frozen v1/v2 tasks, configs, retained reports, prices, report schema and existing CLI flags; no v3 task files, actual graders, references or author-note fixtures in this design session.
-- Actual private grader roots and host runtimes: do not locate/access them. Never share task contents with Role 3 or expose graders to executor/control context.
-- .git is read-only: no staging, commits, history rewriting or deletion. No network, model calls, nested Codex or macOS sandbox-exec.
-- No live plugin install, spending approval, frozen digest, successful H3 execution or measured v3 quality/cost claim is established by these design files.
-- Keep optional C templates for the user's authorship. Do not restart abandoned v2 harness recovery or reinterpret legacy report fields for v3 objects.
+- Work only in this r5/v2 worktree with its .venv; edit only eval/, tests/eval/, state/STATUS-eval.md and the authorized trusted storage. Never publish private locations, grader/reference/author-note content or private validation details.
+- V1/v2 task files, graders, configs, retained reports, prices, shared schemas/interfaces and existing CLI flags. No .git writes, staging, commits, deletions or history rewriting.
+- No network, live model calls, nested Codex, macOS sandbox-exec or plugin installation in this environment. Never share evaluation material with Role 3 or expose trusted graders to an executor/control context.
+- Frozen metadata must remain false until the separate host-validation/freeze step. No calibrated quality, successful H3 execution or measured spending claim follows from offline task construction.
+- Preserve the exact nine validated candidates and private reviews when continuing; any changes invalidate their relevant hash-bound evidence and require revalidation.
 
 ## Assumptions
 
-- The user-approved v3 direction and 2026-10-24/25 host findings are the supplied design basis; this offline session makes no new host measurement. Existing tests may create their ordinary synthetic fixtures; no actual evaluation graders are authored or accessed.
-- The exact 54-task balance, 20-task sample allocation, two-reviewer adjudication, matcher rules, question-pause lifecycle, deadlines and token workloads are explicit design choices requiring validation before implementation/freeze, not unspecified facts silently assumed.
-- Role 1 is defining the artifact contract concurrently; this checkout still exposes the legacy interfaces. Exact plugin paths/schema details are referenced to AGENTS.md, without guessing or editing them.
-- The two-call budget applies to a logical work session across clarification, deterministic retry and ledger continuations; these do not authorize additional Luna calls. Question-only pause behavior requires Role 1/2 confirmation.
-- Fast snapshot openai-fast-short-2026-10-23-v1 is an existing offline planning reference; requested model/tier/context must be verified on the host before actual pricing. Draft USD scenarios are not spending caps or proof of the cost-per-pass goal.
+- The user's supplied approval/freeze of interface v3 on 2026-10-25 is authoritative for this session despite stale proposed-status prose elsewhere; this work edits no interface file and makes no host compatibility claim.
+- The user explicitly authorizes candidate/public and trusted-private authoring and permits completion by whole shape. This supersedes the previous STATUS file's design-only/no-private-access restrictions.
+- The ten-task calibration material and pilot have not been completed; the requested authoring checkpoint remains uncalibrated and unfrozen. The 60–85% A target is a target, not evidence about these candidates.
+- The existing offline Fast pricing scenario is retained without a network refresh; workload counts are planning units, not measured provider-request counts or spending limits.
+- Author pair/equivalence review is the work of this session's author. Independent host review remains pending; no sub-agents, external reviewers or paid models were used.

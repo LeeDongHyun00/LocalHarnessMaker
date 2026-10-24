@@ -8,6 +8,49 @@ shared schema. Historical reports in `reports/baseline-a-first-task/` remain
 unaltered provisional evidence; they have not been reclassified as approved
 reports or rerun.
 
+## Version 3 construction checkpoint — 2026-10-25
+
+The user authorized task construction and supplied interface-v3 approval. The
+complete `bug_fix` shape now has nine independent candidates, with public prompts,
+starters, smoke tests, metadata and grading-command descriptors. All metadata
+keeps `frozen=false`. References, coverage/derivation maps, targeted mutants and
+hash-bound equivalence reviews stay in trusted storage. No v1/v2 input or grader
+was changed. No model execution or calibration was performed.
+
+[Validation counts by task](tasks-v3/VALIDATION.md) and the
+[36-pair author structure comparison](tasks-v3/STRUCTURE-REVIEW.md) record the
+checkpoint. Independent host review remains required; the author comparison is
+not a substitute. Ten disjoint calibration tasks and the approved A-only pilot
+remain pending, so the 60–85% target is unmeasured. The other five shapes (45 tasks)
+are unbuilt, including all ambiguity author notes/matchers and day-2 prompts.
+
+The offline validator recognizes v3 IDs and per-task requirement namespaces. It
+requires executed coverage and rejects private assertion overlap against all
+public versions. V3 mutation acceptance exhausts the generated and declared
+targeted population, requires zero survivors/errors/unexecuted mutants, and keeps
+timeouts unresolved. Equivalences require a named reviewer and a rationale bound
+to reference, grader and complete public input bytes. Historical v1/v2 acceptance
+and existing CLI flags are preserved. Executor-corpus matches remain warnings;
+the checkpoint includes counts of examined and distinct files.
+
+With the trusted parent supplying `LHM_PRIVATE_V3` and the nine IDs from either
+wrapped config, run the existing tools (the variable's value must stay external):
+
+```sh
+.venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_V3" --tasks TASK_IDS
+.venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_V3" --tasks TASK_IDS --mutants 10000
+.venv/bin/python -m pytest tests/eval -q
+```
+
+`--mutants` remains a limit, not a sampling claim: a v3 population larger than that
+limit is rejected as incomplete. Both wrapped full-v3 config files now list only
+the nine authored candidates, with an explicit 54-task planned population and
+45-task construction remainder. They remain `draft_not_approved` and rejected
+by the strict run-config loader. Their estimates cover the actual partial list:
+A has nine Sol workloads ($1.458000 scenario); H3 reserves 18 Sol workloads plus
+18 Luna calls ($3.060720 scenario), or 36 combined STOP-3 units. No spending is
+authorized; the full-population estimates remain separately labeled planning.
+
 ## Version 3 plugin mode — design only, 2026-10-25
 
 The user approved the [v3 direction](../docs/handoff/2026-10-25-v3-direction.md)
@@ -183,14 +226,14 @@ final executor message, using identical extraction rules, not from H3's report.
 ### Draft templates and STOP-3
 
 [A template](configs/full-v3-a.yaml) and [H3 template](configs/full-v3-h3.yaml)
-are deliberately wrapped design documents with a null task-list placeholder,
-unresolved version/build pins and `draft_not_approved` status. The existing
+are deliberately wrapped design documents with the partial nine-task candidate
+list, unresolved version/build pins and `draft_not_approved` status. The existing
 strict loader rejects both; do not unwrap H3 and launch the legacy harness.
 They do not approve calls. Estimates are separate drafts:
 [A](reports/full-v3-a-estimate.md), [H3](reports/full-v3-h3-estimate.md).
 No current run/estimate gate is modified or tested as implemented plugin mode.
 
-Let N=54, D=9, S=N+D=63 logical work sessions, Q<=9 eligible clarification
+For the completed planned population, let N=54, D=9, S=N+D=63 logical work sessions, Q<=9 eligible clarification
 resumes, and R<=S one-check-failure retries. A budgets S=63 executor workloads
 and no controls. H3 budgets S+Q+R<=135 executor workloads and 2S=126 Luna
 calls, or 261 combined budget units. Before clarification/retry reserves its
@@ -219,8 +262,8 @@ is no automatic recovery/retry beyond the single deterministic retry.
 - Single-retry continuation, question pause and ledger continuation reuse the
   logical session; only the two scheduled hook stages call Luna.
 - Counts, deadlines, token workloads and Fast tier are draft design choices.
-  No task authoring, private-root access, live execution or spending is authorized
-  by these documents; the only current verification is offline eval tests.
+  The current user request authorizes offline candidate authoring and trusted
+  validation. Live execution, task freeze and spending remain unauthorized.
 
 ## Executor transport outages
 
