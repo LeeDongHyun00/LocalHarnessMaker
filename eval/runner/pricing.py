@@ -83,8 +83,17 @@ def retained_provenance(task: dict[str, Any], pricing: dict[str, Any] | None = N
         raise ValueError("Duplicate pricing provenance")
     path = evidence_path(refs[0]["path"])
     if digest(path.read_bytes()) != refs[0]["sha256"]:
-        raise ValueError("Pricing provenance hash mismatch")
-    rows = json.loads(path.read_text())
+        # Older continuation builds overwrote unselected tasks' provenance
+        # while retaining the report's original artifact pin. Recover only the
+        # exact legacy fallback bytes that reproduce that historical SHA-256;
+        # never adopt the overwritten file or replace a historical hash.
+        rows = [{"call_id": call["call_id"], "observed_service_tier": None,
+                 "basis": "Retained original accounting; no per-call tier observation available.",
+                 "pricing_ref": call["usage"]["pricing_ref"]} for call in task["calls"]]
+        if digest((json.dumps(rows, indent=2) + "\n").encode()) != refs[0]["sha256"]:
+            raise ValueError("Pricing provenance hash mismatch")
+    else:
+        rows = json.loads(path.read_text())
     if pricing is not None:
         pins = snapshot_hashes(pricing)
         for row in rows:
@@ -105,10 +114,14 @@ def preserve_provenance(task: dict[str, Any], directory: Path, *, prior: dict[st
     current.update({row["call_id"]: row for row in additional or []})
     previous = {row["call_id"]: row for row in retained_provenance(prior, pricing)}
     historical = {call["call_id"] for call in prior["calls"]}
+    old_calls = {call["call_id"]: call for call in prior["calls"]}
     rows = []
     for call in task["calls"]:
         identity = call["call_id"]
         row = previous.get(identity) if identity in historical else current.get(identity)
+        if (identity in old_calls and old_calls[identity]['usage']['usd'] is None
+                and call['usage']['usd'] is not None):
+            row = current.get(identity)
         if row is None:
             row = {"call_id": identity, "observed_service_tier": None,
                    "basis": "Retained original accounting; no per-call tier observation available."}
@@ -116,3 +129,41 @@ def preserve_provenance(task: dict[str, Any], directory: Path, *, prior: dict[st
     path = directory / "pricing-provenance.json"
     path.write_text(json.dumps(pin_provenance(rows, pricing), indent=2) + "\n")
     task["artifacts"] = [a for a in task["artifacts"] if Path(a["path"]).name != path.name] + [artifact(path)]
+
+
+def recover_default_tiers(entry: dict[str, Any], config: dict[str, Any]) -> None:
+    """Recover omitted applied tiers from legacy per-process exit captures only."""
+    from eval.runner.telemetry import _pricing_tier
+
+    for segment in entry['segments']:
+        evidence = segment.get('pricing_evidence', {})
+        observations = evidence.get('records', [])
+        if (evidence.get('tier') == 'unknown' and observations and segment.get('settings_verified') is True
+                and all('observed_service_tier' in row and row['observed_service_tier'] is None
+                        for row in observations)):
+            tier, inferred = _pricing_tier([None], config['model'], config.get('service_tier'))
+            if inferred:
+                segment['pricing_evidence'] = dict(evidence, tier=tier,
+                    basis='Tier inferred from the model default during regrade; retained applied service_tier omitted/null')
+
+
+def merge_regraded_accounting(task: dict[str, Any], prior: dict[str, Any]) -> None:
+    """Keep priced history; fill only complete, newly resolved retained usage."""
+    import copy
+    from eval.metrics import total
+
+    rebuilt = {c['call_id']: c for c in task['calls']}
+    complete_control = task['costs']['control_usd'] is not None
+    calls = copy.deepcopy(prior['calls'])
+    for call in calls:
+        candidate = rebuilt.get(call['call_id'])
+        if (candidate and call['usage']['usd'] is None and candidate['usage']['usd'] is not None
+                and all(call['usage'][k] == candidate['usage'][k]
+                        for k in ('input_tokens', 'cached_input_tokens', 'output_tokens'))):
+            call['usage'] = copy.deepcopy(candidate['usage'])
+    task['calls'] = calls
+    executor = total([c['usage']['usd'] for c in calls if c['purpose'] == 'executor'])
+    control = (total([c['usage']['usd'] for c in calls if c['purpose'] != 'executor'])
+               if complete_control else prior['costs']['control_usd'])
+    task['costs'] = {'executor_usd': executor, 'control_usd': control,
+                     'total_usd': total([executor, control])}

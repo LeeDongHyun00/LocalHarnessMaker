@@ -1,0 +1,28 @@
+{
+  "segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T03:31:05.218529+00:00",
+      "events": "exec-1.jsonl",
+      "stderr": "exec-1.stderr",
+      "day": 1,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T03:31:59.334496+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 54.1141423529989,
+      "native_usage": {
+        "input_tokens": 59176,
+        "cached_input_tokens": 55936,
+        "output_tokens": 1140
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3yme_75h/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-31-06-01a166cf-ee13-7793-b6ab-411730fd0f1e.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "b493e87bd5e9f996203e193b50b0c449f4c0b1210f0142dbfb9e8f97d035c1d7"
+    }
+  ],
+  "control_files": {}
+}

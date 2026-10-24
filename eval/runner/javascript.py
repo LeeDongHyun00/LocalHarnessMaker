@@ -166,6 +166,99 @@ def command_fields(tokens: list[str], pairs: dict[int, int], tool: int) -> list[
     return fields
 
 
+def non_path_arguments(tokens: list[str]) -> bool:
+    """Accept static session/control data only, without command or path operands."""
+    if not tokens:
+        return True
+    if tokens[0] != '{':
+        return False
+    cursor = 0
+
+    def value() -> bool:
+        nonlocal cursor
+        if cursor >= len(tokens):
+            return False
+        token = tokens[cursor]
+        cursor += 1
+        if token in {'{', '['}:
+            closing = '}' if token == '{' else ']'
+            while cursor < len(tokens) and tokens[cursor] != closing:
+                if token == '{':
+                    key = literal(tokens[cursor]) or tokens[cursor]
+                    if (not re.fullmatch(r'[A-Za-z_]\w*', key) or
+                            re.search(r'cmd|command|script|path|file|dir|root|url|uri|target|source|dest|artifact|location', key, re.I) or
+                            tokens[cursor + 1:cursor + 2] != [':']):
+                        return False
+                    cursor += 2
+                if not value():
+                    return False
+                if cursor < len(tokens) and tokens[cursor] == ',':
+                    cursor += 1
+                elif tokens[cursor:cursor + 1] != [closing]:
+                    return False
+            cursor += 1
+            return tokens[cursor - 1:cursor] == [closing]
+        decoded = literal(token)
+        if decoded is not None:
+            return (not any(char in decoded for char in ('/', '\\')) and
+                    decoded not in {'.', '..'} and not decoded.startswith('~') and
+                    not re.search(r'\.[A-Za-z0-9_]+$', decoded))
+        if token in {'true', 'false', 'null'}:
+            return True
+        if token == '-' or token.isdecimal():
+            start = cursor - 1
+            while cursor < len(tokens) and (tokens[cursor].isdecimal() or tokens[cursor] == '.'):
+                cursor += 1
+            return re.fullmatch(r'-?\d+(?:\.\d+)?', ''.join(tokens[start:cursor])) is not None
+        return False
+
+    try:
+        return value() and cursor == len(tokens)
+    except (IndexError, RecursionError):
+        return False
+
+
+def inline_loop_commands(tokens: list[str], pairs: dict[int, int],
+                         fields: dict[int, list[tuple[str, int, int, int]]]) -> dict[int, list[str]]:
+    """Resolve literal for-of arrays with command-only, unaliased loop bindings."""
+    slots = {start for entries in fields.values() for key, _, start, end in entries
+             if key == 'cmd' and end == start + 1}
+    resolved: dict[int, list[str]] = {}
+    for i in range(len(tokens) - 7):
+        if (tokens[i:i + 2] != ['for', '('] or tokens[i + 2] not in {'const', 'let'} or
+                tokens[i + 4:i + 6] != ['of', '[']):
+            continue
+        name = tokens[i + 3]
+        end = pairs.get(i + 5, -1)
+        if end < 0 or pairs.get(i + 1) != end + 1 or tokens[end + 2:end + 3] != ['{']:
+            continue
+        body_end = pairs.get(end + 2, -1)
+        values = []
+        cursor = i + 6
+        while cursor < end:
+            decoded = literal(tokens[cursor])
+            if decoded is None or (cursor + 1 < end and tokens[cursor + 1] != ','):
+                break
+            values.append(decoded)
+            cursor += 2 if cursor + 1 < end else 1
+        if cursor != end or not values:
+            continue
+        # The retained wrapper also displays command:cmd next to the awaited
+        # call's spread result. This is a read, with no escape of the binding.
+        displays = {ref for ref in range(end + 3, body_end)
+                    if tokens[ref] == name and tokens[ref - 5:ref] == ['text', '(', '{', 'command', ':']
+                    and tokens[ref + 1:ref + 7] == [',', '...', 'await', 'tools', '.', 'exec_command']
+                    and pairs.get(ref - 4) == pairs.get(ref + 7, -2) + 2
+                    and pairs.get(ref - 3) == pairs.get(ref + 7, -2) + 1}
+        keys = {position for entries in fields.values() for _, position, start, _ in entries
+                if position != start}
+        uses = {ref for ref, word in enumerate(tokens) if word == name and ref != i + 3 and ref not in keys}
+        operands = uses - displays
+        if operands and operands <= slots and all(end + 2 < ref < body_end for ref in operands):
+            resolved.update({ref: values for ref in operands})
+    return resolved
+
+
 def display_reads(tokens: list[str], pairs: dict[int, int], name: str) -> dict[int, int]:
     """Recognize indexed array data only in read-only forEach text callbacks.
 
@@ -350,8 +443,10 @@ def tool_calls(source: str) -> tuple[list[dict[str, Any]], list[str], bool]:
     commands: list[dict[str, Any]] = []
     patches: list[str] = []
     fields = {i: entries for i, token in enumerate(tokens) if token == 'tools'
+              and tokens[i + 2:i + 3] == ['exec_command']
               and (entries := command_fields(tokens, pairs, i)) is not None}
     collections = collection_commands(tokens, pairs, fields)
+    collections.update(inline_loop_commands(tokens, pairs, fields))
     for i, token in enumerate(tokens):
         if token != 'tools':
             continue
@@ -371,7 +466,11 @@ def tool_calls(source: str) -> tuple[list[dict[str, Any]], list[str], bool]:
             else:
                 patches.append(patch)
             continue
-        if name != 'exec_command' or start >= end or tokens[start] != '{' or pairs.get(start) != end - 1:
+        if name != 'exec_command':
+            if not non_path_arguments(tokens[start:end]):
+                unknown = True
+            continue
+        if start >= end or tokens[start] != '{' or pairs.get(start) != end - 1:
             unknown = True
             continue
         arguments: dict[str, Any] = {}

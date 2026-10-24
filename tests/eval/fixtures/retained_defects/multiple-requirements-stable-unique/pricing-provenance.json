@@ -1,0 +1,48 @@
+[
+  {
+    "call_id": "multiple-requirements-stable-unique-rerun-c757b80e1bb04fe6989dfe9a780ac2e3-multiple-requirements-stable-unique-exec-1",
+    "observed_service_tier": "standard",
+    "basis": "Tier inferred from the model default; new native applied service_tier omitted/null at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nt_0ch_s/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-56-20-01a169b1-28a3-7cd1-828c-28fdd77ea468.jsonl",
+        "record_sha256": "12e0a92a9dc8fb57786f06555808ab33667704ac7f44381892a6c9572579a662",
+        "observed_service_tier": null
+      }
+    ],
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nt_0ch_s/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-56-20-01a169b1-28a3-7cd1-828c-28fdd77ea468.jsonl",
+        "sha256": "035e9dda806d78d68b176ef87fa7ba804b15ced9b98fda3d314b0514bbfcce7e"
+      }
+    ],
+    "pricing_snapshot_sha256": "bdf17583580200967394ead052fb515d5ba77f5311555cbe0b0bc8265efe691b"
+  },
+  {
+    "call_id": "multiple-requirements-stable-unique-rerun-c757b80e1bb04fe6989dfe9a780ac2e3-multiple-requirements-stable-unique-control-1",
+    "observed_service_tier": null,
+    "pricing_evidence": {
+      "tier": "priority",
+      "basis": "Tier inferred from the model default; control_call.service_tier omitted/null"
+    },
+    "basis": "Tier inferred from the model default; control_call.service_tier omitted/null",
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "stderr_sha256": "5018ade338907a6be5314ce0c862de277146900be14100a39a613c0129b302ef",
+    "record_sha256": "0cda6be13d3ead8248fcf7f8df2aa5a85e3d2cc34a2372f67bd018bceb581549",
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  },
+  {
+    "call_id": "multiple-requirements-stable-unique-rerun-c757b80e1bb04fe6989dfe9a780ac2e3-multiple-requirements-stable-unique-control-2",
+    "observed_service_tier": null,
+    "pricing_evidence": {
+      "tier": "priority",
+      "basis": "Tier inferred from the model default; control_call.service_tier omitted/null"
+    },
+    "basis": "Tier inferred from the model default; control_call.service_tier omitted/null",
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "stderr_sha256": "96dd13da99f959a0c702fecec28e02a6625ad0d32339754cde3332b2af1e9ce4",
+    "record_sha256": "5deaff2ed2de01f031e74d12dae16df894f92a4d9fd7615a78eb1d4e231c4356",
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

@@ -670,7 +670,7 @@ def custom_commands(item: dict[str, Any]) -> tuple[list[dict[str, Any]], list[st
             return [], [patch] if isinstance(patch, str) else [], not isinstance(patch, str)
         if name in {"exec_command", "shell", "shell_command"}:
             return [arguments], [], not any(key in arguments for key in ("cmd", "command"))
-        return [], [], True
+        return tool_calls('tools.' + name + '(' + source + ')') if re.fullmatch(r'\w+', name) else ([], [], True)
     if name.endswith("apply_patch"):
         return [], [source], not source.startswith("*** Begin Patch")
     if name != "exec":

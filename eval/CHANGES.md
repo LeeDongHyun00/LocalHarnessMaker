@@ -1,3 +1,43 @@
+# Retained verbatim inputs and recovery accounting — 2026-10-24
+
+The real 1,419-character patch record contains four escaped Add File bodies
+followed by a literal-array for-of loop and a command display wrapper. The
+previous synthetic test omitted that loop. Resolve every literal loop command,
+including the read-only command display, while rejecting rebinding, mutation,
+aliases and nonliteral operands. Keep the original source bytes in fixtures.
+Recognize static non-path control calls, including both retained write_stdin
+interrupts; command/path arguments and dynamic inputs remain unresolved.
+
+Recover the continuation report's 119 overwritten provenance files by
+reconstructing the exact legacy fallback bytes and requiring their SHA-256 to
+match the original report pin. Never adopt overwritten bytes or replace a
+historical pin. Read-only inspection accepts all 120 task provenance entries.
+Regrade fills the unpriced day-2 call only from its complete retained usage and
+exit-captured omitted/null tier, with verified settings and no requested tier.
+Use the model default and retain all already priced historical calls. The
+supplied day-2 counts yield $0.0331696; missing usage or unsupported tiers stay
+unknown. Preserve the new inference in the next report's provenance.
+
+The harness task's judge delegation and Fast prices are complete. Its null
+control total instead comes from rerun_history.control_usd=null with no prior
+calls. Recognize only the recorded prelaunch file collision with no executor
+segments and the exact initial contract manifest pin; normalize that empty
+trial to zero in fresh recovery and retained regrade. Other failed/launched or
+unpriced calls retain unknown costs. The verbatim logs yield control_usd
+$0.00468372 and task total $0.03405012. Retained-evidence regrade repeats without
+changing known historical prices or source files.
+
+Regression fixtures retain both complete code-mode inputs and the supplied
+report/checkpoint accounting values, stderr, manifests and provenance. Tests
+use local temporary copies, synthetic graders and mocked model transports.
+No frozen tasks, report schemas, CLI flags or source evidence copies change.
+
+Assumptions: no model calls or actual private graders are available. Read-only
+pricing/provenance checks are not a host regrade or a new quality measurement.
+
+Validation: focused verbatim/parser checks passed: 196 tests in 32.03s.
+The full tests/eval run on the final parser version is in progress.
+
 # Version 2 audit shapes and control deadline classification — 2026-10-24
 
 Add exact regressions for a code-mode apply_patch single string containing

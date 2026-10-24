@@ -1,0 +1,184 @@
+{
+  "task_id": "multiple-requirements-stable-unique",
+  "task_type": "multiple_requirements",
+  "two_session": false,
+  "outcome": "pass",
+  "invalid_reasons": [],
+  "attempts": 1,
+  "executor_segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T16:56:20.172792+00:00",
+      "exited_at": "2026-10-23T16:56:49.312559+00:00",
+      "exit_code": 0,
+      "session_id": "01a169b1-28a3-7cd1-828c-28fdd77ea468",
+      "events": {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nt_0ch_s/exec-1.jsonl",
+        "sha256": "fa691b95012623869ee0625cbbe0658a87b025bce05b0dcee19706b403a8d4a4"
+      }
+    }
+  ],
+  "grader_access_audit": {
+    "method": "access_audit",
+    "status": "clean",
+    "private_grader_roots": [
+      "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+    ],
+    "reason": null,
+    "matches": []
+  },
+  "grading": {
+    "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-4a0d4f2b25ac4efba2eb54118f52e7db",
+    "copied_at": "2026-10-23T16:57:40.902653+00:00",
+    "grader_source_outside_repo": true,
+    "result": "pass",
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "log": {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/grading.log",
+      "sha256": "4f312f29aea18afe5e5648188828a208949e6ffba314415ff34b3f4e1aa6d901"
+    }
+  },
+  "done_claims": {
+    "claimed_items": 0,
+    "claimed_without_evidence": 0
+  },
+  "calls": [
+    {
+      "call_id": "multiple-requirements-stable-unique-rerun-c757b80e1bb04fe6989dfe9a780ac2e3-multiple-requirements-stable-unique-exec-1",
+      "purpose": "executor",
+      "backend": "codex_cli",
+      "model": "gpt-6.1-sol",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 62190,
+        "cached_input_tokens": 54144,
+        "output_tokens": 786,
+        "usd": 0.0293664,
+        "latency_seconds": 29.082636758997978,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": "openai-standard-short-2026-10-22-v1"
+      }
+    },
+    {
+      "call_id": "multiple-requirements-stable-unique-rerun-c757b80e1bb04fe6989dfe9a780ac2e3-multiple-requirements-stable-unique-control-1",
+      "purpose": "contract",
+      "backend": "codex_cli",
+      "model": "gpt-6-luna",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 17395,
+        "cached_input_tokens": 14976,
+        "output_tokens": 568,
+        "usd": 0.00135132,
+        "latency_seconds": 9.62601267399441,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": "openai-fast-short-2026-10-23-v1"
+      }
+    },
+    {
+      "call_id": "multiple-requirements-stable-unique-rerun-c757b80e1bb04fe6989dfe9a780ac2e3-multiple-requirements-stable-unique-control-2",
+      "purpose": "judge",
+      "backend": "codex_cli",
+      "model": "gpt-6-luna",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 16237,
+        "cached_input_tokens": 0,
+        "output_tokens": 85,
+        "usd": 0.0033324,
+        "latency_seconds": 5.491315414001292,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": "openai-fast-short-2026-10-23-v1"
+      }
+    }
+  ],
+  "costs": {
+    "executor_usd": 0.0293664,
+    "control_usd": null,
+    "total_usd": null
+  },
+  "artifacts": [
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/access-audit.json",
+      "sha256": "a5e00299d0de40e89e401bfd8a5badd7fffc829cf4de1d272693e3e7e7a6e271"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/calibration.json",
+      "sha256": "66a4de1b40fe711c16108c735e08955c3fe152c1bf8d760a5945ad8485ed2fd0"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/contract.control.json",
+      "sha256": "eae6b0642215808354d3630d8044917a83458ed090363624648f71909f79cce4"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/contract.json",
+      "sha256": "4b6ea4504ba4cd47e017a9c7eb46bc6400b90991b46d3096e24ef562d98dfc71"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/contract.stderr",
+      "sha256": "5018ade338907a6be5314ce0c862de277146900be14100a39a613c0129b302ef"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/contract.stdout",
+      "sha256": "cb484fc554a868d0492471a4094ca5d2fd97d27dddbd098d9302ea3e237a76ac"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/exec-1.jsonl",
+      "sha256": "fa691b95012623869ee0625cbbe0658a87b025bce05b0dcee19706b403a8d4a4"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/exec-1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/final-1.md",
+      "sha256": "88d668c5020de9f101fab1b14fc8fc4038e91449cebb46e062b63fab24bd4f88"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/grading.log",
+      "sha256": "4f312f29aea18afe5e5648188828a208949e6ffba314415ff34b3f4e1aa6d901"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/pricing-provenance.json",
+      "sha256": "d70ea9bb2dff9ce3e379ad15ae8da2db2da10b4a3a66143a75468ac1584d9b26"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/result.json",
+      "sha256": "a7632d2af5bd9c7aa7a43f35c45bae8b945df49f7d290e55468b15ea65eb3ae1"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/session-evidence.jsonl",
+      "sha256": "c0ec525daf87ee991578db23b715cd1d73da03413d06f10823c74b7e904235e3"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/task-completion.json",
+      "sha256": "d13fe75381ac4f8160b0e927a3abbb7d29f1b968668227f39fe53452be583a6f"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/verdict-1.control.json",
+      "sha256": "60172d04992b1d34ae4b674316c9a0327f00ea74f3a920123041389036a2b86c"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/verdict-1.json",
+      "sha256": "59a5f5000e7575299345adfbf6fd477a466b9cd77eb9cf20f4bfee46c6657551"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/verdict-1.stderr",
+      "sha256": "96dd13da99f959a0c702fecec28e02a6625ad0d32339754cde3332b2af1e9ce4"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/verdict-1.stdout",
+      "sha256": "395db2b1a198f21cdff15c1337f435c3ffd146c67e8074bc295dbde7bfa48bcd"
+    },
+    {
+      "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nt_0ch_s/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-56-20-01a169b1-28a3-7cd1-828c-28fdd77ea468.jsonl",
+      "sha256": "035e9dda806d78d68b176ef87fa7ba804b15ced9b98fda3d314b0514bbfcce7e"
+    },
+    {
+      "path": "eval/reports/full-harness-recovered4/multiple-requirements-stable-unique/rerun-provenance.json",
+      "sha256": "7e1a914eecd1f8862abf1632366700a1b53e242248fccc7e1e3833e72f9cf7e5"
+    }
+  ],
+  "handoff": null
+}

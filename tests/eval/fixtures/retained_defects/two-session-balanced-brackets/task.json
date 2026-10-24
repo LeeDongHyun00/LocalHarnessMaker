@@ -1,0 +1,174 @@
+{
+  "task_id": "two-session-balanced-brackets",
+  "task_type": "feature_plus_test",
+  "two_session": true,
+  "outcome": "pass",
+  "invalid_reasons": [],
+  "attempts": 2,
+  "executor_segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T04:43:24.022737+00:00",
+      "exited_at": "2026-10-23T04:44:02.015419+00:00",
+      "exit_code": 0,
+      "session_id": "01a16712-2292-7333-896e-bdec48b155fc",
+      "events": {
+        "path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/exec-1.jsonl",
+        "sha256": "3da8ae14f6c1ec6ee3874af1bea6002f9ae7a76b1f426f310fe2c5e59dba7639"
+      }
+    },
+    {
+      "attempt": 2,
+      "started_at": "2026-10-23T15:02:01.196293+00:00",
+      "exited_at": "2026-10-23T15:02:47.103675+00:00",
+      "exit_code": 0,
+      "session_id": "01a16948-7fb4-7313-b216-1a0878060ac2",
+      "events": {
+        "path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/exec-2.jsonl",
+        "sha256": "65a0cf3e73a0a833d3b37965fef821e4955873bf63d7fdbe9b57f1981ac14e97"
+      }
+    }
+  ],
+  "grader_access_audit": {
+    "method": "access_audit",
+    "status": "clean",
+    "private_grader_roots": [
+      "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+    ],
+    "reason": null,
+    "matches": []
+  },
+  "grading": {
+    "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-e03163bc863d4115975aeff0389e7960",
+    "copied_at": "2026-10-23T15:03:02.243794+00:00",
+    "grader_source_outside_repo": true,
+    "result": "pass",
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "log": {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/grading.log",
+      "sha256": "c59f0be2f802204d06efefc4dcd2eef86e430b3836b52ea84b616a5a83fb6f74"
+    }
+  },
+  "done_claims": {
+    "claimed_items": 0,
+    "claimed_without_evidence": 0
+  },
+  "calls": [
+    {
+      "call_id": "two-session-balanced-brackets-exec-1",
+      "purpose": "executor",
+      "backend": "codex_cli",
+      "model": "gpt-6.1-sol",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 59525,
+        "cached_input_tokens": 52608,
+        "output_tokens": 1294,
+        "usd": 0.0320348,
+        "latency_seconds": 37.972105918001034,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": "openai-standard-short-2026-10-22-v1"
+      }
+    },
+    {
+      "call_id": "two-session-balanced-brackets-exec-2",
+      "purpose": "executor",
+      "backend": "codex_cli",
+      "model": "gpt-6.1-sol",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 78522,
+        "cached_input_tokens": 72576,
+        "output_tokens": 1402,
+        "usd": null,
+        "latency_seconds": 45.866890935998526,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": null
+      }
+    }
+  ],
+  "costs": {
+    "executor_usd": null,
+    "control_usd": 0,
+    "total_usd": null
+  },
+  "artifacts": [
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/access-audit.json",
+      "sha256": "0af3b565089ab8c10b41125b909a59e971e7582010655c62659deeb3bb52e750"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/calibration.json",
+      "sha256": "66a4de1b40fe711c16108c735e08955c3fe152c1bf8d760a5945ad8485ed2fd0"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/exec-1.jsonl",
+      "sha256": "3da8ae14f6c1ec6ee3874af1bea6002f9ae7a76b1f426f310fe2c5e59dba7639"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/exec-1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/exec-2.jsonl",
+      "sha256": "65a0cf3e73a0a833d3b37965fef821e4955873bf63d7fdbe9b57f1981ac14e97"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/exec-2.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/final-1.md",
+      "sha256": "d8fd52f0174ddd4467a84a3069e2bf1ef95d34b5e2cac06824cdd3c9875f3ca9"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/final-2.md",
+      "sha256": "d307def18af12d3430186a5c5bdbf21645013a31411af28de12431b45cb9f66c"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/grading.log",
+      "sha256": "c59f0be2f802204d06efefc4dcd2eef86e430b3836b52ea84b616a5a83fb6f74"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/handoff-evidence.json",
+      "sha256": "a92d2eec1335d16a37cc8b24968de15fbbe06d9da29f9f3a8787e24eb84961cc"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/result.json",
+      "sha256": "3ffea48f69a364102544faba1f46e84052164ee12054df1d41e5b044f7f96d68"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/session-evidence.jsonl",
+      "sha256": "7fe6e57eaa96ffd4d2b6393d9eaab3acdf4d70083653e4a6a4b6ca0466fc6fea"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/task-completion.json",
+      "sha256": "70c1a1a89b7c82837693a923edb1dc1fea4bb679ef449e479135b8cf3dec265b"
+    },
+    {
+      "path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-43-24-01a16712-2292-7333-896e-bdec48b155fc.jsonl",
+      "sha256": "09f385c81f22bdc7ac13c8a6319439b429d5ea382b632f0879c4e3a70201a2ee"
+    },
+    {
+      "path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/codex-home/sessions/2026/10/24/rollout-2026-10-24T00-02-01-01a16948-7fb4-7313-b216-1a0878060ac2.jsonl",
+      "sha256": "03e11416ab3b0ca2c51a5d12d5907b213103edf041936b96fe8e8a4d41114156"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/pricing-provenance.json",
+      "sha256": "42fa6ac83f6604f8dadbf32c8b4cc06dab8652c646483af89f911077db5e67e5"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/continuation.json",
+      "sha256": "76bb24520e404d1c10e0722c5f7ddb02af54cbc14aab072eb6db829329a3134f"
+    }
+  ],
+  "handoff": {
+    "day2_pass": true,
+    "user_restated_day1_context": false,
+    "evidence": {
+      "path": "eval/reports/full-a-continued2/two-session-balanced-brackets/handoff-evidence.json",
+      "sha256": "a92d2eec1335d16a37cc8b24968de15fbbe06d9da29f9f3a8787e24eb84961cc"
+    }
+  }
+}

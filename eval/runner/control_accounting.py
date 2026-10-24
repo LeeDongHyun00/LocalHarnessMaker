@@ -13,6 +13,46 @@ from eval.runner.publication import safe_source
 from eval.runner.telemetry import _pricing_tier
 
 
+def prelaunch_collision_cost(task: dict[str, Any]) -> float | None:
+    """Recognize the retained empty trial rejected by the control-file guard.
+
+    An arbitrary empty call list is not evidence of zero spending. Require the
+    specific guard failure, no executor, and only the initial contract manifest
+    among control artifacts. Failed/launched controls retain unknown costs.
+    """
+    if (task.get('calls') != [] or task.get('executor_segments') != [] or
+            'runner_control_file_preexisting' not in task.get('invalid_reasons', [])):
+        return None
+    controls = [a for a in task.get('artifacts', []) if re.fullmatch(
+        r'(?:contract|handoff|verdict-[0-9]+)\.(?:control\.json|stderr|stdout|json)', Path(a['path']).name)]
+    initial = {'operation': 'contract', 'exit_code': None, 'timed_out': False}
+    if (len(controls) == 1 and Path(controls[0]['path']).name == 'contract.control.json' and
+            controls[0]['sha256'] == digest((json.dumps(initial) + '\n').encode())):
+        return 0.0
+    return None
+
+
+def historical_control_cost(history: dict[str, Any], task: dict[str, Any]) -> float | None:
+    """Recover only hash-pinned prelaunch-collision provenance from old reruns."""
+    if history['control_usd'] is not None or history['calls']:
+        return history['control_usd']
+    from eval.runner.publication import evidence_path
+
+    refs = [a for a in task.get('artifacts', []) if Path(a['path']).name == 'rerun-provenance.json']
+    if len(refs) != 1:
+        return None
+    path = evidence_path(refs[0]['path'])
+    if digest(path.read_bytes()) != refs[0]['sha256']:
+        raise ValueError('Rerun provenance hash mismatch')
+    source = json.loads(path.read_text())
+    if (source.get('rerun_id') != history['rerun_id'] or source.get('source_calls') != [] or
+            source.get('accounting_policy') != 'retain_prior_spending' or source.get('source_segments') != []):
+        return None
+    return prelaunch_collision_cost({'calls': source['source_calls'],
+        'executor_segments': source.get('source_executor_segments'),
+        'invalid_reasons': source.get('invalid_reasons', []), 'artifacts': source.get('source_artifacts', [])})
+
+
 def control_calls(entry: dict[str, Any], task_id: str,
                   pricing: dict[str, Any], *, provenance: list[dict[str, Any]] | None = None) -> tuple[list[dict[str, Any]], float | None]:
     """Read only hash-pinned runner evidence, including archived interruptions."""

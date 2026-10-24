@@ -249,9 +249,13 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         core.write_json(out / task_id / 'rerun-provenance.json', evidence)
         provenance['tasks'].append(evidence)
         recovered_state['tasks'].pop(task_id)
+        from eval.runner.control_accounting import prelaunch_collision_cost
+        prior_control = old['costs']['control_usd']
+        if prior_control is None:
+            prior_control = prelaunch_collision_cost(old)
         recovered_state.setdefault('fresh_reruns', {})[task_id] = {
             'rerun_id': evidence['rerun_id'], 'calls': [] if _unaccounted else copy.deepcopy(old['calls']),
-            'control_usd': 0 if _unaccounted else old['costs']['control_usd']}
+            'control_usd': 0 if _unaccounted else prior_control}
     core.write_json(out / 'checkpoint.json', recovered_state)
     core.write_json(provenance_path, provenance)
     config_path = out / 'rerun-config.yaml'
