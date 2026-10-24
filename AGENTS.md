@@ -7,7 +7,7 @@ This file lives at the repository root. Every Codex session reads it automatical
 LocalHarnessMaker now builds hooks that compensate gpt-6.1-sol's measured
 weaknesses with deterministic checks and two pinned gpt-6-luna calls per
 completed session at low effort. Decision 0011 was accepted on 2026-10-25;
-the interface version 3 schema set remains proposed until separately approved.
+the interface version 3 schema set was approved by the user on 2026-10-25 at 01:55 KST and is frozen.
 
 The first-prompt hook shows a requirements table and asks unresolved questions.
 Stop runs deterministic checks, audits final-message claims with Luna, allows
@@ -41,16 +41,16 @@ Rules:
 
 ## 3. Interfaces between roles
 
-### 3.0 Proposed hook interfaces, version 3
+### 3.0 Frozen hook interfaces, version 3
 
-Status: proposed on 2026-10-25. Direction 0011 is accepted; the schema set is
-frozen only after the user's explicit approval, which Claude will request.
-`schemas/VERSION` is 3 as a proposal marker; it does not assert approval or
-runtime implementation. Roles 2–4 start implementation after approval. Role 5
-can design tasks/plugin mode against the draft. This explicit user-requested
-draft is authorized; it does not activate or alter the historical runtime.
+Status: frozen, approved by the user on 2026-10-25 at 01:55 KST, exactly as proposed in
+`docs/interfaces-v3.md` and `schemas/` at commit `d82b87a`.
+`schemas/VERSION` stays 3 and now denotes the frozen set. Roles 2–5 start
+implementation now. Any later change to a frozen v3 schema requires a new
+decision, explicit user approval and a version increment. Publication does not
+assert runtime implementation or compatibility.
 
-Source of truth for proposed paths, mappings and sequencing:
+Source of truth for frozen paths, mappings and sequencing:
 [docs/interfaces-v3.md](docs/interfaces-v3.md), plus these closed draft 2020-12
 schemas and examples in schemas/examples/:
 
@@ -73,7 +73,8 @@ answer. No `llm_judge` on the hook path; historical schemas retain it.
 
 Exact workspace artifact root: `.localharness/v3/`. Per-session directory:
 `sessions/<sha256-of-UTF-8-session_id>/`, containing `pin-check.json`,
-`requirements.json`, `completion-report.json`, `ledger.json`, `luna-calls.jsonl`
+`requirements.json`, `claim-audit.json` (claim-audit block sidecar),
+`completion-report.json`, `ledger.json`, `luna-calls.jsonl`
 and referenced immutable `evidence/` files. `.localharness/v3/latest-ledger.json`
 is an atomic copy of the last validated ledger and is revalidated on injection.
 The ledger supersedes handoff only for this hook path; keep handoff.schema.json
@@ -113,9 +114,9 @@ fails. Report paired uncertainty; no numeric equivalence margin is invented.
 V1/v2 informed this design, so H3 is evaluated on v3 only. Historical report
 schemas are retained unchanged; schema version and task-set version differ.
 
-The following sections 3.1–3.2 describe retained v1/v2 interfaces, not new hook
-work items. Section 3.3 retains measured wire behavior/guard, with the explicit
-H3 environment exception; section 3.4 applies to all evaluations.
+Section 3.1 describes retained v1/v2 schemas. Section 3.2 lists both historical
+and frozen v3 CLIs. Section 3.3 maps v3 events onto measured wire channels and
+retains the nested guard; section 3.4 applies to all evaluations.
 
 Version 1 was approved and published on 2026-10-21, ahead of the planned
 2026-10-24 freeze. Approved records: docs/decisions/0002-judgment-schema-proposal.md,
@@ -133,7 +134,7 @@ remain valid version 1 documents; compare versions only with tools accepting bot
 
 ### 3.1 Historical schemas (directory schemas/, JSON Schema draft 2020-12)
 
-All objects reject unknown fields. make validate-schemas checks all historical and proposed schemas
+All objects reject unknown fields. make validate-schemas checks all historical and frozen v3 schemas
 and every reference example offline, including date/time formats and local
 references. The schema files are the exact field/type definitions.
 
@@ -187,7 +188,9 @@ Cross-artifact ID equality, counts, costs, CI ordering, observed model/effort,
 process/copy ordering and other arithmetic require runtime checks in addition
 to JSON Schema. Decision 0003 specifies metric units and runtime invariants.
 
-### 3.2 Retained command line interfaces
+### 3.2 Command line interfaces
+
+#### Historical versions 1 and 2 (unchanged)
 
 1. python -m controller contract --prompt FILE --handoff FILE_OR_none --cases DIR --backend codex_cli_OR_cheap_api_OR_local --out contract.json
 2. python -m controller handoff --transcript PATH --contract contract.json --verdict verdict.json --backend codex_cli_OR_cheap_api_OR_local --out handoff.json
@@ -216,16 +219,42 @@ Read CLI --json events as logs/accounting and final structured output from
 by the installed CLI and validate locally before overwriting code-owned fields.
 Subprocesses are injectable, use shell=False, piped input and bounded deadlines.
 
-Conventions for every command:
+Conventions for every historical command:
 - Exit 0 means successful computation, 1 input error, 2 internal error. Input validation occurs before model calls. A fail/unverifiable judgment or recorded invalid evaluation task is a successful computation, not a CLI error.
 - Successful stdout contains exactly one output path plus a newline. Logs go to stderr; no success path is printed on error.
 - controller/verifier outputs validate against their named schemas. eval prints its --out directory, containing report.json validated by evaluation-report.schema.json.
 - validate-handoff validates without rewriting input and prints the supplied handoff path; no --out flag is added.
 
+#### Frozen version 3 hook operations
+
+Role 2 hooks are the only production callers. The evaluation runner never calls
+these operations directly; it launches the installed hooks and collects artifacts.
+The historical conventions above apply only to versions 1 and 2. The following
+arguments, results and exit codes are the frozen v3 interfaces. `DIR` supplied to
+`--artifacts` is the exact session artifact directory from section 3.0. All artifact
+inputs/outputs below are inside it unless explicitly stated. Request/configuration
+sources and the workspace are external inputs; hooks retain immutable prompt and
+final-message snapshots under `evidence/` for the FILE arguments and hashes.
+Inputs are validated before model calls. Command-specific exit codes and stdout
+are specified below; historical stdout/exit conventions are not implicitly inherited.
+
+| Operation and exact arguments | Reads and writes | Exit / stdout |
+| --- | --- | --- |
+| `python -m controller requirements --prompt FILE --session-id ID --artifacts DIR [--config FILE]` | Reads retained prompt FILE, optional external project config FILE, `pin-check.json` and phase accounting. One `gpt-6-luna` low call when enabled; writes `requirements.json` and appends one `luna-calls.jsonl` record per invocation. Luna supplies classification, text, source excerpts and open questions; code derives every check from request/configuration, never from Luna. | 0: schema-valid table, state `ready` or `pending_questions`. 2: pin/call failure, table state `unavailable`, visible advisory. A disabled pin invokes no model and appends no fictitious call record. |
+| `python -m controller claim-audit --requirements FILE --final-message FILE --session-id ID --artifacts DIR` | Reads requirements FILE, retained final-message FILE, `pin-check.json`, phase accounting and cited evidence. One `gpt-6-luna` low call when enabled; writes the `claim_audit` block itself to `claim-audit.json` for verifier merge, and appends one accounting record per invocation. Sidecar validates against `completion-report.schema.json#/properties/claim_audit`; no new schema/envelope. | 0: schema-valid completed audit. 2: pin/call failure, sidecar status `unavailable`, visible advisory; no fictitious accounting for a disabled pin. |
+| `python -m verifier check --requirements FILE --workspace DIR --session-id ID --artifacts DIR --round N [--claim-audit FILE] [--final-message FILE]` | Reads requirements FILE, external workspace DIR, optional audit sidecar and final-message snapshot, and prior report/retry state on recheck. Runs every row's deterministic check with `shell=False`, bounded deadlines and workspace isolation. Writes `completion-report.json` (`check_round=N`, N=1 or 2) and immutable `evidence/` files; merges supplied audit. Round 1 writes retry state and failing row IDs, recording whether one repair is warranted; persist `retry.used=1` before blocking for that repair. No extra report fields are added. | 0 whenever report written, whatever verdicts; stdout one-line JSON `{overall, failed_rows, unverifiable_rows, retry_warranted}`. `overall` is pass only if every row passes with ready requirements; otherwise fail. Row lists contain requirement IDs; `retry_warranted` is boolean, true only for executed deterministic failure with the repair available. 2: internal error. |
+| `python -m verifier ledger-validate --ledger FILE --workspace DIR --session-id ID --artifacts DIR` | Reads ledger FILE and external workspace DIR; fills hook-owned `validation` in `ledger.json`. Atomically copies a valid ledger to `<workspace>/.localharness/v3/latest-ledger.json` (the sole output outside session artifacts); invalid ledger is not copied. | 0 valid; 1 invalid, advisory text on stdout; 2 internal error. |
+| `python -m plugin.pin_check --session-id ID --artifacts DIR --codex PATH` | Reads external installed Codex executable PATH, verified-version/model/pricing configuration and observed evidence. Writes `pin-check.json` and referenced immutable `evidence/` snapshots. | 0 enabled; 1 disabled, advisory on stdout; 2 internal error. |
+
+No automatic retry, regeneration or fallback is permitted. Every actual failed
+invocation consumes its phase slot and is accounted once; pre-call pin failures
+consume no provider invocation. Missing usage/cost remains null. Controller call
+failures publish unavailable artifacts rather than inferred requirements/audits.
+
 ### 3.3 Hook input, output and nested environment guard
 
 Source of truth for measured v1/v2 wire behavior: docs/hooks-contract.md,
-published from Role 2's measured draft. Proposed v3 semantics in section 3.0
+published from Role 2's measured draft. Frozen v3 semantics in section 3.0
 replace contract/handoff content on the same measured context/Stop channels;
 they do not claim new production compatibility evidence.
 It records the versions verified so far, starting with codex-cli
@@ -240,6 +269,21 @@ the new guard, handoff, persisted trust or production retry limits.
 - Historical SessionStart injects validated handoff text through hookSpecificOutput.additionalContext with hookEventName=SessionStart.
 - SessionEnd is observe-only. Do not use it.
 
+Frozen v3 event mapping (no new hook wire fields):
+
+| Event | Ordered behavior |
+| --- | --- |
+| SessionStart | Run pin-check, then mechanically revalidate and inject the latest ledger via `hookSpecificOutput.additionalContext`; show pin/ledger advisories. |
+| UserPromptSubmit, first prompt only | Run requirements, show the table/questions, then inject: "if the requirements table has open questions, ask them and end the turn before changing any file". Record visible answers without another Luna call. |
+| PreToolUse | Protected-file guard only if the installed Codex hook contract exposes a pre-tool event and compatibility is verified; otherwise defer the guard with a visible note. Do not invent an event or wire field. |
+| Stop | If questions are pending and the workspace is unchanged, permit termination without a claim audit or ledger turn. Otherwise run verifier check and the claim audit at the first Stop only, merge/publish the report, block once for application repair only when `retry_warranted`, then recheck without another audit. After checks settle, request ledger continuation once, validate, then allow termination. Preserve the original audit and mark stale if the final message changes. |
+
+The question pause applies to noninteractive sessions too. Silence is no answer;
+Role 5 supplies prepared clarification visibly or marks an unresolvable run
+invalid. Pending-question termination is a pause, not successful task completion.
+It may omit later artifacts; do not require an audit/ledger merely to exit that
+unchanged pause. This exception precedes the ordinary first-Stop sequencing.
+
 HARNESS_NESTED=1 makes every LocalHarnessMaker hook exit 0 immediately with zero
 bytes on stdout AND stderr. Compare the exact string "1" before reading stdin,
 loading state/config, importing controller/verifier, logging timing, creating
@@ -249,7 +293,7 @@ normal handling and whole-script exception handling, including stub mode.
 
 Set the guard in a copied child environment for every controller-owned Codex
 subprocess/retry/resume and wrapper that can launch Codex. Role 5 sets it on
-legacy runner-owned executor/resume processes and baseline A. Proposed H3
+legacy runner-owned executor/resume processes and baseline A. H3
 plugin mode removes it from copied executor/resume environments so hooks run;
 H3 does not own an independent control loop. Do not
 mutate the parent environment or persistent configuration. Normal direct-user

@@ -1,5 +1,8 @@
 ## Done
 
+- Published the user-approved frozen v3 schema/artifact set from d82b87a (2026-10-25, 01:55 KST), exact hook CLIs, hook-event mapping, pending-question unchanged-workspace exit, production caller boundaries and role implementation start; synchronized decision 0011, interfaces, plan and prompts (`.venv/bin/python -m pytest tests/lead -q`: 141 passed in 10.12s; `make validate-schemas`: Validated 11 draft 2020-12 schemas and 13 examples).
+- Preserved every approved schema/example/marker byte, including original proposal metadata, while schemas/VERSION remains 3 and now denotes the frozen set (`python3` inline git ls-tree/git show byte comparison against d82b87a: 25 tracked schema/marker/example files byte-for-byte unchanged; VERSION=3).
+
 - Published accepted decision 0011 with attributed v1/v2 findings and invalidity/grader limits, six design principles, hook table, pinned Luna/B-dropped/C-optional/0010-record-only confirmations, held-out v3 freeze rule and success criterion; added 0010's record-only note and resolved 0011 in the plan (`.venv/bin/python -m pytest tests/lead -q`: 141 passed in 31.97s; measurements are attributed host records, not rerun).
 - Drafted interface version 3 requirements, completion-report, ledger, pin-check and Luna-call schemas with examples; exact workspace artifact paths, runner collection/accounting contract, fail-closed pin, kind/check mappings, single repair and separate ledger bookkeeping; retained all six historical schemas and report fields unchanged (`make validate-schemas`: Validated 11 draft 2020-12 schemas and 13 examples).
 - Updated AGENTS.md, docs/interfaces-v3.md, the historical interface-page notice, plan and all five role prompts for the new schedule/ownership and real A/H3 hooks; the schema set remains proposed, not frozen; added lead boundary tests and updated historical version/count assertions (`.venv/bin/python -m pytest tests/lead -q`: 141 passed in 31.97s).
@@ -37,9 +40,10 @@
 - Updated docs/interfaces.md, AGENTS.md section 3, and the two explicitly authorized controller/evaluation role prompts for the approved model order, shared three-call budget, nested guard, judgment/report contracts, access audit and API-equivalent accounting (make test PYTHON=.venv/bin/python: interface/prompt consistency tests passed).
 - Published the approved installed-version hook contract with corrected evidence links; kept probe evidence and other roles' implementations unchanged (published evidence-link test passed; .venv/bin/python -m plugin.check_probe_evidence plugin/evidence/2026-10-21-exec plugin/evidence/2026-10-21-tui: both runs context_visible=true, continued_once=true, exit_code=0).
 
+- Confirmed the final owned changes have no whitespace errors (`git diff --check -- AGENTS.md docs/decisions/0011-pinned-luna-hook-direction.md docs/interfaces-v3.md docs/interfaces.md docs/plan.md prompts/ tests/lead/test_hook_interfaces_v3.py state/STATUS-lead.md`: exit 0, no output).
+
 ## Remaining
 
-- Claude requests explicit user approval of the complete proposed v3 schema/artifact set in docs/interfaces-v3.md and schemas/. Record that approval before declaring the set frozen; direction approval in 0011 does not approve the schema choices. Roles 2–4 implement only after that gate. Do not restart the superseded v2 recovery or 0010 remedy work.
 - Coordinate owning-role work: Role 2 pin-check/guard/advice/ledger injection; Role 3 independent prompt/calibration design and pinned client/accounting; Role 4 deterministic completion/single repair/Stop ledger request; Role 5 v3 task design and real-plugin artifact collection, A/H3 configs and estimates. No runtime implementation or live acceptance is established by this lead publication.
 - Publish a separate v3 freeze record after Role 5 supplies the held-out inventory/digest and reference/starter/mutation/shared-line validation. Freeze before full A/H3 runs. Keep v1/v2 task sets, graders, reports and prior freezes historical and unchanged; no H3 evaluation on them.
 - Track 10/28–11/03 real smokes on two non-evaluation projects, actual hook compatibility, model/version/pricing pin failures, question/answer interaction, complete accounting, application repair and ledger sequencing. The proposal's under-10-second calls, under-2-percent control cost and about-two-hour full configurations remain unmeasured targets/estimate.
@@ -51,10 +55,11 @@
 ## Decisions
 
 - Adopt user-approved 0011, accepted 2026-10-25: the original claim is answered negatively; build deterministic hooks plus two low-effort pinned Luna calls and evaluate only A/H3 on held-out v3. B is dropped, C optional, 0010 record-only.
-- Keep schema version 3 proposed despite incrementing schemas/VERSION: the user requested reviewable definitions now and separate explicit approval before freeze, to be requested by Claude. Do not mistake direction acceptance for schema approval.
+- Freeze schema version 3 from d82b87a, approved by the user 2026-10-25 at 01:55 KST: approval is now explicit, schemas/VERSION stays 3, Roles 2–5 implement now; later schema changes require a new decision, user approval and version increment. Preserve the approved bytes including proposal metadata.
 - Use a workspace-only artifact root .localharness/v3/ with SHA-256 session directories, fixed artifact filenames and per-call JSONL: the runner collects and prices hook outputs without orchestrating control calls. Extra pin-check/Luna-call schemas make those formats locally verifiable.
 - Supersede handoff only on the new hook path with executor-written ledger: retain old schemas/CLIs/artifacts unchanged for v1/v2 history; no Luna transcript reconstruction or llm_judge on H3.
-- Propose one call per phase with no automatic fallback/regeneration: failures count toward the two-call session budget; keep old command budgets only for historical consumers. Unknown usage stays null and conflicting model identity fails closed.
+- Enforce one call per phase with no automatic fallback/regeneration: failures count toward the two-call session budget; keep old command budgets only for historical consumers. Unknown usage stays null and conflicting model identity fails closed.
+- Permit an unchanged-workspace pending-question pause without audit or ledger: the first-prompt hook instructs asking and ending the turn before any file changes; no new wire fields or assumed answers.
 - Audit once before application repair and mark changed final messages stale: a second audit would exceed the chosen phase budget. Request ledger writing once as separate bookkeeping, preserving application claims/evidence in the final response; no extra app repair or recursive ledger retry.
 - Distinguish A and H3 child guards: A uses HARNESS_NESTED=1, H3 removes it for real hooks, controller-owned nested Codex always sets it; never mutate parent configuration/environment.
 - Preserve the user's no-quality-loss rule and report paired uncertainty: an interval containing zero alone is not proof of equivalence; no numeric margin was supplied.
@@ -68,13 +73,13 @@
 ## Do not touch
 
 - This session: eval/, plugin/, controller/, verifier/, task sets/private graders, docs/weekly/, docs/handoff/, docs/evaluation/, CLAUDE.md, root configuration, other roles' tests/STATUS and read-only .git. Do not stage/commit, delete files, rewrite history, change external configuration, use network, spawn agents or invoke nested/live models/macOS sandbox-exec.
-- Historical v1/v2 schema bodies/examples/report fields, task sets, grader contents/digests and measured captures. The current schema marker is a proposed set, not a report migration.
-- No unapproved activation/freeze of v3 interfaces and no tuning H3 on frozen v3 outcomes. Implementation belongs to Roles 2–5 in their owned paths.
+- Historical v1/v2 schema bodies/examples/report fields, task sets, grader contents/digests and measured captures. The current schema marker denotes frozen hook interfaces, not a report migration.
+- No unapproved revision of frozen v3 interfaces and no tuning H3 on frozen v3 outcomes. Implementation belongs to Roles 2–5 in their owned paths.
 
 ## Assumptions
 
 - Direction approval and measured findings are explicit user instructions and attributed Claude proposal/host evidence dated 2026-10-24/25; this offline session did not remeasure them. V2 harness has 23 invalid tasks and stopped recovery; its subset is diagnostic. B pricing at the stop was pending; the proposal's about-1.2x figure is attributed, not recomputed.
-- Workspace artifact layout, code-check mappings, no-fallback phase budget, audit-before-repair/stale-audit handling and ledger bookkeeping/final-summary preservation are proposed design choices for schema-set review, not separately approved runtime policy.
+- The approval time, commit identity, CLI operations and question-pause policy are supplied explicitly by the user; no independent host observation is claimed. This documentation publication establishes no runtime compatibility or implementation evidence.
 - Expected command exit defaults to configured zero-success convention only when unspecified; unsupported/ambiguous oracles stay unavailable and user questions remain unanswered until visible clarification. A ledger presence/hash check does not establish decision quality.
 - No numeric equivalence/noninferiority margin was supplied. The proposal's two-hour Fast run estimate and timing/control-cost targets remain estimates/targets, not measurements or paid-batch approval.
 - No PR is requested in this read-only .git session. This STATUS/0011 provide the change summary and Assumptions; the final Commit plan lists only owned changes. Historical Done evidence below is retained as history, not current H3 acceptance.

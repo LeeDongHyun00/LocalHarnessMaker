@@ -20,8 +20,9 @@ edit controller/, verifier/, eval/ or other roles' STATUS.
 
 ## Interfaces
 
-The version 3 set in AGENTS.md section 3.0 and docs/interfaces-v3.md is proposed,
-not frozen; start implementation only after explicit schema-set approval.
+The version 3 set in AGENTS.md section 3.0 and docs/interfaces-v3.md is frozen,
+approved by the user 2026-10-25 at 01:55 KST from commit d82b87a. Start implementation now.
+Use the frozen hook CLIs and event mapping in AGENTS.md sections 3.2–3.3.
 Direction 0011 is already accepted. Historical CLIs/schemas stay unchanged for
 v1/v2 consumers; new hooks do not call contract, handoff or judge generators.
 
@@ -71,9 +72,8 @@ Update STATUS; never claim live acceptance from mocked tests.
 
 ## First task
 
-Read the approved-or-proposed schema status and current STATUS. Prepare mocked
-pin/ledger/guard cases while awaiting approval; implement D-1 only after that
-gate. Send evidence/proposals to owners without editing their paths.
+Read the frozen schema status and current STATUS. Implement D-1 now with mocked
+pin/ledger/guard cases and the approved question-pause policy. Send evidence/proposals to owners without editing their paths.
 
 ## Assumptions
 

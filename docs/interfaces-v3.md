@@ -1,12 +1,14 @@
-# Hook interfaces, version 3 proposal
+# Hook interfaces, version 3
 
-Status: proposed on 2026-10-25 under [0011](decisions/0011-pinned-luna-hook-direction.md).
-The user approved the direction. Claude will request explicit approval of this
-complete schema set; only then is version 3 frozen and Roles 2–4 implement it.
-`schemas/VERSION = 3` marks this draft, not a freeze. Versions 1/2 interfaces
-remain in [interfaces.md](interfaces.md), including all six historical CLIs.
-No new CLI or hook wire field is proposed here. Internal package integration
-must stay within existing ownership; propose a separate CLI revision if needed.
+Status: frozen, approved by the user on 2026-10-25 at 01:55 KST, exactly as proposed at commit
+`d82b87a` in this document and `schemas/`, under [0011](decisions/0011-pinned-luna-hook-direction.md).
+`schemas/VERSION = 3` now denotes the frozen set. Roles 2–5 start implementation
+now. Any later change to a frozen v3 schema requires a new decision, explicit
+user approval and a version increment. Schema bytes (including original proposal
+metadata) are preserved exactly; this approval record governs their status.
+Versions 1/2 interfaces remain in [interfaces.md](interfaces.md), including all
+six historical CLIs. Frozen v3 hook operations and event mapping are published
+in [AGENTS.md sections 3.2–3.3](../AGENTS.md); no new hook wire fields are added.
 
 ## Artifact directory and collection contract
 
@@ -20,6 +22,7 @@ injection from session IDs. All paths below are exact relative to that directory
 | --- | --- | --- |
 | `pin-check.json` | pin-check.schema.json / Role 2 | User, hook gate, runner |
 | `requirements.json` | requirements.schema.json / Role 3 | User, checks, executor, runner |
+| `claim-audit.json` | completion-report.schema.json#/properties/claim_audit / Role 3 | Role 4 merges into completion report; runner retains sidecar |
 | `completion-report.json` | completion-report.schema.json / Role 4, claim audit by Role 3, advice by Role 2 | User, runner |
 | `ledger.json` | ledger.schema.json / executor through Role 4 Stop continuation; validation by hook | Next session via Role 2, runner |
 | `luna-calls.jsonl` | Each line validates with luna-call.schema.json / Role 3 | Runner accounting |
@@ -56,7 +59,8 @@ model identity, call counts and token totals. Hash-pin the collected files in
 existing report artifact references; missing/malformed/inconsistent required
 artifacts or pin-disabled H3 is invalid with reasons, never a zero-cost pass.
 An interrupted session may lack later artifacts; retain partial files and costs.
-A successful H3 session requires all five files (JSONL may be empty only if
+A completed H3 session requires all five files; the unchanged pending-question
+pause described below is exempt until work resumes (JSONL may be empty only if
 Luna was disabled, which cannot establish a valid H3 result).
 
 A uses no LocalHarnessMaker hooks and sets `HARNESS_NESTED=1` in a copied child
@@ -109,6 +113,13 @@ answer. Pin/call failure produces `unavailable` with visible reason via the
 advisory/accounting and no inferred requirements. The first-prompt phase occurs
 once per native session, not again for clarification or Stop continuation.
 
+The first-prompt hook injects the approved instruction: "if the requirements
+table has open questions, ask them and end the turn before changing any file".
+When questions are pending and the workspace is unchanged, Stop permits
+termination without a claim audit or ledger turn. This is a clarification pause,
+not a completed task, and adds no hook wire fields. Never treat silence as an
+answer; prepared noninteractive clarification must still be visible.
+
 ## Completion, retry and ledger sequencing
 
 `completion-report.schema.json` references the exact requirements snapshot and
@@ -122,7 +133,7 @@ paths/hashes; invented citations are unsupported. Claim-audit opinions never
 turn deterministic verdicts into pass or trigger repair. No overall pass is
 inferred while any row is fail/unverifiable or the requirements are unavailable.
 
-At first Stop, run checks, spend the one claim-audit call, and publish the report.
+Except for the unchanged pending-question pause above, at first Stop, run checks, spend the one claim-audit call, and publish the report.
 If any executed check fails, persist `retry.used=1` and its failed row IDs before
 one `decision=block` repair continuation with concrete evidence for those rows
 only. If none fails, do not repair. After the repair, recheck deterministically,
@@ -201,6 +212,49 @@ Targets: each call below 10 seconds measured, combined control cost well under
 The success criterion remains at most 15 percent extra cost per passing task
 with quality preserved and task false done at least halved.
 
+#### Frozen version 3 hook operations
+
+Role 2 hooks are the only production callers. The evaluation runner never calls
+these operations directly; it launches the installed hooks and collects artifacts.
+The historical conventions above apply only to versions 1 and 2. The following
+arguments, results and exit codes are the frozen v3 interfaces. `DIR` supplied to
+`--artifacts` is the exact session artifact directory from section 3.0. All artifact
+inputs/outputs below are inside it unless explicitly stated. Request/configuration
+sources and the workspace are external inputs; hooks retain immutable prompt and
+final-message snapshots under `evidence/` for the FILE arguments and hashes.
+Inputs are validated before model calls. Command-specific exit codes and stdout
+are specified below; historical stdout/exit conventions are not implicitly inherited.
+
+| Operation and exact arguments | Reads and writes | Exit / stdout |
+| --- | --- | --- |
+| `python -m controller requirements --prompt FILE --session-id ID --artifacts DIR [--config FILE]` | Reads retained prompt FILE, optional external project config FILE, `pin-check.json` and phase accounting. One `gpt-6-luna` low call when enabled; writes `requirements.json` and appends one `luna-calls.jsonl` record per invocation. Luna supplies classification, text, source excerpts and open questions; code derives every check from request/configuration, never from Luna. | 0: schema-valid table, state `ready` or `pending_questions`. 2: pin/call failure, table state `unavailable`, visible advisory. A disabled pin invokes no model and appends no fictitious call record. |
+| `python -m controller claim-audit --requirements FILE --final-message FILE --session-id ID --artifacts DIR` | Reads requirements FILE, retained final-message FILE, `pin-check.json`, phase accounting and cited evidence. One `gpt-6-luna` low call when enabled; writes the `claim_audit` block itself to `claim-audit.json` for verifier merge, and appends one accounting record per invocation. Sidecar validates against `completion-report.schema.json#/properties/claim_audit`; no new schema/envelope. | 0: schema-valid completed audit. 2: pin/call failure, sidecar status `unavailable`, visible advisory; no fictitious accounting for a disabled pin. |
+| `python -m verifier check --requirements FILE --workspace DIR --session-id ID --artifacts DIR --round N [--claim-audit FILE] [--final-message FILE]` | Reads requirements FILE, external workspace DIR, optional audit sidecar and final-message snapshot, and prior report/retry state on recheck. Runs every row's deterministic check with `shell=False`, bounded deadlines and workspace isolation. Writes `completion-report.json` (`check_round=N`, N=1 or 2) and immutable `evidence/` files; merges supplied audit. Round 1 writes retry state and failing row IDs, recording whether one repair is warranted; persist `retry.used=1` before blocking for that repair. No extra report fields are added. | 0 whenever report written, whatever verdicts; stdout one-line JSON `{overall, failed_rows, unverifiable_rows, retry_warranted}`. `overall` is pass only if every row passes with ready requirements; otherwise fail. Row lists contain requirement IDs; `retry_warranted` is boolean, true only for executed deterministic failure with the repair available. 2: internal error. |
+| `python -m verifier ledger-validate --ledger FILE --workspace DIR --session-id ID --artifacts DIR` | Reads ledger FILE and external workspace DIR; fills hook-owned `validation` in `ledger.json`. Atomically copies a valid ledger to `<workspace>/.localharness/v3/latest-ledger.json` (the sole output outside session artifacts); invalid ledger is not copied. | 0 valid; 1 invalid, advisory text on stdout; 2 internal error. |
+| `python -m plugin.pin_check --session-id ID --artifacts DIR --codex PATH` | Reads external installed Codex executable PATH, verified-version/model/pricing configuration and observed evidence. Writes `pin-check.json` and referenced immutable `evidence/` snapshots. | 0 enabled; 1 disabled, advisory on stdout; 2 internal error. |
+
+No automatic retry, regeneration or fallback is permitted. Every actual failed
+invocation consumes its phase slot and is accounted once; pre-call pin failures
+consume no provider invocation. Missing usage/cost remains null. Controller call
+failures publish unavailable artifacts rather than inferred requirements/audits.
+
+## Frozen hook event mapping
+
+Frozen v3 event mapping (no new hook wire fields):
+
+| Event | Ordered behavior |
+| --- | --- |
+| SessionStart | Run pin-check, then mechanically revalidate and inject the latest ledger via `hookSpecificOutput.additionalContext`; show pin/ledger advisories. |
+| UserPromptSubmit, first prompt only | Run requirements, show the table/questions, then inject: "if the requirements table has open questions, ask them and end the turn before changing any file". Record visible answers without another Luna call. |
+| PreToolUse | Protected-file guard only if the installed Codex hook contract exposes a pre-tool event and compatibility is verified; otherwise defer the guard with a visible note. Do not invent an event or wire field. |
+| Stop | If questions are pending and the workspace is unchanged, permit termination without a claim audit or ledger turn. Otherwise run verifier check and the claim audit at the first Stop only, merge/publish the report, block once for application repair only when `retry_warranted`, then recheck without another audit. After checks settle, request ledger continuation once, validate, then allow termination. Preserve the original audit and mark stale if the final message changes. |
+
+The question pause applies to noninteractive sessions too. Silence is no answer;
+Role 5 supplies prepared clarification visibly or marks an unresolvable run
+invalid. Pending-question termination is a pause, not successful task completion.
+It may omit later artifacts; do not require an audit/ledger merely to exit that
+unchanged pause. This exception precedes the ordinary first-Stop sequencing.
+
 ## Approval and validation
 
 Affected roles: Role 1 publishes; Role 2 gates/injects/collects hook state; Role 3
@@ -215,7 +269,7 @@ claim these checks are implemented. Run `make validate-schemas` and
 
 ## Assumptions
 
-- This is a proposed workspace-only artifact layout; no existing plugin state path is migrated by documentation.
+- This is the approved workspace-only artifact layout; no existing plugin state path is migrated by documentation.
 - Code uses a configured zero-success command convention when the request gives no exit expectation; ambiguity about behavior remains a user question.
 - One audit before repair preserves the two-call budget. A changed final message is explicitly stale; report-accuracy evaluation must retain that limitation.
-- A ledger-only Stop continuation is separate from, and cannot extend, the single application repair. Its final response preserves the application outcome so bookkeeping does not erase completion claims. Pending approval covers these sequencing choices.
+- A ledger-only Stop continuation is separate from, and cannot extend, the single application repair. Its final response preserves the application outcome so bookkeeping does not erase completion claims. These sequencing choices are approved.

@@ -2,7 +2,7 @@
 
 Date: 2026-10-25
 
-Status: accepted by the user on 2026-10-25. Direction approved; the interface version 3 schema set is proposed and awaits separate explicit approval.
+Status: accepted by the user on 2026-10-25. Direction approved; interface version 3 schema set approved by the user on 2026-10-25 at 01:55 KST, exactly as proposed in docs/interfaces-v3.md and schemas/ at commit d82b87a, and frozen. The question-pause policy and v3 hook CLIs are published in AGENTS.md sections 3.2–3.3; no new hook wire fields.
 
 ## Context
 
@@ -60,20 +60,21 @@ The user's three confirmations are recorded explicitly:
 
 Target each Luna call below 10 measured seconds and combined control cost well
 under 2 percent of Fast executor cost. These are targets, not measurements.
-The proposed hook budget counts failures and permits no regeneration or
+The frozen hook budget counts failures and permits no regeneration or
 transport fallback beyond the two calls (one per phase). Historical three-call
 controller commands retain their old contracts outside this hook path.
 
 ## Interfaces and ownership
 
-Role 1 proposes requirements, completion-report, ledger, pin-check and per-call
-accounting schemas/examples; `schemas/VERSION` becomes 3 as a proposal marker.
-[The interface draft](../interfaces-v3.md) defines exact plugin artifact paths,
+Role 1 publishes the frozen requirements, completion-report, ledger, pin-check
+and per-call accounting schemas/examples approved on 2026-10-25 at 01:55 KST
+from commit `d82b87a`. `schemas/VERSION` remains 3 and denotes the frozen set.
+[The frozen interface](../interfaces-v3.md) defines exact artifact paths,
 check derivation, accounting and retry/ledger sequencing. AGENTS.md section 3
-marks these proposed, frozen only after explicit user approval of the complete
-set, which Claude will request. Direction approval is not schema approval.
-Roles 2–4 begin implementation after that approval; Role 5 may design its task
-set and plugin mode now without treating proposed interfaces as frozen.
+publishes frozen hook CLIs and event mapping, including the unchanged-workspace
+pending-question exit without claim audit or ledger continuation. Roles 2–5
+start implementation now. Any later frozen v3 schema change requires a new
+decision, explicit user approval and a version increment.
 
 The ledger supersedes `handoff.schema.json` only on the new hook path. Retain
 all old schemas, CLIs and reference artifacts for version 1/2 history. Retire
@@ -129,8 +130,8 @@ approve a paid batch: Role 5 must report calibrated call/cost estimates first.
 
 ## Scope and verification
 
-This publication changes owned documentation, proposed schemas/examples and
-lead validation tests only. It implements no hooks, controller, verifier or
+This publication records approval of the frozen schemas/examples and changes
+owned documentation and lead validation tests only. It implements no hooks, controller, verifier or
 runner and runs no model calls. Historical reports are untouched. Lead tests
 and schema validation establish structural consistency, not live compatibility,
 pin availability, timing, cost targets or evaluation success.
@@ -138,5 +139,5 @@ pin availability, timing, cost targets or evaluation success.
 ## Assumptions
 
 - User approval and measurements come from the supplied proposal and host note; no independent live or private-grader measurement is claimed.
-- Artifact paths, check mappings, two-call failure policy and ledger sequencing are reviewable interface choices in the proposed schema set, pending explicit approval.
+- Artifact paths, check mappings, two-call failure policy and ledger sequencing are approved interface choices; publication does not establish runtime implementation.
 - The paired-interval wording supplies no equivalence margin. The report must retain uncertainty and the user's separate rule that any quality loss fails.

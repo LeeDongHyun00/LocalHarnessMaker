@@ -22,11 +22,11 @@ Do not edit verifier/, plugin/, eval/, root prompts/ or shared schemas.
 
 ## Interfaces
 
-AGENTS.md section 3.0 and docs/interfaces-v3.md define the proposed v3 schema and
-artifact set. Start implementation after explicit schema-set approval; prompt
-and calibration design can be prepared now. Old contract/handoff/judge CLIs and
+AGENTS.md section 3.0 and docs/interfaces-v3.md define the frozen v3 schema and
+artifact set, approved by the user 2026-10-25 at 01:55 KST from commit d82b87a.
+Start implementation now; sections 3.2–3.3 freeze hook CLIs and event mapping. Old contract/handoff/judge CLIs and
 their codex_cli/cheap_api/local selectors remain compatible history, not new
-hook deliverables. No new public CLI without a separate approved proposal.
+hook deliverables. Implement the newly approved v3 hook CLIs; any further CLI change needs a separate approved proposal.
 
 1. Primary codex_cli, exact gpt-6-luna, reasoning effort low. SessionStart pin evidence is required before calls; provider model mismatch fails closed. Explicit cheap_api requires the same model, verified pin and environment key; never copy auth.json or derive HTTP credentials from CLI login. Local/automatic fallback is not used by hooks.
 2. Hook budget: one requirements invocation and one claim-audit invocation per native session, at most two total including failure/timeout/malformed output. No automatic regeneration, retry or transport fallback. Legacy three-call command limits do not apply here. Lock phase allocation before provider invocation and keep it through Stop/clarification events.
@@ -55,7 +55,7 @@ hook deliverables. No new public CLI without a separate approved proposal.
 ## Verification
 
 Run `.venv/bin/python -m pytest tests/controller -q`; validate produced fixtures
-against the proposed/approved schemas with local references. Live independent
+against the frozen schemas with local references. Live independent
 calibration/smokes only on an authorized host, with cost estimate before any
 batch of ten or more. Update STATUS with exact outputs and pending targets.
 
@@ -67,8 +67,8 @@ batch of ten or more. Update STATUS with exact outputs and pending targets.
 
 ## First task
 
-Read schema approval status. Prepare prompt/calibration designs without touching
-evaluation data; implement only once approved, starting with mocked budget,
+Read frozen schema status. Implement the approved client and prompt/calibration designs without touching
+evaluation data; start now with mocked budget,
 accounting and code-owned derivation tests. Update STATUS-controller.md.
 
 ## Assumptions

@@ -27,10 +27,11 @@ QLoRA remain dropped. Retain working runtime/audit/accounting infrastructure.
 ## Approval and freeze gates
 
 The direction is accepted; the [version 3 schema/artifact set](interfaces-v3.md)
-is proposed. `schemas/VERSION = 3` is a draft marker, not a freeze. Claude will
-request explicit user approval of the full set. Roles 2–4 start implementation
-after it; prompt/calibration and task/plugin-mode design may be prepared now.
-Role 1 records approval before publishing a frozen interface.
+was approved by the user on 2026-10-25 at 01:55 KST exactly as proposed at
+commit `d82b87a` and is frozen. `schemas/VERSION = 3` denotes the frozen set.
+Roles 2–5 start implementation now using AGENTS.md sections 3.2–3.3 for frozen
+hook CLIs and event mapping. Later schema changes require a new decision,
+explicit user approval and a version increment.
 
 V1 and v2 informed the design, so H3 is evaluated on held-out v3 only. Retain
 old schemas/reports/freezes as history without rewriting them. Role 5 freezes
@@ -112,11 +113,11 @@ does not prove equivalence or excuse observed quality loss.
 
 - [0011](decisions/0011-pinned-luna-hook-direction.md): resolved, accepted by the user on 2026-10-25; pinned Luna direction and success criterion, B dropped, C optional, 0010 record-only.
 - [0010](decisions/0010-reservations-r2-grader.md): record-only after 0011; its historical remedy options do not authorize grader, digest or population changes.
-- Version 3 schema set: proposed, awaiting explicit approval requested by Claude. This is a separate interface gate, not an unresolved direction decision.
+- Version 3 schema set: resolved, approved by the user 2026-10-25 at 01:55 KST from commit d82b87a and frozen; implementation may start.
 
 ## Assumptions
 
 - Approval and measured findings are supplied user/Claude host evidence; this offline session does not rerun them or access live Notion.
 - About two hours per full configuration is the proposal's estimate, not an approved cost or measured runtime. Role 5 must report its calibrated estimate before large paid batches.
-- Artifact layout, audit-before-repair/stale-audit handling and separate ledger bookkeeping continuation are proposed interface choices pending schema-set approval.
+- Artifact layout, audit-before-repair/stale-audit handling and separate ledger bookkeeping continuation are approved interfaces. Pending questions with an unchanged workspace allow termination without audit or ledger; no new hook wire fields.
 - The user's interval criterion gives no numeric equivalence margin. Undefined/inconclusive evidence cannot be presented as achieved success.

@@ -1,8 +1,8 @@
 # Retained shared interfaces, version 2
 
-Current hook work follows the proposed [version 3 interfaces](interfaces-v3.md)
+Current hook work follows the frozen [version 3 interfaces](interfaces-v3.md)
 and accepted [decision 0011](decisions/0011-pinned-luna-hook-direction.md).
-The schema marker is now 3 (proposed, not frozen); this page retains the
+The schema marker is now 3 (approved by the user 2026-10-25, frozen); this page retains the
 version 1/2 contracts for historical consumers, not current implementation work.
 
 Status: version 2 approved by the user on 2026-10-23 in
@@ -128,7 +128,7 @@ only exit status while retaining evidence.
 
 Schema filenames are under schemas/ and example filenames under
 schemas/examples/. make validate-schemas validates these six historical schema definitions
-and eight samples plus the proposed version 3 set, with local-only reference registration and date/time
+and eight samples plus the frozen version 3 set, with local-only reference registration and date/time
 format checks. Missing required files, unmapped examples, broken references or
 invalid samples fail the target. It executes no embedded verification command
 or network/model call. CI already runs this target and pytest.

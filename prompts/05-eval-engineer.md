@@ -24,12 +24,12 @@ schemas/docs. Send freeze inventory/digest/evidence to Role 1 for publication.
 ## Interfaces and plugin mode
 
 V3 schema/artifact set in AGENTS.md section 3.0 and docs/interfaces-v3.md is
-proposed, awaiting separate explicit approval requested by Claude. Task-set,
-config, estimate and runner-mode design can proceed now; do not assume a draft
-is frozen or a missing plugin is working. Historical report schema v2 adds
+frozen, approved by the user 2026-10-25 at 01:55 KST from commit d82b87a. Start
+implementation now; use sections 3.2–3.3 for hook CLIs/event mapping and question
+pause. A missing plugin still requires implementation and compatibility evidence. Historical report schema v2 adds
 required task_false_done_rate; v1 reports remain valid under decision 0003.
 Keep dual-version consumers and all historical reports unchanged. New hook
-artifacts have their own proposed version 3 schemas; evaluation-report.schema.json
+artifacts have their own frozen version 3 schemas; evaluation-report.schema.json
 is retained, not silently revised. Additional metrics can use existing hashed
 artifact references pending any separately approved report extension.
 
@@ -115,7 +115,7 @@ is pending, not a measured model failure. Update STATUS-eval.md.
 
 ## First task
 
-Read 0011, proposed interface status and current STATUS. Design v3 task shapes,
+Read 0011, frozen interface status and current STATUS. Design v3 task shapes,
 clarifications, A/H3 configs and plugin artifact collection/estimates. Do not
 restart old recovery or implement an unapproved shared-interface change.
 

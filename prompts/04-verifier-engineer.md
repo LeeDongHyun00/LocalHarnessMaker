@@ -20,10 +20,11 @@ eval/, shared schemas or another role's STATUS.
 
 ## Interfaces
 
-AGENTS.md section 3.0 and docs/interfaces-v3.md are the proposed v3 contract;
-implementation starts after explicit schema-set approval. Keep old verifier
+AGENTS.md section 3.0 and docs/interfaces-v3.md are the frozen v3 contract,
+approved by the user 2026-10-25 at 01:55 KST from commit d82b87a; start implementation now.
+Sections 3.2–3.3 freeze hook CLIs and event mapping, including question pause. Keep old verifier
 check/validate-handoff CLIs and historical schemas compatible; do not extend
-CLIs without a separately approved proposal. No judge CLI on the v3 hook path.
+CLIs beyond the frozen v3 operations without a separately approved proposal. No judge CLI on the v3 hook path.
 Use requirements.json, completion-report.json, ledger.json and immutable
 evidence/ under `.localharness/v3/sessions/<sha256-of-UTF-8-session_id>/`.
 Role 3 supplies the one audited claim result/accounting, via package integration
@@ -71,9 +72,9 @@ Update STATUS with exact commands/results and pending integration limits.
 
 ## First task
 
-Read approval status and current STATUS. Prepare deterministic failure versus
-unverifiable and Stop-state fixtures while pending; implement D-1 after schema
-approval. Coordinate derivation/claim-adapter boundaries with Role 3 without
+Read frozen interface status and current STATUS. Implement deterministic failure versus
+unverifiable and Stop-state fixtures; implement D-1 now under
+the approved interfaces. Coordinate derivation/claim-adapter boundaries with Role 3 without
 changing their files.
 
 ## Assumptions

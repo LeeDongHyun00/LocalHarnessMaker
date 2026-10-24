@@ -168,10 +168,12 @@ def test_executor_ledger_and_invalid_validation_are_representable_but_not_valid_
     validator("ledger").validate(sample)
 
 
-def test_direction_is_accepted_but_schema_set_is_still_proposed() -> None:
+def test_direction_and_schema_set_are_approved_and_frozen() -> None:
     decision = (ROOT / "docs/decisions/0011-pinned-luna-hook-direction.md").read_text()
     assert "Status: accepted by the user on 2026-10-25" in decision
-    assert "separate explicit approval" in decision
+    assert "01:55 KST" in decision
+    assert "d82b87a" in decision
+    assert "and frozen" in decision
     plan = (ROOT / "docs/plan.md").read_text()
     assert "resolved, accepted by the user on 2026-10-25" in plan
     assert "record-only after 0011" in plan
@@ -180,7 +182,7 @@ def test_direction_is_accepted_but_schema_set_is_still_proposed() -> None:
         "04-verifier-engineer.md", "05-eval-engineer.md",
     ]]]:
         content = (ROOT / name).read_text()
-        assert "proposed" in content.lower(), name
-        assert "approval" in content.lower(), name
+        assert "frozen" in content.lower(), name
+        assert "01:55 KST" in content, name
     # The old report schema is deliberately not relabeled as interface v3.
     assert "Interface version 2" in load("evaluation-report.schema.json")["description"]
