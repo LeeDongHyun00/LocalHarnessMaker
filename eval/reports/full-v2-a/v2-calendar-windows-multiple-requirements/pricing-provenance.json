@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-calendar-windows-multiple-requirements-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ed08c2x5/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-18-50-01a1698e-d110-7370-a791-eb1a06297b96.jsonl",
+        "record_sha256": "8b8026fc1fd9f04af5446cced03fd7ab317439b633a3587a426c4b975253789f",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ed08c2x5/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-18-50-01a1698e-d110-7370-a791-eb1a06297b96.jsonl",
+        "sha256": "ecbfaee32e416f308cf24a01740e510ac9f0c4f5f7dfaf52f4a1bf3a9ce512ac"
+      }
+    ]
+  }
+]

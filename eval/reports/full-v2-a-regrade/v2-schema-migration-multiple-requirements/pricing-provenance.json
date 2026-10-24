@@ -1,0 +1,22 @@
+[
+  {
+    "call_id": "v2-schema-migration-multiple-requirements-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vk7v46uy/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-06-14-01a169ba-3721-7570-b76e-ad199868c967.jsonl",
+        "record_sha256": "31d9d0295b172443771a10865e036bc7bc590497751bb440444dafdb95d70a20",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vk7v46uy/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-06-14-01a169ba-3721-7570-b76e-ad199868c967.jsonl",
+        "sha256": "dfc145eee42bd6c80298f23e6d0beac850cf448dd4093bf546e9774f5df1c20b"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "33bfc9956c9974ba7a06607c9794ce008f798754b7a81189622c5deb6a208e91",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-calendar-windows-feature-plus-test/final-1.md",
+    "sha256": "1c93fe3f05107b738c517de7e355a875b6556c8143f30559209207dcd5efe644"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs, corrected hour bounds and overlap detection, and added regression coverage for composition and error precedence"
+  ],
+  "undefined_reason": null
+}

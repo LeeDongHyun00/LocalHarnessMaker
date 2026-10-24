@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "042d0622c9dc20d41841fc1f5b8d6da4e895e0ca440a8dcd68d9133e07f7dabc",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-cache-invalidation-two-session/final-2.md",
+    "sha256": "3da16f5dcde846f6af3f54d47c600a6d9ff3dc484bffee9da98a10ec78457b05"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs with Day 1 policies preserved, one compute call per member, ordered processing, first-error failure, and independent results"
+  ],
+  "undefined_reason": null
+}

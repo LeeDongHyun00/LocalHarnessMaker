@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-schema-migration-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-t0m9sfua/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-10-06-01a169bd-bfc4-7a61-b3a7-62b6f223100f.jsonl",
+        "record_sha256": "dc33a8afb2f9ff5884a29b28e94590533ade2261524e1f0e3ac7e65c13e510e4",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-t0m9sfua/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-10-06-01a169bd-bfc4-7a61-b3a7-62b6f223100f.jsonl",
+        "sha256": "4111d2f33bf9e681d688349bec7d396e424cdcffd491a4544c142985b2fd435e"
+      }
+    ]
+  }
+]

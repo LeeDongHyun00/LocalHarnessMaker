@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "7472331c668d9537becd28962cba5196b83963422ecd9fb61069da3ed105aa26",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-filesystem-manifests-constrained-refactoring/final-1.md",
+    "sha256": "e7aa9732d6aca7ea7040f03bc2847614af6fcb65e0d5997f2861c02730a30b63"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

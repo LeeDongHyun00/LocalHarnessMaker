@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-schema-migration-feature-plus-test-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-zzbv_dq4/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-55-08-01a16bd5-5eb7-7683-ad70-5a0417445862.jsonl",
+        "record_sha256": "893bbaf11d30c3772354ca42bafbddbe0bfadefe1671bc550bc0699566f9a4e1",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-zzbv_dq4/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-55-08-01a16bd5-5eb7-7683-ad70-5a0417445862.jsonl",
+        "sha256": "4f0b0ce42f3ba94bdb2d53df9117b616ebedca190a893390ed88a2b0b5d21179"
+      }
+    ]
+  }
+]

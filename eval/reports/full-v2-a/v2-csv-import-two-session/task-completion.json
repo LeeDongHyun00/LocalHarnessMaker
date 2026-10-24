@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "13dbac85c70b9c489dd38a33e0b5e82298250d65e208583c823a6e97869e7300",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-csv-import-two-session/final-2.md",
+    "sha256": "dcfabcac2c34b927807dab01376a8e0cb04caca80abefb4d28c0eb682cc93d11"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `run_many` and `render_many`, preserving Day 1 policies, exact errors, ordered atomic failure, and independent results"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "call_id": "v2-csv-import-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-z8wbi5bp/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-14-38-01a16bb0-4c34-79e1-9f53-76688d4eeac9.jsonl",
+        "record_sha256": "65d027db82ad29ea1c9f07a971f37dce97dba181f0bd87225ee13b30aad446ab",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-z8wbi5bp/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-14-38-01a16bb0-4c34-79e1-9f53-76688d4eeac9.jsonl",
+        "sha256": "dfc78e94dc446699f12ddc8c25e60d5d08c4739b20c6ab6350f4d8dd4868c893"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

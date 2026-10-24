@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "d30f54ecc5fd6e2d7c12c6ce817256c112355d182bf2b59af5e4a3215dc2e411",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-text-indexing-two-session/final-2.md",
+    "sha256": "b11044f4c067f4fde6269dbbc3245ac4caac77887db25651bc4074d18b59d888"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `run_many` and `render_many` with Day 1 policies preserved, ordered processing, atomic failure, and independent results"
+  ],
+  "undefined_reason": null
+}

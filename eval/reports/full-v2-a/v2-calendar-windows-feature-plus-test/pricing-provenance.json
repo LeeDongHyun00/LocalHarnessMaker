@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-calendar-windows-feature-plus-test-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-65q1v819/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-06-26-01a16bdf-b587-7c11-8123-c918077b9396.jsonl",
+        "record_sha256": "02781b96a1848deac8b69aafe43dd1c0b1b7e1bd5143e5f9ebbbd0be3f13a426",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-65q1v819/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-06-26-01a16bdf-b587-7c11-8123-c918077b9396.jsonl",
+        "sha256": "ff8f096d6ea05cc2db55f1169a1c807b6e39b6311141667d1ef5170cc2f160ee"
+      }
+    ]
+  }
+]

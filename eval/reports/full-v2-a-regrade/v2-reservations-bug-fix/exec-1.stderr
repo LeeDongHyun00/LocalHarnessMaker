@@ -1,0 +1,5 @@
+2026-10-24T02:08:37.786852Z ERROR codex_models_manager::manager: failed to refresh available models: request timed out
+2026-10-24T02:08:58.562052Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fl2c4541/workspace/project/render.py:
+    return json.dumps(compute(rows), sort_keys=True, separators=(',', ':'), ensure_ascii=False) + '\\n'
+2026-10-24T02:09:04.678462Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fl2c4541/workspace/project/render.py:
+    return json.dumps(compute(rows), sort_keys=True, separators=(',', ':'), ensure_ascii=False) + '\\n'

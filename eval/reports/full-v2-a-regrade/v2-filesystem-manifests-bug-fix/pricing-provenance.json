@@ -1,0 +1,22 @@
+[
+  {
+    "call_id": "v2-filesystem-manifests-bug-fix-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-88tfmr9o/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-41-29-01a16bc8-e028-7ac3-bd51-a7232d3d8c18.jsonl",
+        "record_sha256": "77da5f3d266fd2242d9180f8f6295508935f031d072164b1a4118c6475028719",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-88tfmr9o/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-41-29-01a16bc8-e028-7ac3-bd51-a7232d3d8c18.jsonl",
+        "sha256": "2206dac3225a9d712ac6957537e9b30ae05a7d286fb345024030246c82473689"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "call_id": "v2-rate-budgets-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-1f5uht7c/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-22-25-01a16bb7-688a-77e2-821c-bfab0c499854.jsonl",
+        "record_sha256": "6cd6dd148ac3f3ace148b1366b93586a1e363296f0f8ab3c92c6b7e13e8816a7",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-1f5uht7c/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-22-25-01a16bb7-688a-77e2-821c-bfab0c499854.jsonl",
+        "sha256": "b6e634ac0cf5741138b7342feb0d7d058fde223ce2fa8ed4c5ac40283fbd7bb9"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  },
+  {
+    "call_id": "v2-rate-budgets-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-1f5uht7c/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-23-25-01a16bb8-5746-7e40-93cb-f3e4a9fe2616.jsonl",
+        "record_sha256": "a7cd6620bf8845a849bb401b029f964a0e1842679b76d240d6495d93bbb54e9d",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-1f5uht7c/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-23-25-01a16bb8-5746-7e40-93cb-f3e4a9fe2616.jsonl",
+        "sha256": "8490c4bc2d1d37992dbc8099dcd694e9a42530c78de305e22485a843d22a4fd8"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

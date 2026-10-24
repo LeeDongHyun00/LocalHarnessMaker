@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "f87c02a557613d59e19f420e9ed8ef22a1338119be03e1b65a97990ea2efef95",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-text-indexing-multiple-requirements/final-1.md",
+    "sha256": "3dbf26c659848666421196054d9f8b86861c18b8815948238ec076770f7ab1c3"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented final-revision semantics and zero-count support"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "call_id": "v2-schema-migration-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-tal3s5h_/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-30-40-01a169d0-93a2-7542-a203-61abfeeace39.jsonl",
+        "record_sha256": "37d9c258940913747e10bc47b4540609a418cc97487d4feecfed98233e9b8796",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-tal3s5h_/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-30-40-01a169d0-93a2-7542-a203-61abfeeace39.jsonl",
+        "sha256": "a26d2d14204c5e3b619c2e7e01f7c79344a4aa506ab7ee0ac02ce40df91d6dc9"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  },
+  {
+    "call_id": "v2-schema-migration-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-tal3s5h_/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-31-58-01a169d1-c82a-72b2-80fe-06d3cec905f4.jsonl",
+        "record_sha256": "bf20df313c3b6e7ab7590820d390b6fc05e22e7c8814bd2a0db583115dd61c78",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-tal3s5h_/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-31-58-01a169d1-c82a-72b2-80fe-06d3cec905f4.jsonl",
+        "sha256": "12271f178884d412319e1a50ff1f7fbe9a73ed64f90569e5125fb648a927e07d"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

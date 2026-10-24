@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "8d4aa6d628f73bb18c0945b77ed9356c802ca0d8cb0d96b092c113e90b7c71a8",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-job-queues-constrained-refactoring/final-1.md",
+    "sha256": "1b03bcc5190f6eeec6e0d3caebae3b2d073af1f8d6f65d90c12fe77a766fec76"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "call_id": "v2-inventory-bug-fix-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c88w2zs7/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-18-42-01a16bea-f2b5-7720-ac6e-2f1bd6872f98.jsonl",
+        "record_sha256": "769c694625d8ce8cff5ba2dd095f9082deace25fd2cca8d594cc4e9bb56d2b34",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c88w2zs7/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-18-42-01a16bea-f2b5-7720-ac6e-2f1bd6872f98.jsonl",
+        "sha256": "033aa463ccbff7905705f72f0a15947093f5585112271545efcdb34b337d8364"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

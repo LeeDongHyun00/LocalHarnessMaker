@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "ff3a4666673de1880bd53a3395656e9c4e2c11ebbfd5607bf78f92c955bd358d",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-dependency-graph-feature-plus-test/final-1.md",
+    "sha256": "3034f659603c47e431d8929517466ef0494213ac15720e147b52833d65054a40"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs, fixed dependency ordering and cycle detection, and added regression coverage"
+  ],
+  "undefined_reason": null
+}

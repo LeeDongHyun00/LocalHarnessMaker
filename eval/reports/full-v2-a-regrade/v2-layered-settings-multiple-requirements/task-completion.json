@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "f4ebff98d2a037d0fc912469c553c7d98c12ca109d9f72e2bb781cefb6c5e5f7",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-layered-settings-multiple-requirements/final-1.md",
+    "sha256": "925c908258de7804a0d59f9edd2e6bc7238a81fadf916befaaecf982b535e22d"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented final-revision semantics and highest-priority selection with smallest-ID tie breaking"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "1215256f7c4e50df2b87ecf37bf4ec23d4b199bea17a58afab8808a1407276ba",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-routing-bug-fix/final-1.md",
+    "sha256": "a5393512b500905670900b036015364f1db09edd87ee01c66b5de93120dfb5a8"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

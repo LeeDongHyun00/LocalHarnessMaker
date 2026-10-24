@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "a9c14e56781f21d8c6b14f574b07454e35e5362b81c73054f9965f5da0af31ec",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-filesystem-manifests-bug-fix/final-1.md",
+    "sha256": "7ff15f548144f0cc1dbe419a714be78189201a306bfaa158265e6a273243655b"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented casefold normalization, `"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,5 @@
+2026-10-24T02:20:16.697665Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-m4btn52h/workspace/project/render.py:
+    return json.dumps(compute(rows), sort_keys=True) + '\\n'
+2026-10-24T02:20:22.978262Z ERROR codex_core::tools::router: error=apply_patch verification failed: invalid patch: multiple operations target /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-m4btn52h/workspace/project/render.py
+2026-10-24T02:20:28.172635Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-m4btn52h/workspace/project/render.py:
+    return json.dumps(compute(rows), sort_keys=True) + '\\n'

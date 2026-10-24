@@ -1,0 +1,22 @@
+[
+  {
+    "call_id": "v2-ledger-multiple-requirements-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-_cmt90ny/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-31-22-01a1699a-4ae4-7d20-beae-a86c81e5e839.jsonl",
+        "record_sha256": "422ef7c9a74c0fc54d7c56092c74295c8a688ba65d5ab7bca1553cbfe36721e3",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-_cmt90ny/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-31-22-01a1699a-4ae4-7d20-beae-a86c81e5e839.jsonl",
+        "sha256": "ba9db8112caea13b3ace1e095c436b555a4897e6da80d56845e22e0ff6fe4cea"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "e9844a634ca88b927994fd4e86a0e9249a1f8f2e7ad1385dfa0e9b7b30bad83e",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-dependency-graph-two-session/final-2.md",
+    "sha256": "be84d3f660f16e237cdf0168e3e4350753a53a5f976031bd77c6d43553e8c4da"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs with day-1 policies, ordered processing, first-failure atomicity, and independent results"
+  ],
+  "undefined_reason": null
+}

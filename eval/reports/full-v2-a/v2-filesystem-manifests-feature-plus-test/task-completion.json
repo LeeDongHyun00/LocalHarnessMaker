@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "9d1a37a46936c2436056d1ea41ea0c6b611c3efb956522514229d7f2b2ac6754",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-filesystem-manifests-feature-plus-test/final-1.md",
+    "sha256": "b23dfb0d5190bea0c1247322b98de10d2e037b140eb42a1a0ea88ba54cf43fb3"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs, fixed `"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,16 @@
+test_R10_consistency (test_private_v2.Checks.test_R10_consistency) ... ok
+test_R11_regression (test_private_v2.Checks.test_R11_regression) ... ok
+test_R12_verification (test_private_v2.Checks.test_R12_verification) ... ok
+test_R1_api (test_private_v2.Checks.test_R1_api) ... ok
+test_R2_shapes (test_private_v2.Checks.test_R2_shapes) ... FAIL
+test_R3_distinct_target (test_private_v2.Checks.test_R3_distinct_target) ... ok
+test_R3_domain (test_private_v2.Checks.test_R3_domain) ... ok
+test_R3_intervals (test_private_v2.Checks.test_R3_intervals) ... ok
+test_R4_empty_and_order (test_private_v2.Checks.test_R4_empty_and_order) ... ok
+test_R5_copying (test_private_v2.Checks.test_R5_copying) ... ok
+test_R6_render (test_private_v2.Checks.test_R6_render) ... ok
+test_R7_batch (test_private_v2.Checks.test_R7_batch) ... ok
+test_R8_atomicity (test_private_v2.Checks.test_R8_atomicity) ... ok
+test_R9_constraints (test_private_v2.Checks.test_R9_constraints) ... ok
+Ran 14 tests in 0.023s
+FAILED (failures=1)

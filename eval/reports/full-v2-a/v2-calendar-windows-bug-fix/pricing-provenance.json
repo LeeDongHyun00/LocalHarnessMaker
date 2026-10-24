@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-calendar-windows-bug-fix-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fbvx3rrw/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-55-32-01a169b0-6a91-74f3-8346-88e376e6496e.jsonl",
+        "record_sha256": "6d8fffc012df9a0759ab54d1babdfc8d44f88a632a2a08859cd6cc209ed4bb74",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-fbvx3rrw/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-55-32-01a169b0-6a91-74f3-8346-88e376e6496e.jsonl",
+        "sha256": "831cde5643ccb3bf399dbd770baabe46858d4ad667131e6071ac9ea66bd04a94"
+      }
+    ]
+  }
+]

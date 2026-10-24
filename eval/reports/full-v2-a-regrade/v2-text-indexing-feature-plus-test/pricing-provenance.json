@@ -1,0 +1,22 @@
+[
+  {
+    "call_id": "v2-text-indexing-feature-plus-test-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-6v6y5zml/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-34-35-01a16bc2-7dfe-7e92-aa63-e829ffc053dd.jsonl",
+        "record_sha256": "7ce096f0baa3f6618c0490beb30bcbebf0d3dac1a40e051dc2afefb73348fd31",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-6v6y5zml/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-34-35-01a16bc2-7dfe-7e92-aa63-e829ffc053dd.jsonl",
+        "sha256": "c6c8814e3b63de16cff2ba78fcc6d907fede9663c6a354d8dac60b3a62b782a8"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

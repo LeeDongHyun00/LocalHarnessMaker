@@ -1,0 +1,22 @@
+[
+  {
+    "call_id": "v2-filesystem-manifests-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-29j24w_6/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-34-16-01a1699c-f20f-7b20-b968-ec75200b5158.jsonl",
+        "record_sha256": "f4371a8e92f24134412ce19cfc72abd5be3728d40f7eec605004165678adf090",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-29j24w_6/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-34-16-01a1699c-f20f-7b20-b968-ec75200b5158.jsonl",
+        "sha256": "354aa55d6655b8ba3df183ee38e863aa027ba5ffb5f7f5b74e8ae719eff98ffc"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "0fc91323f88b9a5b0a430d7f03e597b99d6c2f650a7753642020b07bf3504f87",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-document-patches-feature-plus-test/final-1.md",
+    "sha256": "9f46b7d1ab5a7c5df8fc248a2c0c07255e32a9fe2549c69ce6d597f00ab321f0"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs through the shared engine path, corrected descending offset order, and added regression coverage"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,819 @@
+{
+  "calibration": false,
+  "task_root": "eval/tasks-v2",
+  "service_tier": "priority",
+  "source": "eval/reports/full-v2-a",
+  "source_report_sha256": "4c6c28986efd91a493014962a5b8cf0b52559ec726a95f72027a138001aacb7c",
+  "audit_code_version": {
+    "audit.py": "2fdd021ba141c20d4894e3094cc8e907500a9e2f6ecdaa335615a66ba219316e",
+    "javascript.py": "f90e57ad34ad8fad4e282c41293a10710ee31d1f1e941e5cc14d7250661a8ba8",
+    "javascript_derived.py": "166c28387d6664b59bb7ee7ca8d67a7e9dcfc4dc9a6ce0389d5ded536124eccd",
+    "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+    "regrade.py": "69beeada4fe67b382ea0f4780ba31b25347361446c2e0086fc63aa1e12dee03d",
+    "telemetry.py": "e2c887e38c76829c481d61f8ffd3cd7130b98aa434a04f1189d1dd11bdcc01b2",
+    "core.py": "76849be45ee8569840d72d212ef31c68f37881d40400fec1f0675d8eeb581f05",
+    "workspace_verification.py": "00ff2a966dd89555430cb7ea48712240e065955784344e0289f731d9569d1b4f"
+  },
+  "workspace_hash_checks": [
+    {
+      "task_id": "v2-csv-import-multiple-requirements",
+      "expected_sha256": "04566dc824e634abc3a20249f7c31d8fcb8ce857fc831e588df54cccc5c21f98",
+      "observed_sha256": "04566dc824e634abc3a20249f7c31d8fcb8ce857fc831e588df54cccc5c21f98",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-cache-invalidation-multiple-requirements",
+      "expected_sha256": "a115a73ec75224a871a801f1b63f6196b63ef6a6af249b70e4b11699ff3dd001",
+      "observed_sha256": "a115a73ec75224a871a801f1b63f6196b63ef6a6af249b70e4b11699ff3dd001",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-calendar-windows-constrained-refactoring",
+      "expected_sha256": "da2f62e268073249221a6f7c2789f8fb6ec251ff387af8f55f357cec4c0b3fb1",
+      "observed_sha256": "da2f62e268073249221a6f7c2789f8fb6ec251ff387af8f55f357cec4c0b3fb1",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-cache-invalidation-feature-plus-test",
+      "expected_sha256": "30771287bb248532655df93f9c1176b140b9f45c3235aae96b393ccbf53b7932",
+      "observed_sha256": "30771287bb248532655df93f9c1176b140b9f45c3235aae96b393ccbf53b7932",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-inventory-multiple-requirements",
+      "expected_sha256": "ab73a2e840c9bddc258b7c96c1a2b81b46c9caa54097e5b3af6c58968e9e22c7",
+      "observed_sha256": "ab73a2e840c9bddc258b7c96c1a2b81b46c9caa54097e5b3af6c58968e9e22c7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-calendar-windows-multiple-requirements",
+      "expected_sha256": "81524dfbbe57434a8e18935751391ac2c6fa2fa176cfbba086c099429de58154",
+      "observed_sha256": "81524dfbbe57434a8e18935751391ac2c6fa2fa176cfbba086c099429de58154",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-access-policy-constrained-refactoring",
+      "expected_sha256": "4c7bba1d309b69d30506fa87045f59a796336309eaf879fea861d143ab8e042f",
+      "observed_sha256": "4c7bba1d309b69d30506fa87045f59a796336309eaf879fea861d143ab8e042f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-text-indexing-constrained-refactoring",
+      "expected_sha256": "ad956ec085156d28b702a2a8eb03a053f731b8d2e84f7bf67f4749d754fddcc1",
+      "observed_sha256": "ad956ec085156d28b702a2a8eb03a053f731b8d2e84f7bf67f4749d754fddcc1",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-text-indexing-two-session",
+      "expected_sha256": "d254360565cc4ba1bd08a615182856356f4399117282cfd0be5fc367c91ed38b",
+      "observed_sha256": "d254360565cc4ba1bd08a615182856356f4399117282cfd0be5fc367c91ed38b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-job-queues-two-session",
+      "expected_sha256": "9ad5fa25a2b3902944a42b5dbfec5a0d08d328c0e71860f458ea98cbd390b165",
+      "observed_sha256": "9ad5fa25a2b3902944a42b5dbfec5a0d08d328c0e71860f458ea98cbd390b165",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-command-dispatch-constrained-refactoring",
+      "expected_sha256": "0752dfdbda76688df2d37518ed5e957dd522b13a788a00998d6ce7bbb371c2e0",
+      "observed_sha256": "0752dfdbda76688df2d37518ed5e957dd522b13a788a00998d6ce7bbb371c2e0",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-ledger-multiple-requirements",
+      "expected_sha256": "c2fd40a682e6e82b860bc05bdb1b505f8b22195b7ea1d9f9c71a3a6d897e9ec8",
+      "observed_sha256": "c2fd40a682e6e82b860bc05bdb1b505f8b22195b7ea1d9f9c71a3a6d897e9ec8",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-job-queues-feature-plus-test",
+      "expected_sha256": "b29813a14086f74b1c672973f4ec41a1abc0fa13604461d0e667126a854efafd",
+      "observed_sha256": "b29813a14086f74b1c672973f4ec41a1abc0fa13604461d0e667126a854efafd",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-filesystem-manifests-constrained-refactoring",
+      "expected_sha256": "f11044536f2f211f9759b98b09035507ece92c2b95ccd973c97bd59ad3fcfaaa",
+      "observed_sha256": "f11044536f2f211f9759b98b09035507ece92c2b95ccd973c97bd59ad3fcfaaa",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-schema-migration-bug-fix",
+      "expected_sha256": "1b7235509a78577651a4b1393153d33bd59166e23a67069fa62f2223f450e783",
+      "observed_sha256": "1b7235509a78577651a4b1393153d33bd59166e23a67069fa62f2223f450e783",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-access-policy-feature-plus-test",
+      "expected_sha256": "304040b6c8fa0e383b33014bc7d8c2cc352f8d76421889c36505370f1e77cd4c",
+      "observed_sha256": "304040b6c8fa0e383b33014bc7d8c2cc352f8d76421889c36505370f1e77cd4c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-inventory-feature-plus-test",
+      "expected_sha256": "d08ec5246c4b8c3305efc26374d1d5f8ffa36ba772ad791ae6339a841b5350ff",
+      "observed_sha256": "d08ec5246c4b8c3305efc26374d1d5f8ffa36ba772ad791ae6339a841b5350ff",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-search-facets-feature-plus-test",
+      "expected_sha256": "ed2635aa1c112cfe0c18496aa0f3d40d966a8a1f58508e138301342ebb5a526d",
+      "observed_sha256": "ed2635aa1c112cfe0c18496aa0f3d40d966a8a1f58508e138301342ebb5a526d",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-routing-multiple-requirements",
+      "expected_sha256": "d132e93a328a1adaf6eb597557e4bd8247a13f87bb4d4c343885dbbbcefec59f",
+      "observed_sha256": "d132e93a328a1adaf6eb597557e4bd8247a13f87bb4d4c343885dbbbcefec59f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-rate-budgets-constrained-refactoring",
+      "expected_sha256": "722a2710fe34f5aaa8a4f9f909b371c3619e5ee427bc6dff52349286d1913ead",
+      "observed_sha256": "722a2710fe34f5aaa8a4f9f909b371c3619e5ee427bc6dff52349286d1913ead",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-command-dispatch-two-session",
+      "expected_sha256": "c5d3267cc002c917b4a640cd8b2f6913d7fc190f74918053aac774af8683c723",
+      "observed_sha256": "c5d3267cc002c917b4a640cd8b2f6913d7fc190f74918053aac774af8683c723",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-cache-invalidation-constrained-refactoring",
+      "expected_sha256": "27290f8766a04a21e532f760077a6b7bf7795d34cdadbf36bae381963c361f49",
+      "observed_sha256": "27290f8766a04a21e532f760077a6b7bf7795d34cdadbf36bae381963c361f49",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-csv-import-two-session",
+      "expected_sha256": "f8538e310a25c7a46cd55b5243529418921f4352b26fb01fbca2d5d1e8199e18",
+      "observed_sha256": "f8538e310a25c7a46cd55b5243529418921f4352b26fb01fbca2d5d1e8199e18",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-calendar-windows-bug-fix",
+      "expected_sha256": "3297fba25c3266683071af8974bf58475dca4801ef6955eb7dd86f39490188dc",
+      "observed_sha256": "3297fba25c3266683071af8974bf58475dca4801ef6955eb7dd86f39490188dc",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-layered-settings-two-session",
+      "expected_sha256": "8c35bb964be4089e7056f1333df0932564024136d8f7c359949d6bff14e74b03",
+      "observed_sha256": "8c35bb964be4089e7056f1333df0932564024136d8f7c359949d6bff14e74b03",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-document-patches-bug-fix",
+      "expected_sha256": "03b41986f0bcdcb7ccf0f19edd17b5d1802921ba2004d5756613d030d1d6e517",
+      "observed_sha256": "03b41986f0bcdcb7ccf0f19edd17b5d1802921ba2004d5756613d030d1d6e517",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-csv-import-feature-plus-test",
+      "expected_sha256": "ee4c73e71bd907f8b864f9d224d9e37cbf4591422594396b8ac320d70cebc7eb",
+      "observed_sha256": "ee4c73e71bd907f8b864f9d224d9e37cbf4591422594396b8ac320d70cebc7eb",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-dependency-graph-two-session",
+      "expected_sha256": "805843b10a78a08fe5c2d4d6cfaf172d4a55d75a3ae8df0af6aa48f95ebd8cec",
+      "observed_sha256": "805843b10a78a08fe5c2d4d6cfaf172d4a55d75a3ae8df0af6aa48f95ebd8cec",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-schema-migration-multiple-requirements",
+      "expected_sha256": "b1f859c5d001fdc51108d86cded85c272b293c02c40b2a25bc4adcbdd7d5889a",
+      "observed_sha256": "b1f859c5d001fdc51108d86cded85c272b293c02c40b2a25bc4adcbdd7d5889a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-event-replay-feature-plus-test",
+      "expected_sha256": "a765cb9bca39313d9b4b3577346a001b79905f9d9cc16ef1c002ecc46fc51cea",
+      "observed_sha256": "a765cb9bca39313d9b4b3577346a001b79905f9d9cc16ef1c002ecc46fc51cea",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-text-indexing-multiple-requirements",
+      "expected_sha256": "de0cd3365b38ee59494ef00b5faec6c92ef80287fceb04fb27bb69835ce1c07a",
+      "observed_sha256": "de0cd3365b38ee59494ef00b5faec6c92ef80287fceb04fb27bb69835ce1c07a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-schema-migration-constrained-refactoring",
+      "expected_sha256": "8f198b3e15164f1262f79d1252b28b74751f930c33408ba500ad38002103d44e",
+      "observed_sha256": "8f198b3e15164f1262f79d1252b28b74751f930c33408ba500ad38002103d44e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-filesystem-manifests-multiple-requirements",
+      "expected_sha256": "aad888cd739f527cca2f7e3d69de4ac48b323c91d3e65e0647075fb6cb8196c1",
+      "observed_sha256": "aad888cd739f527cca2f7e3d69de4ac48b323c91d3e65e0647075fb6cb8196c1",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-workflow-state-two-session",
+      "expected_sha256": "2da342b45f845104a5568785c00a19612c2607f649e250dfa41fc9426b879be6",
+      "observed_sha256": "2da342b45f845104a5568785c00a19612c2607f649e250dfa41fc9426b879be6",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-search-facets-constrained-refactoring",
+      "expected_sha256": "b11f4f177a694667cb1c0c0743c4c47c5d67d621a58fe1a880773e16cf78896a",
+      "observed_sha256": "b11f4f177a694667cb1c0c0743c4c47c5d67d621a58fe1a880773e16cf78896a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-dependency-graph-multiple-requirements",
+      "expected_sha256": "599bc1f9febdb30308994ac22c63a1332cc455197ede6bda07fae58e8dfeee46",
+      "observed_sha256": "599bc1f9febdb30308994ac22c63a1332cc455197ede6bda07fae58e8dfeee46",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-document-patches-two-session",
+      "expected_sha256": "7edfeaffd90e9139388fad92310c134aa92e796ee1da50ba7b1d1141d36e48e9",
+      "observed_sha256": "7edfeaffd90e9139388fad92310c134aa92e796ee1da50ba7b1d1141d36e48e9",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-search-facets-multiple-requirements",
+      "expected_sha256": "b8d8dcd0d897436c916b0f759e986d6d2e1083da0578fdef9a69bd263f10a758",
+      "observed_sha256": "b8d8dcd0d897436c916b0f759e986d6d2e1083da0578fdef9a69bd263f10a758",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-filesystem-manifests-two-session",
+      "expected_sha256": "d499bb95150b4f75c6978741f76d6054bd4975d204abc5987d44633c2d91edcc",
+      "observed_sha256": "d499bb95150b4f75c6978741f76d6054bd4975d204abc5987d44633c2d91edcc",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-calendar-windows-two-session",
+      "expected_sha256": "2a3b83b9fce21de3cdd9e4369657d6c416586b3b8af23cefc8f592c2f03d0206",
+      "observed_sha256": "2a3b83b9fce21de3cdd9e4369657d6c416586b3b8af23cefc8f592c2f03d0206",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-schema-migration-two-session",
+      "expected_sha256": "0ae3428b6942166879596b1f97afdf09b01dbf039167cfcfdbf21f2367181eb3",
+      "observed_sha256": "0ae3428b6942166879596b1f97afdf09b01dbf039167cfcfdbf21f2367181eb3",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-reservations-bug-fix",
+      "expected_sha256": "b7deab3701268f5ff2ed1f2feaef6334c478af75387521fc7e2284267db2e76d",
+      "observed_sha256": "b7deab3701268f5ff2ed1f2feaef6334c478af75387521fc7e2284267db2e76d",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-access-policy-two-session",
+      "expected_sha256": "06c88ebdb449d0f21bb6a685825c48c72fda876a5d606a6260271025d2be2c32",
+      "observed_sha256": "06c88ebdb449d0f21bb6a685825c48c72fda876a5d606a6260271025d2be2c32",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-csv-import-bug-fix",
+      "expected_sha256": "001babc1c8551a57e32c123ce422fc917c362aa6e97846085af2a1fdf38f68cb",
+      "observed_sha256": "001babc1c8551a57e32c123ce422fc917c362aa6e97846085af2a1fdf38f68cb",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-command-dispatch-bug-fix",
+      "expected_sha256": "da988c948fe88f0a1499b19ba2b5ba05d2426d43aad327a051c6c26e6dabc7a7",
+      "observed_sha256": "da988c948fe88f0a1499b19ba2b5ba05d2426d43aad327a051c6c26e6dabc7a7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-csv-import-constrained-refactoring",
+      "expected_sha256": "6789f1c54548de3de0e8923a3f46b581423f2ea5045f4bd50c4433d834713264",
+      "observed_sha256": "6789f1c54548de3de0e8923a3f46b581423f2ea5045f4bd50c4433d834713264",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-document-patches-constrained-refactoring",
+      "expected_sha256": "8183feeede96bd629a0d93628189aa2c911a08c2e953e63a1f42afb42038fe58",
+      "observed_sha256": "8183feeede96bd629a0d93628189aa2c911a08c2e953e63a1f42afb42038fe58",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-routing-constrained-refactoring",
+      "expected_sha256": "04990321ce5baf5b6dea3e196cc653b4a9f130a6bac0c75d3b2e720ad75e24f0",
+      "observed_sha256": "04990321ce5baf5b6dea3e196cc653b4a9f130a6bac0c75d3b2e720ad75e24f0",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-layered-settings-feature-plus-test",
+      "expected_sha256": "287a32df757127e11f8e035018506a27989d2805369afc33a5deea1fa16fd878",
+      "observed_sha256": "287a32df757127e11f8e035018506a27989d2805369afc33a5deea1fa16fd878",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-rate-budgets-feature-plus-test",
+      "expected_sha256": "ff3b09e50e7d3b4d4cb49b71fd01645821f18ca8a41b6cdc2b8c6032fa02f8f3",
+      "observed_sha256": "ff3b09e50e7d3b4d4cb49b71fd01645821f18ca8a41b6cdc2b8c6032fa02f8f3",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-reservations-multiple-requirements",
+      "expected_sha256": "0c37cc372f0b80fcd0e116430e21a5ac5922a5e687e73a6511e95ab0b1dda859",
+      "observed_sha256": "0c37cc372f0b80fcd0e116430e21a5ac5922a5e687e73a6511e95ab0b1dda859",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-job-queues-bug-fix",
+      "expected_sha256": "7ee10f4096778bba02fdd8a36a644f9a213ff379f4683f722b8a5c724a18d5e7",
+      "observed_sha256": "7ee10f4096778bba02fdd8a36a644f9a213ff379f4683f722b8a5c724a18d5e7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-rate-budgets-two-session",
+      "expected_sha256": "fb4c339b90fdbb5bd41bea80fda007570ce9eeb7d38b750ad59eb721d4c6e23a",
+      "observed_sha256": "fb4c339b90fdbb5bd41bea80fda007570ce9eeb7d38b750ad59eb721d4c6e23a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-dependency-graph-bug-fix",
+      "expected_sha256": "90e7a091281c20a02a92a0a45e6b6fab311ea009499f04870d49485c621978d4",
+      "observed_sha256": "90e7a091281c20a02a92a0a45e6b6fab311ea009499f04870d49485c621978d4",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-workflow-state-multiple-requirements",
+      "expected_sha256": "79c16e2155b07a765531c60be5dca62872dc7c10338ec2a5459fc5ba4530cbdc",
+      "observed_sha256": "79c16e2155b07a765531c60be5dca62872dc7c10338ec2a5459fc5ba4530cbdc",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-inventory-constrained-refactoring",
+      "expected_sha256": "09726481656d4613f53c427a0a6bb961a5ed9d245c1100ff9fe7d296a5850726",
+      "observed_sha256": "09726481656d4613f53c427a0a6bb961a5ed9d245c1100ff9fe7d296a5850726",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-workflow-state-constrained-refactoring",
+      "expected_sha256": "1cdecf3435d3b1ca3b340e55f533efb80b8b9592aa65e81bba44a483aa3992fb",
+      "observed_sha256": "1cdecf3435d3b1ca3b340e55f533efb80b8b9592aa65e81bba44a483aa3992fb",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-access-policy-bug-fix",
+      "expected_sha256": "cbed9a2436e775f62d16fca0eeaa2cfcf2d145db5970247eb6fa9162b17b55f5",
+      "observed_sha256": "cbed9a2436e775f62d16fca0eeaa2cfcf2d145db5970247eb6fa9162b17b55f5",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-reservations-feature-plus-test",
+      "expected_sha256": "74dd595891267ed7cdbe943bbae070db6f8dd9e155b9c327e8bf59011a2ea66e",
+      "observed_sha256": "74dd595891267ed7cdbe943bbae070db6f8dd9e155b9c327e8bf59011a2ea66e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-event-replay-bug-fix",
+      "expected_sha256": "41d98cdf460c2a2c4b34e0c6c7fe188902c8a8ca25a90b5ab628cfa4f4361e4a",
+      "observed_sha256": "41d98cdf460c2a2c4b34e0c6c7fe188902c8a8ca25a90b5ab628cfa4f4361e4a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-layered-settings-multiple-requirements",
+      "expected_sha256": "6576d10bc3c51ec17ec3346e82f8406432d4953c9440c58994eac9722100835d",
+      "observed_sha256": "6576d10bc3c51ec17ec3346e82f8406432d4953c9440c58994eac9722100835d",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-text-indexing-feature-plus-test",
+      "expected_sha256": "909c53000f214f3d466126a4580ac4f58f3a95d626ace0d14e7aaaec7b432dd2",
+      "observed_sha256": "909c53000f214f3d466126a4580ac4f58f3a95d626ace0d14e7aaaec7b432dd2",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-access-policy-multiple-requirements",
+      "expected_sha256": "2348947d08956bf5e222daa78f44867ac83da5f2eb767a5d5153e8baa15cbb74",
+      "observed_sha256": "2348947d08956bf5e222daa78f44867ac83da5f2eb767a5d5153e8baa15cbb74",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-workflow-state-bug-fix",
+      "expected_sha256": "e6187f82a5dcc6f9c2694b78c950dbcf338279a980b05019163f1f65e0521530",
+      "observed_sha256": "e6187f82a5dcc6f9c2694b78c950dbcf338279a980b05019163f1f65e0521530",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-layered-settings-constrained-refactoring",
+      "expected_sha256": "16fefad0e617ad4a02e7b2b4572f2abe598e331cce01a0299fb7b3a0eaf94103",
+      "observed_sha256": "16fefad0e617ad4a02e7b2b4572f2abe598e331cce01a0299fb7b3a0eaf94103",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-text-indexing-bug-fix",
+      "expected_sha256": "1475141fe50aac08d230aaba6e2af322233574747fddc276f53ebcaf8d9f16cb",
+      "observed_sha256": "1475141fe50aac08d230aaba6e2af322233574747fddc276f53ebcaf8d9f16cb",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-dependency-graph-constrained-refactoring",
+      "expected_sha256": "237efc97eaf4de6f38928e432bf56482caaab23a82418a90273f3416e097a287",
+      "observed_sha256": "237efc97eaf4de6f38928e432bf56482caaab23a82418a90273f3416e097a287",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-filesystem-manifests-bug-fix",
+      "expected_sha256": "4684f42edca3a5a0c3f47f33b96c6865f88b177685e95fa5319a4bbb3217da0f",
+      "observed_sha256": "4684f42edca3a5a0c3f47f33b96c6865f88b177685e95fa5319a4bbb3217da0f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-layered-settings-bug-fix",
+      "expected_sha256": "78ca8b3aa3880fa73718e27b7f706f46bdc3053cba30ea7664d88c024067f0c9",
+      "observed_sha256": "78ca8b3aa3880fa73718e27b7f706f46bdc3053cba30ea7664d88c024067f0c9",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-search-facets-two-session",
+      "expected_sha256": "5de5ed4c2be7314ff8ff2ff4a3926154d2b3576f3ab0d6876401fa055afa7533",
+      "observed_sha256": "5de5ed4c2be7314ff8ff2ff4a3926154d2b3576f3ab0d6876401fa055afa7533",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-routing-bug-fix",
+      "expected_sha256": "a8e64ecc9ded36329f1bfc8f3b54d53b07d5e070e13e394fde8df3e219495e8e",
+      "observed_sha256": "a8e64ecc9ded36329f1bfc8f3b54d53b07d5e070e13e394fde8df3e219495e8e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-reservations-constrained-refactoring",
+      "expected_sha256": "c13f1749c27ed28186a6625649f34437e6eb3edcc442f57e42356a9df2cfcaf0",
+      "observed_sha256": "c13f1749c27ed28186a6625649f34437e6eb3edcc442f57e42356a9df2cfcaf0",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-ledger-bug-fix",
+      "expected_sha256": "ae0a67adae946e181df3eeef7bc96395089f14f38df933ff1f8e00f14131791b",
+      "observed_sha256": "ae0a67adae946e181df3eeef7bc96395089f14f38df933ff1f8e00f14131791b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-filesystem-manifests-feature-plus-test",
+      "expected_sha256": "ed7e377858b491ca3ea954076d8cdf732607578c0ad317e025fbe5494d9e2f48",
+      "observed_sha256": "ed7e377858b491ca3ea954076d8cdf732607578c0ad317e025fbe5494d9e2f48",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-cache-invalidation-two-session",
+      "expected_sha256": "9811a2cb91b73fde7d859f3b02d0421f571861cb70974db49e2fd86ef7982f0a",
+      "observed_sha256": "9811a2cb91b73fde7d859f3b02d0421f571861cb70974db49e2fd86ef7982f0a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-schema-migration-feature-plus-test",
+      "expected_sha256": "c5ac7cb89a1d887621ae60bbb8206258e8eef417fe73265176d79647a765f2f5",
+      "observed_sha256": "c5ac7cb89a1d887621ae60bbb8206258e8eef417fe73265176d79647a765f2f5",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-event-replay-two-session",
+      "expected_sha256": "997d5c4fac3cd4dc67fe5958af903567f48c52a5fb15d547d847ffa4c065ebca",
+      "observed_sha256": "997d5c4fac3cd4dc67fe5958af903567f48c52a5fb15d547d847ffa4c065ebca",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-command-dispatch-multiple-requirements",
+      "expected_sha256": "65c00f600d6ab5074e829172c7582bbe0dfca8d3857066219205be7717cc14b7",
+      "observed_sha256": "65c00f600d6ab5074e829172c7582bbe0dfca8d3857066219205be7717cc14b7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-routing-feature-plus-test",
+      "expected_sha256": "cd9ca24fb62d04b61790c540550b5fd8b25ddc609c167da8fa41a4224f845887",
+      "observed_sha256": "cd9ca24fb62d04b61790c540550b5fd8b25ddc609c167da8fa41a4224f845887",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-rate-budgets-multiple-requirements",
+      "expected_sha256": "dca7604e10a7841ce05c5d8a3b3e2bd34c4413726f8dce2aef26ac9cde4c8b83",
+      "observed_sha256": "dca7604e10a7841ce05c5d8a3b3e2bd34c4413726f8dce2aef26ac9cde4c8b83",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-document-patches-feature-plus-test",
+      "expected_sha256": "00f8fbbedb205308ec77dc3bc742fdc81d4385dc6b4995afda64d9dd8a68a776",
+      "observed_sha256": "00f8fbbedb205308ec77dc3bc742fdc81d4385dc6b4995afda64d9dd8a68a776",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-routing-two-session",
+      "expected_sha256": "2651f54b9336b53a72ecb5a8a0340e0a9dd8335673175570e0ecd3e78c4daaad",
+      "observed_sha256": "2651f54b9336b53a72ecb5a8a0340e0a9dd8335673175570e0ecd3e78c4daaad",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-calendar-windows-feature-plus-test",
+      "expected_sha256": "b204c3ad01145e5916aa0fcc592cfb8f2567f5d5e09d565b2923514ef4e0f274",
+      "observed_sha256": "b204c3ad01145e5916aa0fcc592cfb8f2567f5d5e09d565b2923514ef4e0f274",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-search-facets-bug-fix",
+      "expected_sha256": "ef3cdb9df385629fe5854924027be3204db0b856c8f60a69053080de6defa1eb",
+      "observed_sha256": "ef3cdb9df385629fe5854924027be3204db0b856c8f60a69053080de6defa1eb",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-event-replay-constrained-refactoring",
+      "expected_sha256": "56c58530cc5e9f0e9871e55422bd2dbaacfb1a2df00e9204250d3f1766aecaa7",
+      "observed_sha256": "56c58530cc5e9f0e9871e55422bd2dbaacfb1a2df00e9204250d3f1766aecaa7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-command-dispatch-feature-plus-test",
+      "expected_sha256": "ac9be79f8517eb372686c6bdec9ccff0d24016e5fd65775a1eb7e1028a1ade81",
+      "observed_sha256": "ac9be79f8517eb372686c6bdec9ccff0d24016e5fd65775a1eb7e1028a1ade81",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-ledger-two-session",
+      "expected_sha256": "1827969e48da92039e6f3ce11d293fc5f64961869224ff769fd1fce04bc15d2b",
+      "observed_sha256": "1827969e48da92039e6f3ce11d293fc5f64961869224ff769fd1fce04bc15d2b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-dependency-graph-feature-plus-test",
+      "expected_sha256": "6d6095daf7bfa517698fceacc3a08d93534ea5b2cfd72b598e669388648d3bd7",
+      "observed_sha256": "6d6095daf7bfa517698fceacc3a08d93534ea5b2cfd72b598e669388648d3bd7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-reservations-two-session",
+      "expected_sha256": "db27b5f1fc543d396253ab23c5e6cb2ebffcede039b2cbfc901f778bd1e27e00",
+      "observed_sha256": "db27b5f1fc543d396253ab23c5e6cb2ebffcede039b2cbfc901f778bd1e27e00",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-inventory-bug-fix",
+      "expected_sha256": "dafc5965f075332164fed02d1572a4647c6384791a771c9c0c0f4f5561a0aa2e",
+      "observed_sha256": "dafc5965f075332164fed02d1572a4647c6384791a771c9c0c0f4f5561a0aa2e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-ledger-constrained-refactoring",
+      "expected_sha256": "c343715f71b7a0f9b81e972807ba6980656e6c253790e4acab47c018f2b4e3fb",
+      "observed_sha256": "c343715f71b7a0f9b81e972807ba6980656e6c253790e4acab47c018f2b4e3fb",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-event-replay-multiple-requirements",
+      "expected_sha256": "275d339604db9305cc7ee8897749714232175fe15f77577a3ae1617da0beb0db",
+      "observed_sha256": "275d339604db9305cc7ee8897749714232175fe15f77577a3ae1617da0beb0db",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-job-queues-constrained-refactoring",
+      "expected_sha256": "f629daadf602ad30bedf714f0e33d82d14345b9cce2f0dd3d19bd7ec211e0340",
+      "observed_sha256": "f629daadf602ad30bedf714f0e33d82d14345b9cce2f0dd3d19bd7ec211e0340",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-ledger-feature-plus-test",
+      "expected_sha256": "ffd9b4f385e806dd37bd0d6b75c0985cd1ea6b29d7eebc37596fee4841b18fec",
+      "observed_sha256": "ffd9b4f385e806dd37bd0d6b75c0985cd1ea6b29d7eebc37596fee4841b18fec",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-rate-budgets-bug-fix",
+      "expected_sha256": "34219885f38db2374b3408bd889811be289b044978e5a45efb0e58ad28c0375b",
+      "observed_sha256": "34219885f38db2374b3408bd889811be289b044978e5a45efb0e58ad28c0375b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-document-patches-multiple-requirements",
+      "expected_sha256": "e05e37cddee03aae50fe359e61be9d1fad338fa614b565c9cfc1b197810f4528",
+      "observed_sha256": "e05e37cddee03aae50fe359e61be9d1fad338fa614b565c9cfc1b197810f4528",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-cache-invalidation-bug-fix",
+      "expected_sha256": "b463123e4c8ddf8334aa78c9e6e8ea1d4c09afa16ef6bbc607fe54dff9240ad4",
+      "observed_sha256": "b463123e4c8ddf8334aa78c9e6e8ea1d4c09afa16ef6bbc607fe54dff9240ad4",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-job-queues-multiple-requirements",
+      "expected_sha256": "c1f415fe7f747eec1f76c105ef6c8d794330e3c6e39f403eecafe6d9d676e0d6",
+      "observed_sha256": "c1f415fe7f747eec1f76c105ef6c8d794330e3c6e39f403eecafe6d9d676e0d6",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-workflow-state-feature-plus-test",
+      "expected_sha256": "d5bafc834a8872a67f6ff9e4d2cc1f74eb811cf4330da9b75fd9f8b5619f5f2c",
+      "observed_sha256": "d5bafc834a8872a67f6ff9e4d2cc1f74eb811cf4330da9b75fd9f8b5619f5f2c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "v2-inventory-two-session",
+      "expected_sha256": "8b09ee5645715e64229f5227bb289cd4bcd818ff97256069dedf2b59726fa939",
+      "observed_sha256": "8b09ee5645715e64229f5227bb289cd4bcd818ff97256069dedf2b59726fa939",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "call_id": "v2-csv-import-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-k0afjzmr/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-51-50-01a169ad-0a8b-7af1-a0e4-981d7cad94cb.jsonl",
+        "record_sha256": "1747601c9f45ed60a2be5fdcd6a755cfb4835ccdb847fcbad2854e978eb64fff",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-k0afjzmr/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-51-50-01a169ad-0a8b-7af1-a0e4-981d7cad94cb.jsonl",
+        "sha256": "d9159b112bacdd2e54f7ba2d6c01ceff573c9568cc7613d5b91edbe506a33e70"
+      }
+    ]
+  },
+  {
+    "call_id": "v2-csv-import-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-k0afjzmr/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-53-30-01a169ae-903c-73e1-9cc0-8ebd48254ab8.jsonl",
+        "record_sha256": "9e040182a538787f9a7815977f247ffff3bd417db0951aa9a0f64742ff9cd274",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-k0afjzmr/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-53-30-01a169ae-903c-73e1-9cc0-8ebd48254ab8.jsonl",
+        "sha256": "68f7856cb760294139db559aeb083ed51ebd9169221d31299752666d01239d82"
+      }
+    ]
+  }
+]

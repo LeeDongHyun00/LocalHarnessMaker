@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-workflow-state-feature-plus-test-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vsrmb1_l/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-30-41-01a16bf5-e94d-70a1-98e1-0796481ae8f8.jsonl",
+        "record_sha256": "ba7e3d6cc19a1200466868f4afde1185f155b0c79c47145646c83c7656436917",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-vsrmb1_l/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-30-41-01a16bf5-e94d-70a1-98e1-0796481ae8f8.jsonl",
+        "sha256": "8142538fb56f74c79ba1a94f36abc4476eec250ca31d7dc936172deb44066992"
+      }
+    ]
+  }
+]

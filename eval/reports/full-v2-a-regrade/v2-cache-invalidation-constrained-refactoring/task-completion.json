@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "8f020752fdfb984c43be24738763e1620ef067a7f4d55bc6df5dbabe7e0e86e2",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-cache-invalidation-constrained-refactoring/final-1.md",
+    "sha256": "eb77e876e16f0ea400c1bdde4344f70637abe6e7ae70c750988fbbec591c5314"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

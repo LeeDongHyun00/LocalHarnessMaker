@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "0237bc107bd7924094623a9b07223889f568f6624bb2f26d238c59a05d34a4fb",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-rate-budgets-feature-plus-test/final-1.md",
+    "sha256": "c9a8aacce7fa615fec6e71c7c9ff8169e89dc8f55445e68fe2f8dcd1baf51085"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs, fixed the 100-total boundary, and added regression coverage for priority selection and batch composition"
+  ],
+  "undefined_reason": null
+}

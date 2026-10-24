@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "7bad45ba1002590f405e89d70f7173db0f5c98696ce4428695cabf4f67f5b620",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-routing-two-session/final-2.md",
+    "sha256": "f6a714af7d048d200897e0ff8d40e87ab946c642885854e9d48c05435cacc1e8"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs, preserving day-1 policy, exact errors, signatures, and protected files"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-workflow-state-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-pyzcnjr4/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-28-19-01a16bbc-cfc2-77d0-aeff-6a6bbc8d8e8e.jsonl",
+        "record_sha256": "6b10b6c90e98989590f69467e9399cee33876720ae870f16b75c8ae648259941",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-pyzcnjr4/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-28-19-01a16bbc-cfc2-77d0-aeff-6a6bbc8d8e8e.jsonl",
+        "sha256": "376d9550fefb57203ce8785f2c8f61595d5b3d9047f1b02a947d8af76dca29c6"
+      }
+    ]
+  }
+]

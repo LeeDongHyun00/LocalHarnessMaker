@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-filesystem-manifests-feature-plus-test-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-e1l_dca6/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-50-29-01a16bd1-1d1b-7ca2-afc6-4af3aba26659.jsonl",
+        "record_sha256": "41316a1f4ff05a11a8a6997da4fb5e1056fc9014fc8a02a0c653ec1ee18237ae",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-e1l_dca6/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-50-29-01a16bd1-1d1b-7ca2-afc6-4af3aba26659.jsonl",
+        "sha256": "2f6425ade08e82b8a35df90c48b6234e26f4012746ec838204829f8d97ef74f0"
+      }
+    ]
+  }
+]

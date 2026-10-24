@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "78f1370436140d946720f1c9bad2f6f06bc7927bc9838a9557a4431adab5d260",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-csv-import-bug-fix/final-1.md",
+    "sha256": "ce512f432b53c72eae06dcbd13abfd27bef4703e8ddc72dc3a87026dc7ea1e5d"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented case folding, sorted columns, and shared `engine"
+  ],
+  "undefined_reason": null
+}

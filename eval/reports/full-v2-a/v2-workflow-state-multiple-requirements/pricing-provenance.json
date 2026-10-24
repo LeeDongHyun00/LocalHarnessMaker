@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-workflow-state-multiple-requirements-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qp8uhanr/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-26-19-01a16bba-f654-7f50-8813-760818fd2c59.jsonl",
+        "record_sha256": "aa74dd27edd5fdf1164764238827edfd509e31f199b1518b5f2b61290a1b2820",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qp8uhanr/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-26-19-01a16bba-f654-7f50-8813-760818fd2c59.jsonl",
+        "sha256": "0e0631d448e23073f6222c5781ab5ae88b38fadeaf9ab79d44b3fdad959b09c4"
+      }
+    ]
+  }
+]

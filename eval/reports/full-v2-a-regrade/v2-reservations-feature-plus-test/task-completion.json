@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "b1c090183c90db5df019d149a367a2381dce06b2cdcafca62ae1208e99473331",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-reservations-feature-plus-test/final-1.md",
+    "sha256": "7d6e4892851f4963edd01a6f63ebb4a92e730a60356cfa5a27d270e1c376e8a4"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs and added regression coverage, including `test_batch_edge` for empty batches and touching intervals"
+  ],
+  "undefined_reason": null
+}

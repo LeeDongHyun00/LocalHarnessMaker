@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "16cde9ea9d8d1508956d636d07a4ddf2fa9a8476b4a6cf60b08c33a7ed83df2a",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-inventory-multiple-requirements/final-1.md",
+    "sha256": "86a96483d83801b29f7861dfd7e137c3d42f02bac34ce12650d480ddbc4c30a4"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented consistent validation, canonicalization, prefix stock checks, batch processing, and compact Unicode JSON rendering"
+  ],
+  "undefined_reason": null
+}

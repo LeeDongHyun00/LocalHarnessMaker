@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "06d6db0cb37639b9b547e9212843c4b82c2b1dd34feda5563e6f3966f9a461b3",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-job-queues-two-session/final-2.md",
+    "sha256": "ba09695050d27ac53dab3882dac91a5725ed4bc4bc668d0173cf17d4b61deae6"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs with Day 1 naming, ordering, errors, and one shared compute call per member"
+  ],
+  "undefined_reason": null
+}

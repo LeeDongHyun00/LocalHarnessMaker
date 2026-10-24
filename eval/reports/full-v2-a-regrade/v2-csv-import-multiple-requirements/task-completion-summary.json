@@ -1,0 +1,11 @@
+{
+  "numerator": 4,
+  "denominator": 75,
+  "excluded_task_ids": [
+    "v2-rate-budgets-two-session"
+  ],
+  "exclusions": {
+    "v2-rate-budgets-two-session": "Invalid task: excluded from numerator and denominator."
+  },
+  "undefined_outcomes": {}
+}

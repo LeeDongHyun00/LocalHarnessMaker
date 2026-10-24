@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "aeac6b0e4ccdd4233ef778fbfaa22536d43e46fad8b15f62dbfed10b026e4b69",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-routing-feature-plus-test/final-1.md",
+    "sha256": "bd8ab18c7bd6d4167cd0837f01ec0aacf141520026ced7c144e7d10e9716e966"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs and added regression coverage, including `test_batch_edge`"
+  ],
+  "undefined_reason": null
+}

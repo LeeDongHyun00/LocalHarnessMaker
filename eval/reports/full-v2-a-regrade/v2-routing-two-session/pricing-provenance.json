@@ -1,0 +1,42 @@
+[
+  {
+    "call_id": "v2-routing-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qyojuc0a/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-03-39-01a16bdd-2b3e-70d1-8122-4a5c3cdd2ca0.jsonl",
+        "record_sha256": "fb82ef4513f7bc7aa39a456f45b5a84a1659ca1bd49bd49298eca71497af2aef",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qyojuc0a/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-03-39-01a16bdd-2b3e-70d1-8122-4a5c3cdd2ca0.jsonl",
+        "sha256": "8d3bec1b03f8e31f90aff5cee0d3c45c4b4a35facfc2876538f4fc6e99bce177"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  },
+  {
+    "call_id": "v2-routing-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qyojuc0a/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-04-47-01a16bde-375c-7350-8c25-a3073ce854a5.jsonl",
+        "record_sha256": "008c20c45e0b8f53f2ec46a471aa7be6f8d835a5e99f4caacc6d1f5ea8ecb03c",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-qyojuc0a/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-04-47-01a16bde-375c-7350-8c25-a3073ce854a5.jsonl",
+        "sha256": "ed4f960d94f7366321b720854d3da6128779935159845e6d4c35b19cf0ee5091"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

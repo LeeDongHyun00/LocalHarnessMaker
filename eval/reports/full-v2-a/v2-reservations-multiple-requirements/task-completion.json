@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "f9ff1d29fdbd37e11512b7265f57e3e9247c1579cb62567d5c7d3d014307342c",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-reservations-multiple-requirements/final-1.md",
+    "sha256": "b928168bda1fc04f3edd71fc76e85df6d95dfeb822fedcb675bf7e09da19838d"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented consistent validation, canonicalization, coalescing, batch processing, and JSON rendering"
+  ],
+  "undefined_reason": null
+}

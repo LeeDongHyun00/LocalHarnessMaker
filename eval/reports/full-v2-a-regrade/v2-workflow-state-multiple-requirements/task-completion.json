@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "b7e508941fa34a6855b54917c171c063db99104da8136e1febebcc7c26172147",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-workflow-state-multiple-requirements/final-1.md",
+    "sha256": "b29aa750c2f02e3df8920a7a797716d588023bb887145535af0d944cb3ab6b72"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented final-revision semantics and strict workflow transitions"
+  ],
+  "undefined_reason": null
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "call_id": "v2-cache-invalidation-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nc5vq318/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-51-56-01a16bd2-704a-7642-be53-ac5552cbb71e.jsonl",
+        "record_sha256": "0ed27a54e68ed56896f70efabaa2f3c6dbaad40ae9f22fb004769c1148ff2b3f",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nc5vq318/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-51-56-01a16bd2-704a-7642-be53-ac5552cbb71e.jsonl",
+        "sha256": "cb0f4d9f4b43e9af463e85530e21aa100b1989e6d70ed1381d56cdf5c39bd6d3"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  },
+  {
+    "call_id": "v2-cache-invalidation-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nc5vq318/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-53-36-01a16bd3-fa50-70c0-8e90-816fdf11c089.jsonl",
+        "record_sha256": "9fadaba70cee540c40b492e7b3bef34b18a42993d4162e69f82bec7d79a901b3",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nc5vq318/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-53-36-01a16bd3-fa50-70c0-8e90-816fdf11c089.jsonl",
+        "sha256": "f85830f986c53461083d947d831c5cc01d9b431c21c4fd63139c95f3fed41c32"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]

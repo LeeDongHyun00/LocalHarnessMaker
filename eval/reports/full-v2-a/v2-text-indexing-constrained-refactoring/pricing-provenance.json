@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-text-indexing-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-af5mxqui/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-21-55-01a16991-a679-75f1-996d-4bc73326ca4b.jsonl",
+        "record_sha256": "58a43b822726ad1ed9e8022c77c7b2228144214469c75ae9c0116c79d112affd",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-af5mxqui/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-21-55-01a16991-a679-75f1-996d-4bc73326ca4b.jsonl",
+        "sha256": "36b72c7219544fc3ec16181b5af6924a3d8c969874a2888565e548d992e26343"
+      }
+    ]
+  }
+]

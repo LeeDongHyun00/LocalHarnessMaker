@@ -1,0 +1,20 @@
+test_d01 (test_private_expansion.Specification.test_d01) ... ok
+test_d02 (test_private_expansion.Specification.test_d02) ... ok
+test_r01 (test_private_expansion.Specification.test_r01) ... ok
+test_r02 (test_private_expansion.Specification.test_r02) ... ok
+test_r03 (test_private_expansion.Specification.test_r03) ... ok
+test_r04 (test_private_expansion.Specification.test_r04) ... ok
+test_r05 (test_private_expansion.Specification.test_r05) ... ok
+test_r06 (test_private_expansion.Specification.test_r06) ... ok
+test_r07 (test_private_expansion.Specification.test_r07) ... ok
+test_r08 (test_private_expansion.Specification.test_r08) ... ok
+test_r09 (test_private_expansion.Specification.test_r09) ... ok
+test_r10 (test_private_expansion.Specification.test_r10) ... ok
+test_r11 (test_private_expansion.Specification.test_r11) ... ok
+test_r12 (test_private_expansion.Specification.test_r12) ... ok
+test_r13 (test_private_expansion.Specification.test_r13) ... ok
+test_r14 (test_private_expansion.Specification.test_r14) ... ok
+test_r15 (test_private_expansion.Specification.test_r15) ... ok
+test_r16 (test_private_expansion.Specification.test_r16) ... ok
+Ran 18 tests in 0.712s
+OK

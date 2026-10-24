@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "901dd98c079315d571eac7254839c8de44b39ec13aee296e3fff1d31438e2984",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-rate-budgets-multiple-requirements/final-1.md",
+    "sha256": "cba9379faac935937220c769d38b74e88caa996b5adb8e7b0c74df001fbf0c2e"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented last-revision-wins handling and allowed exhausted buckets to remain at zero"
+  ],
+  "undefined_reason": null
+}

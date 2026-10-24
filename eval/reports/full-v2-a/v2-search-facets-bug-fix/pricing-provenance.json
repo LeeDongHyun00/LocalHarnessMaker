@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-search-facets-bug-fix-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-_9uya78o/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-08-03-01a16be1-27aa-76d2-98e8-27d616062c03.jsonl",
+        "record_sha256": "0d61cfab92f28e3afa932f62b64a69c275fddcd24e11dc100b79c7f805c1bd6b",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-_9uya78o/codex-home/sessions/2026/10/24/rollout-2026-10-24T12-08-03-01a16be1-27aa-76d2-98e8-27d616062c03.jsonl",
+        "sha256": "b9dec9ff0ee60b869bc19470f12bfc484be32c9dfd7ee6340b65eb96a6fc5e9e"
+      }
+    ]
+  }
+]

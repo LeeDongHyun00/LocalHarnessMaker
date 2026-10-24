@@ -1,0 +1,40 @@
+[
+  {
+    "call_id": "v2-calendar-windows-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ja6pbv3l/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-27-15-01a169cd-738a-7fd3-bdeb-7e5396fd2bc5.jsonl",
+        "record_sha256": "5ab6b37fe4a3c0a867104b0ee4cc1f9c8ad7b8f382c15bcbba14c718e4f0d3fb",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ja6pbv3l/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-27-15-01a169cd-738a-7fd3-bdeb-7e5396fd2bc5.jsonl",
+        "sha256": "fe56088a6011ead4cccd4f9ab3d222a86019bb42150140621217520aa7fdcc7c"
+      }
+    ]
+  },
+  {
+    "call_id": "v2-calendar-windows-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ja6pbv3l/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-29-00-01a169cf-118f-76d1-b626-38634e51ff26.jsonl",
+        "record_sha256": "62c8111e4778a9e6129d3bdd6b8748d11543a9c6df5c13676ee049bad68c136a",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-ja6pbv3l/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-29-00-01a169cf-118f-76d1-b626-38634e51ff26.jsonl",
+        "sha256": "92dcb6d9e31c30d00b22589106ff2b9192888a2b2b427e8b8699816ce1ddaecd"
+      }
+    ]
+  }
+]

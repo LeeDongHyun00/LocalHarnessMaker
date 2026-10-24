@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "c9bf6f0d2dd44f442eef314d2ddebbc928ad94b4312c9762ad23fd068fe743e0",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-search-facets-feature-plus-test/final-1.md",
+    "sha256": "64a5fe34f6bd26f02d2aaa7aac1897ba18c49d24598ccf2366a92d7ffb2bd39b"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented both batch APIs, corrected facet sorting, and added regression coverage for composition, validation precedence, isolation, and engine dispatch"
+  ],
+  "undefined_reason": null
+}

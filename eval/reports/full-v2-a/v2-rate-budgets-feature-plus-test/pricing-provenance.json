@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-rate-budgets-feature-plus-test-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-t8f7_sao/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-18-53-01a16bb4-2d33-78c1-9d82-a5689ff12f8f.jsonl",
+        "record_sha256": "67e7f73411130163426eaad967ce7cb031175c2e53992a880c64a5e01fb11f76",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-t8f7_sao/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-18-53-01a16bb4-2d33-78c1-9d82-a5689ff12f8f.jsonl",
+        "sha256": "d73faa37cc5e6135762b2b815c95de80d085e34af73ba32dda356f622b1b1b73"
+      }
+    ]
+  }
+]

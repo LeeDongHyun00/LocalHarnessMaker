@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "18ab272a2b48c0f5455b1fca19289534cd8f27b7147d344509a643966ecd76a9",
+  "final_message": {
+    "path": "eval/reports/full-v2-a-regrade/v2-layered-settings-bug-fix/final-1.md",
+    "sha256": "6dceb92a37738a01de2e5d99c5608212adbc3a38e242e938dfa1b43b3e1dbcea"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented canonicalization, duplicate handling, greatest-layer selection, and shared runtime dispatch through `engine"
+  ],
+  "undefined_reason": null
+}

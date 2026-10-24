@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "1525d08792be4f6860c86450ded2e35e40f3b7392f0bf4e77930a7f222346cb4",
+  "final_message": {
+    "path": "eval/reports/full-v2-a/v2-dependency-graph-constrained-refactoring/final-1.md",
+    "sha256": "aa77106a63bd37bdcfc5b37951c461edd57e7b380315eea9a9b14150db30a146"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

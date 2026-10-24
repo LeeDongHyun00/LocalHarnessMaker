@@ -1,0 +1,2 @@
+2026-10-24T03:10:43.816728Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in /var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-sdn8h5tp/workspace/project/api.py:
+    return json.dumps(engine.compute(rows), ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\\n'

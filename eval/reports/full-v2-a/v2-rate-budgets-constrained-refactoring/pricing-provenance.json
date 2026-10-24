@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-rate-budgets-constrained-refactoring-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-rhciiqs0/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-45-00-01a169a6-c724-74a0-a0ac-2cc183d208ed.jsonl",
+        "record_sha256": "5ce5e896ff6bd49d33d0193ba85bb6a9f5bac8e9636606de8a1e0c0b3420e3a7",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-rhciiqs0/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-45-00-01a169a6-c724-74a0-a0ac-2cc183d208ed.jsonl",
+        "sha256": "8728efb538dd2a518f9ac0f4e7346182fe55218195b7d6874656c5ed30b1226b"
+      }
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+[
+  {
+    "call_id": "v2-reservations-feature-plus-test-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-auyh9isy/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-30-57-01a16bbf-37c4-79e0-94ec-a272ff91c39b.jsonl",
+        "record_sha256": "08900ac7639c5c1b65dd36bbcb77782a6c626081fe045a96f7d68854a8f7f969",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-auyh9isy/codex-home/sessions/2026/10/24/rollout-2026-10-24T11-30-57-01a16bbf-37c4-79e0-94ec-a272ff91c39b.jsonl",
+        "sha256": "a173c8cf4507762fe586262db8179aafa7edb3f81404991e094dde563af315d4"
+      }
+    ]
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "call_id": "v2-filesystem-manifests-two-session-exec-1",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c6ud8yw8/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-22-54-01a169c9-7866-7ab2-bba2-b8f26560c7b6.jsonl",
+        "record_sha256": "9d293e6ce33488981350cc8d30eb0b10b5e13cdd6df011768373281160aab111",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c6ud8yw8/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-22-54-01a169c9-7866-7ab2-bba2-b8f26560c7b6.jsonl",
+        "sha256": "8f72ccb1f842e928cff69fb41ea4355ff98f91ec2a58c39dfa5b05b7069ba0fa"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  },
+  {
+    "call_id": "v2-filesystem-manifests-two-session-exec-2",
+    "observed_service_tier": "priority",
+    "basis": "new native thread_settings_applied records captured at process exit",
+    "captured_records": [
+      {
+        "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c6ud8yw8/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-24-39-01a169cb-15b7-7551-a2d7-b749aa7a2ead.jsonl",
+        "record_sha256": "181fa039a415a5616e4b2f989820f5e1692ac904062e9570f2f132c450cc38ea",
+        "observed_service_tier": "priority"
+      }
+    ],
+    "pricing_ref": "openai-fast-short-2026-10-23-v1",
+    "native_sources": [
+      {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-c6ud8yw8/codex-home/sessions/2026/10/24/rollout-2026-10-24T02-24-39-01a169cb-15b7-7551-a2d7-b749aa7a2ead.jsonl",
+        "sha256": "5188cffb99c3c1a51fd8c4adda6519fd7c4ee5cabd92cdd1d3261441df9db04f"
+      }
+    ],
+    "pricing_snapshot_sha256": "f2b5617b15ef306ef301edaa9a22ae2f331528d64e5c67c80071f4b959d51d27"
+  }
+]
