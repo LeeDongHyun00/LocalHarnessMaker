@@ -55,7 +55,8 @@ class PrivateGraders:
         if not isinstance(names, list) or any(not isinstance(name, str) or Path(name).name != name for name in names):
             raise ValueError("Historical grader aliases must be bare filenames")
         return cls(resolved, files, (str(root.expanduser().absolute()),), tuple(names),
-                   repository / (task_root or ("eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks")))
+                   repository / (task_root or ("eval/tasks-v3" if task_id.startswith("v3-") else
+                                                "eval/tasks-v2" if task_id.startswith("v2-") else "eval/tasks")))
 
     def line_fingerprints(self, cache: "FingerprintCache | None" = None) -> set[str]:
         """Return hidden-line hashes, optionally sharing an invocation snapshot."""
@@ -69,8 +70,8 @@ class PrivateGraders:
         if self.public_root is not None:
             roots = {self.public_root}
             # Grader sources span versions, so public exclusions must too.
-            if self.public_root.name in {"tasks", "tasks-v2"}:
-                roots.update(self.public_root.parent / name for name in ("tasks", "tasks-v2"))
+            if self.public_root.name in {"tasks", "tasks-v2", "tasks-v3"}:
+                roots.update(self.public_root.parent / name for name in ("tasks", "tasks-v2", "tasks-v3"))
             for root in sorted(roots):
                 for task in root.iterdir() if root.is_dir() else ():
                     if task.is_dir():

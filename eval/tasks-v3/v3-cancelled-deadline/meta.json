@@ -1,0 +1,10 @@
+{
+  "id": "v3-cancelled-deadline",
+  "type": "bug_fix",
+  "domain": "scheduling",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
