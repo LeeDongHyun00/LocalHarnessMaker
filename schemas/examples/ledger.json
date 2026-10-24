@@ -1,0 +1,49 @@
+{
+  "schema_version": 3,
+  "session_id": "synthetic-session",
+  "requirements": {
+    "path": "requirements.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "decisions": [
+    {
+      "id": "D-1",
+      "what": "SYNTHETIC: retain health entry point.",
+      "rationale": "Preserve the public API.",
+      "fixes": [
+        {
+          "kind": "signature",
+          "value": "health()",
+          "path": "app/main.py"
+        }
+      ]
+    }
+  ],
+  "open_items": [
+    {
+      "requirement_id": "R-1",
+      "text": "SYNTHETIC: behavior has no deterministic oracle."
+    }
+  ],
+  "validation": {
+    "validated_at": "2026-10-25T00:00:00Z",
+    "status": "valid",
+    "reason": "SYNTHETIC: identifiers found; hashes recorded.",
+    "identifiers": [
+      {
+        "decision_id": "D-1",
+        "kind": "signature",
+        "value": "health()",
+        "path": "app/main.py",
+        "found": true,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "files": [
+      {
+        "path": "app/main.py",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ]
+  }
+}

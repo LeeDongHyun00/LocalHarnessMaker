@@ -4,6 +4,8 @@ Date: 2026-10-24
 
 Status: proposed, awaiting the user.
 
+Status note (2026-10-25): record-only after accepted decision [0011](0011-pinned-luna-hook-direction.md); no remedy or freeze exception is authorized.
+
 ## Context
 
 Role 5's read-only diagnosis of 2026-10-24, recorded in Claude's

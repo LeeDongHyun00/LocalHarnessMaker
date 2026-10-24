@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Session pin-check advisory (proposed)",
+  "description": "Interface version 3 proposal; not frozen until explicit user approval of the schema set.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "checked_at",
+    "status",
+    "requested_model",
+    "codex_version",
+    "checks",
+    "model_list",
+    "pricing_snapshot",
+    "pricing_ref",
+    "reason_codes",
+    "advisory"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "enabled",
+        "disabled"
+      ]
+    },
+    "requested_model": {
+      "const": "gpt-6-luna"
+    },
+    "codex_version": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "codex_version_verified",
+        "model_listed",
+        "pricing_covered"
+      ],
+      "properties": {
+        "codex_version_verified": {
+          "type": "boolean"
+        },
+        "model_listed": {
+          "type": "boolean"
+        },
+        "pricing_covered": {
+          "type": "boolean"
+        }
+      }
+    },
+    "model_list": {
+      "oneOf": [
+        {
+          "$ref": "requirements.schema.json#/$defs/artifact"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pricing_snapshot": {
+      "oneOf": [
+        {
+          "$ref": "requirements.schema.json#/$defs/artifact"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pricing_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "codex_version_unverified",
+          "model_missing",
+          "model_list_unavailable",
+          "pricing_missing",
+          "model_identity_mismatch"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "advisory": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "enabled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "codex_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checks": {
+            "properties": {
+              "codex_version_verified": {
+                "const": true
+              },
+              "model_listed": {
+                "const": true
+              },
+              "pricing_covered": {
+                "const": true
+              }
+            }
+          },
+          "model_list": {
+            "$ref": "requirements.schema.json#/$defs/artifact"
+          },
+          "pricing_snapshot": {
+            "$ref": "requirements.schema.json#/$defs/artifact"
+          },
+          "pricing_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason_codes": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "reason_codes": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

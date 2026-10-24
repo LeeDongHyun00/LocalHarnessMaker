@@ -1,0 +1,19 @@
+{
+  "schema_version": 3,
+  "session_id": "synthetic-session",
+  "call_id": "requirements-1",
+  "phase": "requirements",
+  "backend": "codex_cli",
+  "requested_model": "gpt-6-luna",
+  "model": "gpt-6-luna",
+  "reasoning_effort": "low",
+  "status": "success",
+  "error": null,
+  "input_tokens": null,
+  "cached_input_tokens": null,
+  "output_tokens": null,
+  "latency_seconds": 0.5,
+  "usd": null,
+  "pricing_ref": "SYNTHETIC-prices-v3",
+  "cost_basis": "api_equivalent_usd"
+}

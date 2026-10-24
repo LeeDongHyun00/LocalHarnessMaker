@@ -1,63 +1,80 @@
 # Role 2: Plugin Engineer (hooks and skill)
 
-Read AGENTS.md at the repository root first. This file is your contract.
+Read AGENTS.md first and state/STATUS-plugin.md. Shared ownership, working rules
+and STOP-1 through STOP-4 apply. Do not spawn sub-agents. Continue Remaining
+under accepted decision 0011, which supersedes old contract-loop work.
 
 ## Goal
 
-Build the Codex plugin that runs this loop inside Codex: user request, then contract injection, then approval, then execution, then verification and re-instruction at the Stop event, then handoff save and injection. Keep the hooks thin. Hooks only call the controller and verifier CLIs; they never implement control or verification logic themselves.
+Run the pinned-Luna hooks in real Codex sessions: pin-check, visible requirements
+and questions, deterministic completion/single repair, executor ledger and next
+session injection. Preserve process hygiene, installation and version policy.
+Do not implement a second verification loop in the plugin.
 
 ## Ownership
 
-Owned paths: plugin/ including the hook configuration (hooks.json or the hooks section of config.toml, whichever the installed Codex version uses), plugin/hooks/ (Python scripts), plugin/skills/harness/SKILL.md, plugin/templates/AGENTS.md (the file installed into user projects), plugin/install.sh, plugin/demo.sh, plugin/CODEX_VERSION. Tests in tests/plugin/.
-Read-only: everything else.
+plugin/, including hooks/configuration, skill, templates, installer, demo,
+verified-version registry/evidence; tests/plugin/ and state/STATUS-plugin.md.
+Read everything else. Propose shared docs/interface changes for Role 1; never
+edit controller/, verifier/, eval/ or other roles' STATUS.
 
 ## Interfaces
 
-1. CLIs you call: python -m controller contract, python -m controller handoff, python -m verifier check, python -m verifier validate-handoff. See AGENTS.md section 3.2. If a CLI does not exist yet, use plugin/hooks/_stub.py, which returns the files in schemas/examples/ unchanged. Stub mode is enabled by the environment variable HARNESS_STUB=1.
-2. Hook input and output: the documentation at https://learn.chatgpt.com/docs/hooks. Confirm the real input and output of the three hooks on the installed Codex version and record them in docs/hooks-contract.md. Role 1 merges that file.
-3. State file: .harness/state.json in the user's project with the fields attempt, contract_path, verdict_path, handoff_path, started_at. Reset at the start of every session.
+The version 3 set in AGENTS.md section 3.0 and docs/interfaces-v3.md is proposed,
+not frozen; start implementation only after explicit schema-set approval.
+Direction 0011 is already accepted. Historical CLIs/schemas stay unchanged for
+v1/v2 consumers; new hooks do not call contract, handoff or judge generators.
+
+- Use `.localharness/v3/sessions/<sha256-of-UTF-8-session_id>/` for pin-check.json, requirements.json, completion-report.json, ledger.json, luna-calls.jsonl and referenced evidence/. Revalidate `.localharness/v3/latest-ledger.json` before injection. Atomic JSON writes, confined paths and verified hashes; do not inject a stale ledger.
+- Preserve measured SessionStart/UserPromptSubmit additionalContext and Stop decision=block/reason formats. SessionEnd is observe-only. Obtain version compatibility evidence before optional PreToolUse; propose any new wire fields instead of inventing them.
+- Every hook first checks exact `HARNESS_NESTED=1` and exits 0 with zero bytes on stdout AND stderr before stdin/import/config/files/logging or exception handling. H3 executors leave it unset; controller children set it. Mock both paths.
+- Pin exact gpt-6-luna with verified CLI version/model-list and pinned pricing coverage. Missing/unobservable/renamed pin writes a visible pin-check advisory and disables Luna calls. A provider identity mismatch also disables later calls. Never substitute or change model/effort automatically.
+- Role 3 owns requirements/audit/accounting and Role 4 owns checks/report/retry/ledger request. Preserve session/phase state over Stop continuations and duplicate events: at most two calls, one application repair, one separate ledger bookkeeping request. Never inherit old configurable retry defaults.
 
 ## Deliverables
 
-- D-1, due 2026-10-24: docs/hooks-contract.md. It must answer: do the three hooks fire; the full input JSON sample for each; how output fields behave (is additionalContext visible to the model; does the Stop hook force continuation and which fields do that); do the hooks fire under codex exec. Attach evidence logs. Keep a list of verified Codex versions with their probe evidence in plugin/ and docs/hooks-contract.md, following docs/decisions/0006-codex-version-policy.md.
-- D-2, due 2026-10-27: end-to-end run in stub mode. A request is entered, the contract appears in the model context, the Stop hook re-instructs once, then the run passes. Reproducible with plugin/demo.sh.
-- D-3, due 2026-11-03: real controller and verifier CLIs connected. Re-instruction limit N (default 3, configurable) and the state file.
-- D-4, due 2026-11-10: SessionStart injection of the handoff document. install.sh that registers hooks, copies the skill, checks the Codex version, and supports a --check mode. Fallback on hook failure: any exception produces empty output plus a warning on stderr, and the session continues. Plugin packaging.
-- D-5, due 2026-11-13: demo recording scenario (plugin/demo.sh plus a document with the screen order).
+- D-1, 10/28–11/03 after approval: SessionStart pin-check and advisory, verified-version evidence, exact artifact lifecycle and previously validated ledger injection. Revalidate identifiers/hashes against current workspace, never trust executor validation fields.
+- D-2, 10/28–11/03: connect requirements and completion/report producers without contract approval machinery; show unanswered questions before work and record user answers. Coordinate prepared noninteractive clarifications with Role 5; never assume answers.
+- D-3, by 11/03: escalation advice in completion report on repeated deterministic failure, recommending higher effort or human review without changing effort. Optional protected-file guard only after installed-version PreToolUse evidence; deterministic hash checks remain required even without the guard.
+- D-4, before full runs: installer/check/packaging and two live smoke projects outside every evaluation set; exercise real hooks under codex exec, one repair, ledger writing and next-session injection. Keep process shutdown/capture evidence and artifact hashes.
+- D-5, by 11/13: packaged demo and screen-order scenario for visible requirements, failure evidence and two-session ledger; support fresh-clone docs and rehearsal.
 
-## What the skill (SKILL.md) must instruct the executor model to do
+## Skill instructions for the executor
 
-1. If a contract is present in the context, show a summary before doing anything: goal, checklist, assumptions, reasoning effort, estimated cost. Then wait for the user to answer approve or edit. Do not change any file before approval.
-2. During the work, actually run the commands listed under verification in the contract.
-3. At the end, report every success criterion in a table with its evidence: the command and its output, or the file path. Mark items without evidence as not done.
-4. If the Stop hook re-instructs, handle only the unmet items and finish again.
-5. If no contract is present, behave normally. The plugin must not interfere with the user's other work.
+1. Show the numbered requirements table and open questions before work. Ask the user rather than inventing answers; no old generated-contract approval gate.
+2. Follow exact named/protected files and configured checks. Provide a per-requirement completion table with command/output or path/hash evidence; items lacking an oracle remain unverifiable.
+3. Handle only the executed failures in the single repair continuation. Audit opinions/unverifiable rows do not authorize extra repair.
+4. When the separate Stop ledger request arrives, write schema-shaped decisions/rationale/fixed identifiers/open items with validation=null. Do not alter application code in that bookkeeping continuation. Preserve the application completion summary/evidence in the retained final response; do not replace it with only a ledger-save notice.
+5. If pin-check disables Luna, show the advisory; continue ordinary work without claiming H3 validation or substituting a model.
 
 ## Success criteria
 
-- SC-1: each of the three hooks has a unit test of the form stdin JSON in, stdout JSON out, with the CLIs mocked.
-- SC-2: an integration test in stub mode runs codex exec once and the contract text appears in the transcript.
-- SC-3: the Stop hook forces continuation with reinstruct_message when verdict.overall is fail, and when attempt is greater than or equal to N it lets the session end and shows the list of unmet items to the user.
-- SC-4: an exception in any hook script never breaks the Codex session: whole-script try and except, exit code 0, log on stderr.
-- SC-5: a log line records the hook execution time; the target is under 1 second excluding the control model call.
-- SC-6: install.sh --check reports an unverified Codex version, hooks not registered, and skill missing as three distinct messages.
+- SC-1: mocked hook stdin/stdout tests cover enabled/disabled pin, model/version/pricing failures, duplicate events, nullable transcript and exact nested guard before every side effect.
+- SC-2: ledger schema/identifier/hash rejection prevents stale injection; pin failure produces no Luna calls.
+- SC-3: one repair only on deterministic failure; one ledger request at most; no repeated audit/model call or recursive Stop block.
+- SC-4: errors never strand a Codex session; retain visible advisory/evidence and allow exit when repair/bookkeeping budgets expire. Normal error/timing output must not violate the nested zero-byte guard.
+- SC-5: hook-only overhead target under one second excluding command/model time; each Luna call target below 10 seconds, measured by Role 3.
+- SC-6: install --check distinguishes unverified CLI, missing registration/skill, missing model and missing pricing; full smoke evidence establishes actual behavior rather than registry membership alone.
 
 ## Verification
 
-1. pytest tests/plugin
-2. bash plugin/install.sh --check
-3. bash plugin/demo.sh once in stub mode and once in real mode; keep both logs.
+Run `.venv/bin/python -m pytest tests/plugin -q`. Run installer --check and real
+smokes only where authorized and available, retaining logs/version/model/tier
+and hashes. No live batch of ten or more without estimate and STOP-3 handling.
+Update STATUS; never claim live acceptance from mocked tests.
 
 ## Stop and escalate conditions
 
-In addition to STOP-1 to STOP-4 in AGENTS.md:
-- STOP-P1: the hooks behave differently from the documentation in a way that makes the design impossible, especially if the Stop hook cannot force continuation. Write a draft of the alternative in docs/decisions/ and report. The alternative: the skill instructs the executor to run python -m verifier check before finishing and to continue on its own based on the verdict.
-- STOP-P2: the Codex version changes during a run: stop that run and report it. Do not hold or roll back versions. Record the installed version in every run (evaluation report metadata codex_version and per-session cli_version); compare only same-version reports for SC-3, with mixed-version comparisons diagnostic only. After a version change, require a new hook compatibility probe and a one-task audit compatibility smoke before any large run. Keep a list of verified versions with their probe evidence instead of a single pin; see docs/decisions/0006-codex-version-policy.md.
-- STOP-P3: the control model call inside UserPromptSubmit takes more than 5 seconds. Write down an asynchronous or cached design and report.
+- STOP-P1: measured hooks cannot provide required continuation/context; propose an alternative without silently replacing real-plugin evaluation.
+- STOP-P2: CLI changes mid-run; stop/report. Probe a new version and require one-task audit smoke before large runs per decision 0006.
+- STOP-P3: measured Luna call exceeds the 10-second target; report evidence and a bounded design proposal. Do not switch model or add background calls automatically.
 
 ## First task
 
-1. Record the installed Codex version. Register a script for each of the three hooks that only dumps stdin to a file. Collect the real input JSON and paste it into docs/hooks-contract.md.
-2. In the Stop hook, return the continuation format from the official documentation with the message "test: print one more line". Check whether the session actually continues and record the result including the exact field names.
-3. Repeat the same experiment under codex exec and record whether the hooks fire. Write the result in your STATUS file so that Role 5 can read it.
-4. Update state/STATUS-plugin.md.
+Read the approved-or-proposed schema status and current STATUS. Prepare mocked
+pin/ledger/guard cases while awaiting approval; implement D-1 only after that
+gate. Send evidence/proposals to owners without editing their paths.
+
+## Assumptions
+
+- PreToolUse is optional until measured compatible; a disabled pin disables Luna functionality, not the ordinary executor session.

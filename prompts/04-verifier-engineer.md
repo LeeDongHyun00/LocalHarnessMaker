@@ -1,61 +1,81 @@
 # Role 4: Verifier Engineer
 
-Read AGENTS.md at the repository root first. This file is your contract.
+Read AGENTS.md and state/STATUS-verifier.md first. Shared ownership, working
+rules and STOP-1 through STOP-4 apply. Do not spawn sub-agents. Decision 0011
+replaces old contract/judge/handoff deliverables for the new hook path.
 
 ## Goal
 
-Build the verifier that compares what the executor model claims it did with what it actually did. The verifier is the core asset of the project. Mechanically checkable criteria are judged by code. Only llm_judge criteria are delegated to the judge CLI of Role 3. The verifier must stay independent from the control model: it never imports the controller package; it calls the judge CLI through subprocess only.
+Publish per-requirement completion evidence using deterministic checks, permit
+one repair only on executed failure, and request/validate the executor's own
+decision ledger through Stop continuation. llm_judge is retired from this hook
+path. Claim audit is supplied by Role 3; its opinions cannot override code.
 
 ## Ownership
 
-Owned paths: verifier/ including __main__.py (CLI), rules.py (command, file_exists, regex), claims.py (done-claim versus evidence), reinstruct.py (re-instruction message), handoff_validate.py, sandbox.py (isolated command execution). Tests in tests/verifier/.
-Read-only: everything else.
+verifier/, including check runner, claims extraction, report/retry logic,
+ledger validation, command isolation and RULES.md; tests/verifier/ and
+state/STATUS-verifier.md. Read other paths; never edit controller/, plugin/,
+eval/, shared schemas or another role's STATUS.
 
 ## Interfaces
 
-The two CLIs in AGENTS.md section 3.2: verifier check and verifier validate-handoff. Input: contract.json, --workspace, --transcript, --attempt. Output: verdict.json that validates against schemas/verdict.schema.json.
+AGENTS.md section 3.0 and docs/interfaces-v3.md are the proposed v3 contract;
+implementation starts after explicit schema-set approval. Keep old verifier
+check/validate-handoff CLIs and historical schemas compatible; do not extend
+CLIs without a separately approved proposal. No judge CLI on the v3 hook path.
+Use requirements.json, completion-report.json, ledger.json and immutable
+evidence/ under `.localharness/v3/sessions/<sha256-of-UTF-8-session_id>/`.
+Role 3 supplies the one audited claim result/accounting, via package integration
+coordinated with Role 2; verifier must not import controller or invoke another
+control call itself. Code checks cross-artifact IDs, hashes and provenance.
 
-## Judgment rules
+## Deterministic rules and Stop sequence
 
-1. command: run in --workspace. Default timeout 120 seconds. No network. No writes outside the workspace. Compare the exit code and stdout with expected. Evidence: the command, the exit code, and the last 50 lines of stdout.
-2. file_exists and regex: check the path and the pattern. Evidence: the path and the matching lines, at most 10.
-3. llm_judge: call python -m controller judge. Record its status and reason unchanged and put the string llm_judge in evidence so that humans can review these items.
-4. Done-claim verification (claims.py): from the last report in the transcript, extract claims of the form done, completed, implemented, passing, per criterion. If a claimed criterion fails its mechanical check, set status to fail and reason to claimed_without_evidence. This ratio is the source of the false-done-rate metric.
-5. unverifiable: the command cannot run (missing dependency, missing path, and similar). Never treat it as pass. For the overall result, treat it like fail.
-6. Re-instruction message (reinstruct.py): include only items whose status is not pass (fail or unverifiable), each with its number, description and one line of failure evidence. At most 300 characters. Form: "Items 3 and 5 are not done. Read the evidence below, fix only those items, then finish again." When attempt is greater than or equal to N, set reinstruct_message to null.
-7. Contract quality warning: if success_criteria is empty or every item is llm_judge, print a warning on stderr and fill items with status unverifiable. A contract that cannot be verified must not pass.
+1. Code derives checks from exact request targets/configured project oracles, coordinated with Role 3. behavior: configured tests or unavailable; constraint: configured command/signature snapshot/input-immutability probe or unavailable; protected_file: pre-edit SHA-256 unchanged; named_file: existence; named/test_command: trusted safe argv. No model-generated regex/command or llm_judge. Unsupported derivation remains unverifiable.
+2. Commands use bounded deadlines, shell=False, no network/outside writes and injected runners. Compare observed result to explicit expected exit, retaining argv, exit and output. Capture full output/hash plus bounded report excerpt. Preserve deterministic failures versus unavailable dependencies/timeouts/errors; missing named output/hash mismatch is fail. Record language-aware signature/input baseline evidence before edits.
+3. Every requirement appears once with pass/fail/unverifiable, reason, file/output path and hash/excerpt. Passing tests do not establish uncovered behavior; no overall pass with unavailable rows. Validate cited claim evidence; unsupported claim citations cannot change deterministic status. Keep last-session final-message extraction rules available to Role 5.
+4. At first Stop run checks and publish report with Role 3's one audit. Only an executed deterministic failure permits one application repair. Persist retry.used=1 and failed IDs before block; inject only those rows with concrete failure evidence. Unverifiable rows and claim opinions never trigger repair.
+5. After repair recheck deterministically, publish round 2, no extra Luna call. Preserve original audited message/hash and mark audit stale if the current final message changed. Coordinate repeated-failure advice with Role 2; never raise effort automatically or block for a second repair.
+6. After report settles, request ledger writing via one separate Stop bookkeeping continuation. Executor writes decisions/rationale/fixed names, signatures/constants/paths/open items and validation=null. This request is not application repair and cannot alter app code. Require the final response to preserve application completion claims/evidence, not only a ledger-save notice; refresh current-final-message hash/stale-audit status if it changes. Persist request state before block; duplicate Stop events cannot loop.
+7. Hook code owns validation: schema, exact identifier coverage/presence, hashes, confined paths and current workspace identity. Unsupported extraction/missing identifiers -> invalid. Never trust executor-populated validation. Save validated latest-ledger for Role 2 injection, revalidate on next session; no Luna transcript reconstruction. Invalid/missing ledger is advisory, not another blocking continuation or silent older-memory injection.
 
 ## Deliverables
 
-- D-1, due 2026-10-27: rules.py with the three rule types, verdict output, golden tests using the contract in schemas/examples/ for both the pass and the fail case.
-- D-2, due 2026-11-03: claims.py, reinstruct.py, sandbox.py (timeout, no network, path restriction), complete CLI. Connected to the hooks of Role 2.
-- D-3, due 2026-11-06: validate-handoff, llm_judge delegation, and the command python -m verifier sample --reports DIR --n 20 that extracts a sample for human review.
-- D-4, due 2026-11-10: fixes for misjudgments found in the week 2 comparison, and the rules document verifier/RULES.md.
+- D-1, 10/28–11/03 after approval: deterministic runner for code-derived checks, mechanical baselines, safe execution and complete per-row evidence; unavailable coverage stays explicit.
+- D-2, by 11/03: completion-report producer, injected claim audit integration, strict single-retry state machine, stale audit handling, repeated-failure advice integration with Role 2. Retain claims extraction for task false done without adding judge work.
+- D-3, by 11/03: Stop ledger writing request and mechanical schema/identifier/hash validation. Support two non-evaluation smoke projects and two-session ledger evidence with Role 2.
+- D-4, by 11/13: RULES.md, independently sampled report-accuracy review support, fixes confined to development evidence before v3 freeze; document known unsupported checks and stale-audit limitation.
 
 ## Success criteria
 
-- SC-1: each of the three rule types has unit tests for pass, fail and unverifiable.
-- SC-2: on a fixture where the executor wrote done but the tests fail, claimed_without_evidence is produced.
-- SC-3: a test enforces that the verifier package never imports the controller package.
-- SC-4: the same input always produces the same verdict, except for llm_judge items.
-- SC-5: a command that touches paths outside the workspace or contains destructive operations (for example rm -rf, writes to absolute paths) is not executed and is recorded as unverifiable with a reason.
-- SC-6: a log line records the verifier execution time; the target is under 1 second excluding the time of the commands themselves.
+- SC-1: each deterministic check has pass/fail/unverifiable cases with meaningful evidence; unsafe/unsupported commands never execute.
+- SC-2: false completion fixture exposes failed checks despite executor saying done; unsupported claims do not become evidence or trigger repair alone.
+- SC-3: verifier never imports controller; no llm_judge/provider calls on the new hook path.
+- SC-4: state-machine fixtures prove only one application repair, at most one ledger request, duplicate Stop idempotence and no audit rerun. Unverifiable-only reports never repair.
+- SC-5: forged ledger validation, identifiers absent/changed, stale hashes, path escapes and invalid schema block injection without repeated continuation.
+- SC-6: deterministic report/check overhead target below one second excluding commands/model calls; measured separately from project tests.
 
 ## Verification
 
-1. pytest tests/verifier
-2. python -m verifier check --contract schemas/examples/contract.json --workspace tests/verifier/fixtures/ws_pass --transcript tests/verifier/fixtures/transcript_pass.jsonl --attempt 1 --out /tmp/v.json
-3. The same command for the fixtures ws_fail and ws_claimed with their transcripts.
+Run `.venv/bin/python -m pytest tests/verifier -q`; validate report/ledger fixtures
+with local schema references and runtime cross-artifact checks. Host-only
+sandbox/Codex tests need real evidence; mocked results are not live acceptance.
+Update STATUS with exact commands/results and pending integration limits.
 
 ## Stop and escalate conditions
 
-In addition to STOP-1 to STOP-4 in AGENTS.md:
-- STOP-V1: the verdict schema needs an extra field. Write a proposal in docs/decisions/ and report.
-- STOP-V2: the transcript format differs from docs/hooks-contract.md written by Role 2. Report it. Do not build a parser on guesses.
-- STOP-V3: a dangerous command type that the sandbox cannot block is found. Report it.
+- STOP-V1: shared schema/CLI addition needed; propose it and stop before changing another role's paths.
+- STOP-V2: installed transcript/Stop behavior differs from measured docs/hooks-contract.md; report evidence, never guess the format.
+- STOP-V3: command isolation cannot block a dangerous operation; report and mark unverifiable rather than execute it.
 
 ## First task
 
-1. Read the contract and verdict files in schemas/examples/. Implement the command rule in rules.py first.
-2. Create three workspaces in tests/verifier/fixtures/: ws_pass, ws_fail, and ws_claimed (the transcript claims done but the tests fail), each with a matching transcript sample. Until docs/hooks-contract.md exists, assume the transcript is JSONL and record that assumption.
-3. Update state/STATUS-verifier.md.
+Read approval status and current STATUS. Prepare deterministic failure versus
+unverifiable and Stop-state fixtures while pending; implement D-1 after schema
+approval. Coordinate derivation/claim-adapter boundaries with Role 3 without
+changing their files.
+
+## Assumptions
+
+- Ledger validation proves presence/identity, not the semantic quality of a decision. Report that limitation and preserve open items.

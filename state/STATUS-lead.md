@@ -1,5 +1,11 @@
 ## Done
 
+- Published accepted decision 0011 with attributed v1/v2 findings and invalidity/grader limits, six design principles, hook table, pinned Luna/B-dropped/C-optional/0010-record-only confirmations, held-out v3 freeze rule and success criterion; added 0010's record-only note and resolved 0011 in the plan (`.venv/bin/python -m pytest tests/lead -q`: 141 passed in 31.97s; measurements are attributed host records, not rerun).
+- Drafted interface version 3 requirements, completion-report, ledger, pin-check and Luna-call schemas with examples; exact workspace artifact paths, runner collection/accounting contract, fail-closed pin, kind/check mappings, single repair and separate ledger bookkeeping; retained all six historical schemas and report fields unchanged (`make validate-schemas`: Validated 11 draft 2020-12 schemas and 13 examples).
+- Updated AGENTS.md, docs/interfaces-v3.md, the historical interface-page notice, plan and all five role prompts for the new schedule/ownership and real A/H3 hooks; the schema set remains proposed, not frozen; added lead boundary tests and updated historical version/count assertions (`.venv/bin/python -m pytest tests/lead -q`: 141 passed in 31.97s).
+
+- Confirmed the required six STATUS headings and byte-for-byte preservation of all historical schemas/examples; the owned diff has no whitespace errors (`python3` inline HEAD-byte/heading audit: STATUS headings match; 6 historical schemas and 8 examples are byte-for-byte unchanged; `git diff --check -- AGENTS.md docs/decisions/0010-reservations-r2-grader.md docs/decisions/0011-pinned-luna-hook-direction.md docs/interfaces.md docs/interfaces-v3.md docs/plan.md docs/validate_schemas.py prompts/01-tech-lead.md prompts/02-plugin-engineer.md prompts/03-controller-engineer.md prompts/04-verifier-engineer.md prompts/05-eval-engineer.md schemas tests/lead state/STATUS-lead.md`: exit 0, no output).
+
 - Published proposed decision 0010 with attributed reservations R2 diagnosis, three comparison/freeze options, Role 5/Claude recommendation and conditional owner steps; linked it under Open decisions in docs/plan.md. No decisions index exists in docs/decisions/README.md or AGENTS.md, so no index edit was made (`.venv/bin/python -m pytest tests/lead -q`: 104 passed in 4.20s).
 
 - Published docs/eval-freeze-v2.md with the supplied 2026-10-24 Claude host evidence at main commit 9097281: digest, 100-task/20-family inventory, validation, calibration, shared-template limitation, immutable version 2 and post-freeze anti-contamination rule; moved fresh full A/B/harness runs to W2 in docs/plan.md. Host findings are attributed, not rerun here (`.venv/bin/python -m pytest tests/lead -q`: 104 passed; `git diff --check -- docs/eval-freeze-v2.md docs/plan.md state/STATUS-lead.md`: exit 0, no output).
@@ -33,129 +39,42 @@
 
 ## Remaining
 
-- Await the user's decision on proposed 0010. If accepted, Role 5 amends/validates the five private graders and computes the revised digest; Claude verifies on the host and records it in docs/eval-freeze-v2.md; every v2 report needs equal retained-artifact regrading and final disclosure of both gradings. No remedy or freeze exception is authorized by this proposal.
-
-- Role 5 follow-up for published interface version 2: implement task_false_done_rate in eval/metrics.py and the report builder using verifier/claims.py rules on the retained final message of the last session; validate valid-task-only populations, missing-final exclusions/reasons, bootstrap behavior and dual-version tools. Publication does not establish implementation or measurement. Host evaluation remains untouched.
-- D-6 docs/qa.md and docs/slides/outline.md remain deferred to a separate continuation after this user-prioritized freeze publication, with measured/pending labels and evidence sources only.
-
-- Track Role 5's fresh full A, B and harness runs on frozen version 2 in W2, through 2026-11-06: A/harness on 100 tasks, B on 80 single-session tasks. Freeze publication is complete in docs/eval-freeze-v2.md; run completion remains unverified here. Final analysis is due 2026-11-13; retain native priority-tier evidence, pinned Standard-rate accounting and disclosure of version 1 runs informing the 10/23 fixes. No version 2 result may inform a harness change after freeze; task-set changes require version 3. Keep host evaluation untouched.
-- Pending Claude host acceptance for D-5/SC-4: execute the fresh-clone checklist in docs/demo.md (clone, venv, disposable installation/--check, committed offline evidence checkers, schema validation, full suite and a fresh typed-approval real demo); retain log/commit/version and all skip/xfail reasons. Documentation and existing-capture audits are complete; fresh-clone acceptance is not done.
-- Track decision 0006 run/session version recording, one-task audit smoke and mid-run detection through owning-role evidence. Registry publication is complete at 53cb8a9; registry membership alone does not prove all runtime version-policy behavior.
-
-- D-4: integration review 1 was written early by Claude on 2026-10-23 in docs/weekly/2026-10-27.md; refresh on 10/27 if needed, then review on 11/03 and 11/10. Monitor interface blockers for the two-day limit and reconcile historical runtime pending items below with attributed host evidence. Keep this session away from docs/weekly/ and the running eval/.
-- Owning-role integration follow-up: code now contains controller judge/handoff and shared-budget routing, hook nested guards and verifier delegation; the recorded demos establish only their exercised paths. Review remaining host integration/accounting evidence separately; do not infer complete evaluation validity from these demonstrations.
-- Review persisted trust, nullable transcript/other SessionStart paths and terminal-closure/nested descendant shutdown with owning roles. Pass, exhaustion and injected generation/validation handoff paths now have committed demo evidence; the controller uses bounded subprocess.run without its own process-group cleanup owner.
-- D-6, by 2026-11-15: write docs/slides/ and docs/qa.md with all four required questions.
-- Pending host verification: opt-in real Codex integration, nested codex exec/live model calls, and six macOS Seatbelt tests cannot run in this noninteractive sandbox. Two external private-grader fixture tests also await trusted grader configuration. The full run skipped nine tests total; legacy top-level suites and remote CI were not run.
-- Role 5 expected failure: tests/eval/test_runner.py::test_stop_e1_partial_report_is_invalid_with_counts reports that aggregate-only halt invalidity would require a frozen-schema revision. Recorded only; no schema or eval change was made by this lead session.
+- Claude requests explicit user approval of the complete proposed v3 schema/artifact set in docs/interfaces-v3.md and schemas/. Record that approval before declaring the set frozen; direction approval in 0011 does not approve the schema choices. Roles 2–4 implement only after that gate. Do not restart the superseded v2 recovery or 0010 remedy work.
+- Coordinate owning-role work: Role 2 pin-check/guard/advice/ledger injection; Role 3 independent prompt/calibration design and pinned client/accounting; Role 4 deterministic completion/single repair/Stop ledger request; Role 5 v3 task design and real-plugin artifact collection, A/H3 configs and estimates. No runtime implementation or live acceptance is established by this lead publication.
+- Publish a separate v3 freeze record after Role 5 supplies the held-out inventory/digest and reference/starter/mutation/shared-line validation. Freeze before full A/H3 runs. Keep v1/v2 task sets, graders, reports and prior freezes historical and unchanged; no H3 evaluation on them.
+- Track 10/28–11/03 real smokes on two non-evaluation projects, actual hook compatibility, model/version/pricing pin failures, question/answer interaction, complete accounting, application repair and ledger sequencing. The proposal's under-10-second calls, under-2-percent control cost and about-two-hour full configurations remain unmeasured targets/estimate.
+- Track 11/04–11/08 A/H3 paired runs and human sample, then 11/09–11/13 recovery/final analysis. Success requires preserved quality, pass-rate agreement within paired interval, at least half task false done and at most 15 percent extra cost per pass. Undefined/inconclusive evidence cannot establish success; no numeric equivalence margin is authorized.
+- D-4 integration reviews: 10/27, 11/03, 11/10; Claude prepared the first early. Monitor two-day blockers, schedule slips, stale-audit report accuracy and ledger-continuation effects on retained final-message claims. Do not substitute earlier messages in the task-level metric.
+- Refresh D-5 README/architecture/demo for implemented v3 hooks by 11/13 and obtain fresh-clone/live host evidence. Existing v1/v2 demo captures are historical, not H3 acceptance. D-6 slides and Q&A by 11/15; presentation 11/16, with the original negative result stated plainly.
+- Host performs the full suite once before merge and real compatibility/installation/Codex/sandbox tests. This restricted session runs lead tests only; no staging or commit. Nested Codex/live calls/macOS sandbox-exec/network remain unavailable here.
 
 ## Decisions
 
-- Keep 0010 proposed, awaiting the user: the current instruction authorizes documentation only; graders, tasks, reports and the frozen digest remain unchanged.
-- Use prompts/01-tech-lead.md as the requested Role 1 prompt: prompts/01-lead.md is absent and the repository contains this matching role prompt. This session's user-prioritized proposal supersedes the historical Remaining order.
-- Preserve approved baseline B task scope in the proposed 95-task analysis: comparisons involving B use the same eligible single-session subset, rather than implying B has two-session results.
-
-- Publish the version 2 freeze from user-supplied Claude host findings at 9097281, dated 2026-10-24: the user prioritizes this separate immutable record and moves full A/B/harness measurements into W2; no runtime, interface or historical freeze record changes are needed.
-
-- Publish interface version 2 under decision 0009, approved 2026-10-23: both task_false_done_rate populations contain valid tasks only; invalid tasks remain visible through existing invalid_reasons and validity fields. This resolves the earlier STOP-1 / STOP-L1 blocker.
-- Identify report versions by metrics.task_false_done_rate presence: version 1 reports remain valid under the original schema in decision 0003 and are compared only with tools accepting both versions; no historical report migration or new version field.
-- Exclude tasks without a retained last-session final message with an explicit reason: missing evidence is undefined, not absence of a completion claim; the reference fixture therefore uses a null metric.
-- Keep implementation with Role 5: this session publishes schema/example, decision, shared instructions and lead regression checks only, without touching running evaluation work.
-
-- Adopt decision 0008, approved 2026-10-23: version 1 remains frozen/reported; harder version 2 tests the project claim, usage is not a constraint and result completeness is the goal. Use priority for Codex development jobs and all version 2 configurations, verified from native settings, with pinned Standard-rate API-equivalent costs.
-- Limit this continuation to decision 0008, docs/plan.md, a separate-version-2-record notice in docs/eval-freeze.md and lead STATUS: the user prioritizes these documentation changes while host evaluation runs continue; no schema, CLI, hook or runtime change is needed.
-- Historical D-5 session scope: edit only README.md, docs/architecture.md, docs/demo.md and this STATUS; do not stage/commit, run foreign tests, call models or disturb the host evaluation.
-- Distinguish committed host captures, offline rechecks and pending fresh-clone acceptance: passing saved-evidence audits are not a new live run or persisted-trust/shutdown proof.
-
-- Adopt decision 0007, approved 2026-10-23, superseding the historical local-stage and optional-training decisions below: complete all remaining approved work before the local LLM stage; usage limits are no longer a concern, while executor API billing remains a cap-block fallback only.
-- Historical decision-0007 session scope: update decision 0007, plan, prompts 03/05, the planned-local wording in AGENTS.md and lead STATUS; leave the host evaluation and all runtime/interfaces unchanged.
-
-- Adopt user-approved decision 0006 dated 2026-10-22: versions may change without holding or rollback; record run/session versions, compare same-version reports only, require a fresh hook probe and one-task audit smoke after changes, stop on mid-run changes and retain verified-version evidence.
-- Limit this continuation to decision 0006, AGENTS.md section 3.3, conflicting version-policy wording in the hook contract/plugin prompt/plan and this STATUS: the user explicitly authorized these owned paths without any interface change.
-
-- Record evaluation task-set version 1 as frozen on 2026-10-22 with the user-supplied digest: Claude host verification supplies private validation evidence, while public metadata and counts are independently checked in this session. Any task-set change requires version 2 and a new freeze record.
-- Preserve task-cluster report metrics and require family-cluster intervals in Claude's final evaluation: user-approved decision 4 of 2026-10-22 retains the interfaces and qualifies final claims.
-- Treat FILE1/FILE2/FILE3 as decisions 0002/0003/0004: those are the three proposals immediately preceding the user's explicit approval and implementation request.
-- Publish version 1 on 2026-10-21: the user approved the bundle and explicitly requested VERSION=1 before the planned 2026-10-24 freeze.
-- Preserve approved schema/example content exactly: active artifacts match the JSON blocks in the approved records; existing contract/verdict/handoff shapes remain unchanged.
-- Use gpt-6-luna via logged-in codex_cli as primary, same-model cheap_api fallback and local Gemma as stage two (historical; local stage dropped by decision 0007): the earlier approved model/transport order.
-- Use audited external private graders in fresh post-exit copies and invalidate observed access/inconclusive capture: the user's STOP-E4 decision replaces the earlier deny-read prerequisite without claiming filesystem isolation.
-- Keep role-prompt edits limited to session authorization: the earlier interface session authorized prompts 03/05; this continuation authorizes the D-3 path in prompt 01 and wording only in prompt 04. Runtime packages and other STATUS files remain untouched.
-- Leave staging and commits to the host: this session has read-only .git and explicit instructions not to stage or commit; concurrent role changes remain outside the commit plan.
-- Use importlib collection rather than test-package markers: the user explicitly selected this fix and prohibited __init__.py additions in other roles’ test directories.
-- Retain the historical analyzer timing disagreement: decision 0007 resolves the QLoRA disagreement by dropping training and supersedes conflicting measurement dates with the approved W1–W3 windows.
+- Adopt user-approved 0011, accepted 2026-10-25: the original claim is answered negatively; build deterministic hooks plus two low-effort pinned Luna calls and evaluate only A/H3 on held-out v3. B is dropped, C optional, 0010 record-only.
+- Keep schema version 3 proposed despite incrementing schemas/VERSION: the user requested reviewable definitions now and separate explicit approval before freeze, to be requested by Claude. Do not mistake direction acceptance for schema approval.
+- Use a workspace-only artifact root .localharness/v3/ with SHA-256 session directories, fixed artifact filenames and per-call JSONL: the runner collects and prices hook outputs without orchestrating control calls. Extra pin-check/Luna-call schemas make those formats locally verifiable.
+- Supersede handoff only on the new hook path with executor-written ledger: retain old schemas/CLIs/artifacts unchanged for v1/v2 history; no Luna transcript reconstruction or llm_judge on H3.
+- Propose one call per phase with no automatic fallback/regeneration: failures count toward the two-call session budget; keep old command budgets only for historical consumers. Unknown usage stays null and conflicting model identity fails closed.
+- Audit once before application repair and mark changed final messages stale: a second audit would exceed the chosen phase budget. Request ledger writing once as separate bookkeeping, preserving application claims/evidence in the final response; no extra app repair or recursive ledger retry.
+- Distinguish A and H3 child guards: A uses HARNESS_NESTED=1, H3 removes it for real hooks, controller-owned nested Codex always sets it; never mutate parent configuration/environment.
+- Preserve the user's no-quality-loss rule and report paired uncertainty: an interval containing zero alone is not proof of equivalence; no numeric margin was supplied.
 
 ## Verify commands
 
-- git diff --check -- docs/decisions/0010-reservations-r2-grader.md docs/plan.md state/STATUS-lead.md
-
-- git diff --check -- docs/eval-freeze-v2.md docs/plan.md state/STATUS-lead.md
-
 - .venv/bin/python -m pytest tests/lead -q
 - make validate-schemas
-- git diff --check -- AGENTS.md docs/interfaces.md docs/decisions/0009-task-level-false-done.md prompts/05-eval-engineer.md schemas/evaluation-report.schema.json schemas/examples/evaluation_report.json schemas/VERSION tests/lead/test_interface_proposals.py state/STATUS-lead.md
-
-- git diff --check -- docs/decisions/0008-task-set-v2.md docs/plan.md docs/eval-freeze.md state/STATUS-lead.md
-- .venv/bin/python -m pytest tests/lead -q
-- git diff --check -- README.md docs/architecture.md docs/demo.md state/STATUS-lead.md
-- .venv/bin/python -m plugin.check_demo_evidence plugin/evidence/2026-10-22-real
-- .venv/bin/python -m plugin.two_session_demo check --out plugin/evidence/2026-10-23-two-session
-- .venv/bin/python -m plugin.handoff_failure_demo check --scenario exhaustion --out plugin/evidence/2026-10-23-exhaustion
-- .venv/bin/python -m plugin.handoff_failure_demo check --scenario generation --out plugin/evidence/2026-10-23-generation
-- .venv/bin/python -m plugin.handoff_failure_demo check --scenario validation --out plugin/evidence/2026-10-23-validation
-- git show 53cb8a9:plugin/VERIFIED_VERSIONS.json
-
-- git diff --check -- AGENTS.md docs/decisions/0007-scope-cuts.md docs/plan.md prompts/03-controller-engineer.md prompts/05-eval-engineer.md state/STATUS-lead.md
-- rg -n 'Prepared by Claude|1 Lead' docs/weekly/2026-10-27.md
-
-- git diff --check -- AGENTS.md docs/decisions/0006-codex-version-policy.md docs/hooks-contract.md docs/plan.md prompts/02-plugin-engineer.md state/STATUS-lead.md
-
-- .venv/bin/python -m pytest tests/lead -q
-- git diff --check -- docs/eval-freeze.md docs/plan.md state/STATUS-lead.md
-- make validate-schemas PYTHON=.venv/bin/python
-- make test PYTHON=.venv/bin/python
-- .venv/bin/python -m plugin.check_probe_evidence plugin/evidence/2026-10-21-exec plugin/evidence/2026-10-21-tui
-- git diff --check -- AGENTS.md docs/interfaces.md docs/validate_schemas.py prompts/03-controller-engineer.md prompts/05-eval-engineer.md schemas tests/lead state/STATUS-lead.md
-- make test
-- make test TEST_PATH='tests/lead -q -p no:cacheprovider'
-- make -n test PYTHON=python3
-- git diff --check -- Makefile pyproject.toml prompts/01-tech-lead.md prompts/04-verifier-engineer.md docs/plan.md docs/decisions/0005-direction.md docs/changes/2026-10-22-lead.md tests/lead/test_pytest_config.py state/STATUS-lead.md
+- git diff --check -- AGENTS.md docs/decisions/0010-reservations-r2-grader.md docs/decisions/0011-pinned-luna-hook-direction.md docs/interfaces.md docs/interfaces-v3.md docs/plan.md docs/validate_schemas.py prompts/01-tech-lead.md prompts/02-plugin-engineer.md prompts/03-controller-engineer.md prompts/04-verifier-engineer.md prompts/05-eval-engineer.md schemas tests/lead state/STATUS-lead.md
 
 ## Do not touch
 
-- This session: eval/, schemas/, task sets, docs/weekly/, docs/handoff/, docs/evaluation/, CLAUDE.md, other roles' implementation/tests/STATUS and read-only .git; no staging, commits, network, nested Codex, live model calls or macOS sandbox-exec. Edit only docs/decisions/0010-reservations-r2-grader.md, docs/plan.md and state/STATUS-lead.md. Historical session scopes below do not restrict this proposal.
-
-- Version 1 interfaces without new user approval, a decision record and a version increment.
-- Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. The earlier decision-0008 session edited its decision, plan, version 1 freeze notice and lead STATUS; that historical scope does not authorize further edits here.
-- Existing harness/, experiments/, scripts/, legacy tests and unrelated user edits.
-- No git add -A, broad staging, foreign-path commit, deletion, history rewrite, hook registration or external configuration change.
-- Keep the canonical hook contract and captured evidence; never replace measured evidence with a placeholder or claim production behavior from startup probes.
+- This session: eval/, plugin/, controller/, verifier/, task sets/private graders, docs/weekly/, docs/handoff/, docs/evaluation/, CLAUDE.md, root configuration, other roles' tests/STATUS and read-only .git. Do not stage/commit, delete files, rewrite history, change external configuration, use network, spawn agents or invoke nested/live models/macOS sandbox-exec.
+- Historical v1/v2 schema bodies/examples/report fields, task sets, grader contents/digests and measured captures. The current schema marker is a proposed set, not a report migration.
+- No unapproved activation/freeze of v3 interfaces and no tuning H3 on frozen v3 outcomes. Implementation belongs to Roles 2–5 in their owned paths.
 
 ## Assumptions
 
-- The requested prompts/01-lead.md refers to the existing prompts/01-tech-lead.md; no alternative lead prompt was found. The reservations findings are supplied by the user and the 2026-10-24 Role 5/Claude weekly diagnosis, not independently measured here.
-- No PR was requested; decision 0010 and this STATUS provide its change summary and assumptions. Commit plan: docs/decisions/0010-reservations-r2-grader.md, docs/plan.md and state/STATUS-lead.md; message `docs: propose reservations R2 grader remedies`. No staging or commit is performed.
-- Version 2 inventory, frozen metadata, digest, validation, calibration and template limitation are user-supplied Claude host findings dated 2026-10-24 at main commit 9097281; this offline session does not independently verify them. The supplied pilot CI has no stated confidence level or interval method, so neither is inferred.
-- Historical freeze-publication session: no PR was requested; its STATUS and freeze record provided the change summary and assumptions, with docs/eval-freeze-v2.md, docs/plan.md and state/STATUS-lead.md in that session's commit plan; no staging or commit was performed.
-
-- Decision 0009 approval and the valid-task-only population resolution are explicit user instructions dated 2026-10-23; no additional population assumption is made.
-- Existing artifact references carry final-message provenance and exclusion reasons without new per-task fields; Role 5 owns runtime integration and dual-version tool validation. No historical report migration or measured result is inferred.
-- Historical decision-0009 session: no PR was requested; its decision and STATUS supplied the change summary and assumptions, with nine publication/documentation/test/status paths in that session's commit plan.
-
-- Decision 0008 approval, baseline A figures/commit/version and the CLI Fast description are user-supplied facts; no host or network verification was performed. W2/W3 use decision 0007’s through-11/06 and through-11/13 windows. The formerly pending version 2 inventory, freeze date and digest are now published from the supplied 10/24 host evidence.
-- Historical D-5 assumption: that session documented current code and committed evidence only. Fresh-clone and live acceptance are assigned to Claude on the host after the active evaluation finishes; no result is inferred in advance.
-- Historical decision-0008 session: no PR was requested; its decisions, assumptions and verification results supplied a future PR summary, with four documentation/status paths in that session's commit plan.
-
-- No additional scope assumption: decision 0007 approval and the usage-limit clarification are explicit user instructions dated 2026-10-23. Integration review 1 is attributed Claude host evidence; this offline documentation session does not independently verify its measurements.
-
-- Decision 0006 uses the user-supplied host facts, corroborated by the existing CLAUDE.md section 2 and host-verification decision 11; no new assumption about 0.163.0-alpha.11.1 compatibility or runtime implementation is made.
-
-- The approval placeholders identify the immediately preceding three proposals and DATE is 2026-10-21 in the user's timezone.
-- A separate published judgment-input schema is the approved input validator, referencing the existing contract item rather than duplicating/changing it.
-- This task publishes shared contracts, examples/tests and instructions; implementation changes in other roles' runtime packages remain their responsibility.
-- Synthetic prices, paths, hashes, usage and CIs remain fixtures. No paid model call, real pricing/account eligibility result or runtime-backend completion is inferred.
-- Version 1 validation needs deterministic timestamp checks even when optional jsonschema date-time dependencies are absent; the local validator enforces timestamp syntax/calendar validity without changing dependencies or approved schemas.
-- The supplied Notion export is the historical design baseline; external evidence figures are attributed to that design and were not independently verified. Calendar dates are preserved without weekday labels.
-- Week 4 support work maps Notion stabilization/rehearsal tasks onto existing ownership; it adds no interface or role deliverable.
-- The frozen task-set digest and private validation/mutation findings are the user-supplied Claude host evidence; private grading was not rerun here. No live backend success, local GPU availability or new private measurement is inferred.
-- Current user instructions supersede the previous session’s commit authorization: do not stage/commit, change external configuration, or edit CLAUDE.md, docs/handoff/ or docs/weekly/.
+- Direction approval and measured findings are explicit user instructions and attributed Claude proposal/host evidence dated 2026-10-24/25; this offline session did not remeasure them. V2 harness has 23 invalid tasks and stopped recovery; its subset is diagnostic. B pricing at the stop was pending; the proposal's about-1.2x figure is attributed, not recomputed.
+- Workspace artifact layout, code-check mappings, no-fallback phase budget, audit-before-repair/stale-audit handling and ledger bookkeeping/final-summary preservation are proposed design choices for schema-set review, not separately approved runtime policy.
+- Expected command exit defaults to configured zero-success convention only when unspecified; unsupported/ambiguous oracles stay unavailable and user questions remain unanswered until visible clarification. A ledger presence/hash check does not establish decision quality.
+- No numeric equivalence/noninferiority margin was supplied. The proposal's two-hour Fast run estimate and timing/control-cost targets remain estimates/targets, not measurements or paid-batch approval.
+- No PR is requested in this read-only .git session. This STATUS/0011 provide the change summary and Assumptions; the final Commit plan lists only owned changes. Historical Done evidence below is retained as history, not current H3 acceptance.

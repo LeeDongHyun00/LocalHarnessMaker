@@ -1,85 +1,125 @@
 # Role 5: Evaluation Engineer
 
-Read AGENTS.md at the repository root first. This file is your contract.
+Read AGENTS.md and state/STATUS-eval.md first. Shared ownership, working rules
+and STOP-1 through STOP-4 apply. Do not spawn sub-agents. Accepted decision
+0011 supersedes v2 recovery and the old runner-owned contract-loop priorities.
 
 ## Goal
 
-Produce the proof of the project: is "Sol at medium effort plus the harness" cheaper per passing task than "Sol at max effort alone", with equal or better quality. Build and freeze the task set, run baselines A, B and C and the proposed system with the same runner, and compute the metrics. The runner must not depend on the plugin hooks; the experiment must run even if the hooks break. Every number used in the presentation comes from your reports only.
+Test whether H3 (gpt-6.1-sol medium plus real installed hooks) preserves A's
+quality, at least halves task false done and costs at most 15 percent more per
+pass. Build held-out task set v3 and plugin mode, run A/H3 only and report paired
+results. Any quality loss fails the design. V1/v2 answer the original claim
+negatively and remain history; do not resume the stopped harness recovery or
+use those tasks to evaluate H3. B is dropped for v3, C optional, 0010 record-only.
 
 ## Ownership
 
-Owned paths: eval/ including tasks/ (task set), runner/, baselines/, configs/, metrics.py, prices.yaml, reports/. Tests in tests/eval/.
-Forbidden: editing controller/ or verifier/. Sharing task set contents with Role 3. After the freeze on 2026-10-27, send the task set hash to Role 1 for docs/eval-freeze.md.
+eval/, including tasks-v3/, runner, baselines/configs, metrics/prices, reports
+and analysis; tests/eval/ and state/STATUS-eval.md. Private graders remain in
+the separate trusted private root. Never share evaluation tasks/graders with
+Role 3 or tune its prompts. Read other packages; do not edit them or shared
+schemas/docs. Send freeze inventory/digest/evidence to Role 1 for publication.
 
-## Interfaces
+## Interfaces and plugin mode
 
-Version 1 is approved in AGENTS.md section 3 and decisions 0002–0004.
-Version 2, approved on 2026-10-23 in decision 0009, adds task_false_done_rate
-and the claimed_complete_task unit. Existing version 1 reports remain valid
-version 1 documents; compare versions only through tools accepting both.
+V3 schema/artifact set in AGENTS.md section 3.0 and docs/interfaces-v3.md is
+proposed, awaiting separate explicit approval requested by Claude. Task-set,
+config, estimate and runner-mode design can proceed now; do not assume a draft
+is frozen or a missing plugin is working. Historical report schema v2 adds
+required task_false_done_rate; v1 reports remain valid under decision 0003.
+Keep dual-version consumers and all historical reports unchanged. New hook
+artifacts have their own proposed version 3 schemas; evaluation-report.schema.json
+is retained, not silently revised. Additional metrics can use existing hashed
+artifact references pending any separately approved report extension.
 
-1. Call other roles only through their CLIs. The runner owns contract injection, verification, re-instruction and handoff independently of hooks. Primary control backend is codex_cli with gpt-6-luna; cheap_api HTTP fallback uses the same model, and local Gemma implementation and measurement are dropped by decision 0007 without removing the selector. Pass the explicit backend selection and account for actual fallback transport.
-2. Executor calls retain codex exec "PROMPT" --sandbox workspace-write --json -o FILE and codex exec resume SESSION_ID "REINSTRUCT_MESSAGE". Every executor/resume child inherits HARNESS_NESTED=1 from a copied child environment so plugin hooks exit before any work. Do not mutate the parent environment. Confirm applied model/effort from installed-version evidence; retain complete events and hashes from all attempts/resumes.
-3. Public eval/tasks/ID/ contains prompt.md, workspace/, expected.json and meta.json. Private graders live outside the repository and public workspaces, not in a sibling hidden_tests/ directory. A trusted process copies them into a fresh grading copy only after executor/spawned work termination. Never run/resume Codex in a grading copy or expose grader contents to controller/executor.
-4. Apply the approved STOP-E4 access audit to every --json stream: canonical private source/copy paths, aliases/traversal and tool-access events, including denied attempts. Any access invalidates the task and aggregate report; missing/malformed/truncated/unsupported capture or unresolved operands yields inconclusive and invalid. Assistant-only path prose is not an access. A clean audit is observed cleanliness, not a read-denial claim.
-5. Run config records model, reasoning effort, harness on/off, explicit control backend, retry limit, seed and Codex version. Emit eval/reports/NAME/report.json validated by schemas/evaluation-report.schema.json; successful CLI stdout is the --out directory only. A recorded invalid task is not a CLI error, but the report cannot be a valid headline comparison.
-6. Report metadata/config/task-set hashes, pricing/bootstrap provenance; per-task attempts/segments/log hashes, access audit, grading timestamps, handoff evidence, verdict/claim artifacts, call usage and executor/control costs. Enforce ID/count/cost/ordering invariants in code beyond schema validation. Two-session handoff fields record day2_pass and user_restated_day1_context with evidence; missing observation invalidates instead of silently dropping a task.
-7. All costs are API-equivalent USD from pinned per-model rates, including CLI/local, failed/invalid attempts, retries, contract/judge/handoff and HTTP fallbacks. Missing usage or pricing remains null, never zero. Invalid tasks leave quality samples but retain cost; audit-clean failures/timeouts/errors remain valid samples. Preserve per-call backend/model and prevent double billing cached/reasoning tokens.
+1. Add explicit plugin mode: launch codex exec with LocalHarnessMaker installed, collect `.localharness/v3/` only after all executor/child processes exit. It contains sessions/<sha256-of-UTF-8-session_id>/pin-check.json, requirements.json, completion-report.json, ledger.json, luna-calls.jsonl, evidence/ and latest-ledger.json at the root. Hash-pin collected files in existing report artifact references. The runner reads these for all hook/control results and costs; it never calls contract/judge/handoff or orchestrates control calls, verification or repair. Legacy runner mode remains history and is not H3.
+2. A sets HARNESS_NESTED=1 in copied executor/resume environments. H3 explicitly removes it in those copied environments so installed hooks run; controller-owned nested codex_cli children still set it. Never mutate parent/persistent config. Confirm native gpt-6.1-sol, medium effort, Codex version and Fast/priority tier; retain complete --json logs/hashes including every Stop continuation/resume. No duplicate runner repair loop; honor the plugin's one repair plus separate ledger bookkeeping continuation.
+3. Collect and validate every hook artifact, session ID/hash, evidence path/hash, two-call budget (one requirements, one claim audit), low effort, exact gpt-6-luna pin and model identity. H3 pin-disabled/missing/malformed/unreconciled artifacts is invalid with reasons, never a baseline-equivalent pass. Retain partial artifacts/costs on interruption; never regenerate artifacts or silently make control calls for the plugin.
+4. Price every luna-calls.jsonl record from the pinned snapshot and reconcile model/usage/pricing_ref. Include failed/timeout calls and all executor calls/retries once. Avoid counting nested controller usage from two logs. Unknown usage/pricing -> null, not zero. All costs are API-equivalent USD; subscription usage is not free. Historical transport fallbacks stay accounted but v3 hook mode permits no automatic fallback/regeneration; explicit cheap_api is same pinned model only.
+5. Keep python -m eval run --config YAML --out DIR and stdout/exit conventions unchanged; report.json validates against evaluation-report.schema.json. Metadata/config/task-set/pricing/bootstrap identity and existing artifact refs carry plugin/config/review evidence; propose any required shared schema change before implementation.
+6. Retain recovery/version policy and private-grader access audit. No executor in a trusted grading copy or private test output in executor/controller context. Any runtime change based on frozen v3 outcomes requires a new held-out version, not tuning and rerunning H3 on v3.
+
+## Private grading and access audit
+
+Private graders live outside the repository and public workspaces. After codex
+exec and spawned work exit, copy public output into a fresh trusted grading
+copy, then add graders. Record strict exited_at < copied_at; never run/resume
+Codex there, expose it to later turns or return test contents. Later execution
+uses public workspaces and fresh post-exit copies only.
+
+Audit all retained --json tool arguments/results for canonical private/copy
+paths and aliases, traversal, children, listing/search/read/execute/write and
+denied attempts. Record file/line/tool/path/operation/evidence. Observed access
+invalidates the task and aggregate report. Missing/malformed/truncated/
+unsupported logs or unresolved operands -> inconclusive -> invalid. Assistant
+prose alone is not access. Clean means no observed access, not read isolation.
+No grading result for an invalid task. Retain invalid costs; clean-subset
+quality numbers are diagnostic, never a valid headline aggregate.
 
 ## Deliverables
 
-- D-1, due 2026-10-24: minimal runner that executes one task with codex exec and grades it with external private graders in a post-exit trusted copy. Take the record from Role 2 on whether hooks fire under codex exec and reflect it in the runner design. Default design: the runner itself performs contract injection, verification and resume, without relying on hooks.
-- D-2, due 2026-10-27: task set version 1 frozen. At least 100 tasks across the types bug fix, feature plus test, multiple requirements, and constrained refactoring. Plus 20 two-session tasks (day 1 prompt, then day 2 prompt). Sources: written by hand, or adapted from issues in small open-source repositories. Every task has hidden tests. Run baselines A (Sol medium alone) and B (Sol max alone) on a 10-task pilot first, report the cost, and run the approved scope after approval: A on the full set and B on the 100 single-session tasks only (decision 0007).
-- D-3, due 2026-11-03: baseline C on a stratified 20-task subset (5 per task type, 20 different families; eval/baselines/template.md filled once per task by the user, never Claude, to keep the evaluator independent) and the proposed system with primary codex_cli and separately recorded cheap_api fallback, first measurement, report version 1. Compare the harness with C on the same 20 tasks, paired (decision 0007).
-- D-4, due 2026-11-10: handoff success rate comparing the harness with A, and the table of 20 human-reviewed samples. Local-control measurement is dropped by decision 0007.
-- D-5, due 2026-11-13: final report in eval/reports/final/ with tables and charts for pass rate, false done rate, cost per pass, attempts, and parity reported as not measured under decision 0007; results split by task type; sample sizes and bootstrap confidence intervals.
+- D-1, 10/25–10/27: v3 design for 50–60 tasks with distinct structures spanning bug fix, feature plus test, constrained refactoring, dense requirements, two sessions and new ambiguity tasks. Design author-prepared clarification answers and an observable noninteractive question/answer mechanism; silence is not an answer. Preserve evaluator independence and justify every hidden test from public requirements/clarifications.
+- D-2, 10/28–11/03: build/validate v3: references pass, starters fail, meaningful mutation score and shared-line checks, independent A-only calibration before freeze, no outcome-based task selection. Freeze before full runs; send inventory/hash/validation to Role 1. Keep independent calibration and two non-evaluation hook smoke projects out of v3.
+- D-3, by 11/03: plugin mode, A/H3 config templates and estimate tooling. Demonstrate real installed hooks, artifact capture, audited logs and one-task smoke. Produce calibrated call/time/cost estimates before large paid batches; proposal's about two hours per Fast configuration is only a planning estimate.
+- D-4, 11/04–11/08: full A/H3 on identical frozen tasks, seeds, executor settings and Codex version/tier; retain native evidence, partial costs and recoveries. Human sample requirements precision versus private grading and completion-report accuracy versus hidden outcomes; never return private evidence to execution context. C optional/user-filled only, B no v3 run.
+- D-5, 11/09–11/13: recovery/paired comparison, breakdowns and final report covering v1/v2 negative original result and v3 new claim separately, including all limitations and uncertainty. Do not amend 0010 graders or complete stopped v2 harness recovery; any historical repricing is record-only and separately evidenced.
 
-Decision 0007 sets the run schedule: W1 through 2026-10-30, harness-mode smoke and full A; W2 through 2026-11-06, full harness and C; W3 through 2026-11-13, B and final analysis. These windows supersede conflicting original measurement due dates above. Usage limits are no longer a concern; continue through completion before the local LLM stage. An OPENAI_API_KEY for executor codex exec is only a fallback if the subscription cap blocks a run.
+## Metric definitions and success
 
-## Metric definitions (metrics.py)
+- pass_rate: passing valid tasks / valid tasks, sample_unit=valid_task. H3 minus A paired difference/interval is separate from historical parity.
+- task_false_done_rate: claimed-complete valid tasks failing hidden grading / claimed-complete valid tasks, sample_unit=claimed_complete_task. Apply the same verifier/claims.py extraction rules/version to retained final message of the last session for A/H3 (and optional C). Missing final message -> undefined/excluded with reason, never an inferred absence of claim. Preserve source segment/hash and extraction/classification evidence in artifact refs. Ledger bookkeeping must not hide application claims; retain its final-message/claim-denominator effects, without substituting an earlier message for the retained final. No new model calls and no grading invalid tasks.
+- false_done_rate: existing claimed_without_evidence criterion items / claimed criterion items among valid tasks. Preserve the historical metric; unavailable baseline criterion evidence stays undefined.
+- cost_per_pass: total attempted executor plus all control API-equivalent USD, including invalid/failed/retried calls, divided by passing valid tasks; sample_unit=attempted_task.
+- avg_attempts: executor application attempts per valid task. Report ledger bookkeeping continuations separately from application repairs; do not treat a controller call or ledger-only write as a new repair attempt.
+- handoff_success: eligible valid two-session tasks passing without user-restated day-1 context / eligible valid two-session tasks. Retain day2_pass and user_restated_day1_context evidence; missing observation invalidates.
+- parity: historical local-minus-cheap_api pass rate on matched valid tasks; not measured under scope cuts. Preserve null value/bounds and explicit reason, never redefine it to H3-minus-A.
+- Additional human measures: requirements-table precision against hidden-test coverage, report per-requirement verdict accuracy against private grading, sample sizes/selection method and stale-audit cases. Publish via existing artifact refs without unapproved report fields; collect visible-artifact user feedback separately.
 
-- pass_rate: passing valid tasks divided by valid tasks; sample_size counts valid tasks.
-- false_done_rate: claimed_without_evidence items divided by claimed items from valid tasks; sample_size counts claimed criterion items.
-- task_false_done_rate: claimed-complete valid tasks failing hidden grading divided by claimed-complete valid tasks; both numerator and denominator exclude invalid tasks. sample_size counts claimed-complete valid tasks with retained final evidence; sample_unit is claimed_complete_task. Invalid tasks remain visible through existing invalid_reasons and validity fields. Implement in eval/metrics.py and the report builder using the claim extractor rules from verifier/claims.py on the retained final message of the last session, identically for A, B, C and every harness configuration. A task with no retained final message is undefined and excluded from both populations with a reason, never inferred to have made no claim. Retain source segment/hash, claim evidence and exclusion reasons in existing artifact references without adding per-task fields. Use retained evidence only, with no new executor/judge calls or grading of invalid tasks; preserve the criterion-level metric unchanged.
-- cost_per_pass: executor plus all control API-equivalent USD for all attempted tasks, including invalid/failed/retried/fallback calls, divided by passing valid tasks; sample_size counts all attempted tasks.
-- avg_attempts: mean executor attempts per valid task; controller regenerations affect costs, not executor attempt counts.
-- handoff_success: eligible valid two-session tasks passing without restated day-1 context divided by eligible valid two-session tasks; retain observation evidence.
-- parity: local-control pass_rate minus cheap_api-control pass_rate on matched valid tasks with identical task set, seed, executor model/effort and Codex version. Hash-pin comparator report. Selecting primary codex_cli does not redefine this metric. Decision 0007 drops local measurement: retain the field with null value/bounds and an undefined_reason stating it was not measured; the paired harness-versus-C comparison is separate.
+Every schema metric keeps value, sample_size, sample_unit, ci95 and
+undefined_reason. Seeded task-cluster percentile bootstrap, default 10,000,
+minimum 1,000 resamples, paired task resamples for A/H3 differences/ratios;
+level=0.95 with 2.5th/97.5th percentiles. Keep sessions/attempts/claims within task
+clusters and invalid costs in cost clusters. Zero original/bootstrap denominators
+or missing required accounting -> null values/bounds with reason; never discard
+replicates or fabricate zero. Check ID/count/cost/CI ordering in runtime.
 
-Each metric has value, sample_size, sample_unit, ci95 and undefined_reason.
-Use a seeded task-cluster percentile bootstrap, default 10000/minimum 1000
-resamples, with 2.5th/97.5th endpoints; pair task resamples for parity. Keep
-correlated sessions/claims/attempts inside task clusters and invalid task costs
-inside cost-per-pass clusters. Any zero original/bootstrap denominator or
-missing required accounting yields null value/bounds with an explanation,
-rather than discarded replicates or fake zero cost. Every ci95 has level=0.95
-and method=task_cluster_percentile_bootstrap. Any invalid task makes aggregate
-validity=invalid; clean-subset metrics are diagnostic only, not headline results.
+Success requires H3 equal to A in pass rate within the paired interval, at least
+half task-level false done, and cost per pass no more than 1.15 times A. Any
+quality loss fails. Report the observed difference and uncertainty; an interval
+containing zero alone does not prove equality or excuse a lower observed pass
+rate. No numeric noninferiority margin is authorized. Undefined rates/costs or
+invalid aggregate reports cannot establish success.
 
 ## Success criteria
 
-- SC-1: the runner executes one task end to end without human intervention and writes a result JSON. It supports retry, timeout, failure isolation, and resume after interruption.
-- SC-2: the task set hash is recorded in docs/eval-freeze.md and the set never changes afterwards. A change requires a separate version 2.
-- SC-3: comparisons use matched tasks, the same seed and the same Codex version, with run metadata stored in the report. Under decision 0007, B uses only the 100 single-session tasks, C and its paired harness comparison use the same stratified 20-task subset, and handoff_success compares the harness with A.
-- SC-4: the report states sample sizes and confidence intervals, and splits results by task type.
-- SC-5: before any full run, a 10-task pilot is run and its cost estimate is reported and approved.
-- SC-6: five baseline A results are re-checked by hand and the absence of grader errors is recorded.
+- SC-1: plugin mode runs a task with installed hooks, without runner control orchestration; captured schema-valid artifacts and actual logs prove H3 behavior.
+- SC-2: v3 frozen inventory/digest and grader validation are published before full runs; v1/v2 unchanged and never reused to evaluate H3.
+- SC-3: matched A/H3 settings, version/tier, complete call/accounting/claim evidence and post-exit audited grading are reproducible; missing evidence never becomes pass/zero cost.
+- SC-4: final report carries sample sizes, paired intervals, task-type breakdowns, human sample accuracy and all invalidity/stale-audit/ambiguity limitations.
+- SC-5: pilot/cost estimate precedes full paid runs; at least five A results are independently reviewed with grader issues disclosed.
 
 ## Verification
 
-1. pytest tests/eval
-2. python -m eval run --config eval/configs/pilot.yaml --out eval/reports/pilot/ and keep the log and the report.
+Run `.venv/bin/python -m pytest tests/eval -q`. Exercise offline plugin-mode
+fixtures first, then authorized host one-task smoke and approved estimates/full
+runs. Retain exact commands/logs and observed settings; sandbox unavailability
+is pending, not a measured model failure. Update STATUS-eval.md.
 
 ## Stop and escalate conditions
 
-In addition to STOP-1 to STOP-4 in AGENTS.md:
-- STOP-E1: codex exec cannot complete a task non-interactively (it stops at an approval prompt, the sandbox rejects an action, and similar). Write candidate fixes and report immediately. If this cannot be solved, the whole comparison design must be redone.
-- STOP-E2: the estimated cost of a full run exceeds the user's limit. Report before running.
-- STOP-E3: there is evidence that Role 3 accessed the task set. Report the contamination.
-- STOP-E4 (user-approved access audit): logged tool access to any canonical private grader/grading-copy path, including aliases and denied attempts, invalidates the task and aggregate report. Missing/incomplete/unsupported audit evidence is inconclusive and invalid. Stop that task, retain events/evidence/costs and report it; do not require proof of read denial or treat a clean log as isolation proof.
+- STOP-E1: noninteractive Codex cannot complete (approval/sandbox/clarification failure); report candidates before full runs. Do not replace real hooks with runner control calls.
+- STOP-E2: full-run cost exceeds user limit or ten-plus-call batch lacks the required reported estimate; report before running.
+- STOP-E3: Role 3 accessed evaluation content or other contamination occurred; report and stop the affected comparison.
+- STOP-E4: observed private-grader/copy access invalidates task and aggregate; inconclusive audit is also invalid. Retain all events/evidence/cost and stop that task, without requiring proof of read denial.
 
 ## First task
 
-1. Create one public task (bug fix with three private tests stored outside the repository). Run it with codex exec in configuration A (medium effort) with HARNESS_NESTED=1, audit all events, and grade only in a trusted post-exit copy. Confirm from the --json log that the reasoning effort was actually applied and record it.
-2. Build the runner skeleton: configuration YAML, then the task loop, then result JSON, with resume support. Implement pass_rate in metrics.py.
-3. Update state/STATUS-eval.md.
+Read 0011, proposed interface status and current STATUS. Design v3 task shapes,
+clarifications, A/H3 configs and plugin artifact collection/estimates. Do not
+restart old recovery or implement an unapproved shared-interface change.
+
+## Assumptions
+
+- About two hours per full configuration is the supplied proposal estimate; actual calibrated cost/time and approval remain pending.
+- New human measures and plugin evidence use existing hashed artifact refs unless a separate report revision is approved.

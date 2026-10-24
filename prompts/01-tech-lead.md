@@ -1,46 +1,62 @@
 # Role 1: Tech Lead
 
-Read AGENTS.md at the repository root first. This file is your contract.
+Read AGENTS.md first, then state/STATUS-lead.md. Continue from Remaining unless
+the user gives a different priority. Shared ownership, working rules and stop
+conditions apply. Do not spawn sub-agents.
 
 ## Goal
 
-Freeze the interfaces that the other four roles depend on (three schemas, six CLIs, the hook input and output baseline) by 2026-10-24. After that, own integration, decisions and documentation so that development ends on 2026-11-13 and the presentation happens on 2026-11-16. You do not implement features.
+Publish the approved pinned-Luna hook direction (0011), maintain its proposed
+interfaces and freeze them only after explicit user approval of the full schema
+set. Coordinate integration and held-out v3 evaluation through development end
+2026-11-13 and presentation 2026-11-16. Do not implement other roles' features.
+The original contract-harness claim is answered negatively by v1/v2; retain
+those reports as history, with invalidity and grader ambiguity disclosed.
 
 ## Ownership
 
-Owned paths: AGENTS.md, docs/, schemas/, root configuration (pyproject.toml, Makefile, .github/), initialization of state/.
-Read-only: everything else.
+AGENTS.md, docs/, prompts/, schemas/, root configuration, tests/lead/ and
+state/STATUS-lead.md; initialization of state/ only. Read other roles' work.
+Session-specific restrictions override general ownership: this session excludes
+docs/weekly/, docs/handoff/, docs/evaluation/ and all runtime packages, other
+roles' tests/STATUS and task sets. No staging/commit in a read-only .git session.
 
 ## Deliverables
 
-- D-1, due 2026-10-22: repository skeleton. All directories. pyproject.toml with the packages controller, verifier, eval, plugin. Targets make test and make validate-schemas. CI running pytest. Five empty files state/STATUS-lead.md, state/STATUS-plugin.md, state/STATUS-controller.md, state/STATUS-verifier.md, state/STATUS-eval.md using the format in AGENTS.md section 6.
-- D-2, due 2026-10-24: schemas/ with the three JSON Schemas, schemas/examples/ with example files, docs/interfaces.md. Declare the freeze by setting schemas/VERSION to 1.
-- D-3, due 2026-10-27: docs/plan.md (weekly plan per role, identical to the Notion plan), docs/decisions/0005-direction.md (why the project changed direction, in one page), docs/eval-freeze.md (the task set hash sent by Role 5).
-- D-4, every Tuesday (2026-10-27, 2026-11-03, 2026-11-10): integration review. Read the four other STATUS files and write docs/weekly/DATE.md with blockers, conflicts, schedule risks and scope-cut proposals. Interface mismatches between roles are caught here.
-- D-5, due 2026-11-13: README.md covering install through demo, docs/architecture.md, docs/demo.md (demo scenario including the two-session handoff).
-- D-6, due 2026-11-15: docs/slides/ (presentation draft in markdown) and docs/qa.md with expected questions and answers. Required questions: how is this different from a static template; why not just raise reasoning effort; why a local model; how is this different from built-in Codex features.
+- D-1, 10/25–10/27: decision 0011, record-only note on 0010, current plan and role prompts. Attribute measured findings; do not relabel diagnostic reports as valid comparisons.
+- D-2, 10/25–10/27: proposed requirements, completion-report, ledger, pin-check and call-accounting schemas, valid examples, exact plugin artifact contract, AGENTS.md section 3 and schema marker 3. Claude requests explicit schema-set approval; record it before declaring the interfaces frozen. Keep all v1/v2 schemas/CLIs unchanged for history.
+- D-3, by 11/03: publish a separate v3 freeze record only after Role 5 supplies inventory, digest and reference/starter/mutation/shared-line validation. V3 alone evaluates H3. No v1/v2 recovery or reuse for H3.
+- D-4, 10/27, 11/03, 11/10: integration reviews, two-day interface blockers, smoke/compatibility/accounting evidence and schedule risks. Read all role STATUS files; write weekly notes only when session ownership permits.
+- D-5, by 11/13: refresh install-through-demo README, architecture and two-session ledger demo documentation after owning-role implementation evidence; retain fresh-clone acceptance logs.
+- D-6, by 11/15: slides and Q&A, explicitly covering static templates, raising reasoning effort, dropped local models, built-in Codex features and the negative original result. Presentation 11/16.
 
 ## Success criteria
 
-- SC-1: make validate-schemas validates every file in schemas/ as JSON Schema draft 2020-12, checks every file in schemas/examples/ against its schema, and runs in CI.
-- SC-2: docs/interfaces.md contains one table listing all six CLIs with arguments, outputs and exit codes.
-- SC-3: no STATUS file of another role reports an interface blocker for more than two days.
-- SC-4: on 2026-11-13 a person who has never seen the project can go from install to running the demo using README.md alone.
+- SC-1: offline schema validation checks every historical/proposed draft 2020-12 schema and example, including closed objects/local refs/date formats. Proposed is never mislabeled approved.
+- SC-2: AGENTS.md and docs/interfaces-v3.md agree on exact artifact paths, accounting, pin failure, single repair, ledger continuation and H3 nested-guard exception. Historical six-CLI table remains in docs/interfaces.md.
+- SC-3: no owning-role interface blocker lasts more than two days without escalation; all measurements carry provenance and limits.
+- SC-4: final documentation lets a new user install and run the real two-session demo with retained fresh-clone evidence.
+- SC-5: final evaluation states the original negative result and tests H3 versus A only on v3: no quality loss, pass-rate agreement within paired interval, at least half task false done, at most 15 percent extra cost per pass. Do not invent an equivalence margin.
 
 ## Verification
 
-1. Run make validate-schemas and make test.
-2. Check that docs/weekly/ has an entry for every Tuesday listed in D-4.
-3. Follow README.md in a fresh clone and keep the log as evidence for SC-4.
+1. `.venv/bin/python -m pytest tests/lead -q` and `make validate-schemas`.
+2. Run the full suite once before merge, not after each edit. Host-only checks remain pending with their owners in restricted sessions.
+3. Update STATUS with evidence, remaining work, decisions, commands, exclusions and Assumptions; give a short change summary. Do not claim runtime implementation from schema tests.
 
 ## Stop and escalate conditions
 
-In addition to STOP-1 to STOP-4 in AGENTS.md:
-- STOP-L1: a schema change is requested. List the affected roles, get the user's approval, then change it. Record the change in docs/decisions/ and increment schemas/VERSION.
-- STOP-L2: the schedule looks likely to slip by two or more days. Write a scope-cut proposal (what to drop and why) and report. Drop the week 4 optional item (QLoRA training) first.
+In addition to AGENTS.md STOP-1 through STOP-4:
+- STOP-L1: an unapproved interface change is needed. Write a reviewable proposal identifying affected roles, then stop for approval. An explicit request to draft the v3 set authorizes the draft, not freezing or implementation.
+- STOP-L2: schedule may slip by two days. Propose a scope cut and report. Local Gemma/QLoRA are already dropped; optional C and optional protected guard are candidates, not automatic cuts.
 
 ## First task
 
-1. Create the repository skeleton and the first draft of schemas/. Allow exactly four values for success_criteria.check.type: command, file_exists, regex, llm_judge.
-2. In schemas/examples/, hand-write the files for one reference task: add one FastAPI endpoint plus a pytest test. Files: prompt.json, contract.json, verdict_pass.json, verdict_fail.json, handoff.json. These examples are the reference samples for every role. Use mostly command checks and exactly one llm_judge check.
-3. Write docs/interfaces.md and update state/STATUS-lead.md.
+Read 0011, docs/interfaces-v3.md and the lead STATUS. Reconcile the first
+Remaining item with current user priorities. Do not restart the historical
+contract/judge work or modify other roles' implementations. If there is no
+handoff, prepare the proposed interface review and update STATUS.
+
+## Assumptions
+
+- Direction approval and schema-set approval are separate gates; exact proposal choices remain reviewable until the latter.

@@ -1,0 +1,103 @@
+{
+  "schema_version": 3,
+  "session_id": "synthetic-session",
+  "prompt": {
+    "path": "evidence/prompt.txt",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "state": "ready",
+  "requirements": [
+    {
+      "id": "R-1",
+      "number": 1,
+      "text": "Return healthy status.",
+      "kind": "behavior",
+      "source_excerpt": "Return healthy status.",
+      "check": {
+        "type": "unavailable",
+        "reason": "SYNTHETIC: no configured behavioral oracle."
+      }
+    },
+    {
+      "id": "R-2",
+      "number": 2,
+      "text": "Preserve the health signature.",
+      "kind": "constraint",
+      "source_excerpt": "Preserve the health signature.",
+      "check": {
+        "type": "signature_snapshot",
+        "path": "app/main.py",
+        "identifiers": [
+          "health()"
+        ],
+        "baseline_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    {
+      "id": "R-3",
+      "number": 3,
+      "text": "Do not edit settings.json.",
+      "kind": "protected_file",
+      "source_excerpt": "Do not edit settings.json.",
+      "check": {
+        "type": "file_unchanged",
+        "path": "settings.json",
+        "baseline_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    {
+      "id": "R-4",
+      "number": 4,
+      "text": "Add tests/test_health.py.",
+      "kind": "named_file",
+      "source_excerpt": "Add tests/test_health.py.",
+      "check": {
+        "type": "file_exists",
+        "path": "tests/test_health.py"
+      }
+    },
+    {
+      "id": "R-5",
+      "number": 5,
+      "text": "Run python -m compileall app.",
+      "kind": "named_command",
+      "source_excerpt": "Run python -m compileall app.",
+      "check": {
+        "type": "command",
+        "argv": [
+          "python",
+          "-m",
+          "compileall",
+          "app"
+        ],
+        "cwd": ".",
+        "expected_exit_code": 0,
+        "origin": "request"
+      }
+    },
+    {
+      "id": "R-6",
+      "number": 6,
+      "text": "Run python -m pytest -q.",
+      "kind": "test_command",
+      "source_excerpt": "Run python -m pytest -q.",
+      "check": {
+        "type": "command",
+        "argv": [
+          "python",
+          "-m",
+          "pytest",
+          "-q"
+        ],
+        "cwd": ".",
+        "expected_exit_code": 0,
+        "origin": "request"
+      }
+    }
+  ],
+  "open_questions": [],
+  "luna_call": {
+    "path": "luna-calls.jsonl",
+    "call_id": "requirements-1"
+  }
+}

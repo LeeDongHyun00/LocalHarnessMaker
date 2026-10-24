@@ -1,0 +1,955 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Requirements table (proposed)",
+  "description": "Interface version 3 proposal; not frozen until explicit user approval of the schema set.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "prompt",
+    "state",
+    "requirements",
+    "open_questions",
+    "luna_call"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "state": {
+      "enum": [
+        "ready",
+        "pending_questions",
+        "unavailable"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "number",
+          "text",
+          "kind",
+          "source_excerpt",
+          "check"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^R-[1-9][0-9]*$"
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "behavior",
+              "constraint",
+              "protected_file",
+              "named_file",
+              "named_command",
+              "test_command"
+            ]
+          },
+          "source_excerpt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "check": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "reason"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "unavailable"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "path"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "file_exists"
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "path",
+                  "baseline_sha256"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "file_unchanged"
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "baseline_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "argv",
+                  "cwd",
+                  "expected_exit_code",
+                  "origin"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "command"
+                  },
+                  "argv": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "cwd": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expected_exit_code": {
+                    "type": "integer"
+                  },
+                  "origin": {
+                    "enum": [
+                      "request",
+                      "project_config"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "path",
+                  "identifiers",
+                  "baseline_sha256"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "signature_snapshot"
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "identifiers": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "baseline_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "argv",
+                  "cwd",
+                  "inputs",
+                  "expected_exit_code"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "input_immutability"
+                  },
+                  "argv": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "cwd": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "inputs": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "path",
+                        "sha256"
+                      ],
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      }
+                    },
+                    "minItems": 1
+                  },
+                  "expected_exit_code": {
+                    "type": "integer"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "behavior"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "check": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "argv",
+                        "cwd",
+                        "expected_exit_code",
+                        "origin"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "command"
+                        },
+                        "argv": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "minItems": 1
+                        },
+                        "cwd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "expected_exit_code": {
+                          "type": "integer"
+                        },
+                        "origin": {
+                          "enum": [
+                            "request",
+                            "project_config"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "reason"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "unavailable"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "constraint"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "check": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "argv",
+                        "cwd",
+                        "expected_exit_code",
+                        "origin"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "command"
+                        },
+                        "argv": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "minItems": 1
+                        },
+                        "cwd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "expected_exit_code": {
+                          "type": "integer"
+                        },
+                        "origin": {
+                          "enum": [
+                            "request",
+                            "project_config"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "path",
+                        "identifiers",
+                        "baseline_sha256"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "signature_snapshot"
+                        },
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "identifiers": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "minItems": 1
+                        },
+                        "baseline_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "argv",
+                        "cwd",
+                        "inputs",
+                        "expected_exit_code"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "input_immutability"
+                        },
+                        "argv": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "minItems": 1
+                        },
+                        "cwd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "inputs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "path",
+                              "sha256"
+                            ],
+                            "properties": {
+                              "path": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "sha256": {
+                                "type": "string",
+                                "pattern": "^[a-f0-9]{64}$"
+                              }
+                            }
+                          },
+                          "minItems": 1
+                        },
+                        "expected_exit_code": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "reason"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "unavailable"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "protected_file"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "check": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "path",
+                        "baseline_sha256"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "file_unchanged"
+                        },
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "baseline_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "reason"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "unavailable"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "named_file"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "check": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "path"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "file_exists"
+                        },
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "reason"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "unavailable"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "named_command"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "check": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "argv",
+                        "cwd",
+                        "expected_exit_code",
+                        "origin"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "command"
+                        },
+                        "argv": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "minItems": 1
+                        },
+                        "cwd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "expected_exit_code": {
+                          "type": "integer"
+                        },
+                        "origin": {
+                          "enum": [
+                            "request",
+                            "project_config"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "reason"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "unavailable"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "test_command"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "check": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "argv",
+                        "cwd",
+                        "expected_exit_code",
+                        "origin"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "command"
+                        },
+                        "argv": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "minItems": 1
+                        },
+                        "cwd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "expected_exit_code": {
+                          "type": "integer"
+                        },
+                        "origin": {
+                          "enum": [
+                            "request",
+                            "project_config"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "reason"
+                      ],
+                      "properties": {
+                        "type": {
+                          "const": "unavailable"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "text",
+          "requirement_ids",
+          "answer"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^R-[1-9][0-9]*$"
+            },
+            "uniqueItems": true
+          },
+          "answer": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "luna_call": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "call_id"
+          ],
+          "properties": {
+            "path": {
+              "const": "luna-calls.jsonl"
+            },
+            "call_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "call_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "call_id"
+      ],
+      "properties": {
+        "path": {
+          "const": "luna-calls.jsonl"
+        },
+        "call_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "requirement_id": {
+      "type": "string",
+      "pattern": "^R-[1-9][0-9]*$"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "path",
+        "sha256",
+        "excerpt"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "check_output",
+            "file",
+            "claim"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "excerpt": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "ready",
+              "pending_questions"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "requirements": {
+            "minItems": 1
+          },
+          "luna_call": {
+            "$ref": "#/$defs/call_ref"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "ready"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "open_questions": {
+            "items": {
+              "properties": {
+                "answer": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "pending_questions"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "open_questions": {
+            "minItems": 1,
+            "contains": {
+              "properties": {
+                "answer": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

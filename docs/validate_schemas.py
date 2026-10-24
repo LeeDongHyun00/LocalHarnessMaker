@@ -24,6 +24,11 @@ EXAMPLE_SCHEMAS = {
     "criterion.json": "judgment-input.schema.json",
     "judgment.json": "judgment.schema.json",
     "evaluation_report.json": "evaluation-report.schema.json",
+    "requirements.json": "requirements.schema.json",
+    "completion-report.json": "completion-report.schema.json",
+    "ledger.json": "ledger.schema.json",
+    "pin-check.json": "pin-check.schema.json",
+    "luna-call.json": "luna-call.schema.json",
 }
 REQUIRED_SCHEMAS = set(EXAMPLE_SCHEMAS.values())
 REQUIRED_EXAMPLES = {"prompt.json", *EXAMPLE_SCHEMAS}

@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Executor decision ledger (proposed)",
+  "description": "Interface version 3 proposal; not frozen until explicit user approval of the schema set.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "requirements",
+    "decisions",
+    "open_items",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requirements": {
+      "$ref": "requirements.schema.json#/$defs/artifact"
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "what",
+          "rationale",
+          "fixes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "what": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fixes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "value",
+                "path"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "name",
+                    "signature",
+                    "constant"
+                  ]
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "open_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requirement_id",
+          "text"
+        ],
+        "properties": {
+          "requirement_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^R-[1-9][0-9]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "validation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "validated_at",
+            "status",
+            "reason",
+            "identifiers",
+            "files"
+          ],
+          "properties": {
+            "validated_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "status": {
+              "enum": [
+                "valid",
+                "invalid"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identifiers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "decision_id",
+                  "kind",
+                  "value",
+                  "path",
+                  "found",
+                  "sha256"
+                ],
+                "properties": {
+                  "decision_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "kind": {
+                    "enum": [
+                      "name",
+                      "signature",
+                      "constant"
+                    ]
+                  },
+                  "value": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "found": {
+                    "type": "boolean"
+                  },
+                  "sha256": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "$ref": "requirements.schema.json#/$defs/artifact"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "validation": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "valid"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "identifiers": {
+                "items": {
+                  "properties": {
+                    "found": {
+                      "const": true
+                    },
+                    "sha256": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

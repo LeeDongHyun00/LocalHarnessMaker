@@ -240,7 +240,7 @@ def test_published_artifacts_match_approved_records() -> None:
     example["metrics"].pop("task_false_done_rate")
     # The approved revision must leave every version 1 field unchanged.
     assert [schema, example] == json_blocks(REPORT)
-    assert (ROOT / "schemas/VERSION").read_text().strip() == "2"
+    assert (ROOT / "schemas/VERSION").read_text().strip() == "3"
     for path in [JUDGE, REPORT, BACKEND]:
         assert "Status: approved by the user on 2026-10-21" in path.read_text()
     decision = (DECISIONS / "0009-task-level-false-done.md").read_text()
@@ -287,7 +287,7 @@ def test_task_false_done_rate_accepts_observed_rate_and_missing_final_message() 
     report_validator().validate(example)
 
 
-def test_cli_table_and_authorized_role_prompts_match_version_one() -> None:
+def test_retained_cli_table_and_current_role_prompts_keep_shared_safety_rules() -> None:
     interfaces = (ROOT / "docs/interfaces.md").read_text()
     rows = [line for line in interfaces.splitlines() if line.startswith("| `python -m ")]
     assert len(rows) == 6

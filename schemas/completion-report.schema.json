@@ -1,0 +1,405 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Completion report (proposed)",
+  "description": "Interface version 3 proposal; not frozen until explicit user approval of the schema set.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "requirements",
+    "current_final_message",
+    "check_round",
+    "items",
+    "claim_audit",
+    "retry",
+    "escalation_advice"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requirements": {
+      "$ref": "requirements.schema.json#/$defs/artifact"
+    },
+    "current_final_message": {
+      "oneOf": [
+        {
+          "$ref": "requirements.schema.json#/$defs/artifact"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "check_round": {
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requirement_id",
+          "status",
+          "reason",
+          "evidence"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "pattern": "^R-[1-9][0-9]*$"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "unverifiable"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "requirements.schema.json#/$defs/evidence"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "pass",
+                    "fail"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "evidence": {
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "claim_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "audited_final_message",
+        "claims",
+        "reason",
+        "luna_call"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "stale",
+            "unavailable"
+          ]
+        },
+        "audited_final_message": {
+          "oneOf": [
+            {
+              "$ref": "requirements.schema.json#/$defs/artifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "requirement_id",
+              "claim_excerpt",
+              "cited_evidence",
+              "assessment"
+            ],
+            "properties": {
+              "requirement_id": {
+                "type": "string",
+                "pattern": "^R-[1-9][0-9]*$"
+              },
+              "claim_excerpt": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cited_evidence": {
+                "type": "array",
+                "items": {
+                  "$ref": "requirements.schema.json#/$defs/evidence"
+                }
+              },
+              "assessment": {
+                "enum": [
+                  "supported",
+                  "unsupported",
+                  "unverifiable"
+                ]
+              }
+            }
+          }
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "luna_call": {
+          "oneOf": [
+            {
+              "$ref": "requirements.schema.json#/$defs/call_ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "retry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "used",
+        "failed_requirement_ids",
+        "reason"
+      ],
+      "properties": {
+        "used": {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "failed_requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^R-[1-9][0-9]*$"
+          },
+          "uniqueItems": true
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "escalation_advice": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recommendation",
+            "text"
+          ],
+          "properties": {
+            "recommendation": {
+              "enum": [
+                "higher_reasoning_effort",
+                "human_review"
+              ]
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "check_round": {
+            "const": 2
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "retry": {
+            "properties": {
+              "used": {
+                "const": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "retry": {
+            "properties": {
+              "used": {
+                "const": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "retry": {
+            "properties": {
+              "failed_requirement_ids": {
+                "minItems": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "claim_audit": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "complete",
+                  "stale"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "claim_audit": {
+            "properties": {
+              "audited_final_message": {
+                "$ref": "requirements.schema.json#/$defs/artifact"
+              },
+              "luna_call": {
+                "$ref": "requirements.schema.json#/$defs/call_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "retry": {
+            "properties": {
+              "used": {
+                "const": 0
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "retry": {
+            "properties": {
+              "failed_requirement_ids": {
+                "maxItems": 0
+              },
+              "reason": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "claim_audit": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "stale",
+                  "unavailable"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "claim_audit": {
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "check_round": {
+            "const": 2
+          },
+          "items": {
+            "contains": {
+              "properties": {
+                "status": {
+                  "const": "fail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "escalation_advice": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}

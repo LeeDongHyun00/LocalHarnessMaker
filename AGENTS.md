@@ -4,25 +4,33 @@ This file lives at the repository root. Every Codex session reads it automatical
 
 ## 1. Project summary
 
-LocalHarnessMaker is a Codex plugin (three hooks plus one skill) that makes GPT-6.1 Sol finish tasks completely, follow the user's intent, and continue work across sessions.
+LocalHarnessMaker now builds hooks that compensate gpt-6.1-sol's measured
+weaknesses with deterministic checks and two pinned gpt-6-luna calls per
+completed session at low effort. Decision 0011 was accepted on 2026-10-25;
+the interface version 3 schema set remains proposed until separately approved.
 
-How it works:
-1. A cheap control model (a low-cost API model; local Gemma 4 12B was dropped by decision 0007) turns the user's request into a contract: goal, constraints, success criteria, verification commands, stop conditions, explicit assumptions.
-2. The executor model (GPT-6.1 Sol inside Codex) shows the contract, waits for approval, then does the work.
-3. A verifier checks the result against the contract's success criteria and re-instructs the executor on unmet items only, up to a fixed number of attempts.
-4. At the end of a session a handoff document is generated and injected into the next session.
+The first-prompt hook shows a requirements table and asks unresolved questions.
+Stop runs deterministic checks, audits final-message claims with Luna, allows
+one repair only on executed check failure, and asks the executor to write a
+decision ledger. SessionStart validates and injects that ledger. No llm_judge
+runs on this hook path. The old contract harness and v1/v2 reports are history;
+the original cost-per-pass claim is answered negatively by those measurements.
+H3 is evaluated only on a held-out version 3 set against A (Sol medium alone).
+B is dropped for version 3, C optional, decision 0010 record-only.
 
-Dates: development ends 2026-11-13. Final presentation 2026-11-16. The design document is the Notion page "AI Project: GPT Operating Harness".
+Dates: development ends 2026-11-13. Final presentation 2026-11-16. The original
+design is the Notion page "AI Project: GPT Operating Harness"; current direction
+is docs/decisions/0011-pinned-luna-hook-direction.md and docs/plan.md.
 
 ## 2. Repository layout and ownership
 
 | Path | Owner | Contents |
 |---|---|---|
-| AGENTS.md, docs/, schemas/, root configuration | Role 1 Tech Lead | shared rules, design and decision records (docs/decisions/), schemas, pyproject.toml, Makefile, CI |
+| AGENTS.md, docs/, prompts/, schemas/, root configuration | Role 1 Tech Lead | shared rules, design and decision records (docs/decisions/), schemas, pyproject.toml, Makefile, CI |
 | plugin/ | Role 2 Plugin Engineer | hook configuration, hook scripts, skill, AGENTS.md template for user projects, install script |
-| controller/ | Role 3 Controller Engineer | contract generator, handoff generator, backends (cheap_api, local), case library, prompt templates for the control model |
-| verifier/ | Role 4 Verifier Engineer | rule checks, checklist matching, done-claim verification, re-instruction messages |
-| eval/ | Role 5 Evaluation Engineer | task set, runner, baselines, metrics, reports |
+| controller/ | Role 3 Controller Engineer | requirements-table and claim-audit prompts/calibration, pinned Luna client and accounting; historical generators retained |
+| verifier/ | Role 4 Verifier Engineer | deterministic check runner, completion report, single-retry rule, Stop ledger request and mechanical validation |
+| eval/ | Role 5 Evaluation Engineer | held-out version 3 tasks, plugin-mode runner, A/H3 configs, estimates, metrics and reports |
 | state/STATUS-ROLE.md | each role | per-role status file used as the handoff between sessions |
 | tests/ROLE/ | each role | unit and integration tests |
 
@@ -32,6 +40,82 @@ Rules:
 3. Do not spawn sub-agents. One session per role.
 
 ## 3. Interfaces between roles
+
+### 3.0 Proposed hook interfaces, version 3
+
+Status: proposed on 2026-10-25. Direction 0011 is accepted; the schema set is
+frozen only after the user's explicit approval, which Claude will request.
+`schemas/VERSION` is 3 as a proposal marker; it does not assert approval or
+runtime implementation. Roles 2–4 start implementation after approval. Role 5
+can design tasks/plugin mode against the draft. This explicit user-requested
+draft is authorized; it does not activate or alter the historical runtime.
+
+Source of truth for proposed paths, mappings and sequencing:
+[docs/interfaces-v3.md](docs/interfaces-v3.md), plus these closed draft 2020-12
+schemas and examples in schemas/examples/:
+
+| Schema | Required content |
+| --- | --- |
+| requirements.schema.json | Native session ID, prompt path/hash, state; numbered id/text/kind/source_excerpt/code-derived check rows; open_questions with nullable user answers; Luna accounting reference |
+| completion-report.schema.json | Requirements hash; current final-message hash; per-requirement pass/fail/unverifiable and check evidence (output excerpt, path, hash); claim audit with cited evidence and audited-message hash; single-retry record; escalation advice |
+| ledger.schema.json | Executor-written decisions/rationale and fixed names/signatures/constants with paths; open items; hook-owned validation with identifier presence and workspace hashes |
+| pin-check.schema.json | Installed version, exact model-list/pricing checks with evidence hashes, enabled/disabled status, reason codes and visible advisory |
+| luna-call.schema.json | One accounting JSONL line: session/call/phase, requested and actual model, backend, low effort, tokens, latency, pricing_ref, nullable USD, status/error |
+
+Requirement kinds map deterministically: behavior -> configured project tests
+or unavailable; constraint -> configured command/signature snapshot/input
+immutability probe or unavailable; protected_file -> baseline hash unchanged;
+named_file -> existence; named_command/test_command -> safe argv from the exact
+request or configured project command. Unsupported/missing oracles are
+unavailable/unverifiable. Luna never writes commands, regexes, paths or hashes.
+Questions are shown before work; the user answers visibly. Never assume an
+answer. No `llm_judge` on the hook path; historical schemas retain it.
+
+Exact workspace artifact root: `.localharness/v3/`. Per-session directory:
+`sessions/<sha256-of-UTF-8-session_id>/`, containing `pin-check.json`,
+`requirements.json`, `completion-report.json`, `ledger.json`, `luna-calls.jsonl`
+and referenced immutable `evidence/` files. `.localharness/v3/latest-ledger.json`
+is an atomic copy of the last validated ledger and is revalidated on injection.
+The ledger supersedes handoff only for this hook path; keep handoff.schema.json
+for retained v1/v2 artifacts. All artifact paths are confined relative paths;
+code checks IDs, source/target correspondence, hashes and call references.
+
+Pin `gpt-6-luna` at low effort, verify installed Codex version/model list and
+pinned pricing at SessionStart. Fail closed: missing/renamed/unobservable model,
+unverified version, missing price coverage or provider identity mismatch writes
+a visible advisory and disables Luna hooks; never silently substitute. At most
+two calls per native session, one requirements and one claim audit, counting
+failed invocations. No automatic retry/regeneration/fallback on this hook path.
+Keep nullable unknown usage/cost; code records every call with pinned
+API-equivalent prices. Target each call under 10 seconds and control cost well
+under 2 percent of Fast executor cost; these are unmeasured targets.
+
+Stop permits at most one application repair, only for an executed deterministic
+failure. Unverifiable checks and claim-audit opinions never trigger repair.
+After repair recheck with code, preserve the original audit and mark it stale
+if the final message changed. Repeated failure yields advice, never an automatic
+effort change. After the report settles, request executor ledger writing through
+one separate Stop bookkeeping continuation; it does not extend repair or loop
+on invalid ledgers. Hook code validates before save/injection.
+
+Runner plugin mode launches Codex with the installed hooks and only collects
+these artifacts for control/check/accounting results; it does not orchestrate
+control calls or verification. A bypasses hooks with HARNESS_NESTED=1; H3 removes
+that variable from copied executor/resume environments to run the hooks.
+Controller-owned nested Codex children always set HARNESS_NESTED=1. Preserve
+the immediate zero-byte guard below. Invalid pin/artifacts/accounting cannot be
+presented as successful H3. Existing access audit/post-exit private grading
+rules remain in force.
+
+Success: H3 pass rate matches A within the paired interval, task-level false
+done at least halved, cost per pass at most 15 percent above A; any quality loss
+fails. Report paired uncertainty; no numeric equivalence margin is invented.
+V1/v2 informed this design, so H3 is evaluated on v3 only. Historical report
+schemas are retained unchanged; schema version and task-set version differ.
+
+The following sections 3.1–3.2 describe retained v1/v2 interfaces, not new hook
+work items. Section 3.3 retains measured wire behavior/guard, with the explicit
+H3 environment exception; section 3.4 applies to all evaluations.
 
 Version 1 was approved and published on 2026-10-21, ahead of the planned
 2026-10-24 freeze. Approved records: docs/decisions/0002-judgment-schema-proposal.md,
@@ -43,13 +127,13 @@ owning role has implemented or measured it.
 
 Version 2 was approved by the user and published on 2026-10-23 under
 docs/decisions/0009-task-level-false-done.md. It adds the required evaluation
-metric task_false_done_rate and sample unit claimed_complete_task; schemas/VERSION
-is 2. Both numerator and denominator use valid tasks only. Version 1 reports
+metric task_false_done_rate and sample unit claimed_complete_task; the historical schemas/VERSION
+marker was 2. Both numerator and denominator use valid tasks only. Version 1 reports
 remain valid version 1 documents; compare versions only with tools accepting both.
 
-### 3.1 Schemas (directory schemas/, JSON Schema draft 2020-12)
+### 3.1 Historical schemas (directory schemas/, JSON Schema draft 2020-12)
 
-All objects reject unknown fields. make validate-schemas checks all six schemas
+All objects reject unknown fields. make validate-schemas checks all historical and proposed schemas
 and every reference example offline, including date/time formats and local
 references. The schema files are the exact field/type definitions.
 
@@ -103,7 +187,7 @@ Cross-artifact ID equality, counts, costs, CI ordering, observed model/effort,
 process/copy ordering and other arithmetic require runtime checks in addition
 to JSON Schema. Decision 0003 specifies metric units and runtime invariants.
 
-### 3.2 Command line interfaces
+### 3.2 Retained command line interfaces
 
 1. python -m controller contract --prompt FILE --handoff FILE_OR_none --cases DIR --backend codex_cli_OR_cheap_api_OR_local --out contract.json
 2. python -m controller handoff --transcript PATH --contract contract.json --verdict verdict.json --backend codex_cli_OR_cheap_api_OR_local --out handoff.json
@@ -140,7 +224,10 @@ Conventions for every command:
 
 ### 3.3 Hook input, output and nested environment guard
 
-Source of truth: docs/hooks-contract.md, published from Role 2's measured draft.
+Source of truth for measured v1/v2 wire behavior: docs/hooks-contract.md,
+published from Role 2's measured draft. Proposed v3 semantics in section 3.0
+replace contract/handoff content on the same measured context/Stop channels;
+they do not claim new production compatibility evidence.
 It records the versions verified so far, starting with codex-cli
 0.162.0-alpha.17.2 startup under interactive CLI and exec. Newer versions
 require a hook compatibility probe first; see docs/decisions/0006-codex-version-policy.md.
@@ -148,9 +235,9 @@ Production behavior must be tested separately; startup evidence does not prove
 the new guard, handoff, persisted trust or production retry limits.
 
 - Common stdin fields: session_id, transcript_path (string or null), cwd, hook_event_name, model; UserPromptSubmit also has prompt. Additional event fields may be present, and transcript format is not stable.
-- UserPromptSubmit injects contract text through hookSpecificOutput.additionalContext with hookEventName=UserPromptSubmit.
+- Historical UserPromptSubmit injects contract text through hookSpecificOutput.additionalContext with hookEventName=UserPromptSubmit.
 - Stop continues unmet work with {"decision":"block","reason":"REINSTRUCTION"}; pass/retry exhaustion permits completion. The measured continuation does not fire UserPromptSubmit again, so preserve contract state. Do not block with a null re-instruction.
-- SessionStart injects validated handoff text through hookSpecificOutput.additionalContext with hookEventName=SessionStart.
+- Historical SessionStart injects validated handoff text through hookSpecificOutput.additionalContext with hookEventName=SessionStart.
 - SessionEnd is observe-only. Do not use it.
 
 HARNESS_NESTED=1 makes every LocalHarnessMaker hook exit 0 immediately with zero
@@ -162,7 +249,9 @@ normal handling and whole-script exception handling, including stub mode.
 
 Set the guard in a copied child environment for every controller-owned Codex
 subprocess/retry/resume and wrapper that can launch Codex. Role 5 sets it on
-runner-owned executor/resume processes because the runner owns the loop. Do not
+legacy runner-owned executor/resume processes and baseline A. Proposed H3
+plugin mode removes it from copied executor/resume environments so hooks run;
+H3 does not own an independent control loop. Do not
 mutate the parent environment or persistent configuration. Normal direct-user
 sessions leave it unset. Other plugins' hooks need separate verification.
 

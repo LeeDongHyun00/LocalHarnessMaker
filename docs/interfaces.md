@@ -1,8 +1,13 @@
-# Shared interfaces, version 2
+# Retained shared interfaces, version 2
+
+Current hook work follows the proposed [version 3 interfaces](interfaces-v3.md)
+and accepted [decision 0011](decisions/0011-pinned-luna-hook-direction.md).
+The schema marker is now 3 (proposed, not frozen); this page retains the
+version 1/2 contracts for historical consumers, not current implementation work.
 
 Status: version 2 approved by the user on 2026-10-23 in
 [0009 task-level false done](decisions/0009-task-level-false-done.md).
-schemas/VERSION is 2. Version 1 was approved on 2026-10-21. Decisions
+Its historical schema marker was 2. Version 1 was approved on 2026-10-21. Decisions
 [0002 judgment](decisions/0002-judgment-schema-proposal.md),
 [0003 evaluation report](decisions/0003-evaluation-report-schema-proposal.md) and
 [0004 backend/guard](decisions/0004-codex-cli-backend-and-nested-guard-proposal.md)
@@ -122,8 +127,8 @@ only exit status while retaining evidence.
 | evaluation-report.schema.json | evaluation_report.json | Run metadata, audited task results, seven metrics, accounting and aggregate validity |
 
 Schema filenames are under schemas/ and example filenames under
-schemas/examples/. make validate-schemas validates all six schema definitions
-and all eight samples, with local-only reference registration and date/time
+schemas/examples/. make validate-schemas validates these six historical schema definitions
+and eight samples plus the proposed version 3 set, with local-only reference registration and date/time
 format checks. Missing required files, unmapped examples, broken references or
 invalid samples fail the target. It executes no embedded verification command
 or network/model call. CI already runs this target and pytest.

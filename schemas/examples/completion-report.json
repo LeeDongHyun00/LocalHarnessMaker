@@ -1,0 +1,119 @@
+{
+  "schema_version": 3,
+  "session_id": "synthetic-session",
+  "requirements": {
+    "path": "requirements.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "current_final_message": {
+    "path": "evidence/final-1.txt",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "check_round": 1,
+  "items": [
+    {
+      "requirement_id": "R-1",
+      "status": "unverifiable",
+      "reason": "SYNTHETIC: no oracle.",
+      "evidence": []
+    },
+    {
+      "requirement_id": "R-2",
+      "status": "pass",
+      "reason": "SYNTHETIC: deterministic check succeeded.",
+      "evidence": [
+        {
+          "kind": "check_output",
+          "path": "evidence/checks-1.txt",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "excerpt": "SYNTHETIC: check succeeded."
+        }
+      ]
+    },
+    {
+      "requirement_id": "R-3",
+      "status": "pass",
+      "reason": "SYNTHETIC: deterministic check succeeded.",
+      "evidence": [
+        {
+          "kind": "check_output",
+          "path": "evidence/checks-1.txt",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "excerpt": "SYNTHETIC: check succeeded."
+        }
+      ]
+    },
+    {
+      "requirement_id": "R-4",
+      "status": "pass",
+      "reason": "SYNTHETIC: deterministic check succeeded.",
+      "evidence": [
+        {
+          "kind": "check_output",
+          "path": "evidence/checks-1.txt",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "excerpt": "SYNTHETIC: check succeeded."
+        }
+      ]
+    },
+    {
+      "requirement_id": "R-5",
+      "status": "pass",
+      "reason": "SYNTHETIC: deterministic check succeeded.",
+      "evidence": [
+        {
+          "kind": "check_output",
+          "path": "evidence/checks-1.txt",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "excerpt": "SYNTHETIC: check succeeded."
+        }
+      ]
+    },
+    {
+      "requirement_id": "R-6",
+      "status": "pass",
+      "reason": "SYNTHETIC: deterministic check succeeded.",
+      "evidence": [
+        {
+          "kind": "check_output",
+          "path": "evidence/checks-1.txt",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "excerpt": "SYNTHETIC: check succeeded."
+        }
+      ]
+    }
+  ],
+  "claim_audit": {
+    "status": "complete",
+    "audited_final_message": {
+      "path": "evidence/final-1.txt",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "claims": [
+      {
+        "requirement_id": "R-6",
+        "claim_excerpt": "SYNTHETIC: tests passed.",
+        "cited_evidence": [
+          {
+            "kind": "check_output",
+            "path": "evidence/checks-1.txt",
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "excerpt": "SYNTHETIC: check succeeded."
+          }
+        ],
+        "assessment": "supported"
+      }
+    ],
+    "reason": null,
+    "luna_call": {
+      "path": "luna-calls.jsonl",
+      "call_id": "audit-1"
+    }
+  },
+  "retry": {
+    "used": 0,
+    "failed_requirement_ids": [],
+    "reason": null
+  },
+  "escalation_advice": null
+}
