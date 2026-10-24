@@ -1,3 +1,39 @@
+# Session-authored computed code-mode inputs — 2026-10-24
+
+Add a bounded static reducer for the measured FILE-header scripts and retain
+the existing literal-call audit when reduction fails. Enumerate all tool sites,
+reduce computed arguments to concrete values, and apply the normal access
+checks before recording derived_from_audited_outputs. Provenance alone is
+insufficient: literal fragments can synthesize a private path, so the completed
+argument must also be audited. No captured code or external tool executes.
+
+Track only confirmed text stores in one native session stream. Publish stored
+tool-result fields only after auditing a paired, complete raw result displayed
+without transformation. Unknown/missing sources, unsupported operations,
+ambiguous displays, failed/yielded scripts, unawaited Promise collections,
+helper mutation and unresolved arguments remain
+inconclusive. Preserve STOP-E4 access detection at the source tool output;
+detected access still invalidates the task and report. Regrade provenance pins
+the new reducer, and retained/fresh audit artifacts retain resolution reasons.
+
+The supplied excerpt has two records, native lines 65 and 75 of one task, not
+three. Preserve both complete scripts as fixtures. With confirmed synthetic
+original_sources they resolve to two and one commands respectively; standalone
+excerpts lack the earlier store and remain inconclusive. Add regressions for
+private tool output, unknown sources, pure private-path synthesis, sequential
+scripts, state boundaries and incomplete/altered output evidence.
+
+Assumptions: the supplied excerpt is the complete evidence available here; the
+third requested record and earlier store are unavailable. No full historical
+session or quality result is inferred. All paths/graders and model transports
+in tests are synthetic; no live model calls or other checkouts are used.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1828 passed in
+368.77s. `git diff --check` passes. Scope audit confirms 11 exact authorized
+paths, branch r5/v2, six STATUS headings and zero staged/deleted paths;
+frozen task files, retained reports, shared interfaces and other checkouts are
+unchanged. The source-record location is absent from changed repository files.
+
 # Retained verbatim inputs and recovery accounting — 2026-10-24
 
 The real 1,419-character patch record contains four escaped Add File bodies

@@ -331,7 +331,51 @@ JavaScript escape, UTF-16 and replacement-dollar semantics apply, including
 empty patterns. The resolved text receives exactly the plain-input command or
 patch-target checks. Variables, interpolated templates, regular-expression
 patterns, computed method access, nonliteral arguments and other method/function
-calls remain unresolved. Dynamic directories, unknown tools and unsupported
+calls remain unresolved in this literal decoder. A second, bounded static
+reducer handles the observed session-authored FILE-manifest scripts. It parses
+the whole program, enumerates direct `tools.*` call sites before reduction, and
+audits every resolved command/patch through the existing path, alias, traversal,
+heredoc and output checks. Literal calls are still audited if another call or
+the reducer fails. No captured JavaScript, shell command or host helper executes
+during reduction.
+
+The reducer accepts text loaded from an earlier confirmed `store`/`save` in the
+same identified native session stream, literal strings, and retained outputs
+of earlier audited tool calls. A tool result is usable only when one direct
+`exec_command` result was displayed by an unmodified `text(result)` and its
+paired output contains exactly one complete JSON value (optionally in one text
+block). Only after that output has passed its own audit may a stored text field
+become a later `load` source. Multiple/transformed displays, missing results,
+unpaired calls, failed/yielded scripts, unknown keys, session changes and ambiguous overlapping scripts
+never establish that provenance. Unsupported scripts invalidate saved trust;
+helper values do not transfer between files or tasks. Unsupported/unknown
+overwrites discard the previous key. Helper objects are not imported as text.
+
+Source closure alone cannot prove path safety: concatenating two harmless
+fragments can name a new private path. Consequently this rule also requires
+concrete reduction of every computed tool argument and audits the resulting
+values. Supported operations include the two measured FILE-header `matchAll`
+patterns, `Set.has`, `filter`/`map`, `Object.fromEntries`, indexing, bounded counted
+loops, awaited Promise collections, slices, concatenation and `JSON.stringify`. The conservative subset uses
+ASCII text (LF manifest lines) and safe integers, rejects coercion/reflection/helper rebinding, and
+limits source size, string size and reduction steps. Static enumeration must
+cover every tool call; an unvisited site is unresolved. It records successful
+reductions in `access-audit.json.resolutions` with log/line/hash and
+`reason=derived_from_audited_outputs`; this reason never overrides a detected
+path or an uncertain audit. Environment/process arguments, network/filesystem
+helpers, unknown sources and any operation or result the reducer cannot prove
+stay inconclusive under STOP-E4. Arbitrary JavaScript is not allowlisted.
+
+The supplied baseline-B excerpt contains **two** records, both for the rate
+budgets task, at native lines 65 and 75. The fixtures retain their JavaScript
+with synthetic session/source data. Both reduce under
+`derived_from_audited_outputs` when `original_sources` has established provenance;
+both remain unresolved as standalone excerpts because the earlier store is
+absent. No third record or complete-session re-audit result was supplied here.
+Regressions also detect a private path in the source tool output itself and
+keep unknown inputs inconclusive; pure string synthesis receives path auditing.
+
+Dynamic directories, unknown tools and unsupported
 custom code stay inconclusive. Other unknown record/item kinds
 also stay inconclusive. The synthetic 33-record regression fixture preserves
 the supplied host session's structure and record order, with categorical
