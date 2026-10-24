@@ -1,3 +1,32 @@
+# Approved recovery subset estimates — 2026-10-24
+
+Allow `rerun_invalid`, `rerun_unaccounted` and `continue_day2` to match the
+existing cost estimate when selected tasks are a subset and every other config
+field is identical. Keep the ordinary `run` gate exact and refuse unestimated
+batches of ten or more calls. Print the selected subset's paid-call bound,
+matched estimate path and recovery-subset note.
+
+Record matched estimate, subset bound and selection reasons in
+`run-diagnostics.json.recovery_estimate` and recovery provenance's
+`cost_estimate`, including interrupted recovery outputs. Continuations use a
+conservative bound covering both days of selected tasks. Small recoveries keep
+the existing below-ten exemption and record a null match when unestimated.
+
+Add offline gate refusals for changed settings and extra tasks, print/bound
+checks, estimate-record assertions for all three recovery paths and an
+interruption regression. Update the older two-session gate mock for the new
+return record and recovery keyword.
+
+Assumptions: the full-v2 harness approval and transport outage are user-supplied
+host findings. Synthetic estimates, graders and mocked model transports verify
+the implementation here; actual host recovery remains pending. No live calls,
+private-root access, frozen-input/interface changes, staging or commits.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 2092 passed in
+410.02s. `git diff --check` — exit 0. Inline scope/STATUS audit — PASS:
+11 authorized paths, six headings, zero staged/deleted paths; frozen tasks,
+retained reports and shared interfaces unchanged.
+
 # Deadline transport tail follow-up — 2026-10-24
 
 Recognize the complete Reconnecting... family, including any parenthesized

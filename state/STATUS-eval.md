@@ -1,5 +1,7 @@
 ## Done
 
+- Implemented approved recovery-subset estimate matching, exact non-task-setting refusals and unchanged ordinary-run matching; recorded matched estimate, selected bound and reasons for all three recovery paths, including interruptions; updated README/CHANGES and this handoff (`.venv/bin/python -m pytest tests/eval -q`: 2092 passed in 410.02s; `git diff --check`: exit 0; inline scope/STATUS audit: PASS, 11 authorized paths, six headings, zero staged/deleted paths; frozen tasks/reports/interfaces unchanged).
+
 - Verified the complete evaluation package after the deadline-tail follow-up, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces without staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2072 passed in 387.67s; `git diff --check`: exit 0; inline scope/STATUS audit: PASS, seven exact authorized paths, six headings, no source-location leakage, zero staged/deleted paths).
 
 - Expanded reconnect/network transport recognition and deadline-kill classification for exit -9/null without turn.failed; added hash-pinned verbatim/synthetic-path positive and mixed-error negative fixtures, later-work refusals and retained-regrade regressions preserving costs/source bytes while completed-turn model timeouts stay timeout (`.venv/bin/python -m pytest tests/eval/test_executor_transport.py -q`: 53 passed in 19.63s; inline verbatim-fixture audit: PASS, 15 records, negative adds exactly one model error).
@@ -99,6 +101,8 @@
 
 ## Remaining
 
+- Host/Claude: transfer this approved-subset cost-gate fix, then retry the finished full-v2-harness recovery with the original pinned inputs/graders and approved full-v2-harness estimate. Check stderr's selected paid-call bound and run-diagnostics.json.recovery_estimate (matched estimate, bound, reasons). This worktree made no host calls or actual report repairs; all other configuration fields must remain identical.
+
 - Host/Claude: transfer this deadline-tail follow-up and regrade the retained v2 baseline B run with its original pinned inputs/graders. The user reports the exit-1 casualty now reclassifies after 559aa1e; confirm v2-cache-invalidation-feature-plus-test also becomes executor_transport_failure with the supplied exit -9/no-turn.failed tail. Then use rerun_invalid with --reasons executor_transport_failure in a fresh output and review both outage tasks, audit/pricing, report-pinned provenance and retained prior spending. Synthetic retained regrade passes here; this worktree did not access or repair the actual host run.
 
 - Host/Claude: transfer this literal-store/Unicode-patch follow-up and re-audit the original retained task. Both supplied unresolved loads now resolve offline; the fixture preserves the earlier truncated listing's protected-path finding without waiver. No actual host task/report was repaired here.
@@ -127,6 +131,9 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Accept estimated task subsets only through the explicit recovery gate: rerun_invalid, rerun_unaccounted and continue_day2 compare every non-task field exactly; ordinary run keeps exact matching and the existing below-ten exemption.
+- Retain recovery estimate evidence in diagnostics and provenance, including interrupted recoveries: the host can review the matched estimate, selected-task bound and selection reasons; continuation bounds conservatively include both days.
 
 - Treat the entire Reconnecting... family and the supplied network/DNS phrases as transport errors: observed waiting-for-network events have no numbered reconnect counter.
 - Accept deadline kills with exit -9 or null and an error-only suffix without turn.failed: killed processes may never emit a terminal turn event; later item starts, mixed errors and completed-turn model timeouts cannot prove this cause.
@@ -220,6 +227,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_recovery_estimates.py tests/eval/test_restart_recovery.py tests/eval/test_unaccounted_recovery.py tests/eval/test_continue_day2.py -q`
+
 - `.venv/bin/python -m pytest tests/eval/test_executor_transport.py -q`
 
 - `.venv/bin/python -m pytest tests/eval/test_executor_transport.py tests/eval/test_reaudit.py tests/eval/test_restart_recovery.py tests/eval/test_runner.py::test_regrade_preserves_executor_failure_class -q`
@@ -273,6 +282,8 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The full-v2 harness approval, sixteen pre-executor outage invalidities and 132-call recovery refusal are user-supplied host findings. Recovery subset equality ignores only tasks; retained population and all other settings stay exact. This session uses only this worktree's .venv, synthetic estimates/graders and mocks, with no actual private-root access, live models, staging or commits.
 
 - The supplied read-only tail records baseline B's deadline transport outage; fixtures preserve its 15 runner events verbatim except synthetic workspace paths. Synthetic retained runs establish regrade behavior, not actual host repair. This session uses only this worktree's .venv and mocks, with no live models, original private grader access, staging or commits.
 

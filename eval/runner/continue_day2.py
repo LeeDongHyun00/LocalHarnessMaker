@@ -148,8 +148,8 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
     read_version = version if callable(version) else (lambda: version) if version else core.installed_version
     if read_version() != config['codex_version']:
         raise ValueError('Continuation refused: installed Codex version differs')
-    # Uses the recorded full-run estimate and the same budget guard as the runner.
-    core.require_call_estimate(config)
+    estimate = core.require_call_estimate(dict(config, tasks=selected), recovery=True)
+    estimate['reasons'] = sorted(RECOVERABLE)
     # Regrade validates source/report/task-set provenance and historical pins.
     # Audit-blocked tasks may have only the preceding attempt's
     # exit pin. Regrade validates their run/task provenance but leaves them for
@@ -195,7 +195,7 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
             for name in ('core.py', 'harness.py', 'continue_day2.py', 'day1_recovery.py', 'reaudit.py')},
         'recorded_config_sha256': source_state['config_sha256'],
         'materialized_config_sha256': digest(config_path.read_bytes()),
-        'selected_tasks': selected, 'status': 'pending', 'tasks': []}
+        'selected_tasks': selected, 'status': 'pending', 'tasks': [], 'cost_estimate': estimate}
     core.write_json(out / 'continuation.json', provenance)
     try:
         core.run(config_path, out, private_root, execute=execute, version=read_version,
@@ -204,6 +204,11 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         provenance['status'] = 'incomplete'
         core.write_json(out / 'continuation.json', provenance)
         raise
+    finally:
+        current_diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
+        current_diagnostics['recovery_estimate'] = estimate
+        core.write_json(out / 'run-diagnostics.json', current_diagnostics)
+    diagnostics['recovery_estimate'] = estimate
     state = json.loads((out / 'checkpoint.json').read_text())
     resumed = json.loads((out / 'report.json').read_text())
     new_by_id = {t['task_id']: t for t in resumed['tasks']}

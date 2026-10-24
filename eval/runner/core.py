@@ -197,15 +197,14 @@ def paid_call_bound(config: dict[str, Any], judges: dict[str, int] | None = None
                        if config["harness"] else 0)
 
 
-def require_call_estimate(config: dict[str, Any], judges: dict[str, int] | None = None) -> None:
-    """Refuse unestimated paid batches before calls, and report small harness bounds."""
+def require_call_estimate(config: dict[str, Any], judges: dict[str, int] | None = None, *,
+                          recovery: bool = False) -> dict[str, Any]:
+    """Require exact estimates, allowing task subsets only for explicit recovery."""
     maximum = paid_call_bound(config, judges)
     if config["harness"]:
         print(f"Paid-call estimate: at most {maximum} calls with currently known judge criteria; "
               "includes both days, contracts, handoff, retries and fallbacks. "
               "New judge criteria require a revised bound; planning USD is in the matched estimate, measured USD requires complete accounting.", file=sys.stderr)
-    if maximum < 10:
-        return
     estimated = [(REPOSITORY / f"eval/configs/{kind}-{letter}.yaml",
                   REPOSITORY / f"eval/reports/{kind}-estimate.md")
                  for kind in ("pilot", "full") for letter in ("a", "b")]
@@ -213,13 +212,28 @@ def require_call_estimate(config: dict[str, Any], judges: dict[str, int] | None 
     if isinstance(name, str) and re.fullmatch(r"[a-z0-9][a-z0-9-]*", name):
         estimated.insert(0, (REPOSITORY / f"eval/configs/{name}.yaml",
                              REPOSITORY / f"eval/reports/{name}-estimate.md"))
-    match = next((estimate for candidate, estimate in estimated
-                  if candidate.is_file() and estimate.is_file() and
-                  json.loads(candidate.read_text()) == config), None)
-    if match is None:
+    match = None
+    subset = False
+    for candidate, estimate in estimated:
+        if not candidate.is_file() or not estimate.is_file():
+            continue
+        approved = json.loads(candidate.read_text())
+        subset = (recovery and
+                  {k: v for k, v in approved.items() if k != "tasks"} ==
+                  {k: v for k, v in config.items() if k != "tasks"} and
+                  set(config["tasks"]).issubset(approved["tasks"]))
+        if approved == config or subset:
+            match = estimate
+            break
+    if match is None and maximum >= 10:
         raise ValueError(f"STOP-3: batch upper bound {maximum} paid calls requires a reported cost estimate")
-    print(f"STOP-3 estimate: {match.relative_to(REPOSITORY)}; "
-          "host operator must obtain user approval before execution.", file=sys.stderr)
+    matched_path = str(match.relative_to(REPOSITORY)) if match else None
+    if match is not None:
+        note = " recovery subset of an approved configuration;" if subset else ""
+        print(f"STOP-3 estimate: {matched_path}; batch upper bound {maximum} paid calls;{note} "
+              "host operator must obtain user approval before execution.", file=sys.stderr)
+    return {"matched_estimate": matched_path, "paid_call_bound": maximum,
+            "recovery_subset": bool(match and subset)}
 
 
 def installed_version() -> str:
