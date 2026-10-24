@@ -1,0 +1,2 @@
+{"type": "item.completed", "item": {"id": "item_10", "type": "error", "message": "Falling back from WebSockets to HTTPS transport. stream disconnected before completion: failed to lookup address information: nodename nor servname provided, or not known"}}
+{"type": "item.completed", "item": {"id": "item_0", "type": "error", "message": "Falling back from WebSockets to HTTPS transport. workspace routing discovery timed out"}}

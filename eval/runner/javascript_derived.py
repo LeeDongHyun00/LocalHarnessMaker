@@ -9,6 +9,7 @@ itself is insufficient: concatenating innocent strings can create a new path.
 from dataclasses import dataclass, field
 from bisect import bisect_left
 import json
+import math
 import re
 from typing import Any
 
@@ -27,10 +28,10 @@ PATTERNS = {
 LEX = re.compile(
     r'''\s+|//[^\n]*|/\*[\s\S]*?\*/|"(?:[^"\\]|\\[\s\S])*"|'(?:[^'\\]|\\[\s\S])*'|'''
     r'''`(?:[^`\\]|\\[\s\S])*`|/(?:[^/\\\n]|\\.)+/[a-z]*|'''
-    r'''[A-Za-z_$][\w$]*|\d+|\.\.\.|=>|&&|\|\||\+\+|===|!==|<=|>=|==|!=|[^\s]''')
+    r'''[A-Za-z_$][\w$]*|\d+|\.\.\.|=>|&&|\|\||\+=|\+\+|===|!==|<=|>=|==|!=|[^\s]''')
 Node = tuple[Any, ...]
 GLOBALS = {'load', 'store', 'save', 'text', 'notify', 'tools', 'JSON', 'Object', 'Promise', 'Set'}
-METHODS = {'stringify', 'fromEntries', 'all', 'allSettled', 'matchAll', 'filter', 'map', 'has', 'slice', 'keys', 'entries'}
+METHODS = {'stringify', 'fromEntries', 'all', 'allSettled', 'matchAll', 'match', 'split', 'filter', 'map', 'has', 'slice', 'keys', 'entries'}
 
 
 @dataclass(frozen=True)
@@ -518,7 +519,7 @@ class Parser:
             node = ('name', token)
         else:
             raise Unsupported('expression')
-        precedence = {'=': 1, '?': 2, '||': 3, '&&': 3, '===': 4, '!==': 4, '==': 4, '!=': 4,
+        precedence = {'=': 1, '+=': 1, '?': 2, '||': 3, '&&': 3, '===': 4, '!==': 4, '==': 4, '!=': 4,
                       '<': 5, '>': 5, '<=': 5, '>=': 5, '+': 7, '-': 7, '*': 8}
         while self.peek():
             op = self.peek()
@@ -555,7 +556,12 @@ class Parser:
                     self.take(':')
                     node = ('conditional', node, yes, self.expression(2))
                 else:
-                    node = ('binary', op, node, self.expression(precedence[op] + (op != '=')))
+                    right = self.expression(precedence[op] + (op not in {'=', '+='}))
+                    if op == '+=':
+                        # Only the bounded loop-update form is admitted below.
+                        node = ('advance', node, right)
+                    else:
+                        node = ('binary', op, node, right)
             else:
                 break
         return node
@@ -609,6 +615,12 @@ def validate(nodes: list[Node]) -> set[int]:
                 raise Unsupported('unknown_method')
             elif callee[0] == 'name' and callee[1] not in {'load', 'store', 'save', 'text', 'notify'}:
                 raise Unsupported('unknown_callable')
+        if kind == 'advance':
+            if not (parent and parent[0] == 'for' and parent[3] is node and
+                    parent[1][0] == 'bind' and parent[1][3] == 'let' and
+                    node[1] == ('name', parent[1][1]) and node[2][0] == 'value' and
+                    type(node[2][1]) is int and 1 <= node[2][1] <= 4096):
+                raise Unsupported('advance_scope')
         if kind in {'binary', 'increment'} and (kind == 'increment' or node[1] == '='):
             target = node[1] if kind == 'increment' else node[2]
             if kind == 'increment' and not (
@@ -707,6 +719,8 @@ class Reduction:
             value, key = (self.value(part, env, saved) for part in node[1:])
             if isinstance(value, Unobserved) and type(key) in {str, int}:
                 return Unobserved((*value.path, key), value.site)
+            if isinstance(value, Deferred) and type(key) in {str, int}:
+                return Deferred('member', (value, key))
             if key == 'length' and isinstance(value, (list, str)):
                 return len(value)
             if isinstance(value, dict):
@@ -719,6 +733,12 @@ class Reduction:
             if type(condition) is not bool:
                 raise Unsupported('conditional_coercion')
             return self.value(node[2] if condition else node[3], env, saved)
+        if kind == 'advance':
+            target = node[1][1]
+            if type(env.get(target)) is not int:
+                raise Unsupported('advance_value')
+            env[target] += node[2][1]
+            return env[target]
         if kind in {'increment', 'binary'}:
             if kind == 'increment':
                 target, value = node[1], self.value(node[1], env, saved) + 1
@@ -814,9 +834,17 @@ class Reduction:
             parsed = json.loads(args[0])
             concrete(parsed)
             return parsed
-        if receiver == ('name', 'JSON') and name == 'stringify' and len(args) == 1:
+        if receiver == ('name', 'JSON') and name == 'stringify' and (len(args) == 1 or
+                len(args) == 3 and args[1] is None and type(args[2]) is int and 0 <= args[2] <= 10):
             concrete(args[0])
-            return json.dumps(args[0], ensure_ascii=False, separators=(',', ':'))
+            def has_float(value: Any) -> bool:
+                return type(value) is float or isinstance(value, (dict, list)) and any(
+                    has_float(item) for item in (value.values() if isinstance(value, dict) else value))
+            if has_float(args[0]):
+                raise Unsupported('float_serialization')
+            indent = args[2] if len(args) == 3 and args[2] else None
+            return json.dumps(args[0], ensure_ascii=False, indent=indent,
+                              separators=(',', ': ') if indent else (',', ':'))
         if receiver == ('name', 'Object') and name in {'keys', 'entries'} and len(args) == 1:
             concrete(args[0])
             if not isinstance(args[0], dict):
@@ -835,6 +863,23 @@ class Reduction:
                 if isinstance(value, Unobserved) else {'status': 'fulfilled', 'value': value}
                 for value in args[0]]
         value = self.value(receiver, env, saved)
+        if name in {'split', 'match'} and isinstance(value, str) and len(args) == 1 and args[0][0] == 'regex':
+            pattern, flags = args[0][1:]
+            if flags:
+                raise Unsupported('regexp_method_flags')
+            matches = regex_matches(pattern, 'g', value)
+            if name == 'match':
+                return matches[0] if matches else None
+            result: list[Any] = []
+            offset = 0
+            for match in matches:
+                result.append(value[offset:match['index']])
+                result.extend(match[key] for key in range(1, len(match) - 1))
+                offset = match['index'] + len(match[0])
+            result.append(value[offset:])
+            if len(result) > 4096:
+                raise Unsupported('collection_limit')
+            return result
         if name == 'matchAll' and isinstance(value, str) and len(args) == 1 and args[0][0] == 'regex':
             if len(value) > 65536 or not value.isascii() or re.search(r'[\r\x1c-\x1f]', value):
                 raise Unsupported('regexp_input_limit')
@@ -879,6 +924,7 @@ class Reduction:
                 raw_blocks.append(None)
         results: dict[tuple[int, tuple[str | int, ...]], Any] = {}
         ambiguous: set[tuple[int, tuple[str | int, ...]]] = set()
+        projections: list[tuple[Deferred, Any]] = []
 
         def record(value: Unobserved, actual: Any) -> None:
             key = (value.site, value.path)
@@ -887,7 +933,7 @@ class Reduction:
             results[key] = actual
 
         def compatible(shape: Any, actual: Any) -> bool:
-            if isinstance(shape, Unobserved):
+            if isinstance(shape, (Unobserved, Deferred)):
                 return True
             if isinstance(shape, dict) and isinstance(actual, dict):
                 return all(isinstance(key, Spread) or key in actual and compatible(item, actual[key])
@@ -899,6 +945,8 @@ class Reduction:
         def align(shape: Any, actual: Any) -> None:
             if isinstance(shape, Unobserved):
                 record(shape, actual)
+            elif isinstance(shape, Deferred):
+                projections.append((shape, actual))
             elif isinstance(shape, dict) and isinstance(actual, dict):
                 explicit = {key for key in shape if isinstance(key, str)}
                 for key, item in shape.items():
@@ -923,6 +971,7 @@ class Reduction:
                     align(shape, actual)
                 else:
                     results.clear()
+                    projections.clear()
                     break
                 witnessed += 1
 
@@ -939,11 +988,17 @@ class Reduction:
                 concrete(resolved)
                 return resolved
             if isinstance(value, Deferred):
+                observed = [actual for shape, actual in projections if shape == value]
+                if len(observed) == 1:
+                    concrete(observed[0])
+                    return observed[0]
                 args = [bind(arg) for arg in value.arguments]
                 if value.operation == 'parse':
                     parsed = json.loads(args[0])
                     concrete(parsed)
                     return parsed
+                if value.operation == 'member':
+                    return args[0][args[1]]
                 if value.operation in {'===', '==', '!==', '!='}:
                     equal = type(args[0]) is type(args[1]) and args[0] == args[1]
                     return equal if value.operation in {'===', '=='} else not equal
@@ -998,6 +1053,9 @@ class Reduction:
             if not effectful(node):
                 return
             condition = self.value(node[1], env, saved)
+            if condition is None or isinstance(condition, (dict, list, str)):
+                # JSON null/strings/containers have unambiguous JS truthiness.
+                condition = False if condition is None else bool(condition) if isinstance(condition, str) else True
             if (isinstance(condition, (Unobserved, Deferred)) and not tool_sites(node)
                     and not mutating(node) and node[3] is None):
                 self.guards.append(condition)
@@ -1055,6 +1113,10 @@ def concrete(value: Any, _budget: list[int] | None = None) -> None:
     if type(value) is int:
         if abs(value) > 2**53 - 1:
             raise Unsupported('number_limit')
+        return
+    if type(value) is float and math.isfinite(value) and abs(value) <= 2**53 - 1:
+        # Captured tool timing is inert JSON data; arithmetic/serialization of
+        # floats is deliberately unsupported by the evaluator above.
         return
     if type(value) is bool or value is None:
         return

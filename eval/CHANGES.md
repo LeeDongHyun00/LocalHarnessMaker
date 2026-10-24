@@ -1,3 +1,38 @@
+# Protected listings, transport diagnostics and remaining code chains — 2026-10-24
+
+Resolve only supported literal-basename ancestor listings backed by their own
+unique, complete paired command output. Verify every positive filter and every
+returned path; protect grading copies, private storage and all eval runtimes,
+including the current one. Record `protected_listing_without_exposure` with
+input/completion lines. Wildcards, unsafe names, second protected operands,
+unknown command forms, missing/ambiguous output and truncation keep detection.
+Pin the new listing implementation in regrade provenance.
+
+Retain both supplied exec error items as transport diagnostics, without tool
+classification. Reject malformed/expanded error records. Extend the bounded
+reducer for both still-unresolved call chains: captured-delimiter regex split,
+first regex match, positive literal loop steps, JSON indentation and displayed
+parsed-field provenance. Preserve finite tool timing floats as inert metadata;
+float serialization and mixed-type arithmetic stay unsupported.
+
+Add synthetic-path/output fixtures for all six listings, both transport
+messages and both full code-mode chains, plus refusal variants. The first
+native listing explicitly says its output was truncated for persistence;
+its complete exec version resolves, while that native record keeps
+`protected_path`. Both unresolved chains required code changes and now resolve
+offline. Original host streams/reports were not repaired or regraded here.
+
+Assumptions: paired command completion records are the evidence for observed
+listing output. The supplied excerpts do not establish complete historical
+capture. Source locations and host paths are absent from the new fixtures.
+All graders/model transports are synthetic or mocked. No frozen inputs,
+shared schema/CLI flags, other checkout, staging or commits change.
+
+Validation: focused listing/code-chain/regrade provenance regressions — 82
+passed in 3.34s. `.venv/bin/python -m pytest tests/eval -q` — 2004 passed
+in 372.36s. Nine fixture hashes / 50 synthetic records and the exact
+18-path scope/STATUS audit pass; nothing is staged or deleted.
+
 # Native sleep and post-exit day-1 recovery — 2026-10-24
 
 Classify native Extension items by kind. Accept the observed clock.sleep shape

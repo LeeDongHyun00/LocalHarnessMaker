@@ -1,5 +1,9 @@
 ## Done
 
+- Verified the full evaluation package after the listing/transport/code-chain fixes, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2004 passed in 372.36s; `git diff --check`: exit 0; inline exact-scope/fixture/STATUS audit: PASS, 18 authorized paths, nine fixture hashes / 50 records, six headings, zero staged/deleted paths).
+- Implemented paired-output literal-basename listing proofs, transport-error diagnostics and bounded reducer support for both supplied unresolved chains; added nine hash-pinned synthetic-path/output fixtures, refusal cases and regrade implementation provenance (`.venv/bin/python -m pytest tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 82 passed in 3.34s).
+- Verified the six complete exec listing fixtures resolve and both code chains now audit clean; preserved protected_path on the first native listing's explicit persistence truncation and refused wildcard/protected-output/missing-evidence/second-operand variants (`.venv/bin/python -m pytest tests/eval/test_audit_records_3.py -q`: 81 passed in 1.28s).
+
 - Verified the complete eval package after the native sleep/recovery changes, updated README/CHANGES and this status, and preserved frozen inputs/reports/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 1923 passed in 369.23s; `git diff --check`: exit 0; inline authorized-scope/verbatim-fixture/STATUS audit: PASS, 11 exact paths, six headings, zero staged/deleted paths).
 
 - Preserved legacy v1 digest/artifact/published-copy validation for existing final-attempt pins, including unchanged source manifests, alias protections and negative cases; pinned the recovery selector in continuation provenance (`.venv/bin/python -m pytest tests/eval/test_day1_audit_recovery.py tests/eval/test_continue_day2.py tests/eval/test_recovery_boundaries.py -q`: 148 passed in 106.84s; `.venv/bin/python -m pytest tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 1 passed in 2.95s).
@@ -82,6 +86,8 @@
 
 ## Remaining
 
+- Host/Claude: transfer this listing/transport/code-chain follow-up and re-audit the original retained streams with original pinned graders. All six complete exec listing fixtures and both previously unresolved code chains now resolve offline. The access-policy native listing explicitly contains a persistence truncation marker, so its protected_path remains; do not treat the complete exec capture as a waiver for the truncated native record. No actual host task/report was repaired here.
+
 - Host/Claude: transfer this native sleep/post-exit day-1 recovery follow-up and run continue_day2 on the retained v2 harness task using original pinned inputs/graders. Confirm attempt 3 receives its missed verifier check, a validated handoff reaches day 2, and result.json/continuation.json disclose recovery-time hash and verification timestamps. This offline worktree did not recover the actual host run.
 
 - Host/Claude: transfer this runtime-provenance follow-up and re-audit the complete original streams for all five supplied baseline-B tasks and the baseline-A rate-budgets day-2 shell record with original pinned graders. All supplied excerpt sequences now resolve in synthetic offline audits; this does not establish historical validity or repair retained reports. Keep any other unknown/missing evidence inconclusive.
@@ -104,6 +110,10 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Resolve ancestor listings only from their own unique, complete command completion and safe literal positive basenames: no output line may expose protected storage or any eval runtime, and every other operand retains the ordinary audit. A truncation marker keeps protected_path even if another capture is complete.
+- Retain exec error items as metadata diagnostics with messages and evidence hashes: transport outages have no tool/file effect, while expanded or malformed records remain inconclusive.
+- Extend only bounded source-closed data operations for the two remaining chains: the hash manifest needs regex split/match, positive literal loop steps, indentation and inert timing metadata; the inventory call needs parsed-field references. Ambiguous projections and its variable-length display tail cannot export a saved report; comparison-only loads need no operand reduction.
 
 - Classify native Extension items by kind and accept only the observed clock.sleep fields: sleeping supplies no file/process operands; other kinds include their kind in unsupported_native_item and remain inconclusive.
 - Reuse the ordinary pending-verification runner for a narrowly identified harness day-1 gap: re-audit intact retained manifests first, preserve any historical final-attempt hash, or record an explicit recovery-time snapshot when absent; then verify, generate/validate the handoff and continue day 2 without modifying the source.
@@ -184,6 +194,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`
+
 - `.venv/bin/python -m pytest tests/eval/test_day1_audit_recovery.py tests/eval/test_continue_day2.py -q`
 
 - `.venv/bin/python -m pytest tests/eval/test_runtime_records.py tests/eval/test_derived_inputs.py tests/eval/test_access_audit.py -q`
@@ -229,6 +241,9 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- Synthetic paths, source text, hash values and output lines preserve the supplied code shapes; the two transport messages and native truncation marker retain their observed text. Offline fixture cleanliness does not establish full historical capture or host report validity.
+- Original host re-audit/regrade remains external work with the original pinned inputs and graders: this session makes no model calls and accesses no actual private grader storage or other checkout.
 
 - The supplied native sleep line is the available verbatim evidence for this job. Synthetic three-attempt harness runtimes and graders establish recovery behavior; an absent historical attempt-3 hash permits only a disclosed current snapshot, not reconstruction of original exit-time bytes. Host quality/validity remains unmeasured here, and all executor/controller/verifier transports in the regression are mocked.
 

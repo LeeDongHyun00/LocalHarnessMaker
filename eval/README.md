@@ -411,6 +411,50 @@ also stay inconclusive. Native `Extension` items are classified by `kind`:
 Extra item fields or malformed sleep fields are inconclusive. Other Extension
 kinds remain `unsupported_native_item`, including the kind in the diagnostic.
 The supplied sleep record is retained verbatim in a hash-pinned fixture.
+
+Name-filtered ancestor enumeration can resolve as
+`protected_listing_without_exposure` in `access-audit.json.resolutions`.
+The command must be a single supported `rg --files` or `find` listing whose
+positive filters are literal basenames, excluding Python, hidden-test,
+grader/reference and configured grader names. Exclusion globs are allowed.
+Every branch of a supported find expression must require a positive name;
+execution, early printing, unknown options and compound shell commands receive
+no exception. No other operand or working directory may touch a protected root.
+
+Require the command's own unique `item.completed` output, with a terminal
+status and integer exit code. Pair ordinary items by ID and command; pair
+code-mode calls with their intervening native command completion inside that
+call's boundary. Never borrow evidence across sessions or repeated invocations.
+Reject missing output, truncation markers/flags, unterminated or unparseable
+lines, and any returned path under a protected root, any `lhm-eval-*` runtime
+(including the current task), or the current runtime's other directories.
+Record both input and completion line numbers. Other access/error checks remain
+in force. One supplied native listing contains an explicit persistence
+truncation marker although its exec capture is complete: the native record
+retains `protected_path`; this rule does not repair that historical task.
+
+Exec `item.completed` items of type `error` with only ID/type/message fields
+are metadata, never tool calls. Retain their log, line, redacted message and
+evidence hash in the audit's `diagnostics` as `transport_error`. Extra effect
+fields or malformed messages remain inconclusive. Diagnostics and resolutions
+are audit-artifact details; the shared report schema and CLI are unchanged.
+
+Synthetic-path fixtures in `tests/eval/fixtures/audit-records-3/` cover all six
+listing commands, both transport messages and both complete code-mode call
+chains. Paths, source text, hash values and command output lines are synthetic;
+code shapes and the observed native truncation marker are preserved. Both
+previously unresolved chains need the new reducer: bounded regex
+`split` with captured delimiters, first-result `match`, positive integer loop
+steps, and JSON indentation support the hash extraction; projected parsed JSON
+fields support the inventory call. Only uniquely paired displays establish
+projected stored values; its variable-length changed-file display tail cannot
+establish a stored report and has no later operand dependency in this excerpt.
+Observed finite timing floats may remain inert stored
+metadata, while float serialization and mixed-type arithmetic remain unsupported. Missing or
+ambiguous sources, unsafe regexes, live mutations and unknown tool operands
+still fail closed. A comparison-only missing load can remain outside operand
+reduction. Offline fixture results do not establish original-stream validity.
+
 The synthetic 33-record regression fixture preserves
 the supplied host session's structure and record order, with categorical
 discriminators retained and all task, identity, path and usage content replaced.

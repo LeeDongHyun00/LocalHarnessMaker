@@ -27,7 +27,7 @@ def audit_code_version() -> dict[str, str]:
     """Pin the audit implementation, including uncommitted parser changes."""
     directory = Path(__file__).parent
     return {name: digest((directory / name).read_bytes())
-            for name in ('audit.py', 'javascript.py', 'javascript_derived.py', 'fingerprint_history.py', 'regrade.py', 'telemetry.py',
+            for name in ('audit.py', 'protected_listing.py', 'javascript.py', 'javascript_derived.py', 'fingerprint_history.py', 'regrade.py', 'telemetry.py',
                          'core.py', 'workspace_verification.py')}
 
 

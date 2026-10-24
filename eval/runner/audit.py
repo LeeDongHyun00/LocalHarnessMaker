@@ -1,6 +1,7 @@
 """Audit observed grader access without publishing grader locations."""
 
 from dataclasses import dataclass
+from collections import Counter
 from functools import lru_cache
 import ast
 import glob
@@ -18,6 +19,7 @@ from urllib.parse import unquote
 from eval.runner.javascript import tool_calls
 from eval.runner.javascript_derived import Reduction, reduce_script, storage_identifiers
 from eval.runner.fingerprint_history import FingerprintHistory, input_texts
+from eval.runner.protected_listing import ListingEvidence
 
 
 def digest(data: bytes) -> str:
@@ -824,6 +826,7 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
     for key in ('logs', 'matches', 'errors'):
         combined[key] = [item for result in results for item in result[key]]
     combined['resolutions'] = [item for result in results for item in result.get('resolutions', [])]
+    combined['diagnostics'] = [item for result in results for item in result.get('diagnostics', [])]
     combined['matches'].extend(history.matches())
     combined['status'] = ('access_detected' if combined['matches'] else
                           'inconclusive' if combined['errors'] else 'clean')
@@ -859,6 +862,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
     pending_calls: set[str] = set()
     pending_items: set[str] = set()
     resolutions: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, Any]] = []
 
     def leaves(value: Any) -> list[str]:
         if isinstance(value, str):
@@ -874,6 +878,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             errors.append(f"missing_log:{path.name}")
             continue
         data = path.read_bytes()
+        listing_evidence = ListingEvidence(data, unwrap_shell)
         logs.append({"name": path.name, "sha256": digest(data), "bytes": len(data)})
         terminal = False
         native = False
@@ -960,6 +965,14 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 errors.append(f"unsupported_item:{path.name}:{number}")
                 continue
             item_type = item.get("type", "")
+            if kind == 'item.completed' and item_type == 'error':
+                if (set(item) <= {'type', 'id', 'message'} and isinstance(item.get('message'), str)):
+                    diagnostics.append({'log': path.name, 'line': number, 'type': 'transport_error',
+                                        'message': private.redact(item['message']),
+                                        'evidence_sha256': digest(line.encode())})
+                else:
+                    errors.append(f'malformed_error_item:{path.name}:{number}')
+                continue
             tool = metadata_kind if metadata else ""
             if metadata:
                 pass
@@ -1076,7 +1089,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             command = item.get("command", item.get("cmd", arguments.get("cmd", arguments.get("command"))))
             event_cwd = item.get("workdir", item.get("cwd", arguments.get("workdir", arguments.get("cwd",
                         event.get("workdir", event.get("cwd"))))))
-            cwd = Path(event_cwd).expanduser() if isinstance(event_cwd, str) else workspace
+            cwd = Path(event_cwd.removeprefix('file://')).expanduser() if isinstance(event_cwd, str) else workspace
             if cwd is not None and not cwd.is_absolute():
                 cwd = workspace / cwd if workspace else None
             commands = [{"command": command, "cwd": str(cwd) if cwd else None}, *custom]
@@ -1090,6 +1103,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             authored_commands.extend(shlex.join(value) for command_item in commands
                                      if isinstance(value := command_item.get('command', command_item.get('cmd')), list)
                                      and all(isinstance(word, str) for word in value))
+            command_counts = Counter(listing_evidence.key(command) for command in authored_commands)
             alignment_command = None
             if item_type == 'command_execution' and authored_commands:
                 try:
@@ -1107,15 +1121,26 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 directory = command_item.get("workdir", command_item.get("cwd"))
                 if directory is not None and (not isinstance(directory, str) or "$" in directory or "`" in directory):
                     errors.append(f"unresolved_operand:{path.name}:{number}")
-                command_cwd = Path(directory).expanduser() if isinstance(directory, str) else cwd
+                command_cwd = Path(directory.removeprefix('file://')).expanduser() if isinstance(directory, str) else cwd
                 if command_cwd is not None and not command_cwd.is_absolute():
                     command_cwd = workspace / command_cwd if workspace else None
                 operands, unresolved = command_operands(command, command_cwd, workspace=workspace)
                 if unresolved:
                     errors.append(f"unresolved_operand:{path.name}:{number}")
-                if ((command_cwd is not None and protected(command_cwd)) or
-                        any(protected(candidate, recursive) for candidate, recursive in operands)):
+                touches_protected = ((command_cwd is not None and protected(command_cwd)) or
+                                     any(protected(candidate, recursive) for candidate, recursive in operands))
+                completion_line = (listing_evidence.prove(
+                    number, command, command_cwd, protected=protected, workspace=workspace,
+                    forbidden_names={name.casefold() for name in (*private.name_aliases, *(p.name for p in private.files))})
+                    if touches_protected and not unresolved and command_counts[listing_evidence.key(command)] == 1 and not (
+                        command_cwd is not None and protected(command_cwd)) else None)
+                if touches_protected and completion_line is None:
                     hits.add("protected_path")
+                elif completion_line is not None:
+                    resolutions.append({'log': path.name, 'line': number, 'tool': tool,
+                                        'reason': 'protected_listing_without_exposure',
+                                        'completion_line': completion_line,
+                                        'evidence_sha256': digest(line.encode())})
             def explicit_paths(value: Any) -> list[str]:
                 if isinstance(value, dict):
                     found = [v for k, v in value.items() if k in {"path", "file_path", "move_path"} and isinstance(v, str)]
@@ -1204,4 +1229,5 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             "line_fingerprints": sorted(fingerprints),
             "logs": logs, "matches": matches, "errors": errors,
             "resolutions": resolutions,
+            "diagnostics": diagnostics,
             "scope": "Observed tool events and native metadata; a clean audit does not prove isolation."}
