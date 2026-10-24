@@ -1,0 +1,37 @@
+{
+  "template_status": "draft_not_approved",
+  "warning": "Design template only. Not accepted by the current runner. Replace task placeholder and pins after validation/freeze and obtain STOP-3 approval.",
+  "design_reference": "eval/tasks-v3/DESIGN.md",
+  "estimate_reference": "eval/reports/full-v3-a-estimate.md",
+  "tasks_placeholder": "Insert the same complete ordered frozen 54-task v3 manifest in A and H3; no tasks exist yet.",
+  "run_config": {
+    "name": "full-v3-a",
+    "task_root": "eval/tasks-v3",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "service_tier": "priority",
+    "harness": false,
+    "control_backend": "none",
+    "reinstruction_limit": 0,
+    "retry_limit": 0,
+    "seed": 0,
+    "codex_version": "PIN_AFTER_V3_HOOK_COMPATIBILITY_PROBE",
+    "tasks": null,
+    "timeout_seconds": 900,
+    "grading_timeout_seconds": 30,
+    "calibration": false
+  },
+  "execution_design": {
+    "mode": "standalone",
+    "plugin_enabled": false,
+    "executor_nested_guard": "1",
+    "clarification_responder": "hook_questions_only_so_A_never_receives_a_note",
+    "task_count": 54,
+    "two_session_tasks": 9,
+    "required_sessions": 63,
+    "pricing_snapshot": "openai-fast-short-2026-10-23-v1",
+    "pricing_snapshot_sha256": "PIN_EXISTING_SNAPSHOT_BYTES_BEFORE_RUN",
+    "population_sha256": "PIN_AFTER_PUBLIC_AND_PRIVATE_FREEZE",
+    "day2_delivery": "new_session_new_prompt_retained_workspace_no_runner_memory"
+  }
+}

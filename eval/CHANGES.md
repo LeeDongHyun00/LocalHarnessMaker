@@ -1,3 +1,47 @@
+# Version 3 evaluation design — 2026-10-25
+
+Replace the session's v2-recovery priority with the user-approved v3 design.
+Add `tasks-v3/DESIGN.md`: 54 independent task briefs in six shapes, 18 domains
+with three tasks each, 45 single-session tasks and nine two-session tasks.
+Specify the 60–85% A single-session difficulty target, disjoint calibration,
+grader/mutation/overlap/corpus acceptance gates and a stratified 20-task human
+review of table precision and completion accuracy against hidden grading.
+
+Document the deliberate ambiguity advantage: only an eligible question in H3's
+hook table earns the frozen author note; A has no hook and receives no reply.
+Define deterministic matching, question-only pause/resume, provenance, separate
+stratum reporting and plugin-contract dependencies without introducing paths,
+schemas or CLI flags. Describe real plugin installation/execution, nested-guard
+policy, SessionStart ledger injection, artifact hashing/audit, Luna JSONL pricing
+and report artifact references in README. The current runner is unchanged.
+
+Add wrapped, non-runnable A/H3 config templates with null task lists and draft,
+not-approved estimates. Plan 63 work sessions; A budgets $10.206000 at the
+existing Fast token scenario. H3 reserves 135 executor workloads plus 126 Luna
+calls (261 combined budget units), $22.883040, including up to nine clarification
+resumes and one deterministic-failure retry per session. These are scenario
+budgets, not usage measurements, spending approval or evidence of the <=15%
+cost-per-pass goal. No B arm; C remains optional and separately estimated.
+
+## Assumptions
+
+- Balanced 54-task allocation, sampling allocation, deterministic question matcher,
+  question-pause lifecycle, deadlines and workload assumptions are design choices.
+  Role 1/2 confirmation of artifact provenance, pause/resume and revision binding
+  precedes implementation. Exact plugin artifact paths come from AGENTS.md.
+- Work is confined to this r5/v2 worktree and its .venv. No task inputs, actual
+  graders, private-root lookup, model/network calls, installation, staging or
+  commits occur. Frozen v1/v2 configs/task sets/reports and interfaces stay intact.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 2115 passed in
+523.80s. Inline design audit — PASS: 54 unique briefs, six shapes × nine tasks,
+18 domains × three tasks, valid JSON-subset YAML templates rejected by the
+strict loader before execution, and matching session/call/cost arithmetic.
+`git diff --check` — exit 0. Inline scope/STATUS audit — PASS: eight exact
+paths, r5/v2, worktree .venv, six ordered headings, zero staged/deleted paths,
+v3 DESIGN only and valid local links. Frozen inputs/reports/interfaces and
+existing test/code files are unchanged.
+
 # Per-request context pricing — 2026-10-25
 
 Apply the pinned short-context bound to each native model request rather than
