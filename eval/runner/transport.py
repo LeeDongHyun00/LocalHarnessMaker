@@ -11,8 +11,9 @@ from eval.runner.telemetry import _instant, records, session_id
 
 REASON = 'executor_transport_failure'
 _TRANSPORT = re.compile(
-    r'Reconnecting\.\.\.\s*\d+/\d+\s*\(|stream disconnected before completion|'
+    r'Reconnecting\.\.\.|stream disconnected before completion|'
     r'workspace routing discovery|No route to host|request timed out|'
+    r'Connection failed|Transport error|failed to lookup address information|waiting for network|'
     r'Falling back from WebSockets to HTTPS transport', re.I)
 
 
@@ -25,7 +26,7 @@ def _message(event: dict[str, Any]) -> str | None:
 def _same(left: str, right: str) -> bool:
     """The terminal error may omit the reconnect counter/wrapper."""
     def normalize(value: str) -> str:
-        value = re.sub(r'^Reconnecting\.\.\.\s*\d+/\d+\s*\((.*)\)\s*$', r'\1', value, flags=re.I)
+        value = re.sub(r'^Reconnecting\.\.\.\s*[^\r\n(]*\((.*)\)\s*$', r'\1', value, flags=re.I)
         return value.strip().casefold()
     return normalize(left) == normalize(right)
 
@@ -39,7 +40,9 @@ def classify(segment: dict[str, Any], runtime: Path,
     or unsupported suffixes cannot establish a transport-only termination.
     Access auditing remains independent and is never waived by classification.
     """
-    if (type(segment.get('exit_code')) is not int or type(segment.get('attempt')) is not int or
+    deadline_kill = bool(segment.get('timed_out')) and segment.get('exit_code') in (-9, None)
+    if ((type(segment.get('exit_code')) is not int and not (
+            deadline_kill and segment.get('exit_code') is None)) or type(segment.get('attempt')) is not int or
             not isinstance(segment.get('events'), str)):
         return None
     if (segment.get('interrupted') or segment.get('exit_code') == -2 or
@@ -59,6 +62,7 @@ def classify(segment: dict[str, Any], runtime: Path,
         failed = False
         completed = False
         valid = True
+        deadline_only = True
         for number, line in enumerate(path.read_text(errors='replace').split('\n'), 1):
             if not line.strip():
                 continue
@@ -80,6 +84,7 @@ def classify(segment: dict[str, Any], runtime: Path,
             kind = event.get('type')
             if kind in {'turn.started', 'task_started'}:
                 suffix, failed, completed = [], False, False
+                deadline_only = True
                 continue
             if kind in {'turn.completed', 'task_complete'}:
                 suffix, completed = [], True
@@ -90,8 +95,13 @@ def classify(segment: dict[str, Any], runtime: Path,
             elif kind in {'error', 'turn.failed'}:
                 message = _message(event)
             elif kind in {'thread.started', 'session_meta', 'turn_context', 'token_count', 'thread_settings_applied'}:
+                deadline_only = False
                 continue
             else:
+                # A deadline needs an uninterrupted error-only suffix after
+                # completed work. Starting another item cannot be hidden by
+                # transport errors that arrive while that item is unfinished.
+                deadline_only = kind in {'item.completed', 'item_completed'} and isinstance(item, dict)
                 suffix, failed = [], False
                 continue
             if not isinstance(message, str) or not _TRANSPORT.search(message):
@@ -110,9 +120,9 @@ def classify(segment: dict[str, Any], runtime: Path,
                     continue
             suffix.append({'log': path.name, 'line': number, 'message': redact(message),
                            'evidence_sha256': digest(line.encode()), '_raw': message})
-        if path == events_path and (not valid or completed):
+        if path == events_path and (not valid or completed or deadline_kill and not deadline_only):
             return None  # A native rollout cannot override explicit executor completion/model failure.
-        if valid and suffix and (failed or segment.get('timed_out')) and not completed:
+        if valid and suffix and (failed or deadline_kill) and not completed and (not deadline_kill or deadline_only):
             return {'attempt': segment['attempt'], 'day': segment.get('day', 1), 'reason': REASON,
                     'exit_code': segment['exit_code'], 'timed_out': bool(segment.get('timed_out')),
                     'log_sha256': digest(path.read_bytes()),

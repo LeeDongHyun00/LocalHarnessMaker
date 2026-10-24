@@ -15,6 +15,11 @@ from tests.eval.test_runner import Executor, setup, two_session_config
 VERSION = 'codex-cli 0.162.0-alpha.17.2'
 TIMEOUT = 'stream disconnected before completion: No route to host (os error 65)'
 ROUTING = 'workspace routing discovery timed out'
+FIXTURES = Path(__file__).parent / 'fixtures/executor-transport'
+TAIL_HASHES = {
+    'deadline-tail.jsonl': '048063ce1e1bca36c88cd94da3692bed2586260220c8ce832352f7de8449aab5',
+    'deadline-tail-model-error.jsonl': 'b241b31104f1c33c54449c0f780888dca95f3303aaa704a77028ff088f80e8ae',
+}
 
 
 def error_item(message: str) -> dict[str, Any]:
@@ -56,9 +61,61 @@ def test_real_transport_shapes_keep_line_evidence(tmp_path: Path, shape: str) ->
     'stream disconnected before completion', 'workspace routing discovery timed out',
     'No route to host (os error 65)', 'request timed out',
     'Falling back from WebSockets to HTTPS transport',
+    'Reconnecting... waiting for network (Connection failed: error sending request)',
+    'Reconnecting... 1/5 (arbitrary reconnect reason)',
+    'Reconnecting... (another reason)', 'Connection failed: error sending request',
+    'Transport error: timeout', 'failed to lookup address information', 'waiting for network',
 ])
 def test_transport_error_family(tmp_path: Path, message: str) -> None:
     write_events(tmp_path / 'exec.jsonl', [error_item(message), {'type': 'turn.failed', 'error': {'message': message}}])
+    assert transport.classify({'attempt': 1, 'events': 'exec.jsonl', 'exit_code': 1}, tmp_path, str)
+
+
+@pytest.mark.parametrize('name', TAIL_HASHES)
+@pytest.mark.parametrize('exit_code', [-9, None])
+def test_verbatim_deadline_tail(tmp_path: Path, name: str, exit_code: int | None) -> None:
+    data = (FIXTURES / name).read_bytes()
+    assert digest(data) == TAIL_HASHES[name]
+    path = tmp_path / 'exec.jsonl'
+    path.write_bytes(data)
+    failure = transport.classify({'attempt': 1, 'events': path.name, 'exit_code': exit_code,
+                                  'timed_out': True}, tmp_path, str)
+    if name == 'deadline-tail-model-error.jsonl':
+        assert failure is None
+    else:
+        assert failure and failure['reason'] == transport.REASON
+        assert failure['exit_code'] == exit_code
+        assert [row['line'] for row in failure['errors']] == list(range(4, 16))
+        assert failure['log_sha256'] == TAIL_HASHES[name]
+        assert all(row['evidence_sha256'] == digest(data.splitlines()[row['line'] - 1])
+                   for row in failure['errors'])
+
+
+@pytest.mark.parametrize('tail', [
+    [{'type': 'item.started', 'item': {'id': 'later', 'type': 'command_execution'}}],
+    [{'type': 'unknown_event'}],
+    [{'type': 'token_count'}],
+    [{'type': 'error', 'message': 'Model could not produce a valid response'}],
+    [{'type': 'turn.completed'}, {'type': 'error', 'message': 'Model timeout'}],
+])
+def test_deadline_tail_cannot_restart_after_later_activity(tmp_path: Path, tail: list[dict[str, Any]]) -> None:
+    events = [json.loads(line) for line in (FIXTURES / 'deadline-tail.jsonl').read_text().splitlines()]
+    write_events(tmp_path / 'exec.jsonl', [*events[:8], *tail, *events[8:]])
+    assert transport.classify({'attempt': 1, 'events': 'exec.jsonl', 'exit_code': -9,
+                               'timed_out': True}, tmp_path, str) is None
+
+
+@pytest.mark.parametrize('exit_code,timed_out', [(None, False), (-9, False), (1, True), (0, True)])
+def test_deadline_tail_requires_kill_metadata(tmp_path: Path, exit_code: int | None, timed_out: bool) -> None:
+    (tmp_path / 'exec.jsonl').write_bytes((FIXTURES / 'deadline-tail.jsonl').read_bytes())
+    assert transport.classify({'attempt': 1, 'events': 'exec.jsonl', 'exit_code': exit_code,
+                               'timed_out': timed_out}, tmp_path, str) is None
+
+
+def test_reconnect_wrapper_matches_terminal_reason(tmp_path: Path) -> None:
+    message = 'Connection failed: error sending request'
+    write_events(tmp_path / 'exec.jsonl', [error_item(f'Reconnecting... waiting for network ({message})'),
+                                         {'type': 'turn.failed', 'error': {'message': message}}])
     assert transport.classify({'attempt': 1, 'events': 'exec.jsonl', 'exit_code': 1}, tmp_path, str)
 
 
@@ -105,8 +162,14 @@ class OutageExecutor(Executor):
         result = super().__call__(argv, **kwargs)
         if argv[0] != 'codex' or self.recover and self.calls > 1:
             return result
-        if self.shape in {'timeout', 'failed'}:
-            events = stream(self.shape)
+        if self.shape in {'timeout', 'failed', 'deadline_record', 'deadline_model_error'}:
+            if self.shape.startswith('deadline_'):
+                name = 'deadline-tail.jsonl' if self.shape == 'deadline_record' else 'deadline-tail-model-error.jsonl'
+                text = (FIXTURES / name).read_text().replace('/synthetic/runtime/workspace', str(kwargs['cwd']))
+                events = [{'type': 'thread.started', 'thread_id': 'unit-session'}, {'type': 'turn.started'},
+                          *[json.loads(line) for line in text.splitlines()]]
+            else:
+                events = stream(self.shape)
             if self.shape == 'timeout':
                 events.append({'type': 'error', 'message': 'request timed out'})
             # Retain measured usage even for a failed call; unknown usage is
@@ -124,7 +187,8 @@ class OutageExecutor(Executor):
         write_events(kwargs['stdout'], events)
         kwargs['stderr'].write_text('failed to refresh available models: request timed out\n'
                                     'http/request failed: error sending request for url (https://chatgpt.com/backend-api/...)\n')
-        return ProcessResult(-9, timed_out=True) if self.shape in {'timeout', 'model_timeout'} else ProcessResult(1)
+        return ProcessResult(-9, timed_out=True) if self.shape in {
+            'timeout', 'model_timeout', 'deadline_record', 'deadline_model_error'} else ProcessResult(1)
 
 
 def finished_run(root: Path, config: Path, out: Path, execute: Any) -> dict[str, Any]:
@@ -180,6 +244,36 @@ def test_regrade_reclassifies_legacy_outage_and_reaudit_is_readonly(
     assert report['accounting']['invalid_tasks'] == 1
     assert 'transport.py' in regrade.audit_code_version()
     assert json.loads((out / 'run-diagnostics.json').read_text())['executor_transport_failures']
+    assert before == {p: p.read_bytes() for p in source.rglob('*') if p.is_file()}
+
+
+@pytest.mark.parametrize('shape', ['deadline_record', 'deadline_model_error', 'model_timeout'])
+def test_regrade_retained_deadline_record(
+    setup: tuple[Path, Path, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch, shape: str,
+) -> None:
+    root, config, source = setup
+    with monkeypatch.context() as patch:
+        patch.setattr(transport, 'inspect', lambda *args: [])
+        original = finished_run(root, config, source, OutageExecutor(shape))
+    assert original['tasks'][0]['outcome'] == 'timeout'
+    before = {p: p.read_bytes() for p in source.rglob('*') if p.is_file()}
+
+    def forbidden(*args: Any, **kwargs: Any) -> ProcessResult:
+        pytest.fail('Retained deadline classification must not call models or graders')
+
+    out = tmp_path / 'regraded'
+    report = json.loads(regrade.regrade(root, source, out, execute=forbidden).read_text())
+    task = report['tasks'][0]
+    outage = shape == 'deadline_record'
+    assert task['outcome'] == ('invalid' if outage else 'timeout')
+    assert (transport.REASON in task['invalid_reasons']) == outage
+    assert task['grading'] is None
+    assert task['costs'] == original['tasks'][0]['costs']
+    diagnostics = json.loads((out / 'run-diagnostics.json').read_text())['executor_transport_failures']
+    assert bool(diagnostics) == outage
+    if outage:
+        assert [row['line'] for row in diagnostics[0]['errors']] == list(range(6, 18))
+        assert report['accounting']['invalid_tasks'] == 1
     assert before == {p: p.read_bytes() for p in source.rglob('*') if p.is_file()}
 
 
