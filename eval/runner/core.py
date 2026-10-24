@@ -91,7 +91,7 @@ def matching_workspace_digest_version(workspace: Path, recorded: dict[str, Any])
 
 
 def record_workspace_exit(workspace: Path, entry: dict[str, Any], segment: dict[str, Any]) -> None:
-    """Pin the current attempt after its verifier checks, using the current algorithm."""
+    """Pin current workspace bytes; recovery snapshots carry separate provenance."""
     value = workspace_digest(workspace)
     for record in (entry, segment):
         record.update(workspace_exit_sha256=value, workspace_digest_version=WORKSPACE_DIGEST_VERSION)
@@ -558,6 +558,10 @@ def run(
                     write_json(checkpoint, state)
                 entry.setdefault("verdicts", []).append(verdict)
                 entry.setdefault(f"verdicts_day{day}", []).append(verdict)
+                recovery = entry.get('day1_verification_recovery')
+                if day == 1 and recovery and recovery['attempt'] == attempt:
+                    recovery.update(verified_at=now(), verdict_sha256=digest(
+                        (control_runtime / f'verdict-{attempt}.json').read_bytes()))
                 entry["reinstruction"] = verdict["reinstruct_message"]
                 entry.pop("pending_verification", None)
                 write_json(checkpoint, state)
@@ -875,6 +879,8 @@ def run(
                   "session_id": session_id(event_paths), "segments": entry["segments"],
                   "two_session": two_session, "day2_observation": observation,
                   "grader_access_audit": access_audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
+        if 'day1_verification_recovery' in entry:
+            result['day1_verification_recovery'] = entry['day1_verification_recovery']
         write_json(task_out / "result.json", json.loads(private.redact(json.dumps(result))))
         # Preserve completed source only; no private grader or grading copy is published.
         if grading and grading.get("executor_already_exited") and not (task_out / "workspace").exists():

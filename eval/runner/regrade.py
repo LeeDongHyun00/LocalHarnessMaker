@@ -84,7 +84,9 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                     Path(s['events']).name != s['events'] for s in entry['segments'])):
             raise ValueError("Invalid retained runtime manifest or output location")
         if task in _fresh_tasks:
-            continue  # Fresh reruns never reuse the source workspace or grading.
+            # The caller owns subsequent workspace validation for deferred
+            # reruns/recovery; never reuse or grade their source workspace here.
+            continue
         if old_by_id[task]['two_session'] and not (
                 old_by_id[task]['outcome'] == 'invalid' and not entry.get('day2_observation') and
                 not any(s.get('day') == 2 for s in entry['segments'])):

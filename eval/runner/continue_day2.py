@@ -22,12 +22,13 @@ from eval.runner.control_accounting import control_calls
 from eval.runner.report import artifact, validate
 from eval.runner.publication import safe_source
 from eval.runner.workspace_verification import verify as verify_workspace
+from eval.runner.day1_recovery import pending_verification
 
 
 RECOVERABLE = {'incomplete_access_audit', 'missing_two_session_handoff_observation'}
 
 
-def eligible(task: dict[str, Any], entry: dict[str, Any]) -> bool:
+def eligible(task: dict[str, Any], entry: dict[str, Any], config: dict[str, Any] | None = None) -> bool:
     """Require only the two causal invalid reasons and consistent day-1 evidence."""
     result = entry.get('result', {})
     audit = result.get('grader_access_audit', {})
@@ -42,9 +43,10 @@ def eligible(task: dict[str, Any], entry: dict[str, Any]) -> bool:
                 len(task.get('executor_segments', [])) == len(segments) and
                 all(all(s.get(key) == published.get(key) for key in ('attempt', 'started_at', 'exited_at', 'exit_code'))
                     for s, published in zip(segments, task['executor_segments'])) and
-                all(s.get('day', 1) == 1 and type(s.get('exit_code')) is int and
-                    re.fullmatch(r'[0-9a-f]{64}', s.get('workspace_exit_sha256', '')) for s in segments) and
-                segments[-1]['workspace_exit_sha256'] == entry.get('workspace_exit_sha256'))
+                (pending_verification(entry, config or {}) or
+                 (all(s.get('day', 1) == 1 and type(s.get('exit_code')) is int and
+                      re.fullmatch(r'[0-9a-f]{64}', s.get('workspace_exit_sha256', '')) for s in segments) and
+                  segments[-1]['workspace_exit_sha256'] == entry.get('workspace_exit_sha256'))))
 
 
 def copy_runtime(entry: dict[str, Any], private: PrivateGraders,
@@ -131,13 +133,15 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
     original_bytes = (source / 'report.json').read_bytes()
     original = json.loads(original_bytes)
     source_state = json.loads((source / 'checkpoint.json').read_text())
+    config = source_state['config']
     candidates = {task['task_id'] for task in original['tasks']
-                  if eligible(task, source_state['tasks'][task['task_id']])}
+                  if eligible(task, source_state['tasks'][task['task_id']], config)}
     rows = {row['task_id']: row for row in reaudit.reaudit(private_root, source)}
     selected = sorted(task for task in candidates if rows[task]['status'] == 'clean')
     if not selected:
         raise ValueError('Continuation refused: no audit-recoverable day-1 task')
-    config = source_state['config']
+    recovering = frozenset(task for task in selected
+                           if pending_verification(source_state['tasks'][task], config))
     pricing = json.loads((core.REPOSITORY / 'eval/prices.yaml').read_text())
     if not extends(pricing, original['metadata']['pricing']):
         raise ValueError('Continuation refused: recorded pricing snapshot differs')
@@ -146,18 +150,40 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         raise ValueError('Continuation refused: installed Codex version differs')
     # Uses the recorded full-run estimate and the same budget guard as the runner.
     core.require_call_estimate(config)
-    # Regrade performs all source/report/task-set/exit-hash validation before
-    # creating output or trusted copies. Selected tasks still lack day 2 here,
-    # so they cannot be graded during this pass.
-    regrade.regrade(private_root, source, out, execute=execute)
+    # Regrade validates source/report/task-set provenance and historical pins.
+    # Audit-blocked tasks may have only the preceding attempt's
+    # exit pin. Regrade validates their run/task provenance but leaves them for
+    # the explicitly recorded post-exit verification below.
+    regrade.regrade(private_root, source, out, execute=execute, _fresh_tasks=recovering)
     base_report = json.loads((out / 'report.json').read_text())
     diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
     state = json.loads((out / 'checkpoint.json').read_text())
     source_tasks = {task['task_id']: task for task in original['tasks']}
+    prepared = copy.deepcopy(source_state['tasks'])
     for task in selected:
         private = PrivateGraders.load(private_root, task, core.REPOSITORY, task_root=config.get('task_root'))
-        state['tasks'][task] = copy_runtime(source_state['tasks'][task], private, source_tasks[task],
+        retained = prepared[task]
+        if task in recovering:
+            last = retained['segments'][-1]
+            recovery = {'attempt': last['attempt'], 'executor_exited_at': last['exited_at'],
+                        'snapshot_recorded_at': core.now(), 'verification_after_exit': True,
+                        'historical_exit_hash_available': 'workspace_exit_sha256' in last,
+                        'prior_workspace_exit_sha256': retained.get('workspace_exit_sha256')}
+            workspace = Path(retained['runtime']) / 'workspace'
+            if 'workspace_exit_sha256' in last:
+                if (last['workspace_exit_sha256'] != retained.get('workspace_exit_sha256') or
+                        verify_workspace(workspace, retained, source_tasks[task],
+                                         published_workspace=source / task / 'workspace') is None):
+                    raise ValueError('Continuation refused: retained attempt exit hash mismatch')
+            else:
+                core.record_workspace_exit(workspace, retained, last)
+            recovery['recovery_workspace_sha256'] = core.workspace_digest(workspace)
+            recovery['workspace_digest_version'] = core.WORKSPACE_DIGEST_VERSION
+            retained['day1_verification_recovery'] = recovery
+        state['tasks'][task] = copy_runtime(retained, private, source_tasks[task],
                                            published_workspace=source / task / 'workspace')
+        if task in recovering:
+            state['tasks'][task].update(completed_days=[], pending_verification=True)
     core.write_json(out / 'checkpoint.json', state)
     config_path = out / 'continuation-config.yaml'
     core.write_json(config_path, config)
@@ -166,7 +192,7 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         'source_run_id': original['metadata']['run_id'],
         'audit_code_version': regrade.audit_code_version() | {
             name: digest((Path(__file__).parent / name).read_bytes())
-            for name in ('core.py', 'harness.py', 'continue_day2.py')},
+            for name in ('core.py', 'harness.py', 'continue_day2.py', 'day1_recovery.py', 'reaudit.py')},
         'recorded_config_sha256': source_state['config_sha256'],
         'materialized_config_sha256': digest(config_path.read_bytes()),
         'selected_tasks': selected, 'status': 'pending', 'tasks': []}
@@ -223,11 +249,13 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
             'day1_started_at': day1[0]['started_at'], 'day1_exited_at': day1[-1]['exited_at'],
             'day2_started_at': day2[0]['started_at'] if day2 else None,
             'day2_exited_at': day2[-1]['exited_at'] if day2 else None, 'gap_seconds': gap,
-            'day1_workspace_exit_sha256': source_state['tasks'][task_id]['workspace_exit_sha256'],
+            'day1_workspace_exit_sha256': prepared[task_id]['workspace_exit_sha256'],
             'copied_workspace_sha256': day1[-1]['workspace_exit_sha256'], 'copy_hash_matched': True,
             'added_call_ids': [call['call_id'] for call in extra],
             'added_cost_usd': total([call['usage']['usd'] for call in extra])}
         evidence.update(entry.get('retained_audit_context', {}).get('workspace_verification', {}))
+        if task_id in recovering:
+            evidence['day1_verification_recovery'] = entry['day1_verification_recovery']
         if evidence.get('workspace_verification') in {'published_artifact_hashes', 'published_workspace_copy'}:
             observed_copy = entry['retained_audit_context']['workspace_copy']
             evidence.update(copied_workspace_sha256=observed_copy['sha256'],

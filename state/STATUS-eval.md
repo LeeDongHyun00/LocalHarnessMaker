@@ -1,5 +1,12 @@
 ## Done
 
+- Verified the complete eval package after the native sleep/recovery changes, updated README/CHANGES and this status, and preserved frozen inputs/reports/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 1923 passed in 369.23s; `git diff --check`: exit 0; inline authorized-scope/verbatim-fixture/STATUS audit: PASS, 11 exact paths, six headings, zero staged/deleted paths).
+
+- Preserved legacy v1 digest/artifact/published-copy validation for existing final-attempt pins, including unchanged source manifests, alias protections and negative cases; pinned the recovery selector in continuation provenance (`.venv/bin/python -m pytest tests/eval/test_day1_audit_recovery.py tests/eval/test_continue_day2.py tests/eval/test_recovery_boundaries.py -q`: 148 passed in 106.84s; `.venv/bin/python -m pytest tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 1 passed in 2.95s).
+
+- Implemented native Extension classification with a verbatim hash-pinned clock.sleep fixture; recovered a synthetic harness audit stop at attempt 3 through its missed ordinary verification, validated handoff and graded day 2, retaining post-exit snapshot/verdict provenance and source immutability (`.venv/bin/python -m pytest tests/eval/test_day1_audit_recovery.py -q`: 19 passed in 29.48s).
+- Confirmed current resolutions survive read-only re-audit and regrade for both FILE-header records and four retained code-mode sequences; unknown Extension kinds, malformed sleeps and still-dirty recovery remain refused (`.venv/bin/python -m pytest tests/eval/test_day1_audit_recovery.py -q`: 19 passed in 29.48s).
+
 - Verified the final evaluation package in this worktree's .venv, updated README/CHANGES and this handoff, and confirmed authorized scope with frozen files/interfaces unchanged and nothing staged or committed (`.venv/bin/python -m pytest tests/eval -q`: 1904 passed in 362.58s; `git diff --check`: exit 0; inline authorized-scope/STATUS audit: PASS, 14 exact paths, six headings, zero staged/deleted paths).
 - Compared all six fixture files to the supplied read-only records and confirmed the source-record location is absent from changed repository files (inline verbatim fixture/source-location audit: PASS, six files / 72 exact JSONL records).
 
@@ -75,6 +82,8 @@
 
 ## Remaining
 
+- Host/Claude: transfer this native sleep/post-exit day-1 recovery follow-up and run continue_day2 on the retained v2 harness task using original pinned inputs/graders. Confirm attempt 3 receives its missed verifier check, a validated handoff reaches day 2, and result.json/continuation.json disclose recovery-time hash and verification timestamps. This offline worktree did not recover the actual host run.
+
 - Host/Claude: transfer this runtime-provenance follow-up and re-audit the complete original streams for all five supplied baseline-B tasks and the baseline-A rate-budgets day-2 shell record with original pinned graders. All supplied excerpt sequences now resolve in synthetic offline audits; this does not establish historical validity or repair retained reports. Keep any other unknown/missing evidence inconclusive.
 - Host/Claude: transfer this verbatim-input and recovery-accounting follow-up, then regrade the retained continuation and harness recovery with original pinned inputs/private graders. Confirm all retained task provenance validates, the day-2 session is priced at the model default, and the selected harness task totals $0.03405012. This session checked supplied copies read-only and synthetic regrade paths; no host regrade or quality result is claimed.
 - Host/Claude: publish the user-supplied host population digest 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, type/family counts and 2026-10-24 freeze date through Role 1 in docs/eval-freeze-v2.md. The supplied B digest 3af558f5f0993bcac598c4f71772b14e884ea54a106a4988b2dd3d2f23a12b09 identifies only its 80-task selection. This worktree already has B's ordered 100-task task_population; ensure the main checkout uses it for report population identity. No host digest was recomputed here.
@@ -95,6 +104,10 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Classify native Extension items by kind and accept only the observed clock.sleep fields: sleeping supplies no file/process operands; other kinds include their kind in unsupported_native_item and remain inconclusive.
+- Reuse the ordinary pending-verification runner for a narrowly identified harness day-1 gap: re-audit intact retained manifests first, preserve any historical final-attempt hash, or record an explicit recovery-time snapshot when absent; then verify, generate/validate the handoff and continue day 2 without modifying the source.
+- Use current concrete resolutions in re-audit/regrade: historical parser errors cannot override a clean current audit, while residual errors, access and manifest changes still invalidate it.
 
 - Preserve helper state across scripts without store/save identifiers, including nonwriter failures and detected outputs: those scripts cannot change storage, while their own uncertainty/detection still controls the aggregate audit result.
 - Bind result fields through matched paired JSON displays and retain bounded JSON objects as well as text: real records use indexed Promise results and literal hash maps. Overridden, missing, ambiguous or unobserved fields never become load sources.
@@ -171,6 +184,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_day1_audit_recovery.py tests/eval/test_continue_day2.py -q`
+
 - `.venv/bin/python -m pytest tests/eval/test_runtime_records.py tests/eval/test_derived_inputs.py tests/eval/test_access_audit.py -q`
 
 - `.venv/bin/python -m pytest tests/eval -q`
@@ -214,6 +229,8 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The supplied native sleep line is the available verbatim evidence for this job. Synthetic three-attempt harness runtimes and graders establish recovery behavior; an absent historical attempt-3 hash permits only a disclosed current snapshot, not reconstruction of original exit-time bytes. Host quality/validity remains unmeasured here, and all executor/controller/verifier transports in the regression are mocked.
 
 - The supplied record sequences are read-only evidence excerpts, not complete original execution streams. Tests preserve every supplied script verbatim and add synthetic identity/graders; no host runtime, actual private grader or historical quality result was inspected or regenerated here.
 - This session is limited to eval/, tests/eval/ and this STATUS file in the separate r5/v2 worktree using its .venv. Network, nested executors and live executor/controller/judge calls remain unavailable; no staging or commits are authorized.

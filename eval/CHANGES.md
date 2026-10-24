@@ -1,3 +1,37 @@
+# Native sleep and post-exit day-1 recovery — 2026-10-24
+
+Classify native Extension items by kind. Accept the observed clock.sleep shape
+as benign metadata with strict duration/identity/timestamp validation; preserve
+the supplied record verbatim in a hash-pinned fixture. Unknown kinds remain
+unsupported_native_item with their kind in the diagnostic, and malformed or
+expanded sleep items remain inconclusive.
+
+Continue audit-blocked harness day 1 through the ordinary missed verifier call,
+then handoff generation/validation and the existing day-2 runner. Re-audit all
+retained streams and manifests before selection. Preserve a final-attempt exit
+pin if present; when absent, record recovery-time bytes explicitly rather than
+using the preceding attempt's hash. Keep the source runtime/checkpoint unchanged.
+Task results and continuation provenance retain the snapshot, executor exit and
+actual post-exit verification times, hash/digest version and verdict hash.
+Non-harness and ordinary regrade hash requirements remain unchanged.
+
+Regression re-audit/regrade tests confirm both FILE-header records and four
+runtime code-mode sequences use their current resolutions and become clean,
+without waiving residual errors/access or manifest checks. All model/executor
+transports are mocked with synthetic graders; actual host recovery is pending.
+No frozen tasks, reports, shared schemas or CLI flags change.
+
+Assumptions: the supplied record is an excerpt. A recovery snapshot establishes
+current retained workspace bytes, not historical exit-time integrity. Original
+host logs/private graders are unavailable in this worktree.
+
+Validation: recovery/native/resolution and existing legacy continuation
+regressions — 148 passed in 106.84s; regrade provenance regression — 1 passed
+in 2.95s. `.venv/bin/python -m pytest tests/eval -q` — 1923 passed in
+369.23s. `git diff --check` and the final scope/fixture/STATUS audit pass:
+11 exact authorized paths, six STATUS headings, zero staged/deleted paths,
+verbatim fixture bytes and no source-record location in changed files.
+
 # Runtime store provenance and computed operands — 2026-10-24
 
 Resolve the five supplied baseline-B code-mode sequences with complete paired

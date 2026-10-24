@@ -11,6 +11,7 @@ from typing import Any
 from eval.runner import core
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
 from eval.runner.workspace_verification import verify as verify_workspace
+from eval.runner.day1_recovery import pending_verification
 
 
 class InputParser(argparse.ArgumentParser):
@@ -70,6 +71,8 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
             if not workspace.is_dir():
                 errors.add("missing_retained_workspace")
             elif ("workspace_exit_sha256" in entry and
+                  not (pending_verification(entry, state.get('config', {})) and
+                       'workspace_exit_sha256' not in segments[-1]) and
                   verify_workspace(workspace, entry, published_tasks[task],
                                    published_workspace=out / task / 'workspace') is None):
                 errors.add("workspace_exit_hash_mismatch")

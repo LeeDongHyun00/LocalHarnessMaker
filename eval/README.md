@@ -384,6 +384,9 @@ combine into a private path. Successful reductions record log/line/hash and
 `reason=derived_from_audited_outputs` in `access-audit.json.resolutions`; this
 never overrides detected access or another unresolved audit item. Unknown
 sources feeding an operand remain inconclusive under STOP-E4.
+Read-only re-audit and regrade use these current resolutions from the complete
+retained streams; historical parser errors do not override a now-clean audit.
+Resolutions never waive a changed manifest, remaining parser error or access.
 
 Hash-pinned fixtures in `tests/eval/fixtures/runtime-records/` retain all supplied
 code-mode scripts and paired records for five baseline-B tasks, plus the
@@ -402,7 +405,13 @@ host work.
 
 Dynamic directories, unknown tools and unsupported
 custom code stay inconclusive. Other unknown record/item kinds
-also stay inconclusive. The synthetic 33-record regression fixture preserves
+also stay inconclusive. Native `Extension` items are classified by `kind`:
+`clock.sleep` is benign metadata only with the observed ID, nonnegative integer
+`durationMs`, thread/turn IDs and ordered integer start/completion timestamps.
+Extra item fields or malformed sleep fields are inconclusive. Other Extension
+kinds remain `unsupported_native_item`, including the kind in the diagnostic.
+The supplied sleep record is retained verbatim in a hash-pinned fixture.
+The synthetic 33-record regression fixture preserves
 the supplied host session's structure and record order, with categorical
 discriminators retained and all task, identity, path and usage content replaced.
 Additional synthetic cases preserve the retained interval-union session's
@@ -996,6 +1005,17 @@ other invalid reasons and still-inconclusive evidence are never selected. Findin
 eligible task is an input error. All source exit hashes, selected/population
 input hashes and report/config provenance receive the normal regrade checks.
 
+An audit-blocked harness attempt may have stopped before its final day-1
+verification. Continuation also accepts this narrow case: all earlier attempts
+have exit hashes and failed verdicts with re-instructions, the last successful
+attempt has no verdict, and no handoff or day-2 execution exists. Re-audit must
+first be clean with unchanged log/grader manifests. If the last attempt has no
+exit hash, the preceding attempt's hash is not applied to its workspace.
+Instead, recovery records a current workspace snapshot and copy hash check;
+this establishes recovery-time bytes, not an original exit-time measurement.
+An existing final-attempt hash must still match. Non-harness hash requirements
+and ordinary regrade's refusal of missing historical pins are unchanged.
+
 `--out` must be fresh. The source run and every source runtime stay unchanged.
 The command re-audits/regrades all other tasks just as regrade does, retaining
 their original accounting. For each selected task it copies the retained
@@ -1013,6 +1033,14 @@ retry limits, nested guard and cost-estimate guard use the recorded config.
 Historical log bytes are audited in their original workspace context with
 pinned hashes; new events protect the original runtime as well as private
 storage and grading copies. Changed historical logs/workspaces are inconclusive.
+For an audit-blocked attempt, the runner first uses the ordinary verifier call
+at the retained attempt number on the copied public workspace and retained
+native transcripts, honoring the recorded retry limit. It then generates and
+validates the handoff before day 2. The task's `result.json` and continuation
+provenance retain `day1_verification_recovery`: executor exit, recovery snapshot
+and actual verification times, current hash/digest version, verdict hash, and
+whether an original final-attempt exit hash existed. Verification is explicitly
+marked as occurring after exit; the source checkpoint is never repinned.
 No Codex session runs in a grading copy. Eligible completed day-2 work is graded
 once, after exit, in a fresh trusted copy.
 

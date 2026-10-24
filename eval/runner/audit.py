@@ -708,6 +708,18 @@ def valid_native_metadata(kind: str, payload: Any) -> bool:
     """Validate the observed snapshot/usage envelope, allowing evolving fields."""
     if not isinstance(payload, dict):
         return False
+    if kind == "clock.sleep":
+        item = payload.get("item")
+        return (isinstance(item, dict) and
+                set(item) == {"type", "kind", "id", "durationMs"} and
+                item["type"] == "Extension" and item["kind"] == kind and
+                isinstance(item["id"], str) and bool(item["id"]) and
+                type(item["durationMs"]) is int and item["durationMs"] >= 0 and
+                all(isinstance(payload.get(key), str) and payload[key]
+                    for key in ("thread_id", "turn_id")) and
+                all(type(payload.get(key)) is int and payload[key] >= 0
+                    for key in ("started_at_ms", "completed_at_ms")) and
+                payload["completed_at_ms"] >= payload["started_at_ms"])
     if kind == "world_state":
         return type(payload.get("full")) is bool and isinstance(payload.get("state"), dict)
     if kind == "thread_settings_applied":
@@ -919,6 +931,17 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                     errors.append(f"malformed_event_msg:{path.name}:{number}")
                     continue
                 event_type = payload.get("type")
+                if (event_type in {"item_started", "item_completed"} and
+                        isinstance(payload.get("item"), dict) and
+                        payload["item"].get("type") == "Extension"):
+                    extension_kind = payload["item"].get("kind")
+                    if extension_kind != "clock.sleep":
+                        errors.append(f"unsupported_native_item:{path.name}:{number}:{extension_kind}")
+                    elif not valid_native_metadata(extension_kind, payload):
+                        errors.append(f"malformed_clock.sleep:{path.name}:{number}")
+                    # Extensions have no ordinary tool operands. Only the exact
+                    # observed sleep shape is supported; new fields fail closed.
+                    continue
                 if event_type == "item_completed":
                     item = payload.get("item")
                     if isinstance(item, dict):
