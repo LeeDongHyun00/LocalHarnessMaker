@@ -131,6 +131,8 @@ def regrade(private_root: Path, source: Path, out: Path, *,
             audit['status'] = 'inconclusive'
         result = copy.deepcopy(entry['result'])
         if audit['status'] == 'clean':
+            from eval.runner.pricing import recover_default_tiers
+            recover_default_tiers(entry, config)
             recover_partial_usage(entry['segments'], [p for p in paths if p not in
                                   {runtime / s['events'] for s in entry['segments']}])
             new_state['tasks'][task]['segments'] = copy.deepcopy(entry['segments'])
@@ -188,10 +190,11 @@ def regrade(private_root: Path, source: Path, out: Path, *,
         if verification['workspace_verification'] == 'published_artifact_hashes':
             # Preserve the original published pins for subsequent retained recovery.
             shared['artifacts'].extend(copy.deepcopy(ref) for _, ref in workspace_artifacts(old_task))
-        # Regrading does not change executor/control accounting or observations.
-        for key in ('calls', 'costs', 'done_claims'):
-            shared[key] = copy.deepcopy(old_task[key])
-        from eval.runner.pricing import preserve_provenance
+        # Preserve known historical prices while completing retained, previously
+        # unpriced calls and a proven prelaunch-collision accounting gap.
+        from eval.runner.pricing import preserve_provenance, merge_regraded_accounting
+        merge_regraded_accounting(shared, old_task)
+        shared['done_claims'] = copy.deepcopy(old_task['done_claims'])
         preserve_provenance(shared, task_out, prior=old_task, pricing=original['metadata']['pricing'])
         tasks.append(shared)
     report['tasks'] = tasks

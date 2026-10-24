@@ -1,0 +1,120 @@
+{
+  "task_id": "feature-plus-test-interval-union",
+  "task_type": "feature_plus_test",
+  "two_session": false,
+  "outcome": "pass",
+  "invalid_reasons": [],
+  "attempts": 1,
+  "executor_segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T03:31:05.218529+00:00",
+      "exited_at": "2026-10-23T03:31:59.334496+00:00",
+      "exit_code": 0,
+      "session_id": "01a166cf-ee13-7793-b6ab-411730fd0f1e",
+      "events": {
+        "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3yme_75h/exec-1.jsonl",
+        "sha256": "39a1a965ac665740b2ba7734f297361cf6d2de8a63e528b8911f134dc5511869"
+      }
+    }
+  ],
+  "grader_access_audit": {
+    "method": "access_audit",
+    "status": "clean",
+    "private_grader_roots": [
+      "sha256:9b9a66b6501c0338fb673335bb32e6be6f962d52ca6c692d197eb4886c35c02a"
+    ],
+    "reason": null,
+    "matches": []
+  },
+  "grading": {
+    "copy_path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-retained-grading/grading-622214821d3a4a25b1ffcb14dd5a42fc",
+    "copied_at": "2026-10-23T14:44:26.174695+00:00",
+    "grader_source_outside_repo": true,
+    "result": "pass",
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "log": {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/grading.log",
+      "sha256": "0f8aa4ec3f07bbce82dfbc0509f532014e4ef6fbc1ca1c42cdb29dbad4bed73b"
+    }
+  },
+  "done_claims": {
+    "claimed_items": 0,
+    "claimed_without_evidence": 0
+  },
+  "calls": [
+    {
+      "call_id": "feature-plus-test-interval-union-exec-1",
+      "purpose": "executor",
+      "backend": "codex_cli",
+      "model": "gpt-6.1-sol",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 59176,
+        "cached_input_tokens": 55936,
+        "output_tokens": 1140,
+        "usd": 0.023473599999999997,
+        "latency_seconds": 54.1141423529989,
+        "cost_basis": "api_equivalent_usd",
+        "pricing_ref": "openai-standard-short-2026-10-22-v1"
+      }
+    }
+  ],
+  "costs": {
+    "executor_usd": 0.023473599999999997,
+    "control_usd": 0,
+    "total_usd": 0.023473599999999997
+  },
+  "artifacts": [
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/access-audit.json",
+      "sha256": "3c28066d570523a895e292b2577518341e559009767d92045eba3c1bbff39bc0"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/calibration.json",
+      "sha256": "66a4de1b40fe711c16108c735e08955c3fe152c1bf8d760a5945ad8485ed2fd0"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/exec-1.jsonl",
+      "sha256": "39a1a965ac665740b2ba7734f297361cf6d2de8a63e528b8911f134dc5511869"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/exec-1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/final-1.md",
+      "sha256": "028a97ef1e688daf13a20dc20c7bd7bd9b3857fd7917c2ffddaed4bcd544b03c"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/grading.log",
+      "sha256": "0f8aa4ec3f07bbce82dfbc0509f532014e4ef6fbc1ca1c42cdb29dbad4bed73b"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/result.json",
+      "sha256": "75e09790a21320e04953ddf7652347ae0ff0d0da39c3ef24f6bfd11bad0862c4"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/session-evidence.jsonl",
+      "sha256": "b13e7ed287a3f9b6a5aee1fa08156ef65380271e30de89e84581397495330b68"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/task-completion.json",
+      "sha256": "fa1349b7654d2e8edda24b6538a9e3e152e3474af5a9b0b3ae737b91e9dc7d94"
+    },
+    {
+      "path": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-3yme_75h/codex-home/sessions/2026/10/23/rollout-2026-10-23T12-31-06-01a166cf-ee13-7793-b6ab-411730fd0f1e.jsonl",
+      "sha256": "08d5420544ca1cf2551f9adc3191ad07ed1992d97803fe68b1ee882cc1d96d03"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/feature-plus-test-interval-union/pricing-provenance.json",
+      "sha256": "ffffa2b3109197370223c47a8a87a5be696fe08385eacf8eabb39e9c28945342"
+    },
+    {
+      "path": "eval/reports/full-a-continued2/task-completion-summary.json",
+      "sha256": "de3ede29a1a4705bec4a6bd810145f39eedbf2fa2ef96b1f8c1aaa0c2c9289a1"
+    }
+  ],
+  "handoff": null
+}

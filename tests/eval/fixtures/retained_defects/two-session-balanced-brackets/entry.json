@@ -1,0 +1,68 @@
+{
+  "segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T04:43:24.022737+00:00",
+      "events": "exec-1.jsonl",
+      "stderr": "exec-1.stderr",
+      "day": 1,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T04:44:02.015419+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 37.972105918001034,
+      "native_usage": {
+        "input_tokens": 59525,
+        "cached_input_tokens": 52608,
+        "output_tokens": 1294
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/codex-home/sessions/2026/10/23/rollout-2026-10-23T13-43-24-01a16712-2292-7333-896e-bdec48b155fc.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "2b5662a7c736338dc648721cc41dd7d7c4a5b011989dfdebe775bb6d024fec96"
+    },
+    {
+      "attempt": 2,
+      "started_at": "2026-10-23T15:02:01.196293+00:00",
+      "events": "exec-2.jsonl",
+      "stderr": "exec-2.stderr",
+      "day": 2,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T15:02:47.103675+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 45.866890935998526,
+      "evidence_sha256": {
+        "exec-2.jsonl": "65a0cf3e73a0a833d3b37965fef821e4955873bf63d7fdbe9b57f1981ac14e97",
+        "exec-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "final-2.md": "d307def18af12d3430186a5c5bdbf21645013a31411af28de12431b45cb9f66c"
+      },
+      "pricing_evidence": {
+        "tier": "unknown",
+        "basis": "new native thread_settings_applied records captured at process exit",
+        "records": [
+          {
+            "native_log": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/codex-home/sessions/2026/10/24/rollout-2026-10-24T00-02-01-01a16948-7fb4-7313-b216-1a0878060ac2.jsonl",
+            "record_sha256": "dc2607015aa3110467ae032e264653096ba3afac3533fb85bd10fb5ed2c7310c",
+            "observed_service_tier": null
+          }
+        ]
+      },
+      "native_usage": {
+        "input_tokens": 78522,
+        "cached_input_tokens": 72576,
+        "output_tokens": 1402
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/codex-home/sessions/2026/10/24/rollout-2026-10-24T00-02-01-01a16948-7fb4-7313-b216-1a0878060ac2.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "7404ff0768449f3d9042e47c3fd747a98004b972454d7f44bd2f036b9179f777",
+      "workspace_digest_version": 2
+    }
+  ],
+  "control_files": {}
+}

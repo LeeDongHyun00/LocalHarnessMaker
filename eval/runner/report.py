@@ -12,7 +12,7 @@ from eval.runner.publication import checkout_text, evidence_path
 
 from eval.metrics import METHOD, compute, metric, total
 from eval.runner.audit import digest
-from eval.runner.control_accounting import control_calls
+from eval.runner.control_accounting import control_calls, historical_control_cost
 from eval.runner.telemetry import records, session_id
 from eval.runner.pricing import select, report_pricing, pin_provenance, retained_provenance, snapshots
 from eval.runner.schema_compat import validate_schema
@@ -121,7 +121,7 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
                        "basis": "Prior rerun accounting retained; see source artifacts in rerun provenance.",
                        "pricing_ref": c["usage"]["pricing_ref"]} for c in history["calls"]] + provenance
         calls = history["calls"] + calls
-        control_usd = (None if history["control_usd"] is None or control_usd is None else
+        control_usd = (None if historical_control_cost(history, meta) is None or control_usd is None else
                        total([c["usage"]["usd"] for c in calls if c["purpose"] != "executor"]))
         executor_usd = total([c["usage"]["usd"] for c in calls if c["purpose"] == "executor"])
     (out / "pricing-provenance.json").write_text(json.dumps(pin_provenance(provenance, pricing), indent=2) + "\n")

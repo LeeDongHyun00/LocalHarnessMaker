@@ -1,0 +1,60 @@
+{
+  "segments": [
+    {
+      "attempt": 1,
+      "started_at": "2026-10-23T16:56:20.172792+00:00",
+      "events": "exec-1.jsonl",
+      "stderr": "exec-1.stderr",
+      "day": 1,
+      "cli_version": "codex-cli 0.163.0-alpha.11.1",
+      "exited_at": "2026-10-23T16:56:49.312559+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "latency_seconds": 29.082636758997978,
+      "evidence_sha256": {
+        "exec-1.jsonl": "fa691b95012623869ee0625cbbe0658a87b025bce05b0dcee19706b403a8d4a4",
+        "exec-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "final-1.md": "88d668c5020de9f101fab1b14fc8fc4038e91449cebb46e062b63fab24bd4f88"
+      },
+      "pricing_evidence": {
+        "tier": "standard",
+        "basis": "Tier inferred from the model default; new native applied service_tier omitted/null at process exit",
+        "records": [
+          {
+            "native_log": "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nt_0ch_s/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-56-20-01a169b1-28a3-7cd1-828c-28fdd77ea468.jsonl",
+            "record_sha256": "12e0a92a9dc8fb57786f06555808ab33667704ac7f44381892a6c9572579a662",
+            "observed_service_tier": null
+          }
+        ]
+      },
+      "native_usage": {
+        "input_tokens": 62190,
+        "cached_input_tokens": 54144,
+        "output_tokens": 786
+      },
+      "usage_evidence": "Native event_msg.token_count cumulative delta; output includes reasoning",
+      "native_logs": [
+        "/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-nt_0ch_s/codex-home/sessions/2026/10/24/rollout-2026-10-24T01-56-20-01a169b1-28a3-7cd1-828c-28fdd77ea468.jsonl"
+      ],
+      "settings_verified": true,
+      "workspace_exit_sha256": "e7291af3ee0a2e5291afb0c1161b955fcdd847dc06943d049070e5feac139849",
+      "workspace_digest_version": 2
+    }
+  ],
+  "control_files": {
+    "contract.control.json": "eae6b0642215808354d3630d8044917a83458ed090363624648f71909f79cce4",
+    "contract.stdout": "cb484fc554a868d0492471a4094ca5d2fd97d27dddbd098d9302ea3e237a76ac",
+    "contract.stderr": "5018ade338907a6be5314ce0c862de277146900be14100a39a613c0129b302ef",
+    "contract.json": "4b6ea4504ba4cd47e017a9c7eb46bc6400b90991b46d3096e24ef562d98dfc71",
+    "transcript-1.jsonl": "035e9dda806d78d68b176ef87fa7ba804b15ced9b98fda3d314b0514bbfcce7e",
+    "verdict-1.control.json": "60172d04992b1d34ae4b674316c9a0327f00ea74f3a920123041389036a2b86c",
+    "verdict-1.stdout": "395db2b1a198f21cdff15c1337f435c3ffd146c67e8074bc295dbde7bfa48bcd",
+    "verdict-1.stderr": "96dd13da99f959a0c702fecec28e02a6625ad0d32339754cde3332b2af1e9ce4",
+    "verdict-1.json": "59a5f5000e7575299345adfbf6fd477a466b9cd77eb9cf20f4bfee46c6657551"
+  },
+  "rerun_history": {
+    "rerun_id": "c757b80e1bb04fe6989dfe9a780ac2e3",
+    "calls": [],
+    "control_usd": null
+  }
+}

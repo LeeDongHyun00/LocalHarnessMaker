@@ -1,5 +1,8 @@
 ## Done
 
+- Fixed the four retained-input/accounting defects with verbatim, hash-pinned source fixtures, conservative operand boundaries, exact historical provenance reconstruction, retained default-tier repricing and the empty prelaunch-collision history correction (`.venv/bin/python -m pytest tests/eval/test_retained_defects.py tests/eval/test_javascript.py tests/eval/test_host_audit_shapes.py -q`: 196 passed in 32.03s).
+- Checked the supplied reports read-only without accessing their historical runtimes: all 120 continuation task provenance entries resolve, its unpriced day-2 call computes $0.0331696, and the selected harness task computes control $0.00468372 / total $0.03405012 (`.venv/bin/python` inline retained-evidence inspection: 120/120 accepted; day2=0.0331696; control=0.004683720000000001; historical prelaunch=0.0; total=0.03405012).
+
 - Added exact multi-file code-mode patch regressions, canonical private-path checks for every header, variable-built patch rejection and process-pattern handling; classified structured control deadlines as control_timeout across backend configurations, retaining invalidity and infrastructure recovery eligibility. Used only this worktree's .venv, mocks and synthetic graders (`.venv/bin/python -m pytest tests/eval -q`: 1722 passed in 369.66s).
 - Updated CHANGES and this handoff; verified the exact authorized worktree scope, frozen inputs/reports/interfaces, STATUS headings and unstaged state (`git diff --check -- eval tests/eval state/STATUS-eval.md`: exit 0; inline scope audit: PASS, 10 exact authorized paths, r5/v2, six STATUS headings, zero staged paths).
 - Implemented shared default-tier control pricing, preserved completed-task accounting/artifact bytes during recovery, and added per-snapshot provenance hashes with mixed Standard/Fast validation. Verified invalid and unaccounted one-task reruns, checkpoint reuse, repeated regrades, fresh day-2 control pins and tamper refusals with mocks and synthetic graders (`.venv/bin/python -m pytest tests/eval -q`: 1690 passed in 313.94s).
@@ -62,8 +65,7 @@
 
 ## Remaining
 
-- Host/Claude: transfer the audit-shape and control-timeout changes, then re-audit the two retained v2 records with original pinned inputs. The supplied multi-file literal already resolves in this checkout; the new regressions pin that behavior and every header target. Review control_timeout classification once Role 3 emits control_failure reason=deadline. No host outcome or report was repaired here.
-- Host/Claude: transfer the recovery pricing/provenance fix and regenerate full-harness recovery from its original pinned source, then regrade that new output. Review inferred Luna priority costs, every referenced snapshot pin and unchanged historical spending. The supplied recovered3 copy already has stale hashes; do not waive or replace historical artifact pins. Offline mocked coverage is not a repaired host report or newly measured cost_per_pass.
+- Host/Claude: transfer this verbatim-input and recovery-accounting follow-up, then regrade the retained continuation and harness recovery with original pinned inputs/private graders. Confirm all retained task provenance validates, the day-2 session is priced at the model default, and the selected harness task totals $0.03405012. This session checked supplied copies read-only and synthetic regrade paths; no host regrade or quality result is claimed.
 - Host/Claude: publish the user-supplied host population digest 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, type/family counts and 2026-10-24 freeze date through Role 1 in docs/eval-freeze-v2.md. The supplied B digest 3af558f5f0993bcac598c4f71772b14e884ea54a106a4988b2dd3d2f23a12b09 identifies only its 80-task selection. This worktree already has B's ordered 100-task task_population; ensure the main checkout uses it for report population identity. No host digest was recomputed here.
 - Host only, after validation/freeze and spending approval: transfer the full-v2 A/B/harness configs and matched Fast estimates to the main checkout. This worktree must not run executor/controller/judge models. Re-estimate dynamic judge slots before a harness batch.
 - Host/Claude: transfer this session's three recovery/accounting fixes, retry full-harness rerun_invalid using the committed published workspace copies, retry full-a two-session-balanced-brackets continuation and full-b-regrade feature-plus-test-partition-sign rerun_unaccounted. Review comparison counts, inferred model-default tiers, fresh accounting and replacement provenance. This worktree produced synthetic regression evidence only; no actual task was re-audited or rerun here.
@@ -82,6 +84,11 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Resolve the whole retained code-mode input: the unresolved operand was the inline literal-array loop after the four-file patch, rather than escaped patch bodies. Keep static non-path session controls outside operand resolution.
+- Recover overwritten legacy provenance only through exact historical SHA-256 reconstruction: the retained calls reproduce all 119 original fallback artifact pins; no new historical pin is fabricated.
+- Fill previously unpriced retained calls only with complete usage and verified omitted/null exit-tier captures: retain known historical Standard prices and record model-default inference during regrade.
+- Normalize only a proven empty prelaunch-collision trial: an arbitrary empty call list, launched control failure or genuinely unpriced call remains unknown.
 
 - Preserve the existing literal multi-file patch decoder and audit every extracted header: the supplied literal already resolves, while variable-built patch text must remain inconclusive.
 - Exempt static process-name operands only for pkill, pgrep and killall: their regular expressions select processes; shell expansions, redirections and other commands retain conservative handling.
@@ -144,6 +151,8 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/eval/test_retained_defects.py -q
+
 - .venv/bin/python -m pytest tests/eval/test_host_audit_shapes.py tests/eval/test_control_failures.py -q
 - .venv/bin/python -m pytest tests/eval/test_runner.py::test_control_failure_deadline_classification tests/eval/test_restart_recovery.py::test_rerun_prelaunch_control_failure_needs_no_exit_hash -q
 - .venv/bin/python -m pytest tests/eval/test_recovery_pricing.py tests/eval/test_control_accounting.py tests/eval/test_v2_metrics_pricing.py -q
@@ -182,6 +191,8 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- This session is r5/v2 at f1fa062 in the authorized worktree. Supplied evidence copies are read-only inputs; their locations are not written into repository files. Offline retained-data pricing and synthetic repeated regrades establish the fixes without host grading or new model calls.
 
 - This offline audit session consumes Role 3 deadline diagnostics as a control_failure line followed by a JSON object with reason=deadline. The two reported inconclusive host shapes are user-supplied observations; this checkout already resolves the supplied multi-file literal. Only this worktree's .venv, synthetic graders/logs and mocked model transports are used; no host re-audit, model calls or actual private-root access is claimed.
 - This session's reported full-harness outcome (valid, 119 pass/1 fail) is supplied host evidence. The supplied read-only copy confirms the accounting and stale-artifact symptoms only; host regeneration and repaired aggregate costs remain unmeasured. Use this worktree's .venv and mocks only, with no actual private grader root, network or model calls.

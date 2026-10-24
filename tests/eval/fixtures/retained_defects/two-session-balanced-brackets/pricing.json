@@ -1,0 +1,19 @@
+{
+  "snapshot_id": "openai-standard-short-2026-10-22-v1",
+  "checked_on": "2026-10-23",
+  "source": "Pinned tier snapshots: [{\"checked_on\": \"2026-10-22\", \"rates\": [{\"cached_input_per_million_usd\": 0.1, \"input_per_million_usd\": 2, \"model\": \"gpt-6.1-sol\", \"output_per_million_usd\": 10}, {\"cached_input_per_million_usd\": 0.01, \"input_per_million_usd\": 0.1, \"model\": \"gpt-6-luna\", \"output_per_million_usd\": 0.5}], \"snapshot_id\": \"openai-standard-short-2026-10-22-v1\", \"source\": \"https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-22; Standard tier, short context up to 272K input tokens; USD per 1M tokens. Page provides no price-list version or date. Local snapshot version v1. Reasoning tokens billed as output once (decision 0002).\"}, {\"checked_on\": \"2026-10-23\", \"rates\": [{\"cached_input_per_million_usd\": 0.2, \"input_per_million_usd\": 4, \"model\": \"gpt-6.1-sol\", \"output_per_million_usd\": 20}, {\"cached_input_per_million_usd\": 0.02, \"input_per_million_usd\": 0.2, \"model\": \"gpt-6-luna\", \"output_per_million_usd\": 1}, {\"cached_input_per_million_usd\": 0.4, \"input_per_million_usd\": 4, \"model\": \"gpt-6-sol\", \"output_per_million_usd\": 20}], \"snapshot_id\": \"openai-fast-short-2026-10-23-v1\", \"source\": \"https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-23; Fast mode (priority processing, renamed 2026-07-30); short context up to 272K input tokens; USD per 1M tokens; exactly 2x Standard input, cached input and output. Local snapshot version v1. Reasoning output billed once.\"}, {\"checked_on\": \"2026-10-23\", \"rates\": [{\"cached_input_per_million_usd\": 0.2, \"input_per_million_usd\": 2, \"model\": \"gpt-6-sol\", \"output_per_million_usd\": 10}], \"snapshot_id\": \"openai-standard-short-2026-10-23-v1\", \"source\": \"https://developers.openai.com/api/docs/pricing ; Claude host fetch supplied by user, checked 2026-10-23; Standard short context up to 272K; supplemental gpt-6-sol rate, USD per 1M tokens. The 2026-10-22 Standard snapshot remains unchanged.\"}]",
+  "rates": [
+    {
+      "model": "gpt-6.1-sol",
+      "input_per_million_usd": 2,
+      "cached_input_per_million_usd": 0.1,
+      "output_per_million_usd": 10
+    },
+    {
+      "model": "gpt-6-luna",
+      "input_per_million_usd": 0.1,
+      "cached_input_per_million_usd": 0.01,
+      "output_per_million_usd": 0.5
+    }
+  ]
+}
