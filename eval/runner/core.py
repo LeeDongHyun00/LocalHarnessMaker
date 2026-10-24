@@ -20,6 +20,7 @@ from eval.runner import harness
 from eval.runner.publication import checkout_text, control_target, review_bytes, safe_source
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, interrupted_logs, digest, executor_environment
+from eval.runner import transport
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.telemetry import collect, collect_runs, applied_tier_records, capture_tier, native_token_delta, native_token_totals, records, session_id, recover_partial_usage
@@ -688,6 +689,9 @@ def run(
                     segment["native_usage"] = native_usage
                     segment["usage_evidence"] = "Native event_msg.token_count cumulative delta; output includes reasoning"
                 segment["native_logs"] = [str(p) for p in native_changed]
+                transport_failure = transport.classify(segment, runtime, private.redact)
+                if transport_failure:
+                    segment['transport_failure'] = transport_failure
                 recover_partial_usage([segment], native_changed)
                 settings = collect([event_path], native_changed,
                                    config["model"], config["reasoning_effort"], config.get("service_tier"))["settings_evidence"]
@@ -754,12 +758,17 @@ def run(
                         transport_retries += 1
                         entry["transport_retries"] = transport_retries
                         write_json(checkpoint, state)
+                        if transport_failure:
+                            wait = BACKOFF_SECONDS[min(transport_retries - 1, len(BACKOFF_SECONDS) - 1)]
+                            segment['recovery_wait_seconds'] = wait
+                            sleep(wait)
                 finally:
                     if not interrupted:
                         record_workspace_exit(workspace, entry, segment)
                         write_json(checkpoint, state)
             if (infrastructure_stop or interrupted or blocked or control_error or not final_process or
-                    current_audit is None or current_audit["status"] != "clean"):
+                    current_audit is None or current_audit["status"] != "clean" or
+                    transport.unresolved(transport.inspect(entry, private.redact))):
                 break
             if day not in entry.setdefault("completed_days", []):
                 entry["completed_days"].append(day)
@@ -840,7 +849,8 @@ def run(
             except harness.HarnessError as exc:
                 entry["control_invalid_reason"] = exc.invalid_reason
                 control_error = entry["control_error"] = str(exc)
-        invalid = []
+        transport_failures = transport.inspect(entry, private.redact)
+        invalid = [transport.REASON] if transport.unresolved(transport_failures) else []
         if control_error:
             specific = entry.get("control_invalid_reason")
             invalid.append("control_timeout" if specific == "control_timeout" else "control_cli_error")
@@ -878,7 +888,8 @@ def run(
                   "invalid_reasons": invalid, "attempts": max(1, sum(not s.get("capacity_error") for s in entry["segments"])),
                   "session_id": session_id(event_paths), "segments": entry["segments"],
                   "two_session": two_session, "day2_observation": observation,
-                  "grader_access_audit": access_audit, "grading": grading, "verdicts": entry.get("verdicts", []), **telemetry}
+                  "grader_access_audit": access_audit, "grading": grading, "verdicts": entry.get("verdicts", []),
+                  "diagnostics": {"executor_transport_failures": transport_failures}, **telemetry}
         if 'day1_verification_recovery' in entry:
             result['day1_verification_recovery'] = entry['day1_verification_recovery']
         write_json(task_out / "result.json", json.loads(private.redact(json.dumps(result))))
@@ -889,7 +900,8 @@ def run(
         if not interrupted:
             entry["result"] = json.loads(private.redact(json.dumps(result)))
         write_json(checkpoint, state)
-        if interrupted or (final_process and (final_process.returncode != 0 and not final_process.timed_out)):
+        if interrupted or (final_process and (final_process.returncode != 0 and not final_process.timed_out)
+                           and not transport.unresolved(transport_failures)):
             stop_reason = "STOP-E1: executor interrupted or could not complete non-interactively; inspect retained logs before another live call."
             break
     tasks = [json.loads((out / task / "result.json").read_text()) for task in order if (out / task / "result.json").exists()]
@@ -898,6 +910,7 @@ def run(
     write_json(out / "run-diagnostics.json", {
         "calibration": config.get("calibration", False), "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier"),
         "stop_reason": stop_reason, "attempted_tasks": attempted, "configured_tasks": configured,
+        "executor_transport_failures": transport.summary(state["tasks"]),
         "infrastructure_recoveries": [
             {"task_id": task_id, **segment} for task_id, entry in state["tasks"].items()
             for segment in entry["segments"] if segment.get("infrastructure_recovery")

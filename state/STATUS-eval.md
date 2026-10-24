@@ -1,5 +1,11 @@
 ## Done
 
+- Verified the complete evaluation package after the transport-outage fix, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2048 passed in 384.64s; `git diff --check`: exit 0; inline authorized-scope/STATUS audit: PASS, eleven paths, six headings, zero staged/deleted paths).
+
+- Extended the existing exact provenance-file regression to pin the new transport classifier, including its content hash (`.venv/bin/python -m pytest tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 1 passed in 2.41s).
+
+- Implemented shared terminal transport classification, retained regrade/read-only reaudit recovery, fresh infrastructure reruns with prior spending retained, live backoff/resume and report-pinned outage/rerun provenance; preserved genuine timeout/error outcomes and audit refusals (`.venv/bin/python -m pytest tests/eval/test_executor_transport.py tests/eval/test_reaudit.py tests/eval/test_restart_recovery.py tests/eval/test_runner.py::test_regrade_preserves_executor_failure_class -q`: 85 passed in 37.30s).
+
 - Verified the full evaluation package after the literal-store/Unicode-patch fix, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2019 passed in 363.40s; `git diff --check`: exit 0; inline scope/fixture/STATUS audit: PASS, six authorized paths, 18 sanitized verbatim records with pinned hash, six headings, no source-location leakage, zero staged/deleted paths).
 - Reconstructed the line-48 literal hash store beside its Unicode patch using the line-51 paired completion; both line-57/91 loads resolve as derived_from_audited_outputs. Added an 18-record hash-pinned synthetic-path fixture, undisplayed-result refusal and Unicode/protected/failed-output boundaries (`.venv/bin/python -m pytest tests/eval/test_audit_records_4.py tests/eval/test_derived_inputs.py tests/eval/test_runtime_records.py tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 246 passed in 15.21s).
 
@@ -89,6 +95,8 @@
 
 ## Remaining
 
+- Host/Claude: transfer this transport-outage follow-up, regrade the retained v2 baseline B run with its original pinned inputs/graders, then use rerun_invalid with --reasons executor_transport_failure in a fresh output. Review v2-cache-invalidation-feature-plus-test and v2-csv-import-multiple-requirements diagnostics, rerun audit/pricing and report-pinned provenance. Disclose outage tasks, source/rerun IDs and retained prior spending in final evaluation. This worktree did not access or repair the actual host run.
+
 - Host/Claude: transfer this literal-store/Unicode-patch follow-up and re-audit the original retained task. Both supplied unresolved loads now resolve offline; the fixture preserves the earlier truncated listing's protected-path finding without waiver. No actual host task/report was repaired here.
 
 - Host/Claude: transfer this listing/transport/code-chain follow-up and re-audit the original retained streams with original pinned graders. All six complete exec listing fixtures and both previously unresolved code chains now resolve offline. The access-policy native listing explicitly contains a persistence truncation marker, so its protected_path remains; do not treat the complete exec capture as a waiver for the truncated native record. No actual host task/report was repaired here.
@@ -115,6 +123,10 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Classify only structured terminal transport suffixes or transport-only deadline suffixes: stderr/prose, explicit completion, non-transport terminal errors and later model outcomes retain existing behavior. A later resume supersedes the prior outage; unresolved day-1 outages stop before day 2.
+- Recover proven executor transport invalidity through existing rerun_invalid flags: fresh runtimes receive ordinary audits/pricing, historical costs remain retained/unknown, and only a proven deadline's missing terminal event gains recovery eligibility; malformed/unresolved/access evidence remains refused.
+- Use existing report artifact references for infrastructure-provenance.json and rerun-provenance.json: task diagnostics and run-diagnostics.json disclose redacted messages, JSONL lines/hashes, failed tasks and reruns without changing the shared schema.
 
 - Permit Unicode only in direct single-literal patch payloads within store reconstruction: opaque authored patch text must not reject an independent literal hash map, while other syntax/data bounds, tool enumeration, patch-target audits and displayed-result provenance remain enforced.
 
@@ -201,6 +213,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_executor_transport.py tests/eval/test_reaudit.py tests/eval/test_restart_recovery.py tests/eval/test_runner.py::test_regrade_preserves_executor_failure_class -q`
+
 - `.venv/bin/python -m pytest tests/eval/test_audit_records_4.py tests/eval/test_derived_inputs.py tests/eval/test_runtime_records.py tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`
 
 - `.venv/bin/python -m pytest tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`
@@ -250,6 +264,8 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The two 2026-10-24 baseline B outage shapes and transport messages are user-supplied observations. Regression logs use synthetic session/workspace/grader evidence and mocked transports; no original host runtime, actual private root, live executor/controller/judge, network or other checkout was accessed. All work uses this worktree's .venv; frozen tasks/interfaces/flags remain unchanged, with no staging or commits.
 
 - The supplied complete code-mode chain is the available evidence for this follow-up. The fixture substitutes synthetic host paths and runtime names; offline load resolution does not establish full historical capture or host validity. This session uses only this worktree's .venv, synthetic graders and mocks, with no staging, commits or model calls.
 

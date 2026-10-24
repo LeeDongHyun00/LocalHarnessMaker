@@ -8,6 +8,42 @@ shared schema. Historical reports in `reports/baseline-a-first-task/` remain
 unaltered provisional evidence; they have not been reclassified as approved
 reports or rerun.
 
+## Executor transport outages
+
+`run`, `regrade` and read-only `reaudit` share terminal transport classification.
+A failed last turn with reconnect/transport error items and matching
+`turn.failed`, or a deadline kill with only transport errors after the last
+completed item, receives `outcome=invalid` and
+`invalid_reasons=["executor_transport_failure", ...]`. Recognized messages include
+stream disconnection, workspace routing discovery, no route to host, request
+timeout and WebSockets-to-HTTPS fallback. Stderr and assistant/tool prose alone
+cannot establish an outage. Completed turns and non-transport model errors keep
+their existing outcomes; a later resume's outcome supersedes the earlier outage.
+Shared native rollouts require matching session identity and process timestamps.
+
+Task `result.json` diagnostics retain redacted messages, original JSONL line
+numbers, log names and record/log hashes. The report pins each task's
+`infrastructure-provenance.json` through its existing artifact references;
+`run-diagnostics.json.executor_transport_failures` lists affected tasks,
+including resolved live retries and fresh reruns. No report schema changes are
+needed. Regrade reclassifies retained evidence without executor/control/judge
+calls and never grades infrastructure-invalid tasks. Access audits and retained
+hash checks remain independent requirements; classification never makes an
+inconclusive audit clean.
+
+On the host, first regrade a historical report, then select
+`--reasons executor_transport_failure` with `eval.runner.rerun_invalid` using
+its existing `--private-root`, `--from` and `--out` flags. Recovery starts a fresh
+external runtime, audits it and prices all fresh calls, retaining prior spending
+and unknown historical costs. A deadline's absent terminal event alone can be
+eligible for a fresh rerun when transport evidence proves the cause; malformed
+streams, unfinished tools, unresolved audit operands and access matches remain
+refusals. Existing live retry limits and resume behavior apply, with backoff for
+observed transport failures. An unresolved day-1 outage does not launch day 2.
+Disclose task IDs, outage evidence, source run, rerun IDs/runtimes and added costs
+from `run-diagnostics.json`, `rerun-invalid.json` and the report-pinned task
+`rerun-provenance.json` in final evaluation reporting.
+
 ## Version 2 frozen public population
 
 [DESIGN.md](tasks-v2/DESIGN.md) specifies the separate harder population before

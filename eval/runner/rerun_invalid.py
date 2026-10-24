@@ -12,7 +12,7 @@ import uuid
 
 from eval.runner.pricing import extends, report_pricing, select
 from eval.metrics import compute, total
-from eval.runner import core, harness, regrade
+from eval.runner import core, harness, regrade, transport
 from eval.runner.audit import PrivateGraders, audit_retained_logs, digest, interrupted_logs
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.control_accounting import control_calls
@@ -28,7 +28,7 @@ REASONS = frozenset({
     'control_cli_error', 'control_timeout', 'runner_control_file_preexisting', 'execution_interrupted',
     'incomplete_access_audit', 'missing_executor_session_id', 'executor_settings_unverified',
     'missing_cli_version_evidence', 'missing_two_session_handoff_observation',
-    'executor_service_tier_missing_or_different', 'capacity_exhausted',
+    'executor_service_tier_missing_or_different', 'capacity_exhausted', transport.REASON,
 })
 
 
@@ -36,7 +36,8 @@ class RecoveryEligibilityError(ValueError):
     """Safe condition names suitable for CLI diagnostics without private paths."""
 
 
-def eligible(task: dict[str, Any], entry: dict[str, Any], audit: dict[str, Any]) -> bool:
+def eligible(task: dict[str, Any], entry: dict[str, Any], audit: dict[str, Any], *,
+             transport_failures: list[dict[str, Any]] | None = None) -> bool:
     """Whitelist causes, not quality outcomes; unexplained audit errors stay invalid."""
     result = entry.get('result', {})
     reasons = set(task.get('invalid_reasons', []))
@@ -54,11 +55,18 @@ def eligible(task: dict[str, Any], entry: dict[str, Any], audit: dict[str, Any])
     capacity = bool(entry.get('infrastructure_stop') and
                     'at capacity' in entry['infrastructure_stop'].lower() and
                     any(s.get('capacity_error') for s in segments))
-    if not (no_launch and control or interrupted or control or capacity):
+    failed_transport = transport.unresolved(transport_failures or [])
+    if transport.REASON in reasons and not failed_transport:
+        return False
+    if not (no_launch and control or interrupted or control or capacity or failed_transport):
         return False
     if 'runner_control_file_preexisting' in reasons and not no_launch:
         return False  # Executor-authored control inputs are never infrastructure.
     allowed_errors = {'missing_logs'} if no_launch else set()
+    transport_deadlines = [s for s in segments if s.get('timed_out') and
+                           any(f['attempt'] == s['attempt'] for f in (transport_failures or []))]
+    if transport_deadlines:
+        allowed_errors.add('missing_terminal_event')
     if interrupted:
         allowed_errors.update({'missing_log', 'missing_logs', 'missing_terminal_event'})
     # Check both historical and current error lists. A parser precision error is
@@ -68,9 +76,9 @@ def eligible(task: dict[str, Any], entry: dict[str, Any], audit: dict[str, Any])
             kind, _, name = error.partition(':')
             if kind not in allowed_errors:
                 return False
-            if kind in {'missing_log', 'missing_terminal_event'} and name not in {s['events'] for s in interrupted}:
+            if kind in {'missing_log', 'missing_terminal_event'} and name not in {s['events'] for s in interrupted + transport_deadlines}:
                 return False
-    if 'executor_service_tier_missing_or_different' in reasons and not (no_launch or interrupted):
+    if 'executor_service_tier_missing_or_different' in reasons and not (no_launch or interrupted or failed_transport):
         return False
     return True
 
@@ -194,19 +202,22 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         if any(a.get('matches') or a.get('status') == 'access_detected' for a in (
                 task.get('grader_access_audit', {}), entry.get('result', {}).get('grader_access_audit', {}), audit)):
             raise RecoveryEligibilityError('Refused task with access matches: clean_access_audits_required')
+        failures = transport.inspect(entry, private.redact)
         failed = []
         causes = unaccounted_causes(task, entry, audit, original['metadata']['pricing'],
                                    paths[len(entry['segments']):], refusals=failed) if _unaccounted else []
         if failed:
             identity = task['task_id'] if re.fullmatch(r'[a-z0-9][a-z0-9-]*', task['task_id']) else 'invalid_task_id'
             refusals.extend(f'{identity}: {reason}' for reason in failed)
-        if not (bool(causes) if _unaccounted else eligible(task, entry, audit)):
+        if not (bool(causes) if _unaccounted else eligible(task, entry, audit, transport_failures=failures)):
             continue  # Precision/quality invalidity is regraded from retained evidence.
         # Never classify modified trusted control bytes as a restart artifact.
         harness.ControlFiles(runtime, entry.get('control_files', {}), lambda: None).verify()
         if _unaccounted:
             recover_partial_usage(entry['segments'], paths[len(entry['segments']):])
             causes_by_task[task['task_id']] = causes
+        if not _unaccounted and transport.REASON in task['invalid_reasons']:
+            causes_by_task[task['task_id']] = failures
         selected.append(task['task_id'])
     if not selected:
         detail = '; '.join(sorted(set(refusals or ['valid_task_with_null_executor_cost_required']))) if _unaccounted else ''
@@ -255,7 +266,9 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
             prior_control = prelaunch_collision_cost(old)
         recovered_state.setdefault('fresh_reruns', {})[task_id] = {
             'rerun_id': evidence['rerun_id'], 'calls': [] if _unaccounted else copy.deepcopy(old['calls']),
-            'control_usd': 0 if _unaccounted else prior_control}
+            'control_usd': 0 if _unaccounted else prior_control,
+            'source_run_id': original['metadata']['run_id'],
+            'executor_transport_failures': causes_by_task.get(task_id, []) if not _unaccounted else []}
     core.write_json(out / 'checkpoint.json', recovered_state)
     core.write_json(provenance_path, provenance)
     config_path = out / 'rerun-config.yaml'

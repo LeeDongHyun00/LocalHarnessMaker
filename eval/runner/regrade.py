@@ -13,7 +13,7 @@ from typing import Any, Callable
 import uuid
 
 from eval.metrics import compute, total
-from eval.runner import core
+from eval.runner import core, transport
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
 from eval.runner.process import ProcessResult, run_process
 from eval.runner.signals import stop_signals
@@ -28,7 +28,7 @@ def audit_code_version() -> dict[str, str]:
     directory = Path(__file__).parent
     return {name: digest((directory / name).read_bytes())
             for name in ('audit.py', 'protected_listing.py', 'javascript.py', 'javascript_derived.py', 'fingerprint_history.py', 'regrade.py', 'telemetry.py',
-                         'core.py', 'workspace_verification.py')}
+                         'core.py', 'transport.py', 'workspace_verification.py')}
 
 
 def regrade(private_root: Path, source: Path, out: Path, *,
@@ -157,6 +157,10 @@ def regrade(private_root: Path, source: Path, out: Path, *,
                     'result.json', 'access-audit.json', 'grading.log'}:
                 core.publish(path, task_out / path.name, private, source_root=source / task)
         core.write_json(task_out / 'access-audit.json', json.loads(private.redact(json.dumps(audit))))
+        failures = transport.inspect(entry, private.redact)
+        result.setdefault('diagnostics', {})['executor_transport_failures'] = failures
+        if transport.unresolved(failures) and transport.REASON not in result['invalid_reasons']:
+            result['invalid_reasons'].append(transport.REASON)
         result['grading'] = None
         last = entry['segments'][-1]
         if (audit['status'] == 'clean' and not result['invalid_reasons'] and
@@ -217,6 +221,7 @@ def regrade(private_root: Path, source: Path, out: Path, *,
     core.write_json(out / 'run-diagnostics.json', {
         'calibration': config.get('calibration', False), 'task_root': config.get('task_root', 'eval/tasks'), 'service_tier': config.get('service_tier'),
         'source': str(source), 'source_report_sha256': digest(source_bytes),
+        'executor_transport_failures': transport.summary(new_state['tasks']),
         'audit_code_version': audit_code_version(), 'workspace_hash_checks': checks})
     text = json.dumps(report, indent=2) + '\n'
     for private in private_by_task.values():

@@ -8,7 +8,7 @@ import re
 import sys
 from typing import Any
 
-from eval.runner import core
+from eval.runner import core, transport
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_retained_logs, interrupted_logs, digest
 from eval.runner.workspace_verification import verify as verify_workspace
 from eval.runner.day1_recovery import pending_verification
@@ -44,11 +44,13 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
     for task, entry in sorted(tasks.items()):
         errors: set[str] = set()
         labels: list[str] = []
+        failures: list[dict[str, Any]] = []
         try:
             private = PrivateGraders.load(private_root, task, core.REPOSITORY,
                                           task_root=state.get('config', {}).get('task_root'))
             runtime = Path(entry["runtime"])
             workspace = runtime / "workspace"
+            failures = transport.inspect(entry, private.redact)
             segments = entry["segments"]
             if (not runtime.is_absolute() or not segments or any(
                     Path(segment["events"]).name != segment["events"] for segment in segments)):
@@ -80,7 +82,9 @@ def reaudit(private_root: Path, out: Path) -> list[dict[str, Any]]:
             # Exceptions can contain grader paths or source. Do not serialize them.
             errors.add("reaudit_input_error")
         status = "access_detected" if labels else "inconclusive" if errors else "clean"
-        rows.append({"task_id": task, "status": status, "error_kinds": sorted(errors), "match_labels": labels})
+        rows.append({"task_id": task, "status": status, "error_kinds": sorted(errors), "match_labels": labels,
+                     **({'outcome': 'invalid', 'invalid_reasons': [transport.REASON],
+                         'executor_transport_failures': failures} if transport.unresolved(failures) else {})})
     return rows
 
 

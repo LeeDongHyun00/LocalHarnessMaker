@@ -73,6 +73,10 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
                            "basis": tier_evidence["basis"], "captured_records": tier_evidence.get("records", []),
                            "pricing_ref": calls[-1]["usage"]["pricing_ref"],
                            "native_sources": [artifact(p) for p in native if p.is_file()]})
+    failures = result.get('diagnostics', {}).get('executor_transport_failures', [])
+    if failures:
+        (out / 'infrastructure-provenance.json').write_text(json.dumps({
+            'task_id': result['task_id'], 'executor_transport_failures': failures}, indent=2) + '\n')
     audit = result["grader_access_audit"]
     status = audit["status"]
     reason = "Observed forbidden access." if status == "access_detected" else "; ".join(audit["errors"]) if status == "inconclusive" else None

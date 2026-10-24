@@ -1,3 +1,33 @@
+# Executor transport outages — 2026-10-24
+
+Classify terminal reconnect/transport failures consistently in run, regrade
+and read-only reaudit as invalid with executor_transport_failure. Preserve
+normal model timeouts/errors, explicit completion and non-transport terminal
+failures. Retain redacted messages, JSONL line numbers and hashes in task
+diagnostics and report-pinned infrastructure provenance. Track resolved live
+retries, and stop before day 2 when day 1 exhausts transport recovery.
+
+Permit proven transport failures in rerun_invalid through the existing reason
+selector. Use fresh external runtimes with ordinary auditing/pricing, retain
+prior spending and unknown costs, and record source causes, reruns and added
+costs in diagnostics and report-pinned provenance. Incomplete audit evidence
+remains invalid; fresh recovery permits only the proven deadline's absent
+terminal event, never malformed/unresolved/access evidence. Keep live backoff
+and resume within the configured retry budget.
+
+Assumptions: the supplied 2026-10-24 outage messages define the recognized
+family. Tests synthesize both retained shapes with mocked executor transports
+and synthetic graders. No host report, actual private root or live model is
+accessed; host regrade/rerun remains pending. Frozen tasks, shared interfaces
+and CLI flags are unchanged.
+
+Validation: focused classification/recovery/reaudit regressions — 85 passed
+in 37.30s; updated existing provenance regression — 1 passed in 2.41s.
+`.venv/bin/python -m pytest tests/eval -q` — 2048 passed in 384.64s.
+`git diff --check` and the authorized-scope/STATUS audit pass: eleven paths,
+six STATUS headings, frozen inputs/interfaces unchanged, zero staged/deleted
+paths. No staging or commits occurred.
+
 # Literal hash stores beside Unicode patches — 2026-10-24
 
 Accept Unicode only in a direct single-literal `tools.apply_patch` payload
