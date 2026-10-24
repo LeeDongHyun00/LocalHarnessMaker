@@ -1,3 +1,34 @@
+# Deadline transport tail follow-up — 2026-10-24
+
+Recognize the complete Reconnecting... family, including any parenthesized
+reason, plus Connection failed, Transport error, failed to lookup address
+information and waiting for network. A deadline kill with timed_out=true and
+exit -9 or null needs only a transport-error suffix after the last completed
+non-error item, with no later item start; no turn.failed is required. Mixed
+errors, intervening unfinished work and completed turns followed by model-side
+timeouts retain timeout classification.
+
+Add a hash-pinned 15-record verbatim runner tail with synthetic workspace paths
+and a negative fixture inserting one non-transport error before later reconnects.
+Retained-run regrade regressions confirm timeout becomes invalid with
+executor_transport_failure, preserving source bytes and costs without model or
+grader calls; negative and completed-turn records stay timeout. README lists
+the expanded phrases and deadline requirements.
+
+Assumptions: the supplied read-only record is the available host evidence.
+Synthetic retained runs, synthetic graders and mocked executors establish the
+regression; no actual host report or private grader root was accessed or repaired.
+Frozen tasks, shared interfaces and CLI flags remain unchanged. Nothing staged
+or committed.
+
+Validation: `.venv/bin/python -m pytest tests/eval/test_executor_transport.py -q`
+— 53 passed in 19.63s. Verbatim-fixture audit — PASS: 15 records differ only by
+synthetic workspace paths; the negative adds exactly one model error.
+`.venv/bin/python -m pytest tests/eval -q` — 2072 passed in 387.67s.
+`git diff --check` and the scope/STATUS audit — PASS: seven exact authorized
+paths, six STATUS headings, no source-location leakage, zero staged/deleted
+paths.
+
 # Executor transport outages — 2026-10-24
 
 Classify terminal reconnect/transport failures consistently in run, regrade

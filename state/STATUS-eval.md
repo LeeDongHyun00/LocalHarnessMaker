@@ -1,5 +1,9 @@
 ## Done
 
+- Verified the complete evaluation package after the deadline-tail follow-up, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces without staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2072 passed in 387.67s; `git diff --check`: exit 0; inline scope/STATUS audit: PASS, seven exact authorized paths, six headings, no source-location leakage, zero staged/deleted paths).
+
+- Expanded reconnect/network transport recognition and deadline-kill classification for exit -9/null without turn.failed; added hash-pinned verbatim/synthetic-path positive and mixed-error negative fixtures, later-work refusals and retained-regrade regressions preserving costs/source bytes while completed-turn model timeouts stay timeout (`.venv/bin/python -m pytest tests/eval/test_executor_transport.py -q`: 53 passed in 19.63s; inline verbatim-fixture audit: PASS, 15 records, negative adds exactly one model error).
+
 - Verified the complete evaluation package after the transport-outage fix, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2048 passed in 384.64s; `git diff --check`: exit 0; inline authorized-scope/STATUS audit: PASS, eleven paths, six headings, zero staged/deleted paths).
 
 - Extended the existing exact provenance-file regression to pin the new transport classifier, including its content hash (`.venv/bin/python -m pytest tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 1 passed in 2.41s).
@@ -95,7 +99,7 @@
 
 ## Remaining
 
-- Host/Claude: transfer this transport-outage follow-up, regrade the retained v2 baseline B run with its original pinned inputs/graders, then use rerun_invalid with --reasons executor_transport_failure in a fresh output. Review v2-cache-invalidation-feature-plus-test and v2-csv-import-multiple-requirements diagnostics, rerun audit/pricing and report-pinned provenance. Disclose outage tasks, source/rerun IDs and retained prior spending in final evaluation. This worktree did not access or repair the actual host run.
+- Host/Claude: transfer this deadline-tail follow-up and regrade the retained v2 baseline B run with its original pinned inputs/graders. The user reports the exit-1 casualty now reclassifies after 559aa1e; confirm v2-cache-invalidation-feature-plus-test also becomes executor_transport_failure with the supplied exit -9/no-turn.failed tail. Then use rerun_invalid with --reasons executor_transport_failure in a fresh output and review both outage tasks, audit/pricing, report-pinned provenance and retained prior spending. Synthetic retained regrade passes here; this worktree did not access or repair the actual host run.
 
 - Host/Claude: transfer this literal-store/Unicode-patch follow-up and re-audit the original retained task. Both supplied unresolved loads now resolve offline; the fixture preserves the earlier truncated listing's protected-path finding without waiver. No actual host task/report was repaired here.
 
@@ -123,6 +127,9 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Treat the entire Reconnecting... family and the supplied network/DNS phrases as transport errors: observed waiting-for-network events have no numbered reconnect counter.
+- Accept deadline kills with exit -9 or null and an error-only suffix without turn.failed: killed processes may never emit a terminal turn event; later item starts, mixed errors and completed-turn model timeouts cannot prove this cause.
 
 - Classify only structured terminal transport suffixes or transport-only deadline suffixes: stderr/prose, explicit completion, non-transport terminal errors and later model outcomes retain existing behavior. A later resume supersedes the prior outage; unresolved day-1 outages stop before day 2.
 - Recover proven executor transport invalidity through existing rerun_invalid flags: fresh runtimes receive ordinary audits/pricing, historical costs remain retained/unknown, and only a proven deadline's missing terminal event gains recovery eligibility; malformed/unresolved/access evidence remains refused.
@@ -213,6 +220,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_executor_transport.py -q`
+
 - `.venv/bin/python -m pytest tests/eval/test_executor_transport.py tests/eval/test_reaudit.py tests/eval/test_restart_recovery.py tests/eval/test_runner.py::test_regrade_preserves_executor_failure_class -q`
 
 - `.venv/bin/python -m pytest tests/eval/test_audit_records_4.py tests/eval/test_derived_inputs.py tests/eval/test_runtime_records.py tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`
@@ -264,6 +273,8 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The supplied read-only tail records baseline B's deadline transport outage; fixtures preserve its 15 runner events verbatim except synthetic workspace paths. Synthetic retained runs establish regrade behavior, not actual host repair. This session uses only this worktree's .venv and mocks, with no live models, original private grader access, staging or commits.
 
 - The two 2026-10-24 baseline B outage shapes and transport messages are user-supplied observations. Regression logs use synthetic session/workspace/grader evidence and mocked transports; no original host runtime, actual private root, live executor/controller/judge, network or other checkout was accessed. All work uses this worktree's .venv; frozen tasks/interfaces/flags remain unchanged, with no staging or commits.
 

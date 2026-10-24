@@ -12,12 +12,18 @@ reports or rerun.
 
 `run`, `regrade` and read-only `reaudit` share terminal transport classification.
 A failed last turn with reconnect/transport error items and matching
-`turn.failed`, or a deadline kill with only transport errors after the last
-completed item, receives `outcome=invalid` and
+`turn.failed`, or a deadline kill (`timed_out=true`, exit code `-9` or `null`)
+with only transport error events after the last completed non-error item and
+no later item start, receives `outcome=invalid` and
 `invalid_reasons=["executor_transport_failure", ...]`. Recognized messages include
 stream disconnection, workspace routing discovery, no route to host, request
-timeout and WebSockets-to-HTTPS fallback. Stderr and assistant/tool prose alone
-cannot establish an outage. Completed turns and non-transport model errors keep
+timeout, WebSockets-to-HTTPS fallback, the whole `Reconnecting...` family
+(any parenthesized reason), `Connection failed`, `Transport error`,
+`failed to lookup address information` and `waiting for network`. Deadline
+kills need no `turn.failed`; each suffix event must be a top-level `error` or
+an `item.completed` with `item.type=error`. Stderr and assistant/tool prose alone
+cannot establish an outage. Completed turns followed by model-side timeouts
+stay timeout. Other completed turns and non-transport model errors keep
 their existing outcomes; a later resume's outcome supersedes the earlier outage.
 Shared native rollouts require matching session identity and process timestamps.
 
