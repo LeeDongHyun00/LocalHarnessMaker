@@ -362,10 +362,28 @@ class Parser:
     """Parse the whole input before reducing any argument or helper write."""
 
     def __init__(self, source: str) -> None:
-        if len(source) > 65536 or not source.isascii():
+        if len(source) > 65536:
             raise Unsupported('source_limit')
-        self.tokens = [m[0] for m in LEX.finditer(source)
-                       if not m[0].isspace() and not m[0].startswith(('//', '/*'))]
+        self.tokens: list[str] = []
+        for match in LEX.finditer(source):
+            token = match[0]
+            if token.isspace() or token.startswith(('//', '/*')):
+                if not token.isascii():
+                    raise Unsupported('source_limit')
+            else:
+                self.tokens.append(token)
+        # A direct literal patch is opaque authored text, audited separately by
+        # its paths. It cannot supply data to a binding or helper write. Keep
+        # the reducer's ASCII restriction everywhere else, including literals
+        # that decode Unicode escapes outside this exact argument position.
+        self.patch_literals = {
+            index for index, token in enumerate(self.tokens)
+            if index >= 4 and self.tokens[index - 4:index] == ['tools', '.', 'apply_patch', '(']
+            and self.tokens[index + 1:index + 2] == [')'] and literal(token) is not None
+        }
+        if any(not token.isascii() and index not in self.patch_literals
+               for index, token in enumerate(self.tokens)):
+            raise Unsupported('source_limit')
         self.pos = 0
 
     def peek(self) -> str:
@@ -441,7 +459,7 @@ class Parser:
         token = self.take()
         decoded = literal(token)
         if decoded is not None:
-            if not decoded.isascii():
+            if not decoded.isascii() and self.pos - 1 not in self.patch_literals:
                 raise Unsupported('non_ascii_literal')
             node = ('value', decoded)
         elif token.isdecimal():

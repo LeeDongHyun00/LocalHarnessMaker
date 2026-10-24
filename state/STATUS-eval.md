@@ -1,5 +1,8 @@
 ## Done
 
+- Verified the full evaluation package after the literal-store/Unicode-patch fix, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2019 passed in 363.40s; `git diff --check`: exit 0; inline scope/fixture/STATUS audit: PASS, six authorized paths, 18 sanitized verbatim records with pinned hash, six headings, no source-location leakage, zero staged/deleted paths).
+- Reconstructed the line-48 literal hash store beside its Unicode patch using the line-51 paired completion; both line-57/91 loads resolve as derived_from_audited_outputs. Added an 18-record hash-pinned synthetic-path fixture, undisplayed-result refusal and Unicode/protected/failed-output boundaries (`.venv/bin/python -m pytest tests/eval/test_audit_records_4.py tests/eval/test_derived_inputs.py tests/eval/test_runtime_records.py tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 246 passed in 15.21s).
+
 - Verified the full evaluation package after the listing/transport/code-chain fixes, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces with no staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2004 passed in 372.36s; `git diff --check`: exit 0; inline exact-scope/fixture/STATUS audit: PASS, 18 authorized paths, nine fixture hashes / 50 records, six headings, zero staged/deleted paths).
 - Implemented paired-output literal-basename listing proofs, transport-error diagnostics and bounded reducer support for both supplied unresolved chains; added nine hash-pinned synthetic-path/output fixtures, refusal cases and regrade implementation provenance (`.venv/bin/python -m pytest tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`: 82 passed in 3.34s).
 - Verified the six complete exec listing fixtures resolve and both code chains now audit clean; preserved protected_path on the first native listing's explicit persistence truncation and refused wildcard/protected-output/missing-evidence/second-operand variants (`.venv/bin/python -m pytest tests/eval/test_audit_records_3.py -q`: 81 passed in 1.28s).
@@ -86,6 +89,8 @@
 
 ## Remaining
 
+- Host/Claude: transfer this literal-store/Unicode-patch follow-up and re-audit the original retained task. Both supplied unresolved loads now resolve offline; the fixture preserves the earlier truncated listing's protected-path finding without waiver. No actual host task/report was repaired here.
+
 - Host/Claude: transfer this listing/transport/code-chain follow-up and re-audit the original retained streams with original pinned graders. All six complete exec listing fixtures and both previously unresolved code chains now resolve offline. The access-policy native listing explicitly contains a persistence truncation marker, so its protected_path remains; do not treat the complete exec capture as a waiver for the truncated native record. No actual host task/report was repaired here.
 
 - Host/Claude: transfer this native sleep/post-exit day-1 recovery follow-up and run continue_day2 on the retained v2 harness task using original pinned inputs/graders. Confirm attempt 3 receives its missed verifier check, a validated handoff reaches day 2, and result.json/continuation.json disclose recovery-time hash and verification timestamps. This offline worktree did not recover the actual host run.
@@ -110,6 +115,8 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Permit Unicode only in direct single-literal patch payloads within store reconstruction: opaque authored patch text must not reject an independent literal hash map, while other syntax/data bounds, tool enumeration, patch-target audits and displayed-result provenance remain enforced.
 
 - Resolve ancestor listings only from their own unique, complete command completion and safe literal positive basenames: no output line may expose protected storage or any eval runtime, and every other operand retains the ordinary audit. A truncation marker keeps protected_path even if another capture is complete.
 - Retain exec error items as metadata diagnostics with messages and evidence hashes: transport outages have no tool/file effect, while expanded or malformed records remain inconclusive.
@@ -194,6 +201,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_audit_records_4.py tests/eval/test_derived_inputs.py tests/eval/test_runtime_records.py tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`
+
 - `.venv/bin/python -m pytest tests/eval/test_audit_records_3.py tests/eval/test_runner.py::test_regrade_matches_live_outcomes_without_source_writes -q`
 
 - `.venv/bin/python -m pytest tests/eval/test_day1_audit_recovery.py tests/eval/test_continue_day2.py -q`
@@ -241,6 +250,8 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The supplied complete code-mode chain is the available evidence for this follow-up. The fixture substitutes synthetic host paths and runtime names; offline load resolution does not establish full historical capture or host validity. This session uses only this worktree's .venv, synthetic graders and mocks, with no staging, commits or model calls.
 
 - Synthetic paths, source text, hash values and output lines preserve the supplied code shapes; the two transport messages and native truncation marker retain their observed text. Offline fixture cleanliness does not establish full historical capture or host report validity.
 - Original host re-audit/regrade remains external work with the original pinned inputs and graders: this session makes no model calls and accesses no actual private grader storage or other checkout.

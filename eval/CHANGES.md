@@ -1,3 +1,32 @@
+# Literal hash stores beside Unicode patches — 2026-10-24
+
+Accept Unicode only in a direct single-literal `tools.apply_patch` payload
+inside the bounded reducer. The recorded line-48 script stores a literal
+`protected_hashes` object before such a patch; the line-51 paired output
+confirms completion. Previously the whole-script ASCII gate rejected that
+independent store. Other syntax/data keep their ASCII bounds, patch targets
+still receive the ordinary audit, and unknown values never become stored
+evidence merely because an unrelated patch result was displayed.
+
+Preserve the complete 18-record call chain in a hash-pinned fixture with
+synthetic paths. Both original lines 57 and 91 resolve as
+`derived_from_audited_outputs`. A variant storing JSON from an undisplayed
+tool result leaves both unresolved. Cover Unicode-boundary refusals,
+failed/yielded output, protected patch targets and computed private operands.
+The fixture's earlier truncated listing retains its protected-path finding;
+resolving these loads does not waive unrelated evidence.
+
+Assumptions: only the supplied call chain is available. Original host validity
+and grading require a separate retained-stream re-audit; no host run, private
+grader access or model call occurs here. Preserve frozen inputs, interfaces
+and unstaged worktree scope.
+
+Validation: focused store/code-chain/regrade regressions — 246 passed in 15.21s.
+`.venv/bin/python -m pytest tests/eval -q` — 2019 passed in 363.40s.
+`git diff --check` and the six-path scope/fixture/STATUS audit pass: 18
+sanitized verbatim records, pinned hash, six STATUS headings, no source-location
+leakage and zero staged/deleted paths.
+
 # Protected listings, transport diagnostics and remaining code chains — 2026-10-24
 
 Resolve only supported literal-basename ancestor listings backed by their own

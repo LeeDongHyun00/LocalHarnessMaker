@@ -348,6 +348,10 @@ another computed call cannot resolve.
 
 Confirmed `store`/`save` values belong to one identified native session stream.
 They may contain bounded JSON data, including text fields and literal hash maps.
+Direct single-literal `tools.apply_patch` payloads may contain Unicode without
+preventing reconstruction of an independent store in the same script. Patch
+targets still receive the ordinary audit; other reducer syntax and data retain
+their ASCII bounds. Patch-result values require their own displayed evidence.
 For audited tool results, reconstruct values from the corresponding complete
 JSON in the paired output: direct `text(result)`, indexed objects with a nested
 result, and indexed objects spreading the unmodified result are supported,
