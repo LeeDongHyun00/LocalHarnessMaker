@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-25",
+  "status": "pending_host_verification",
+  "live_calls": 0,
+  "live_model_quality_measured": false,
+  "datasets": {
+    "requirements": {
+      "requests": 40,
+      "v1_public_derived": 20,
+      "v2_public_derived": 20,
+      "gold_rows": 302,
+      "gold_open_questions": 20,
+      "sha256": "220e70c2a3022aac65ce473a0dbd1cf87054467e846bbc5d894928c69ea73a8c",
+      "live_precision": null,
+      "live_recall": null,
+      "undefined_reason": "No live calls: network disabled; host measurement pending."
+    },
+    "claim_audit": {
+      "requests": 40,
+      "v1_public_derived": 20,
+      "v2_public_derived": 20,
+      "gold_rows": 302,
+      "gold_open_questions": 20,
+      "sha256": "553254192040b7bc7a3e798b6b40afb1e860b9791f6301a82b67f285205904ab",
+      "live_precision": null,
+      "live_recall": null,
+      "undefined_reason": "No live calls: network disabled; host measurement pending."
+    }
+  },
+  "scorer_validation": {
+    "requirements": {
+      "source": "authored gold fed back to scorer; not provider output",
+      "sample_size": 40,
+      "schema_valid": 40,
+      "errors": [],
+      "metrics": {
+        "rows": {
+          "true_positive": 302,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "open_questions": {
+          "true_positive": 20,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        }
+      }
+    },
+    "claim_audit": {
+      "source": "authored gold fed back to scorer; not provider output",
+      "sample_size": 40,
+      "schema_valid": 40,
+      "errors": [],
+      "metrics": {
+        "claimed_rows": {
+          "true_positive": 20,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "citations": {
+          "true_positive": 16,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        }
+      }
+    }
+  },
+  "planning": {
+    "maximum_calls_per_phase": 40,
+    "estimated_usd_per_phase": 0.048,
+    "maximum_calls_both_phases": 80,
+    "estimated_usd_both_phases": 0.096,
+    "is_cap": false
+  }
+}

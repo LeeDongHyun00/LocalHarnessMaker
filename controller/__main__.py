@@ -61,8 +61,27 @@ def main(
     for subparser in (contract_parser, judge_parser, handoff_parser):
         subparser.add_argument("--backend", required=True, choices=("codex_cli", "cheap_api", "local"))
         subparser.add_argument("--out", required=True, type=Path)
+    requirements_parser = commands.add_parser("requirements")
+    requirements_parser.add_argument("--prompt", required=True, type=Path)
+    requirements_parser.add_argument("--config", type=Path)
+    audit_parser = commands.add_parser("claim-audit")
+    audit_parser.add_argument("--requirements", required=True, type=Path)
+    audit_parser.add_argument("--final-message", required=True, type=Path)
+    for subparser in (requirements_parser, audit_parser):
+        subparser.add_argument("--session-id", required=True)
+        subparser.add_argument("--artifacts", required=True, type=Path)
     try:
         args = parser.parse_args(argv)
+        if args.command in {"requirements", "claim-audit"}:
+            from controller.v3 import run_operation
+            options = ({"prompt_path": args.prompt, "config_path": args.config}
+                       if args.command == "requirements" else
+                       {"requirements_path": args.requirements, "final_path": args.final_message})
+            path, code = run_operation(args.command.replace("-", "_"),
+                                       session_id=args.session_id, artifacts=args.artifacts, **options)
+            if code == 0:
+                print(path)
+            return code
         if not args.out.parent.is_dir() or args.out.is_dir():
             raise InputError("--out must have an existing parent directory and name a file")
         if args.command == "contract":
