@@ -339,41 +339,66 @@ heredoc and output checks. Literal calls are still audited if another call or
 the reducer fails. No captured JavaScript, shell command or host helper executes
 during reduction.
 
-The reducer accepts text loaded from an earlier confirmed `store`/`save` in the
-same identified native session stream, literal strings, and retained outputs
-of earlier audited tool calls. A tool result is usable only when one direct
-`exec_command` result was displayed by an unmodified `text(result)` and its
-paired output contains exactly one complete JSON value (optionally in one text
-block). Only after that output has passed its own audit may a stored text field
-become a later `load` source. Multiple/transformed displays, missing results,
-unpaired calls, failed/yielded scripts, unknown keys, session changes and ambiguous overlapping scripts
-never establish that provenance. Unsupported scripts invalidate saved trust;
-helper values do not transfer between files or tasks. Unsupported/unknown
-overwrites discard the previous key. Helper objects are not imported as text.
+The reducer follows dependencies that reach `tools.*` arguments or helper
+writes. Comparisons, throws, result displays and inspection loops that do not
+change those operands need no value reduction. Every direct tool site is still
+enumerated; aliases, reflection, unknown effects on live operands and unvisited
+sites remain unsupported. Literal calls receive the ordinary audit even when
+another computed call cannot resolve.
 
-Source closure alone cannot prove path safety: concatenating two harmless
-fragments can name a new private path. Consequently this rule also requires
-concrete reduction of every computed tool argument and audits the resulting
-values. Supported operations include the two measured FILE-header `matchAll`
-patterns, `Set.has`, `filter`/`map`, `Object.fromEntries`, indexing, bounded counted
-loops, awaited Promise collections, slices, concatenation and `JSON.stringify`. The conservative subset uses
-ASCII text (LF manifest lines) and safe integers, rejects coercion/reflection/helper rebinding, and
-limits source size, string size and reduction steps. Static enumeration must
-cover every tool call; an unvisited site is unresolved. It records successful
-reductions in `access-audit.json.resolutions` with log/line/hash and
-`reason=derived_from_audited_outputs`; this reason never overrides a detected
-path or an uncertain audit. Environment/process arguments, network/filesystem
-helpers, unknown sources and any operation or result the reducer cannot prove
-stay inconclusive under STOP-E4. Arbitrary JavaScript is not allowlisted.
+Confirmed `store`/`save` values belong to one identified native session stream.
+They may contain bounded JSON data, including text fields and literal hash maps.
+For audited tool results, reconstruct values from the corresponding complete
+JSON in the paired output: direct `text(result)`, indexed objects with a nested
+result, and indexed objects spreading the unmodified result are supported,
+with or without a bounded display loop. Match display order and literal wrapper
+fields, preserve each tool result's identity, and refuse missing, ambiguous or
+overridden fields. A directly displayed string field retains its raw text.
+Only after the output's own access audit may reconstructed values feed a later
+`load`. A failed script can confirm a write only when a subsequent captured
+display proves execution passed that write; yielded scripts cannot do so.
 
-The supplied baseline-B excerpt contains **two** records, both for the rate
-budgets task, at native lines 65 and 75. The fixtures retain their JavaScript
-with synthetic session/source data. Both reduce under
-`derived_from_audited_outputs` when `original_sources` has established provenance;
-both remain unresolved as standalone excerpts because the earlier store is
-absent. No third record or complete-session re-audit result was supplied here.
-Regressions also detect a private path in the source tool output itself and
-keep unknown inputs inconclusive; pure string synthesis receives path auditing.
+A script whose token stream contains neither `store` nor `save` cannot change
+helper storage and preserves saved values even when its other syntax is outside
+the reducer. Unsupported scripts mentioning either writer clear saved trust.
+Unknown overwrites, unpaired/overlapping calls and session/log boundaries still
+prevent borrowing earlier values. This state rule does not waive uncertainty
+in the script's own tool arguments.
+
+Supported data operations include literal pair arrays mapped through destructured
+arrow parameters, awaited Promise collections, bounded loops, indexing, slices,
+`Set.has`, `filter`/`map`, `Object.fromEntries`/`keys`/`entries`, `JSON.parse` and
+`JSON.stringify`, concatenation and expression-only template interpolation.
+`matchAll` additionally accepts an ASCII regex subset translated to Python `re`:
+character classes, ordinary/noncapturing groups, quantifiers, anchors,
+`\d`/`\w`/`\s` and complements, control escapes, `\b`, escaped punctuation and
+ASCII `\xHH`/`\uHHHH`, with mandatory `g` and optional `m`/`s`. Nested/overlapping
+repetition, unsafe search rescans, backreferences, alternation, arbitrary
+lookarounds, Unicode modes, unknown flags and empty/unmatched-group results
+remain unsupported. The two historical FILE-header patterns retain their
+separately measured matcher. Input, collection, number and reduction-step
+limits still apply; nothing from a captured script executes during reduction.
+
+Concrete argument auditing remains mandatory: harmless source fragments can
+combine into a private path. Successful reductions record log/line/hash and
+`reason=derived_from_audited_outputs` in `access-audit.json.resolutions`; this
+never overrides detected access or another unresolved audit item. Unknown
+sources feeding an operand remain inconclusive under STOP-E4.
+
+Hash-pinned fixtures in `tests/eval/fixtures/runtime-records/` retain all supplied
+code-mode scripts and paired records for five baseline-B tasks, plus the
+baseline-A shell records. Tests add synthetic session identity and synthetic
+graders, preserving scripts verbatim. They cover store provenance, intervening
+large literal patches, comparison-only loads, pair mapping, regex groups in
+heredoc commands, and private paths reached through reduced values. The shell
+parser also unrolls literal `for` lists whose body uses
+`if test -f "$p"; then cat "$p"; fi`, followed by a separate quoted heredoc.
+Each literal loop operand is audited regardless of file existence; a runtime's
+own ancestor AGENTS.md is ordinary, while an explicitly protected sibling root
+is detected. Heredocs inside loops, dynamic operands and unsafe bodies remain
+inconclusive. These offline results do not establish historical task/report
+validity; full original-stream re-audit with original pinned graders remains
+host work.
 
 Dynamic directories, unknown tools and unsupported
 custom code stay inconclusive. Other unknown record/item kinds

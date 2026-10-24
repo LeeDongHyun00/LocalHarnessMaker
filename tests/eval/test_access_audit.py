@@ -784,14 +784,18 @@ def test_native_retained_array_with_readonly_display(tmp_path: Path, private: Pr
     'const results = await Promise.all(commands.map(cmd => tools.exec_command({cmd})));',
     'for (const cmd of commands) { text(await tools.exec_command({cmd})); }',
 ])
-def test_native_custom_collection_near_misses_stay_inconclusive(tmp_path: Path, private: PrivateGraders,
+def test_native_custom_collection_boundaries(tmp_path: Path, private: PrivateGraders,
                                                                native_session: list[dict[str, Any]],
                                                                source: str, use: str) -> None:
     native_session[22]['payload']['input'] = source.replace('USE', use)
     audit = audit_native(tmp_path, private, native_session)
-    assert audit['status'] == 'inconclusive', audit
+    expected = 'clean' if source.endswith('USE text(commands);') else 'inconclusive'
+    assert audit['status'] == expected, audit
     assert audit['matches'] == []
-    assert 'unresolved_custom_input:native.jsonl:23' in audit['errors']
+    if expected == 'inconclusive':
+        assert 'unresolved_custom_input:native.jsonl:23' in audit['errors']
+    else:
+        assert audit['errors'] == []
 
 
 @pytest.mark.parametrize("case, expected", [

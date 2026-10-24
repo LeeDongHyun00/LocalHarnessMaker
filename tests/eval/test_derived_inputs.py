@@ -197,12 +197,12 @@ def test_unpaired_or_overlapping_store_cannot_establish_provenance(tmp_path: Pat
     assert 'overlapping_code_mode_scripts:synthetic.jsonl:3' in result['errors']
 
 
-def test_unrelated_external_read_prevents_computed_call_exemption(tmp_path: Path, private: PrivateGraders) -> None:
+def test_unused_external_value_does_not_feed_computed_argument(tmp_path: Path, private: PrivateGraders) -> None:
     source = ('const unused = process.env.SECRET; '
               'await tools.exec_command({cmd:"cat " + load("original_sources")});')
     result = run_scripts(tmp_path, private, [(stored('solution.py'), ''), (source, '')])
-    assert result['status'] == 'inconclusive', result
-    assert not result['resolutions']
+    assert result['status'] == 'clean', result
+    assert result['resolutions']
 
 
 @pytest.mark.parametrize('failure', ['Script error: synthetic failure', 'Script running with cell ID synthetic', 'flag'])
@@ -282,7 +282,8 @@ def test_both_retained_scripts_in_sequence(tmp_path: Path, private: PrivateGrade
     'const x = load("original_sources"); await tools.exec_command({cmd:x.constructor("opaque")()});',
     'const x = "\\u{1f600}"; await tools.exec_command({cmd:x.slice(1)});',
     'const x = true + true; await tools.exec_command({cmd:x});',
-    'const x = load("original_sources"); x.matchAll(/(a+)+$/gm);',
+    'const x = load("original_sources"); const bad = [...x.matchAll(/(a+)+$/gm)]; '
+    'await tools.exec_command({cmd:JSON.stringify(bad)});',
     'const result = await tools.exec_command({cmd:"cat source.txt"}); '
     'await tools.exec_command({cmd:result ? "cat safe.py" : "cat other.py"});',
     'const a = 0 == "0"; await tools.exec_command({cmd:a ? "cat safe.py" : "cat other.py"});',

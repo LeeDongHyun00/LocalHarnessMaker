@@ -1,5 +1,11 @@
 ## Done
 
+- Verified the final evaluation package in this worktree's .venv, updated README/CHANGES and this handoff, and confirmed authorized scope with frozen files/interfaces unchanged and nothing staged or committed (`.venv/bin/python -m pytest tests/eval -q`: 1904 passed in 362.58s; `git diff --check`: exit 0; inline authorized-scope/STATUS audit: PASS, 14 exact paths, six headings, zero staged/deleted paths).
+- Compared all six fixture files to the supplied read-only records and confirmed the source-record location is absent from changed repository files (inline verbatim fixture/source-location audit: PASS, six files / 72 exact JSONL records).
+
+- Resolved all five supplied baseline-B code-mode sequences and both baseline-A shell lifecycle records in offline regression audits; preserved the supplied scripts/paired records in six hash-pinned fixtures with synthetic session identity and graders (`.venv/bin/python -m pytest tests/eval/test_runtime_records.py tests/eval/test_derived_inputs.py tests/eval/test_access_audit.py -q`: 729 passed in 9.20s).
+- Extended result-field reconstruction through indexed/nested/spread displays, bounded JSON stores, nonwriting-script state retention, operand dependency reduction, destructured pair maps, safe ASCII matchAll/template commands and literal test-f/cat loops before a separate heredoc; preserved private-path detection and unsupported-source refusals (`.venv/bin/python -m pytest tests/eval/test_runtime_records.py tests/eval/test_derived_inputs.py tests/eval/test_access_audit.py -q`: 729 passed in 9.20s).
+
 - Verified the final evaluation package with only this worktree's .venv, mocked model transports and synthetic graders; confirmed all changes are in the 11 exact authorized files, with frozen inputs/reports/interfaces unchanged and nothing staged (`.venv/bin/python -m pytest tests/eval -q`: 1828 passed in 368.77s; `git diff --check`: exit 0; inline scope/branch/STATUS/source-location audit: PASS, zero staged/deleted paths).
 - Implemented a bounded static reducer for session-authored FILE manifests, concrete computed-argument auditing, confirmed text-store provenance, source-output access detection and missing/unknown-source refusals; documented the rule and pinned its implementation for regrades (`.venv/bin/python -m pytest tests/eval/test_derived_inputs.py -q`: 73 passed in 2.95s).
 - Preserved both supplied JavaScript excerpts as regression fixtures and classified their prerequisite explicitly: native lines 65 and 75 resolve with a confirmed original_sources store, while standalone excerpts stay inconclusive; no third record was supplied (`.venv/bin/python -m pytest tests/eval/test_derived_inputs.py -q`: 73 passed in 2.95s).
@@ -69,7 +75,7 @@
 
 ## Remaining
 
-- Host/Claude: transfer the computed-input audit follow-up and re-audit the complete original baseline-B native streams at a safe boundary. The supplied excerpt has two records of one task, lacks the earlier original_sources store and contains no third record. Establish actual store/output provenance before claiming either historical session clean; keep unknown/missing evidence inconclusive. No historical task/report was re-audited here.
+- Host/Claude: transfer this runtime-provenance follow-up and re-audit the complete original streams for all five supplied baseline-B tasks and the baseline-A rate-budgets day-2 shell record with original pinned graders. All supplied excerpt sequences now resolve in synthetic offline audits; this does not establish historical validity or repair retained reports. Keep any other unknown/missing evidence inconclusive.
 - Host/Claude: transfer this verbatim-input and recovery-accounting follow-up, then regrade the retained continuation and harness recovery with original pinned inputs/private graders. Confirm all retained task provenance validates, the day-2 session is priced at the model default, and the selected harness task totals $0.03405012. This session checked supplied copies read-only and synthetic regrade paths; no host regrade or quality result is claimed.
 - Host/Claude: publish the user-supplied host population digest 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, type/family counts and 2026-10-24 freeze date through Role 1 in docs/eval-freeze-v2.md. The supplied B digest 3af558f5f0993bcac598c4f71772b14e884ea54a106a4988b2dd3d2f23a12b09 identifies only its 80-task selection. This worktree already has B's ordered 100-task task_population; ensure the main checkout uses it for report population identity. No host digest was recomputed here.
 - Host only, after validation/freeze and spending approval: transfer the full-v2 A/B/harness configs and matched Fast estimates to the main checkout. This worktree must not run executor/controller/judge models. Re-estimate dynamic judge slots before a harness batch.
@@ -89,6 +95,12 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Preserve helper state across scripts without store/save identifiers, including nonwriter failures and detected outputs: those scripts cannot change storage, while their own uncertainty/detection still controls the aggregate audit result.
+- Bind result fields through matched paired JSON displays and retain bounded JSON objects as well as text: real records use indexed Promise results and literal hash maps. Overridden, missing, ambiguous or unobserved fields never become load sources.
+- Accept a write before a later script failure only with a captured postwrite execution witness: the constrained-refactoring record stores literal hashes before a displayed shell result and a failed patch. Yielded scripts and unwitnessed writes remain untrusted.
+- Reduce dependencies of tool operands and helper writes; leave independent comparison/throw/display work outside value reduction: the routing record's load does not flow to a tool argument. Mutations, unknown effects and conditional writes that cannot be proven still fail closed.
+- Generalize matchAll only within bounded ASCII semantics and conservative repetition/search bounds: retain exact Python-re translation for accepted patterns and reject unknown dialect features or unsafe backtracking shapes. Concrete commands always receive the normal private-path audit.
 
 - Require both source closure and concrete computed-argument auditing before derived_from_audited_outputs: pure strings can synthesize a private path absent from their source fragments.
 - Export only confirmed text stores within one native session stream, with paired raw output evidence for tool-result fields: unsupported code, transformed/missing output, unknown keys and ambiguous concurrency cannot establish trust.
@@ -159,6 +171,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_runtime_records.py tests/eval/test_derived_inputs.py tests/eval/test_access_audit.py -q`
+
 - `.venv/bin/python -m pytest tests/eval -q`
 - .venv/bin/python -m pytest tests/eval/test_retained_defects.py -q
 
@@ -200,6 +214,9 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The supplied record sequences are read-only evidence excerpts, not complete original execution streams. Tests preserve every supplied script verbatim and add synthetic identity/graders; no host runtime, actual private grader or historical quality result was inspected or regenerated here.
+- This session is limited to eval/, tests/eval/ and this STATUS file in the separate r5/v2 worktree using its .venv. Network, nested executors and live executor/controller/judge calls remain unavailable; no staging or commits are authorized.
 
 - The supplied read-only excerpt is the complete available record bundle for this job; it contains two records, not three, and no earlier original_sources store. Synthetic provenance tests do not establish actual historical session cleanliness.
 - The computed-input reducer intentionally accepts a bounded ASCII/LF and safe-integer subset; other code or unobservable tool values remain inconclusive rather than inheriting trust.

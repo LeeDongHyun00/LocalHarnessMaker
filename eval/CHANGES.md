@@ -1,3 +1,37 @@
+# Runtime store provenance and computed operands — 2026-10-24
+
+Resolve the five supplied baseline-B code-mode sequences with complete paired
+result provenance, including indexed/spread displays, bounded JSON helper data,
+comparison-only loads, destructured literal pair maps and safe ASCII matchAll
+patterns in concatenated/template heredoc commands. Keep saved helper values
+across scripts without storage-writer identifiers. For a later script failure,
+require a captured postwrite execution witness before retaining the write;
+yielded or unsupported writer scripts cannot establish trust.
+
+Audit the concrete command after reduction, retaining STOP-E4 detection over
+resolution reasons. Refuse unknown live sources/effects, conditional mutations,
+unsupported regexes, transformed/ambiguous result fields and incomplete output.
+Allow a separate quoted heredoc after a literal for-loop using test -f/cat;
+audit each path, including private and protected sibling roots.
+
+Preserve all supplied records as six hash-pinned JSONL fixtures with verbatim
+scripts. Regression sessions add synthetic identity/graders and cover the real
+sequences plus negative variants. Update earlier expectations for read-only
+displays that cannot affect operands. No frozen task, retained report, schema,
+CLI flag, other checkout or actual private-grader storage changes.
+
+Assumptions: supplied records are evidence excerpts, not complete original
+execution captures. Offline clean fixture audits do not change historical
+quality/validity claims. Original-stream re-audit remains on the host with the
+original pinned inputs and graders. Model calls are mocked; no live calls ran.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 1904 passed in
+362.58s. Focused audit regressions — 729 passed in 9.20s. Verbatim fixture
+comparison — six files / 72 records match the supplied evidence exactly.
+`git diff --check` and the authorized-scope/STATUS audit pass: 14 exact paths,
+six STATUS headings, zero staged/deleted paths, no source-record location in
+changed repository files.
+
 # Session-authored computed code-mode inputs — 2026-10-24
 
 Add a bounded static reducer for the measured FILE-header scripts and retain
