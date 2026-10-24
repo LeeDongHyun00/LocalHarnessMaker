@@ -41,6 +41,7 @@ def environment(metadata: dict[str, Any]) -> dict[str, str]:
     env = {key: value for key, value in os.environ.items()
            if not key.startswith(('HARNESS_', 'CODEX_'))}
     env.update(HOME=metadata['home'], CODEX_HOME=metadata['codex_home'],
+               HARNESS_INTERFACE_VERSION='2',
                HARNESS_CODEX=metadata['codex'], HARNESS_STUB='1',
                PYTHONDONTWRITEBYTECODE='1')
     return env
@@ -252,13 +253,21 @@ def check(out: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('prepare', 'second', 'check'))
+    parser.add_argument('action', choices=('prepare', 'second', 'check', 'v3-prepare', 'v3-check'))
     parser.add_argument('--scenario', choices=SCENARIOS)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     out = args.out.resolve()
     try:
-        if args.action == 'prepare':
+        if args.action == 'v3-prepare':
+            from plugin.v3_demo import prepare as prepare_v3
+            prepare_v3(out)
+        elif args.action == 'v3-check':
+            from plugin.v3_demo import check as check_v3
+            result = check_v3(out)
+            write(out / 'audit.json', result)
+            print(json.dumps(result))
+        elif args.action == 'prepare':
             if args.scenario is None:
                 raise ValueError('--scenario is required for prepare')
             prepare(out, args.scenario)

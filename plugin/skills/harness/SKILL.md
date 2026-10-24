@@ -1,7 +1,31 @@
 ---
 name: harness
-description: Execute a LocalHarnessMaker contract injected by lifecycle hooks, including approval, verification evidence and focused re-instruction. Without an injected contract, follow the user's ordinary request.
+description: Follow LocalHarnessMaker requirements, visible questions, deterministic completion evidence, one focused repair and an executor-written decision ledger. Retains historical contract instructions for v1/v2 demos.
 ---
+
+When `HARNESS_REQUIREMENTS` appears, display the numbered table before work.
+Ask every unanswered question and end that turn before changing any file.
+Never assume an answer. The hook accepts explicit user JSON of the form
+`{"answers":{"Q-1":"the user's answer"}}`; request that format when needed.
+There is no generated-contract approval gate on this v3 path.
+
+Follow exact named/protected files and configured checks. Report each row with
+command/output or path/hash evidence. Missing oracles remain unverifiable.
+Only an executed deterministic failure authorizes the single application
+repair continuation; audit opinions and unverifiable rows do not.
+
+In the separate verifier ledger continuation, write the requested schema-shaped
+ledger with `validation=null`, decisions/rationale, fixed identifiers/paths and
+open items. Do not edit application code in that continuation. Preserve the
+application completion summary and evidence in the retained final response.
+`HARNESS_LEDGER` is prior context validated against the current workspace.
+Leave `.localharness/v3/` phase/accounting/validation files to their producers.
+
+If a pin disables Luna, show the advisory and continue ordinary work without
+claiming H3 validation, substituting another model or changing effort/settings.
+
+The remaining instructions apply only to explicit historical v1/v2 demos
+(`HARNESS_INTERFACE_VERSION=2` or routing-only `HARNESS_STUB=1`).
 
 When `HARNESS_CONTRACT` appears in context, display the goal, success-criterion
 checklist, assumptions, reasoning effort with rationale, and estimated tokens

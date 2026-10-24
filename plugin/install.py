@@ -19,6 +19,10 @@ REQUIRED = ('controller/__main__.py', 'verifier/__main__.py', 'schemas/contract.
             'plugin/hooks/_runtime.py', 'plugin/hooks/_entrypoint.py', 'plugin/hooks/_scope.py',
             'plugin/hooks/_config.py', 'plugin/hooks/_process.py', 'plugin/skills/harness/SKILL.md',
             'plugin/CODEX_VERSION', 'plugin/VERIFIED_VERSIONS.json', 'plugin/versions.py', *(f'plugin/hooks/{name}' for name in EVENTS.values()))
+REQUIRED += ('plugin/artifacts.py', 'plugin/pin_check.py', 'plugin/v3_adapter.py',
+             'plugin/hooks/_v3_runtime.py', 'schemas/pin-check.schema.json',
+             'schemas/requirements.schema.json', 'schemas/completion-report.schema.json',
+             'schemas/ledger.schema.json', 'schemas/luna-call.schema.json', 'controller/prices.yaml')
 APP_CODEX = '/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex'
 
 
@@ -169,7 +173,8 @@ def plan_install(home: Path, project: Path) -> dict[Path, bytes]:
         for source in sorted((ROOT / name).rglob('*')):
             if source.is_file() and '__pycache__' not in source.parts and source.suffix != '.pyc':
                 plan[snapshot / source.relative_to(ROOT)] = source.read_bytes()
-    for name in ('CODEX_VERSION', 'VERIFIED_VERSIONS.json', 'versions.py'):
+    for name in ('CODEX_VERSION', 'VERIFIED_VERSIONS.json', 'versions.py', 'artifacts.py',
+                 'pin_check.py', 'v3_adapter.py'):
         plan[snapshot / 'plugin' / name] = (ROOT / 'plugin' / name).read_bytes()
     for source in (ROOT / 'plugin/skills/harness').rglob('*'):
         if source.is_file():
@@ -230,9 +235,21 @@ def main() -> int:
             print(f'Codex version probe failed: {exc}', file=sys.stderr)
     if args.check:
         installed_ok = check_install(home, project)
-        if version_ok and version_verified and installed_ok:
+        pin_ok = True
+        if os.environ.get('HARNESS_INTERFACE_VERSION') != '2':
+            import tempfile
+            from plugin.pin_check import check
+            from plugin.artifacts import session_directory
+            from plugin.hooks._process import run_group
+            with tempfile.TemporaryDirectory(prefix='lhm-pin-check-') as temporary:
+                directory = session_directory(Path(temporary), 'installation-check')
+                pin = check('installation-check', directory, executable or 'codex', runner=run_group,
+                            pricing=home / 'local-harness-maker/controller/prices.yaml')
+                pin_ok = pin['status'] == 'enabled'
+                print(pin['advisory'], file=sys.stderr)
+        if version_ok and version_verified and installed_ok and pin_ok:
             print('LocalHarnessMaker installation OK')
-        return 0 if version_ok and version_verified and installed_ok else 1
+        return 0 if version_ok and version_verified and installed_ok and pin_ok else 1
     if not version_ok:
         return 1
     assert plan is not None

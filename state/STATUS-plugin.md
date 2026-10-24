@@ -1,5 +1,9 @@
 ## Done
 
+- Implemented the default v3 hook runtime, exact-model/version/pricing pin-check CLI, confined atomic artifacts, immutable evidence and append-only accounting-prefix validation; legacy v1/v2 routing and evidence remain explicit historical paths (.venv/bin/python -m pytest tests/plugin -q: 313 passed, 1 opt-in real Codex test skipped in 27.21s; mocked pin tests cover exact/renamed/missing/unobservable models, unverified versions, missing prices, timeout and app-server model/list responses).
+- Added per-native-session phase locking/reservations, first-prompt requirements and explicit-answer question pauses, deterministic completion delegation, one executed-failure repair, stale audits, one separate ledger continuation, strict prior-session selection and ledger coverage/hash checks (.venv/bin/python -m pytest tests/plugin -q: 313 passed, 1 skipped in 27.21s; v3 stdin/stdout and state-machine fixtures cover success, disabled pin, pending questions, edited pending workspace, one repair, escalation, duplicate Stops, ledger publication/injection and rejection without older-ledger fallback).
+- Updated installer snapshots/--check, executor instructions, README and host checks; added host-only v3 two-session preparation/structural audit while retaining historical demos (.venv/bin/python -m pytest tests/plugin -q: 313 passed, 1 skipped in 27.21s; .venv/bin/python -m plugin.v3_demo --help, plugin.host_checks --help and plugin.pin_check --help: each exit 0; bash -n plugin/install.sh plugin/demo.sh: exit 0; git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
+
 - Added plugin.host_checks prepare/second/check and plugin/HOST-CHECKS.md with explicit host commands, isolated installation, interactive trust capture, fresh second sessions without hook-trust bypass, empty-PATH bundle installation, raw production-hook stream recording, evidence layout and offline rejection of contradictory captures (.venv/bin/python -m pytest tests/plugin -q: 272 passed, 1 opt-in live Codex test skipped in 18.57s; new host-check fixtures cover all three scenarios and eleven incomplete/false-silence cases; no live procedure was run).
 - Added bounded SessionStart CLI-version checks against VERIFIED_VERSIONS.json, persisted cli_version, one advisory per session naming the probe command, resume detection and fail-open handling including unavailable handoff context (.venv/bin/python -m pytest tests/plugin -q: 272 passed, 1 skipped in 18.57s; fake-version tests cover listed/unlisted versions, once-per-session injection, resumed updates, timeout recovery and unavailable handoff).
 
@@ -60,11 +64,20 @@
 
 ## Remaining
 
+- Integrate Roles 3/4 before any H3/live acceptance: this checkout still has historical controller/verifier parsers. plugin/v3_adapter.py alone contains the user-authorized v3 CLI spellings and the provisional verifier.ledger.ledger_request(ledger=Path, requirements=Path, session_id=str) formatter seam. Match that seam to Role 4's actual in-package ledger text; the current missing formatter fails open visibly and never substitutes plugin-authored wording.
+- Host-only v3 verification: after integration run .venv/bin/python -m plugin.host_checks v3-prepare --out /tmp/lhm-v3-host-capture, follow its two interactive session scripts/explicit question-answer instructions, then run v3-check. Verify exact installed model/list protocol, pin disablement, fresh-session hook trust, requirements table/pause, real completion/one repair, ledger writing and injection on two non-evaluation smoke projects. No Codex/model/sandbox-exec was run here; timing, two-call cost targets and real model-context acceptance remain unmeasured.
+- Role 1 updates docs/hooks-contract.md with active v3 sequencing, explicit question-ID/answer JSON, adapter/message seam, pending live compatibility and optional PreToolUse deferral. The Role 2 prompt does not own that document, so it was not edited. Retained compatibility evidence exposes only measured SessionStart/UserPromptSubmit/Stop behavior; no pre-tool hook was registered.
+
 - Claude runs the prepared trust, bundle and silence captures from plugin/HOST-CHECKS.md after host evaluation capacity is available, then runs plugin.host_checks check on each capture and its copied review directory. These procedures are offline-tested; live results remain pending. macOS sandbox isolation remains a separate unprepared host check.
 - Pending host measurement: revised Stop 660s / check 480s / handoff 120s / validation 5s budgets and Role 4's internal 450s verifier budget, plus contract cutoff at 30s inside 40s despite the controller's 35s deadline. SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants remains separate from the completed host SIGTERM/SIGHUP/child-exit checks.
 - Before merge: coordinating role runs the full suite once. This job runs only tests/plugin; .git is read-only and all work remains unstaged/uncommitted. Do not disturb the in-progress host evaluation or edit eval/, controller/ or verifier/.
 
 ## Decisions
+
+- Implement the schema freeze and four v3 CLI operation shapes supplied explicitly by the user: that authorization supersedes the still-proposed wording in checked-in shared documents without editing another role's paths.
+- Use a thin v3 adapter and retain explicit HARNESS_INTERFACE_VERSION=2 for historical demos/tests (HARNESS_STUB=1 also remains historical): the production default is v3 and legacy retry/backend defaults do not leak into it.
+- Require explicit user-authored question-ID/value JSON instead of inferring natural-language mappings: silence or an ambiguous answer never makes requirements ready and never spends another Luna call.
+- Keep verifier-owned repair/ledger text and fail open on absent package integration: do not invent a second verification loop or present mocked cross-package behavior as live H3 acceptance.
 
 - Record host/CI completions as user-supplied evidence and rerun only the failure-demo offline checkers: network, live models, Codex, sandbox-exec and real-home writes are prohibited in this session.
 - Use an interactive trust-establishment session followed by a fresh exec session, with no hook-trust bypass in either launch; retain diagnostic wrappers around the production hooks: actual hook invocation and distinct session IDs prevent skipped/untrusted hooks from passing as silence or persisted trust.
@@ -103,6 +116,13 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/plugin -q
+- bash -n plugin/install.sh plugin/demo.sh
+- git diff --check -- plugin tests/plugin state/STATUS-plugin.md
+- .venv/bin/python -m plugin.v3_demo --help
+- .venv/bin/python -m plugin.host_checks --help
+- .venv/bin/python -m plugin.pin_check --help
+
 - .venv/bin/python -m pytest tests/plugin -q (latest: 272 passed, 1 opt-in live Codex test skipped in 18.57s).
 - Host only: .venv/bin/python -m plugin.host_checks prepare --scenario trust --out /tmp/lhm-trust-DATE; follow plugin/HOST-CHECKS.md for the recorded interactive session and second/check commands. Repeat separately for silence; bundle needs prepare/check only. No procedure was run in this session.
 - Offline after host capture: .venv/bin/python -m plugin.host_checks check --out /tmp/lhm-trust-DATE (repeat for bundle/silence and copied review directories).
@@ -129,6 +149,9 @@
 
 ## Do not touch
 
+- controller/, verifier/, eval/, schemas/, prompts/, shared root files, docs/hooks-contract.md and other roles' STATUS files; user-authorized paths in this worktree are plugin/, tests/plugin/ and state/STATUS-plugin.md only.
+- .git is read-only: do not stage or commit. Preserve all historical evidence and demos, exact HARNESS_NESTED=1 zero-byte guards and copied child environments. Never run the live host scripts in this sandbox.
+
 - This session: .git is read-only; do not stage or commit. Host evaluations are in progress; leave eval/, controller/ and verifier/ untouched.
 
 - Other roles' code, tests, STATUS files, root configuration, schemas or CLI/hook interfaces; the canonical docs/hooks-contract.md is published and read-only for Role 2.
@@ -138,6 +161,11 @@
 - Never infer real task success, control-model latency, actual cost, fork/clear behavior, real handoff success or installed packaging from synthetic fixture verdicts.
 
 ## Assumptions
+
+- The user's 2026-10-25 schema freeze/CLI instructions are the current authority; no separate approval or shared interface edit is needed in this session.
+- Explicit question-ID/answer JSON is a local recording convention with no new hook wire field. Unstructured answers remain pending rather than being guessed.
+- verifier.ledger.ledger_request is a provisional private formatter seam only; its final name/signature is not asserted to exist in this historical checkout. Roles 3/4 integration and real host execution remain pending.
+- A read-only strings inspection found model/list, ModelListParams, clientInfo and nextCursor in the installed binary, supporting the non-generating app-server probe choice; it does not prove runtime protocol compatibility. Unsupported or incomplete responses disable Luna.
 
 - Claude's 3ef1e84 live demonstration results and 1550267 Ubuntu/Python 3.11/3.14 CI completion are user-supplied evidence; only retained demo checkers and offline plugin tests ran here.
 - New trust/silence procedures assume macOS /usr/bin/script and normal interactive acceptance of isolated hook trust. Their two executor sessions use stub control calls, not real task execution. Bundle discovery runs the actual installer with empty PATH/no HARNESS_CODEX; no new live host result is claimed.

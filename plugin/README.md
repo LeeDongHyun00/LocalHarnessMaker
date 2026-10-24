@@ -1,5 +1,132 @@
 # LocalHarnessMaker plugin
 
+The default hook path is interface v3, authorized by the user's 2026-10-25
+schema freeze. SessionStart pins exactly `gpt-6-luna`, then revalidates the
+most recent prior ledger. The first native-session prompt produces a visible
+requirements table. Unanswered questions pause the turn before file changes;
+explicit user answers use `{"answers":{"Q-1":"answer"}}`. Later prompts never
+regenerate requirements or spend another requirements call.
+
+Stop delegates checks to verifier, audits the first retained final message
+once, and permits one application repair only for executed failures. The next
+Stop checks round 2 without Luna. Repeated failure writes/surfaces
+`escalation_advice` recommending human review or higher effort, without changing
+settings. A separate verifier-authored ledger continuation happens at most
+once. Invalid or missing ledgers get an advisory; they never create a loop.
+The report retains the original audit and marks it stale if repair or ledger
+bookkeeping changes the final message. Completion evidence is printed on
+stderr and retained in `completion-report.json`.
+
+All state lives in
+`<workspace>/.localharness/v3/sessions/<sha256(UTF-8 native session_id)>/`.
+JSON replacements are atomic, evidence snapshots immutable, and controller
+owns append-only `luna-calls.jsonl`; hooks verify the retained prefix, call
+count/identity and pricing reference. `hook-state.json` and `hook.lock` are
+private orchestration files in that directory. A nonblocking per-session lock
+and persisted reservations prevent duplicate calls/repairs after replay or
+interruption. Interrupted phases fail open with an advisory and cannot count
+as valid H3 completion. Paths reject absolute/traversal/symlink escapes.
+
+`latest-ledger.json` must exactly match the ledger of the most recent prior
+session selected by `pin-check.checked_at`, excluding the current session.
+Missing artifacts, timestamp ties or identity conflicts never fall back to an
+older ledger. `verifier ledger-validate` remeasures before injection, and the
+hook checks identifier/file coverage and current hashes before publication.
+
+Every hook retains the exact, immediate `HARNESS_NESTED=1` zero-byte bypass.
+Controller/verifier children receive that value in a copied environment.
+Direct host demos remove it. No v3 hook calls contract, handoff, judge,
+`llm_judge`, fallback, regeneration, or an automatic effort change.
+
+## Pin preflight and installation
+
+```sh
+.venv/bin/python -m plugin.pin_check --session-id ID \
+  --artifacts /WORKSPACE/.localharness/v3/sessions/SHA256_OF_ID --codex /PATH/TO/codex
+.venv/bin/python -m plugin.install --codex-home /ISOLATED/CODEX_HOME --project /PROJECT --check
+```
+
+Pin-check exits 0 enabled, 1 disabled with a readable stdout advisory, or 2 for
+an internal/artifact error. It verifies the installed version against
+`VERIFIED_VERSIONS.json`, discovers an advertised `models --json` command, or
+uses a non-generating stdio app-server `initialize` / `initialized` /
+`model/list` probe. It starts no thread and invokes no model. Unsupported,
+truncated or unobservable listings fail closed; display names, prefixes and
+newer model identities never satisfy the exact pin. Model-list bytes and the
+versioned `controller/prices.yaml` snapshot are retained with hashes and a
+pricing reference. The probe's actual behavior on the installed host is pending
+verification; registry membership alone proves neither it nor v3 compatibility.
+
+`install.sh --check` delegates the same checks and separately reports missing
+registration/skill, unverified CLI, unavailable/missing exact model and missing
+installed pricing. Its temporary preflight artifacts stay outside the project;
+it does not change external configuration. Installation snapshots include the
+v3 modules, schemas and pinned prices. Pin-disabled sessions skip all later
+Luna calls and cannot be reported as H3. Ordinary work and safe deterministic
+verification/ledger handling remain available.
+
+## Concurrent-role adapter and host verification
+
+`plugin/v3_adapter.py` contains all v3 argument spelling. It uses the four
+user-authorized operation shapes, with stdout parsing confined to the expected
+path or verifier JSON summary. The controller/verifier in this checkout still
+implement historical operations, so cross-package execution remains pending
+Roles 3/4 integration. Repair wording uses verifier's retained `reinstruct`
+formatter with only executed failing rows and an explicit one-repair budget.
+The ledger formatter seam is `verifier.ledger.ledger_request(ledger=Path,
+requirements=Path, session_id=str)`; adjust this adapter to Role 4's actual
+in-package formatter when it lands. Missing wording fails open visibly; there
+is no plugin-authored substitute or repeated bookkeeping block.
+
+Run the two-session demonstration only on the host, after those packages land:
+
+```sh
+.venv/bin/python -m plugin.host_checks v3-prepare --out /tmp/lhm-v3-host-capture
+# Follow the printed session1.sh / explicit-answer / session2.sh commands.
+.venv/bin/python -m plugin.host_checks v3-check --out /tmp/lhm-v3-host-capture
+```
+
+Preparation creates an isolated installation and two interactive launch
+scripts, preserving actual hook trust prompts and terminal captures. It never
+launches either paid executor automatically. The first session asks for an
+unspecified release label, pauses, accepts the user's explicit JSON answer,
+then shows the report and writes the ledger. Exit before launching session 2;
+it should inject the ledger and write the same label to `followup.txt` without
+restatement. The offline checker rejects missing artifacts, disabled pins,
+missing calls, absent question/injection context and mismatched output bytes.
+Review terminal captures for actual user-visible questions/answers and retained
+application completion evidence. Structural audits do not establish live
+latency, cost, isolation or model-context acceptance.
+
+Optional PreToolUse protection is deferred: the retained installed-version
+compatibility evidence covers SessionStart/UserPromptSubmit/Stop only, and
+exposes no measured pre-tool event contract. Deterministic protected-file hash
+checks stay verifier-owned. No new hook event or wire field was invented.
+`docs/hooks-contract.md` is Role 1 owned. Role 1 needs to record this active
+v3 sequencing, question-answer JSON convention, adapter seam, optional guard
+deferral and pending live compatibility measurement there.
+
+Historical demos explicitly select `HARNESS_INTERFACE_VERSION=2` (stub mode
+also remains historical). Their evidence and implementation below are retained.
+New sessions use v3 unless that legacy setting is explicitly supplied.
+
+## Verification and assumptions
+
+Run `.venv/bin/python -m pytest tests/plugin -q`. These tests mock controller,
+verifier and CLI model discovery; no live model or nested Codex run is implied.
+The coordinating role runs the full repository suite once before merge.
+
+- The user's schema freeze and CLI shapes supersede still-proposed wording in
+  the checked-in shared documentation; this role does not change shared files.
+- Explicit question-ID/answer JSON records answers without inferring a mapping
+  from ambiguous natural language. Unstructured answers keep the pause active.
+- Role 4's pending ledger formatter name is an adapter seam, not an asserted
+  implemented/public CLI. Host integration must resolve it before H3 runs.
+- Live pin/model-list protocol, fresh-session hooks/trust, ledger validation,
+  one repair, timing/cost and two non-evaluation smoke projects remain host work.
+
+## Historical v1/v2 implementation and evidence
+
 The three hooks generate a contract before approval, verify approved work at
 Stop, continue unmet work up to `HARNESS_MAX_ATTEMPTS` (default 3), and generate
 and validate a handoff after a passing verdict or retry exhaustion. SessionStart validates and injects
