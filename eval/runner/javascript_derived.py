@@ -12,14 +12,14 @@ import json
 import re
 from typing import Any
 
-from eval.runner.javascript import literal
+from eval.runner.javascript import literal, TOKEN
 
 
 class Unsupported(ValueError):
     """The program cannot be proven within the supported static subset."""
 
 
-# Only the two observed FILE-header patterns have bounded, known semantics.
+# Historical FILE-header patterns retain their measured linear matcher.
 PATTERNS = {
     r'^FILE ([^\n]+) SHA256 ([a-f0-9]{64})\n([\s\S]*?)(?=^FILE |\s*$)',
     r'^FILE (\S+) SHA256 [a-f0-9]{64}\n',
@@ -27,19 +27,46 @@ PATTERNS = {
 LEX = re.compile(
     r'''\s+|//[^\n]*|/\*[\s\S]*?\*/|"(?:[^"\\]|\\[\s\S])*"|'(?:[^'\\]|\\[\s\S])*'|'''
     r'''`(?:[^`\\]|\\[\s\S])*`|/(?:[^/\\\n]|\\.)+/[a-z]*|'''
-    r'''[A-Za-z_$][\w$]*|\d+|\.\.\.|=>|\+\+|===|!==|<=|>=|==|!=|[^\s]''')
+    r'''[A-Za-z_$][\w$]*|\d+|\.\.\.|=>|&&|\|\||\+\+|===|!==|<=|>=|==|!=|[^\s]''')
 Node = tuple[Any, ...]
 GLOBALS = {'load', 'store', 'save', 'text', 'notify', 'tools', 'JSON', 'Object', 'Promise', 'Set'}
-METHODS = {'stringify', 'fromEntries', 'all', 'allSettled', 'matchAll', 'filter', 'map', 'has', 'slice'}
+METHODS = {'stringify', 'fromEntries', 'all', 'allSettled', 'matchAll', 'filter', 'map', 'has', 'slice', 'keys', 'entries'}
+
+
 @dataclass(frozen=True)
 class Unobserved:
     """A result whose actual contents were not captured by this static reducer."""
 
     path: tuple[str | int, ...] = ()
+    site: int = 0
 
 
-UNKNOWN = Unobserved()
 OPAQUE = object()
+
+
+@dataclass(frozen=True)
+class Spread:
+    """An unmodified result spread into a displayed object."""
+
+    source: Unobserved
+
+
+@dataclass(frozen=True)
+class Deferred:
+    """Pure computation awaiting a displayed audited result."""
+
+    operation: str
+    arguments: tuple[Any, ...]
+
+
+def storage_identifiers(source: str) -> bool:
+    """Strings/comments are indivisible; only helper identifiers invalidate state."""
+    for match in TOKEN.finditer(source):
+        token = match[0]
+        if token in {'store', 'save'} or (token.startswith('`') and '${' in token
+                                         and re.search(r'\b(?:store|save)\b', token)):
+            return True
+    return False
 
 
 def manifest_matches(pattern: str, value: str) -> list[dict[Any, Any]]:
@@ -60,6 +87,274 @@ def manifest_matches(pattern: str, value: str) -> list[dict[Any, Any]]:
         records.append({0: value[match.start():end], 1: match[1], 2: match[2],
                         3: value[match.end():end], 'index': match.start()})
     return records
+
+
+def bind_target(target: str | list[str], value: Any, env: dict[str, Any]) -> None:
+    """Bind only an exact pair/array destructuring, without defaults or rest."""
+    if isinstance(target, str):
+        if target in GLOBALS:
+            raise Unsupported('shadowed_helper')
+        env[target] = value
+    elif isinstance(value, list) and len(target) == len(value) and len(set(target)) == len(target):
+        for name, item in zip(target, value):
+            if name in GLOBALS:
+                raise Unsupported('shadowed_helper')
+            env[name] = item
+    else:
+        raise Unsupported('destructuring_value')
+
+
+def walk(node: Node) -> list[Node]:
+    return [node, *(child for part in children(node) for child in walk(part))]
+
+
+def tool_sites(node: Node) -> bool:
+    return any(part[0] == 'call' and part[1][0] == 'member' and part[1][1] == ('name', 'tools')
+               for part in walk(node))
+
+
+def mutating(node: Node) -> bool:
+    """A branch assignment can change a later operand without calling a tool."""
+    return any(part[0] == 'increment' or part[0] == 'binary' and part[1] == '=' for part in walk(node))
+
+
+def effectful(node: Node) -> bool:
+    return tool_sites(node) or mutating(node) or any(part[0] == 'call' and part[1] in [('name', 'store'), ('name', 'save')]
+                                   for part in walk(node) if isinstance(part[1], tuple))
+
+
+def required_names(nodes: list[Node], *, displays: bool = False) -> set[str]:
+    """Slice bindings backwards from tool operands and helper writes only."""
+    required: set[str] = set()
+    bindings: dict[str, list[Node]] = {}
+    all_nodes = [part for node in nodes for part in walk(node)]
+    for part in all_nodes:
+        if displays and part[0] == 'call' and part[1] == ('name', 'text'):
+            required.update(item[1] for arg in part[2] for item in walk(arg) if item[0] == 'name')
+        if part[0] == 'for' and part[1][0] == 'bind':
+            required.add(part[1][1])
+        if part[0] == 'expr' and effectful(part[1]):
+            required.update(item[1] for item in walk(part[1]) if item[0] == 'name')
+        if part[0] == 'bind':
+            bindings.setdefault(part[1], []).append(part[2])
+            if effectful(part[2]):
+                required.update(item[1] for item in walk(part[2]) if item[0] == 'name')
+        if part[0] == 'call' and (part[1] in [('name', 'store'), ('name', 'save')]
+                                 if part[1][0] == 'name' else
+                                 part[1][0] == 'member' and part[1][1] == ('name', 'tools')):
+            for arg in part[2]:
+                required.update(item[1] for item in walk(arg) if item[0] == 'name')
+        if part[0] in {'for', 'for_of', 'if'} and effectful(part):
+            required.update(item[1] for item in walk(part) if item[0] == 'name')
+        # Member assignments populate containers subsequently used by operands.
+        if part[0] == 'binary' and part[1] == '=':
+            required.update(item[1] for item in walk(part) if item[0] == 'name')
+    while True:
+        expanded = set(required)
+        for name in required:
+            for expression in bindings.get(name, []):
+                expanded.update(item[1] for item in walk(expression) if item[0] == 'name')
+        if expanded == required:
+            return required
+        required = expanded
+
+
+def regex_work_bound(pattern: str, options: re.RegexFlag) -> None:
+    """Reject overlapping repetition and repeated unanchored search rescans.
+
+    The stdlib parser is used only for the already validated translated syntax.
+    Disjoint separators keep independently repeated atoms from backtracking
+    across each other. Unanchored searches also need a mandatory first atom
+    excluded from every repetition, bounding the total rescanned input.
+    """
+    from re import _parser as parser, _constants as constants
+
+    alphabet = set(range(128))
+    categories = {
+        constants.CATEGORY_DIGIT: set(range(48, 58)),
+        constants.CATEGORY_WORD: set(map(ord, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_')),
+        constants.CATEGORY_SPACE: set(map(ord, ' \t\r\n\v\f')),
+    }
+    for negative, positive in [(constants.CATEGORY_NOT_DIGIT, constants.CATEGORY_DIGIT),
+                               (constants.CATEGORY_NOT_WORD, constants.CATEGORY_WORD),
+                               (constants.CATEGORY_NOT_SPACE, constants.CATEGORY_SPACE)]:
+        categories[negative] = alphabet - categories[positive]
+
+    def atoms(nodes: Any) -> list[tuple[set[int], bool, bool]]:
+        result = []
+        for operation, argument in nodes:
+            if operation == constants.AT:
+                continue
+            if operation == constants.SUBPATTERN:
+                result.extend(atoms(argument[-1]))
+                continue
+            if operation in {constants.MAX_REPEAT, constants.MIN_REPEAT}:
+                lower, upper, inner = argument
+                members = atoms(inner)
+                if any(repeated for _, _, repeated in members):
+                    raise Unsupported('regexp_nested_repetition')
+                characters = set().union(*(chars for chars, _, _ in members))
+                result.append((characters, lower > 0 and all(required for _, required, _ in members), upper > 1))
+                continue
+            if operation == constants.LITERAL:
+                characters = {argument}
+            elif operation == constants.NOT_LITERAL:
+                characters = alphabet - {argument}
+            elif operation == constants.ANY:
+                characters = alphabet if options & re.DOTALL else alphabet - {10}
+            elif operation == constants.IN:
+                characters = set()
+                negate = False
+                for kind, value in argument:
+                    if kind == constants.NEGATE:
+                        negate = True
+                    elif kind == constants.LITERAL:
+                        characters.add(value)
+                    elif kind == constants.RANGE:
+                        characters.update(range(value[0], value[1] + 1))
+                    elif kind == constants.CATEGORY and value in categories:
+                        characters.update(categories[value])
+                    else:
+                        raise Unsupported('regexp_alphabet')
+                if negate:
+                    characters = alphabet - characters
+            else:
+                raise Unsupported('regexp_atom')
+            result.append((characters, True, False))
+        return result
+
+    sequence = atoms(parser.parse(pattern, options))
+    repeated_sets = [chars for chars, _, repeated in sequence if repeated]
+    anchored = pattern.startswith('^') and (not options & re.MULTILINE or
+                                            all(10 not in chars for chars in repeated_sets))
+    if repeated_sets and not anchored:
+        if not sequence or not sequence[0][1] or any(sequence[0][0] & chars for chars in repeated_sets):
+            raise Unsupported('regexp_search_overlap')
+    active: set[int] = set()
+    for characters, required, repeated in sequence:
+        if repeated:
+            if active & characters:
+                raise Unsupported('regexp_repetition_overlap')
+            active.update(characters)
+        elif required and not active & characters:
+            active.clear()
+
+
+def regex_matches(pattern: str, flags: str, value: str) -> list[dict[Any, Any]]:
+    """Translate a bounded ASCII JS regexp subset without executing JS code.
+
+    No backreferences, lookarounds, alternation, named groups, inline flags,
+    Unicode modes or nested repetition. The two historical manifest expressions
+    retain their separately measured linear implementation.
+    """
+    if len(value) > 65536 or not value.isascii() or re.search(r'[\r\x1c-\x1f]', value):
+        raise Unsupported('regexp_input_limit')
+    if pattern in PATTERNS and flags == 'gm':
+        return manifest_matches(pattern, value)
+    if (len(pattern) > 1024 or len(set(flags)) != len(flags) or 'g' not in flags
+            or set(flags) - set('gms') or not pattern.isascii()):
+        raise Unsupported('regexp')
+    translated: list[str] = []
+    groups: list[bool] = [False]
+    in_class = False
+    atom = False
+    repeated_atom = False
+    cursor = 0
+    while cursor < len(pattern):
+        char = pattern[cursor]
+        cursor += 1
+        if char == '\\':
+            if cursor >= len(pattern):
+                raise Unsupported('regexp_escape')
+            escape = pattern[cursor]
+            cursor += 1
+            if escape in 'dDsSwWnrtfv' or escape == 'b':
+                translated.append('\\' + escape)
+            elif escape in r'\/.^$*+?{}[]()|-':
+                translated.append(re.escape(escape))
+            elif escape in 'xu':
+                size = 2 if escape == 'x' else 4
+                digits = pattern[cursor:cursor + size]
+                if len(digits) != size or not re.fullmatch('[a-fA-F0-9]+', digits) or int(digits, 16) > 127:
+                    raise Unsupported('regexp_escape')
+                translated.append(re.escape(chr(int(digits, 16))))
+                cursor += size
+            else:
+                raise Unsupported('regexp_escape')
+            atom = True
+            repeated_atom = False
+        elif in_class:
+            if char == '[':
+                raise Unsupported('regexp_class')
+            translated.append(char)
+            if char == ']':
+                in_class = False
+                atom = True
+                repeated_atom = False
+        elif char == '[':
+            if pattern[cursor:cursor + 1] == ']' or pattern[cursor:cursor + 2] == '^]':
+                raise Unsupported('regexp_class')
+            in_class = True
+            translated.append(char)
+        elif char == '(':
+            if pattern[cursor:cursor + 1] == '?':
+                if pattern[cursor:cursor + 2] != '?:':
+                    raise Unsupported('regexp_group')
+                translated.append('(?:')
+                cursor += 2
+            else:
+                translated.append('(')
+            groups.append(False)
+            atom = False
+        elif char == ')':
+            if len(groups) < 2:
+                raise Unsupported('regexp_group')
+            repeated_atom = groups.pop()
+            groups[-1] |= repeated_atom
+            atom = True
+            translated.append(char)
+        elif char in '*+?{':
+            if not atom or repeated_atom:
+                raise Unsupported('regexp_repetition')
+            quantifier = char
+            if char == '{':
+                match = re.match(r'\d+(?:,\d*)?}', pattern[cursor:])
+                if match is None:
+                    raise Unsupported('regexp_repetition')
+                quantifier += match[0]
+                if any(int(n) > 65536 for n in re.findall(r'\d+', quantifier)):
+                    raise Unsupported('regexp_repetition')
+                cursor += len(match[0])
+            if pattern[cursor:cursor + 1] == '?':
+                quantifier += '?'
+                cursor += 1
+            translated.append(quantifier)
+            groups[-1] = True
+            atom = False
+        elif char == '$':
+            translated.append('$' if 'm' in flags else r'\Z')
+            atom = False
+        elif char in '|}':
+            raise Unsupported('regexp_operator')
+        else:
+            translated.append(char)
+            atom = char != '^'
+            repeated_atom = False
+    if in_class or len(groups) != 1:
+        raise Unsupported('regexp_group')
+    expression = ''.join(translated)
+    options = re.ASCII | (re.MULTILINE if 'm' in flags else 0) | (re.DOTALL if 's' in flags else 0)
+    regex_work_bound(expression, options)
+    compiled = re.compile(expression, options)
+    # Empty/adjacent matches have subtly different JS iteration rules.
+    if compiled.match('') is not None:
+        raise Unsupported('regexp_empty')
+    results = []
+    for match in compiled.finditer(value):
+        if not match[0] or any(group is None for group in match.groups()) or len(results) >= 4096:
+            raise Unsupported('regexp_match_limit')
+        results.append({**dict(enumerate((match[0], *match.groups()))), 'index': match.start()})
+    return results
 
 
 class Parser:
@@ -100,9 +395,36 @@ class Parser:
         elif token == '{':
             self.take()
             return ('block', self.statements('}'))
+        elif token == 'if':
+            self.take()
+            self.take('(')
+            condition = self.expression()
+            self.take(')')
+            yes = self.statement()
+            no = None
+            if self.peek() == 'else':
+                self.take()
+                no = self.statement()
+            return ('if', condition, yes, no)
+        elif token == 'throw':
+            self.take()
+            node = ('throw', self.expression())
         elif token == 'for':
             self.take()
             self.take('(')
+            if self.peek() in {'const', 'let'} and 'of' in self.tokens[self.pos:self.pos + 12]:
+                self.take()
+                target: Any = self.take()
+                if target == '[':
+                    target = [self.take()]
+                    while self.peek() == ',':
+                        self.take()
+                        target.append(self.take())
+                    self.take(']')
+                self.take('of')
+                values = self.expression()
+                self.take(')')
+                return ('for_of', target, values, self.statement())
             initial = self.statement()
             condition = self.expression()
             self.take(';')
@@ -129,16 +451,42 @@ class Parser:
             node = ('value', {'true': True, 'false': False, 'null': None}[token])
         elif token.startswith('/') and token.count('/') >= 2:
             pattern, flags = token[1:].rsplit('/', 1)
-            if pattern not in PATTERNS or flags != 'gm':
-                raise Unsupported('regexp')
-            node = ('regex', pattern)
+            node = ('regex', pattern, flags)
         elif token == 'await':
             node = ('await', self.expression(12))
+        elif token.startswith('`') and token.endswith('`'):
+            parts: list[Node] = []
+            cursor = 1
+            # Interpolations are expressions only, with no nested braces/templates.
+            for match in re.finditer(r'(?<!\\)\$\{([^{} `]*(?:[ ][^{} `]*)*)\}', token):
+                raw = token[cursor:match.start()]
+                decoded_part = literal('`' + raw + '`')
+                if decoded_part is None:
+                    raise Unsupported('template')
+                parts.append(('value', decoded_part))
+                inner = Parser(match[1])
+                parts.append(inner.expression())
+                if inner.peek():
+                    raise Unsupported('template_expression')
+                cursor = match.end()
+            tail = literal('`' + token[cursor:-1] + '`')
+            if tail is None:
+                raise Unsupported('template')
+            parts.append(('value', tail))
+            node = ('template', parts)
+        elif token == 'async':
+            node = self.expression()
         elif token == 'new':
-            self.take('Set')
+            constructor = self.take()
+            if constructor != 'Set':
+                node = ('opaque_new', constructor, self.expression())
+                return node
+
             self.take('(')
             node = ('set', self.expression())
             self.take(')')
+        elif token == '!':
+            node = ('not', self.expression(12))
         elif token == '-':
             node = ('negative', self.expression(12))
         elif token == '(':
@@ -154,8 +502,11 @@ class Parser:
                 elif token == '{':
                     key = self.take()
                     name = literal(key) if literal(key) is not None else key
-                    self.take(':')
-                    entries.append((name, self.expression()))
+                    if self.peek() == ':':
+                        self.take(':')
+                        entries.append((name, self.expression()))
+                    else:
+                        entries.append((name, ('name', name)))
                 else:
                     entries.append(('item', self.expression()))
                 if self.peek() != ',':
@@ -167,13 +518,16 @@ class Parser:
             node = ('name', token)
         else:
             raise Unsupported('expression')
-        precedence = {'=': 1, '?': 2, '===': 4, '!==': 4, '==': 4, '!=': 4,
+        precedence = {'=': 1, '?': 2, '||': 3, '&&': 3, '===': 4, '!==': 4, '==': 4, '!=': 4,
                       '<': 5, '>': 5, '<=': 5, '>=': 5, '+': 7, '-': 7, '*': 8}
         while self.peek():
             op = self.peek()
-            if op == '=>' and minimum == 0 and node[0] == 'name':
+            if op == '=>' and minimum == 0 and node[0] in {'name', 'array'}:
                 self.take()
-                node = ('lambda', node[1], self.expression())
+                target = node[1] if node[0] == 'name' else [entry[1][1] for entry in node[1]]
+                if node[0] == 'array' and any(entry[0] != 'item' or entry[1][0] != 'name' for entry in node[1]):
+                    raise Unsupported('destructuring')
+                node = ('lambda', target, self.expression())
             elif op == '.' and minimum <= 14:
                 self.take()
                 node = ('member', node, ('value', self.take()))
@@ -212,7 +566,7 @@ def children(node: Node) -> list[Node]:
     kind = node[0]
     if kind in {'array', 'object'}:
         return [entry[1] for entry in node[1]]
-    if kind == 'block':
+    if kind in {'block', 'template'}:
         return node[1]
     if kind == 'call':
         return [node[1], *node[2]]
@@ -221,19 +575,17 @@ def children(node: Node) -> list[Node]:
 
 def validate(nodes: list[Node]) -> set[int]:
     """Reject hidden sources, aliases and unenumerable tool calls in all branches."""
-    bindings: set[str] = set()
-    names: set[str] = set()
     sites: set[int] = set()
 
     def visit(node: Node, parent: Node | None = None) -> None:
         kind = node[0]
+        if kind == 'opaque_new' and node[1] != 'Error':
+            raise Unsupported('unknown_constructor')
         if kind in {'bind', 'lambda'}:
-            name = node[1]
-            if name in GLOBALS or not re.fullmatch(r'[A-Za-z_$][\w$]*', name):
-                raise Unsupported('shadowed_helper')
-            bindings.add(name)
+            for name in node[1] if isinstance(node[1], list) else [node[1]]:
+                if name in GLOBALS or not re.fullmatch(r'[A-Za-z_$][\w$]*', name):
+                    raise Unsupported('shadowed_helper')
         if kind == 'name':
-            names.add(node[1])
             if node[1] == 'tools' and not (parent and parent[0] == 'member' and parent[1] is node):
                 raise Unsupported('tool_alias')
         if kind in {'member', 'index'}:
@@ -253,10 +605,9 @@ def validate(nodes: list[Node]) -> set[int]:
                 raise Unsupported('unawaited_collection')
             if callee[0] == 'member' and callee[1] == ('name', 'tools'):
                 sites.add(node[3])
-            elif callee[0] == 'member':
-                if callee[2][0] != 'value' or callee[2][1] not in METHODS:
-                    raise Unsupported('unknown_method')
-            elif callee[0] != 'name' or callee[1] not in {'load', 'store', 'save', 'text', 'notify'}:
+            elif callee[0] == 'member' and (callee[2][0] != 'value' or callee[2][1] not in METHODS | {'parse', 'test'}):
+                raise Unsupported('unknown_method')
+            elif callee[0] == 'name' and callee[1] not in {'load', 'store', 'save', 'text', 'notify'}:
                 raise Unsupported('unknown_callable')
         if kind in {'binary', 'increment'} and (kind == 'increment' or node[1] == '='):
             target = node[1] if kind == 'increment' else node[2]
@@ -276,8 +627,6 @@ def validate(nodes: list[Node]) -> set[int]:
 
     for node in nodes:
         visit(node)
-    if names - bindings - GLOBALS:
-        raise Unsupported('unknown_source')
     return sites
 
 
@@ -290,12 +639,29 @@ class Reduction:
     steps: int = 0
     displays: list[Any] = field(default_factory=list)
     saved: dict[str, Any] = field(default_factory=dict)
+    guards: list[Any] = field(default_factory=list)
+    required: set[str] = field(default_factory=set)
+    tool_count: int = 0
+    display_required: set[str] = field(default_factory=set)
+    write_displays: dict[str, int] = field(default_factory=dict)
 
     def value(self, node: Node, env: dict[str, Any], saved: dict[str, Any]) -> Any:
         self.steps += 1
         if self.steps > 20000:
             raise Unsupported('step_limit')
         kind = node[0]
+        if kind == 'template':
+            values = [self.value(part, env, saved) for part in node[1]]
+            if not all(isinstance(value, str) for value in values):
+                raise Unsupported('template_coercion')
+            result = ''.join(values)
+            concrete(result)
+            return result
+        if kind == 'not':
+            value = self.value(node[1], env, saved)
+            if type(value) is not bool:
+                raise Unsupported('boolean_coercion')
+            return not value
         if kind == 'value':
             return node[1]
         if kind == 'await':
@@ -317,12 +683,13 @@ class Reduction:
             return set(values)
         if kind in {'array', 'object'}:
             result: Any = [] if kind == 'array' else {}
-            opaque = False
             for key, expression in node[1]:
                 value = self.value(expression, env, saved)
                 if key == 'spread':
                     if isinstance(value, Unobserved):
-                        opaque = True
+                        if not isinstance(result, dict) or any(isinstance(key, Spread) for key in result):
+                            raise Unsupported('ambiguous_result_spread')
+                        result[Spread(value)] = value
                     else:
                         if len(result) + len(value) > 4096:
                             raise Unsupported('collection_limit')
@@ -335,11 +702,11 @@ class Reduction:
                     result[key] = value
                 if len(result) > 4096:
                     raise Unsupported('collection_limit')
-            return OPAQUE if opaque else result
+            return result
         if kind in {'member', 'index'}:
             value, key = (self.value(part, env, saved) for part in node[1:])
             if isinstance(value, Unobserved) and type(key) in {str, int}:
-                return Unobserved((*value.path, key))
+                return Unobserved((*value.path, key), value.site)
             if key == 'length' and isinstance(value, (list, str)):
                 return len(value)
             if isinstance(value, dict):
@@ -360,6 +727,10 @@ class Reduction:
             else:
                 left, right = self.value(node[2], env, saved), self.value(node[3], env, saved)
                 op = node[1]
+                if isinstance(left, (Unobserved, Deferred)) or isinstance(right, (Unobserved, Deferred)):
+                    if op not in {'===', '!=='}:
+                        raise Unsupported('unobserved_operation')
+                    return Deferred(op, (left, right))
                 if op == '+':
                     if type(left) is not type(right) or type(left) not in {int, str}:
                         raise Unsupported('coercion')
@@ -407,12 +778,14 @@ class Reduction:
             if name == 'load' and len(args) == 1 and isinstance(args[0], str):
                 if args[0] not in self.writes and args[0] not in saved:
                     raise Unsupported('unknown_store_key')
+                if args[0] in self.writes and self.guards:
+                    raise Unsupported('guarded_same_script_load')
                 value = self.writes.get(args[0], saved.get(args[0]))
-                if not isinstance(value, str):
-                    raise Unsupported('non_text_load')
-                return value
+                concrete(value)
+                return json.loads(json.dumps(value))
             if name in {'store', 'save'} and len(args) == 2 and isinstance(args[0], str):
                 self.writes[args[0]] = args[1]
+                self.write_displays[args[0]] = len(self.displays)
                 return OPAQUE
             raise Unsupported('helper_arguments')
         receiver, method = callee[1], callee[2]
@@ -423,7 +796,8 @@ class Reduction:
             self.sites.add(node[3])
             if name == 'apply_patch' and len(args) == 1 and expressions[0][0] == 'value' and isinstance(args[0], str):
                 self.patches.append(args[0])
-                return UNKNOWN
+                self.tool_count += 1
+                return Unobserved(site=self.tool_count)
             if name != 'exec_command' or len(args) != 1 or not isinstance(args[0], dict):
                 raise Unsupported('unsupported_tool')
             command = args[0]
@@ -432,10 +806,22 @@ class Reduction:
             # Do not allow an unknown result nested inside a command/metadata.
             concrete(command)
             self.commands.append(command)
-            return UNKNOWN
+            self.tool_count += 1
+            return Unobserved(site=self.tool_count)
+        if receiver == ('name', 'JSON') and name == 'parse' and len(args) == 1:
+            if isinstance(args[0], (Unobserved, Deferred)):
+                return Deferred('parse', tuple(args))
+            parsed = json.loads(args[0])
+            concrete(parsed)
+            return parsed
         if receiver == ('name', 'JSON') and name == 'stringify' and len(args) == 1:
             concrete(args[0])
             return json.dumps(args[0], ensure_ascii=False, separators=(',', ':'))
+        if receiver == ('name', 'Object') and name in {'keys', 'entries'} and len(args) == 1:
+            concrete(args[0])
+            if not isinstance(args[0], dict):
+                raise Unsupported('object_arguments')
+            return list(args[0]) if name == 'keys' else [[key, item] for key, item in args[0].items()]
         if receiver == ('name', 'Object') and name == 'fromEntries' and len(args) == 1:
             if not isinstance(args[0], list) or not all(
                     isinstance(entry, list) and len(entry) == 2 and isinstance(entry[0], str) for entry in args[0]):
@@ -444,17 +830,24 @@ class Reduction:
         if receiver == ('name', 'Promise') and name in {'all', 'allSettled'} and len(args) == 1:
             if not isinstance(args[0], list):
                 raise Unsupported('promise_arguments')
-            return args[0] if name == 'all' else [{'status': OPAQUE, 'value': value} for value in args[0]]
+            return args[0] if name == 'all' else [
+                {'status': Unobserved(site=-value.site), 'value': value}
+                if isinstance(value, Unobserved) else {'status': 'fulfilled', 'value': value}
+                for value in args[0]]
         value = self.value(receiver, env, saved)
         if name == 'matchAll' and isinstance(value, str) and len(args) == 1 and args[0][0] == 'regex':
             if len(value) > 65536 or not value.isascii() or re.search(r'[\r\x1c-\x1f]', value):
                 raise Unsupported('regexp_input_limit')
-            return manifest_matches(args[0][1], value)
+            return regex_matches(args[0][1], args[0][2], value)
         if name in {'filter', 'map'} and isinstance(value, list) and len(args) == 1:
             callback, captured = args[0]
             if callback[0] != 'lambda':
                 raise Unsupported('callback')
-            results = [self.value(callback[2], dict(captured, **{callback[1]: item}), saved) for item in value]
+            results = []
+            for item in value:
+                local = dict(captured)
+                bind_target(callback[1], item, local)
+                results.append(self.value(callback[2], local, saved))
             if name == 'filter' and not all(type(result) is bool for result in results):
                 raise Unsupported('filter_coercion')
             return results if name == 'map' else [item for item, keep in zip(value, results) if keep]
@@ -464,32 +857,97 @@ class Reduction:
             return value[args[0]:args[1] if len(args) == 2 else None]
         raise Unsupported('method')
 
-    def completed(self, output: Any) -> dict[str, Any]:
-        """Bind only one unmodified text(result) from one audited tool call.
-
-        Display transformations, multiple results, missing/ambiguous blocks
-        and truncated JSON cannot establish the original tool value. The
-        caller audits the output before using any exported helper state.
-        """
-        observed: Any = None
-        if self.displays == [UNKNOWN] and len(self.commands) == 1 and not self.patches:
-            if isinstance(output, list) and len(output) == 1 and isinstance(output[0], dict):
-                output = output[0].get('text') if output[0].get('type') == 'text' else None
-            if isinstance(output, str):
+    def completed(self, output: Any, *, failed: bool = False) -> dict[str, Any]:
+        """Reconstruct result fields only through unmodified displayed structure."""
+        blocks = output if isinstance(output, list) else [output]
+        observed: list[Any] = []
+        raw_blocks: list[str | None] = []
+        for block in blocks:
+            if isinstance(block, dict) and block.get('type') in {'text', 'input_text'}:
+                block = block.get('text')
+            if isinstance(block, str):
                 try:
-                    observed = json.loads(output)
+                    observed.append(json.loads(block))
+                    raw_blocks.append(block)
                 except ValueError:
-                    pass
+                    # The host emits a separate Script completed/timing preamble.
+                    if not block.startswith(('Script completed\n', 'Script failed\n', 'Script error:')):
+                        observed.append(OPAQUE)
+                        raw_blocks.append(block)
+            else:
+                observed.append(OPAQUE)
+                raw_blocks.append(None)
+        results: dict[tuple[int, tuple[str | int, ...]], Any] = {}
+        ambiguous: set[tuple[int, tuple[str | int, ...]]] = set()
+
+        def record(value: Unobserved, actual: Any) -> None:
+            key = (value.site, value.path)
+            if key in results:
+                ambiguous.add(key)
+            results[key] = actual
+
+        def compatible(shape: Any, actual: Any) -> bool:
+            if isinstance(shape, Unobserved):
+                return True
+            if isinstance(shape, dict) and isinstance(actual, dict):
+                return all(isinstance(key, Spread) or key in actual and compatible(item, actual[key])
+                           for key, item in shape.items())
+            if isinstance(shape, list) and isinstance(actual, list):
+                return len(shape) == len(actual) and all(compatible(a, b) for a, b in zip(shape, actual))
+            return type(shape) is type(actual) and shape == actual
+
+        def align(shape: Any, actual: Any) -> None:
+            if isinstance(shape, Unobserved):
+                record(shape, actual)
+            elif isinstance(shape, dict) and isinstance(actual, dict):
+                explicit = {key for key in shape if isinstance(key, str)}
+                for key, item in shape.items():
+                    if isinstance(key, Spread):
+                        # Explicit fields shadow unknown spread fields. Only the
+                        # untouched fields may later be reconstructed.
+                        for name, captured in actual.items():
+                            if name not in explicit:
+                                record(Unobserved((*key.source.path, name), key.source.site), captured)
+                    elif key in actual:
+                        align(item, actual[key])
+            elif isinstance(shape, list) and isinstance(actual, list):
+                for item, captured in zip(shape, actual):
+                    align(item, captured)
+
+        witnessed = 0
+        if len(observed) == len(self.displays) or failed and len(observed) <= len(self.displays):
+            for shape, actual, raw in zip(self.displays, observed, raw_blocks):
+                if isinstance(shape, Unobserved) and shape.path == ('output',) and raw is not None:
+                    record(shape, raw)
+                elif compatible(shape, actual):
+                    align(shape, actual)
+                else:
+                    results.clear()
+                    break
+                witnessed += 1
 
         def bind(value: Any) -> Any:
             if isinstance(value, Unobserved):
-                if observed is None:
+                candidates = [(path, actual) for (site, path), actual in results.items()
+                              if site == value.site and value.path[:len(path)] == path
+                              and (site, path) not in ambiguous]
+                if not candidates:
                     raise Unsupported('unobserved_output')
-                resolved = observed
-                for key in value.path:
+                path, resolved = max(candidates, key=lambda candidate: len(candidate[0]))
+                for key in value.path[len(path):]:
                     resolved = resolved[key]
                 concrete(resolved)
                 return resolved
+            if isinstance(value, Deferred):
+                args = [bind(arg) for arg in value.arguments]
+                if value.operation == 'parse':
+                    parsed = json.loads(args[0])
+                    concrete(parsed)
+                    return parsed
+                if value.operation in {'===', '==', '!==', '!='}:
+                    equal = type(args[0]) is type(args[1]) and args[0] == args[1]
+                    return equal if value.operation in {'===', '=='} else not equal
+                raise Unsupported('deferred_operation')
             if isinstance(value, dict):
                 return {key: bind(item) for key, item in value.items()}
             if isinstance(value, list):
@@ -500,15 +958,14 @@ class Reduction:
         result = dict(self.saved)
         for key, value in self.writes.items():
             result.pop(key, None)
-            if (self.commands or self.patches) and observed is None:
-                continue
-            if not isinstance(value, (str, Unobserved)):
-                continue
             try:
-                resolved = bind(value)
-                if isinstance(resolved, str):
+                if failed and self.write_displays[key] >= witnessed:
+                    continue
+                if all(bind(guard) is True for guard in self.guards):
+                    resolved = bind(value)
+                    concrete(resolved)
                     result[key] = resolved
-            except (Unsupported, KeyError, IndexError, TypeError):
+            except (Unsupported, KeyError, IndexError, TypeError, ValueError):
                 pass
         concrete(result)
         return json.loads(json.dumps(result))
@@ -516,11 +973,53 @@ class Reduction:
     def statement(self, node: Node, env: dict[str, Any], saved: dict[str, Any]) -> None:
         kind = node[0]
         if kind == 'bind':
+            if node[1] not in self.required and not effectful(node[2]):
+                if node[1] in self.display_required:
+                    try:
+                        env[node[1]] = self.value(node[2], env, saved)
+                    except (Unsupported, KeyError, TypeError, ValueError):
+                        pass
+                return
             if node[1] in env:
                 raise Unsupported('rebound_name')
             env[node[1]] = self.value(node[2], env, saved)
         elif kind == 'expr':
-            self.value(node[1], env, saved)
+            if effectful(node[1]):
+                self.value(node[1], env, saved)
+            else:
+                try:
+                    self.value(node[1], env, saved)
+                except (Unsupported, KeyError, TypeError, ValueError):
+                    pass
+        elif kind == 'throw':
+            if effectful(node):
+                raise Unsupported('effectful_throw')
+        elif kind == 'if':
+            if not effectful(node):
+                return
+            condition = self.value(node[1], env, saved)
+            if (isinstance(condition, (Unobserved, Deferred)) and not tool_sites(node)
+                    and not mutating(node) and node[3] is None):
+                self.guards.append(condition)
+                self.statement(node[2], env, saved)
+            elif type(condition) is bool:
+                branch = node[2] if condition else node[3]
+                if branch is not None:
+                    self.statement(branch, env, saved)
+            else:
+                raise Unsupported('conditional_effect')
+        elif kind == 'for_of':
+            try:
+                values = self.value(node[2], env, saved)
+                if not isinstance(values, list) or len(values) > 4096:
+                    raise Unsupported('iteration')
+                for item in values:
+                    local = dict(env)
+                    bind_target(node[1], item, local)
+                    self.statement(node[3], local, saved)
+            except (Unsupported, KeyError, TypeError, ValueError):
+                if effectful(node):
+                    raise
         elif kind == 'block':
             local = dict(env)
             for child in node[1]:
@@ -575,6 +1074,8 @@ def reduce_script(source: str, saved: dict[str, Any]) -> Reduction | None:
         nodes = parser.statements()
         sites = validate(nodes)
         result = Reduction()
+        result.required = required_names(nodes)
+        result.display_required = required_names(nodes, displays=True)
         env: dict[str, Any] = {}
         for node in nodes:
             result.statement(node, env, saved)

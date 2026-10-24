@@ -16,7 +16,7 @@ from typing import Any, Callable
 from urllib.parse import unquote
 
 from eval.runner.javascript import tool_calls
-from eval.runner.javascript_derived import Reduction, reduce_script
+from eval.runner.javascript_derived import Reduction, reduce_script, storage_identifiers
 from eval.runner.fingerprint_history import FingerprintHistory, input_texts
 
 
@@ -407,10 +407,6 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
         offset = position + len(raw)
     if not loops:
         return tokens, False
-    if data:
-        # Unrolling across data could rewrite it or mistake its assignments for
-        # shell mutations. Mixed forms are outside the bounded loop grammar.
-        return tokens, True
     if len(loops) != 1 or tokens[loops[0]][0] != "for":
         return tokens, True
     start = loops[0]
@@ -446,6 +442,9 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
     if len(ends) != 1:
         return tokens, True
     end = ends[0]
+    if any(begin < positions[end] + len(tokens[end][1]) and finish > positions[start]
+           for begin, finish in data):
+        return tokens, True
     newline_after = (end + 1 < len(tokens) and
                      "\n" in command[positions[end] + len(tokens[end][1]):positions[end + 1]])
     if (end <= boundary + 2 or tokens[end - 1] != (";", ";") or
@@ -458,7 +457,9 @@ def literal_loop_tokens(tokens: list[tuple[str, str]], command: str, *,
                  "eval", "source", ".", "exec", "command", "builtin", "env", "trap", "alias", "unalias",
                  "sh", "bash", "zsh", "dash", "break", "continue", "return",
                  "case", "esac", "elif", "else", "function", "do", "{", "}"}
-    outside_header = tokens[:start] + tokens[boundary + 2:end] + tokens[end + 1:]
+    outside_header = [pair for i, pair in enumerate(tokens)
+                      if not start <= i < boundary + 2 and i != end
+                      and not any(begin <= positions[i] < finish for begin, finish in data)]
     if (any(Path(value).name in forbidden or value == raw and any(ch in raw for ch in "()") or
             re.match(r"[A-Za-z_][A-Za-z0-9_]*(?:=|\+=|\[)", value) or
             re.search(rf"(?:\+\+|--){variable}\b|\b{variable}(?:\+\+|--)", value)
@@ -870,6 +871,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
         saved: dict[str, Any] = {}
         saved_session: str | None = None
         pending_stores: dict[str, Reduction] = {}
+        writing_scripts: set[str] = set()
         if not data or not data.endswith(b"\n"):
             errors.append(f"empty_or_truncated_log:{path.name}")
         for number, line in enumerate(data.decode("utf-8", errors="replace").removesuffix("\n").split("\n"), 1):
@@ -890,6 +892,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             if session != saved_session:
                 saved.clear()
                 pending_stores.clear()
+                writing_scripts.clear()
                 saved_session = session
             terminal |= kind in {"turn.completed", "turn.failed", "error"}
             native_kinds = {"session_meta", "turn_context", "response_item", "event_msg",
@@ -969,6 +972,8 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             code_script = (item_type == 'custom_tool_call' and tool == 'exec'
                            and isinstance(item.get('input'), str))
             if code_script:
+                if storage_identifiers(item['input']):
+                    writing_scripts.add(item.get('call_id', ''))
                 # Work on a snapshot: rejected scripts must not mutate previous
                 # helper values. Only this parser's complete subset can add trust.
                 reduction = reduce_script(item['input'], json.loads(json.dumps(saved))) if session else None
@@ -984,9 +989,10 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                                             'reason': 'derived_from_audited_outputs',
                                             'evidence_sha256': digest(line.encode())})
                 else:
-                    # Unsupported code may overwrite any key or keep references.
-                    saved.clear()
-                    pending_stores.clear()
+                    # Only helper writes can change the persistent store.
+                    if storage_identifiers(item['input']):
+                        saved.clear()
+                        pending_stores.clear()
             patch_call = item_type in {"function_call", "custom_tool_call"} and tool.endswith("apply_patch")
             if patch_call and item_type == "function_call":
                 arguments = item.get("arguments")
@@ -1140,21 +1146,25 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 # Uncertainty anywhere in the input prevents exporting state.
                 if not hits and not unknown and not any(error.endswith(f':{path.name}:{number}') for error in errors):
                     pending_stores[item.get('call_id', '')] = reduction
-                else:
+                elif storage_identifiers(item['input']):
                     saved.clear()
                     pending_stores.clear()
             elif item_type == 'custom_tool_call_output':
                 stored = pending_stores.pop(item.get('call_id', ''), None)
                 failed = (item.get('is_error') is True or item.get('isError') is True or bool(item.get('error')) or
-                          any(re.search(r'^(?:Script error:|Script running with cell ID|Error executing (?:tool|code))',
+                          any(re.search(r'^(?:Script error:|Script failed|Script running with cell ID|Error executing (?:tool|code))',
                                         value.lstrip()) for value in leaves(item.get('output'))))
-                if stored is not None and not hits and not failed:
+                yielded = any(value.lstrip().startswith('Script running with cell ID')
+                              for value in leaves(item.get('output')))
+                writing = item.get('call_id', '') in writing_scripts
+                writing_scripts.discard(item.get('call_id', ''))
+                if stored is not None and not hits and not yielded:
                     try:
-                        saved = stored.completed(item.get('output'))
+                        saved = stored.completed(item.get('output'), failed=failed)
                     except (ValueError, TypeError, RecursionError, OverflowError):
                         saved.clear()
                         errors.append(f'unresolved_stored_output:{path.name}:{number}')
-                elif hits or failed:
+                elif writing and (hits or failed):
                     saved.clear()
                     pending_stores.clear()
         if require_completion and not native and not terminal and path not in (interrupted_paths or set()):
