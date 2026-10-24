@@ -1,3 +1,36 @@
+# Per-request context pricing — 2026-10-25
+
+Apply the pinned short-context bound to each native model request rather than
+session cumulative input. Use last_token_usage or consecutive total_token_usage
+differences, exclude repeated counter/rate-limit observations, and require the
+selected request sums to reproduce the call's complete input/cache/output usage.
+Capture process offsets for new calls; retained evidence uses process timestamps
+when available and exact totals checks to reject later-resume contamination.
+
+Price cumulative totals above 272K when all requests fit the snapshot. Record
+turn_count, max_input_tokens, context_bound_input_tokens and exceeded_turn_count
+in pricing_evidence. An observed oversized request keeps usd/pricing_ref null
+with long_context_rate_missing; unproved large sessions use request_usage_missing.
+No catalog rates, frozen inputs, schemas or existing flags change.
+
+Share the rule across run, regrade, rerun_invalid, rerun_unaccounted,
+continue_day2 and controls with native evidence. Retained recovery fills only
+previously-null prices with identical complete counts, archives prior usage and
+provenance, and preserves existing prices and full metadata snapshot pins.
+Mixed historical Standard/Fast snapshots remain allowed under r5-fixes-005.
+Infrastructure reruns retain recovered prior spending; unaccounted replacements
+keep their existing replacement policy.
+
+Assumptions: the 22-of-80 host finding and per-request billing rule are supplied
+by the user. Tests use synthetic request records/graders and mocked transports
+in this worktree's .venv. No host report, actual private grader root, network or
+live executor/controller/judge was accessed; nothing staged or committed.
+
+Validation: `.venv/bin/python -m pytest tests/eval -q` — 2115 passed in
+388.16s. `git diff --check` — exit 0. Inline scope/STATUS audit — PASS:
+11 exact authorized paths, r5/v2, worktree .venv, six STATUS headings and zero
+staged/deleted paths; frozen tasks, retained reports, rates and interfaces unchanged.
+
 # Approved recovery subset estimates — 2026-10-24
 
 Allow `rerun_invalid`, `rerun_unaccounted` and `continue_day2` to match the

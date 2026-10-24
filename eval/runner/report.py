@@ -13,8 +13,8 @@ from eval.runner.publication import checkout_text, evidence_path
 from eval.metrics import METHOD, compute, metric, total
 from eval.runner.audit import digest
 from eval.runner.control_accounting import control_calls, historical_control_cost
-from eval.runner.telemetry import records, session_id
-from eval.runner.pricing import select, report_pricing, pin_provenance, retained_provenance, snapshots
+from eval.runner.telemetry import records, session_id, native_request_usage
+from eval.runner.pricing import price_usage, report_pricing, pin_provenance, retained_provenance, snapshots
 from eval.runner.schema_compat import validate_schema
 from eval.runner.limits import capacity_message, capacity_refusal_without_items
 
@@ -24,7 +24,9 @@ def artifact(path: Path) -> dict[str, str]:
     return {"path": checkout_text(str(path)), "sha256": digest(path.read_bytes())}
 
 
-def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str | None = None, native_counts: dict[str, int] | None = None) -> dict[str, Any]:
+def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, tier: str | None = None,
+          native_counts: dict[str, int] | None = None, native_paths: list[Path] | None = None,
+          segment: dict[str, Any] | None = None, pricing_evidence: dict[str, Any] | None = None) -> dict[str, Any]:
     """Use complete per-segment counts; cache is a subset, output includes reasoning."""
     turns = [e.get("usage", {}) for e in records(events) if e.get("type") == "turn.completed"]
     counts = {key: sum(t[key] for t in turns) if turns and all(type(t.get(key)) is int and t[key] >= 0 for t in turns) else None
@@ -36,13 +38,11 @@ def usage(events: Path, latency: float, model: str, pricing: dict[str, Any], *, 
     i, c, o = (counts[k] for k in counts)
     if i is not None and c is not None and c > i:
         raise ValueError("Cached tokens exceed input tokens")
-    covered = all(t["input_tokens"] <= 272000
-                  for t in turns if type(t.get("input_tokens")) is int)
-    covered = covered and (i is None or i <= 272000)
-    rate, pricing_ref = select(pricing, model, tier) if covered else (None, None)
-    usd = None
-    if rate is not None and all(v is not None for v in (i, c, o)):
-        usd = ((i - c) * rate["input_per_million_usd"] + c * rate["cached_input_per_million_usd"] + o * rate["output_per_million_usd"]) / 1_000_000
+    requests = (segment or {}).get('native_request_usage')
+    if requests is None and native_counts is not None:
+        requests = native_request_usage(native_paths or [], counts, segment=segment)
+    usd, pricing_ref = price_usage(counts, pricing, model, tier, requests=requests,
+                                   evidence=pricing_evidence)
     return {**counts, "usd": usd, "latency_seconds": latency, "cost_basis": "api_equivalent_usd",
             "pricing_ref": pricing_ref}
 
@@ -60,17 +60,20 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
             segments.append({k: segment[k] for k in ("attempt", "started_at", "exited_at", "exit_code")}
                             | {"session_id": sid, "events": artifact(path)})
         native = [Path(p) for p in segment.get("native_logs", [])]
-        tier_evidence = segment.get("pricing_evidence") or {
-            "tier": "unknown", "basis": "No retained per-process applied-tier capture."}
+        tier_evidence = dict(segment.get("pricing_evidence") or {
+            "tier": "unknown", "basis": "No retained per-process applied-tier capture."})
         tier = tier_evidence["tier"]
         calls.append({"call_id": f'{result["task_id"]}-exec-{segment["attempt"]}', "purpose": "executor",
                       "backend": "codex_cli", "model": config["model"],
                       "status": "timeout" if segment.get("timed_out") else "completed" if segment["exit_code"] == 0 else "failed",
                       "usage": usage(path, segment.get("latency_seconds", 0), config["model"], pricing,
                                      tier=tier,
-                                     native_counts=segment.get("native_usage"))})
+                                     native_counts=segment.get("native_usage"), native_paths=native,
+                                     segment=segment, pricing_evidence=tier_evidence)})
+        segment['pricing_evidence'] = tier_evidence
         provenance.append({"call_id": calls[-1]["call_id"], "observed_service_tier": tier,
                            "basis": tier_evidence["basis"], "captured_records": tier_evidence.get("records", []),
+                           "pricing_evidence": tier_evidence,
                            "pricing_ref": calls[-1]["usage"]["pricing_ref"],
                            "native_sources": [artifact(p) for p in native if p.is_file()]})
     failures = result.get('diagnostics', {}).get('executor_transport_failures', [])
@@ -121,7 +124,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
             row["call_id"] = f'{result["task_id"]}-rerun-{history["rerun_id"]}-{row["call_id"]}'
         for call in calls:
             call["call_id"] = f'{result["task_id"]}-rerun-{history["rerun_id"]}-{call["call_id"]}'
-        provenance = [{"call_id": c["call_id"], "observed_service_tier": None,
+        historical_rows = {r['call_id']: r for r in history.get('pricing_provenance', [])}
+        provenance = [historical_rows.get(c['call_id']) or {"call_id": c["call_id"], "observed_service_tier": None,
                        "basis": "Prior rerun accounting retained; see source artifacts in rerun provenance.",
                        "pricing_ref": c["usage"]["pricing_ref"]} for c in history["calls"]] + provenance
         calls = history["calls"] + calls
