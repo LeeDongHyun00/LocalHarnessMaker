@@ -6,11 +6,11 @@ import re
 from typing import Any
 
 from eval.metrics import total
-from eval.runner.pricing import select
+from eval.runner.pricing import price_usage
 from eval.runner.audit import digest
 from eval.runner.limits import capacity_refusal_without_items
 from eval.runner.publication import safe_source
-from eval.runner.telemetry import _pricing_tier
+from eval.runner.telemetry import _pricing_tier, request_usage
 
 
 def prelaunch_collision_cost(task: dict[str, Any]) -> float | None:
@@ -154,6 +154,7 @@ def control_calls(entry: dict[str, Any], task_id: str,
                 continue
             counts = {k: value.get(k) if type(value.get(k)) is int and value[k] >= 0 else None
                       for k in ("input_tokens", "cached_input_tokens", "output_tokens")}
+            events = []
             if backend == "codex_cli" and isinstance(pending_events, dict):
                 try:
                     events = [json.loads(row) for row in pending_events.get("events", "").removesuffix("\n").split("\n")]
@@ -170,14 +171,9 @@ def control_calls(entry: dict[str, Any], task_id: str,
             pricing_evidence = {"tier": tier, "basis": (
                 "Tier inferred from the model default; control_call.service_tier omitted/null"
                 if inferred else "controller control_call.service_tier only")}
-            rate, pricing_ref = select(pricing, model, tier)
-            if i is not None and i > 272000:
-                rate, pricing_ref = None, None
-            usd = None
-            if rate and all(v is not None for v in (i, c, o)) and i <= 272000:
-                usd = ((i - c) * rate["input_per_million_usd"] +
-                       c * rate["cached_input_per_million_usd"] +
-                       o * rate["output_per_million_usd"]) / 1_000_000
+            usd, pricing_ref = price_usage(counts, pricing, model, tier,
+                requests=request_usage([e for e in events if isinstance(e, dict)]),
+                evidence=pricing_evidence, single_request=backend != 'codex_cli')
             successful |= value.get("status") == "success"
             calls.append({"call_id": f"{task_id}-control-{len(calls) + 1}", "purpose": purpose,
                           "backend": backend, "model": model,

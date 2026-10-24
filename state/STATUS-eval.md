@@ -1,5 +1,7 @@
 ## Done
 
+- Fixed per-request context pricing for native executor/control evidence and retained recovery, including last counters/cumulative differences, duplicate suppression, resume boundaries, explicit long_context_rate_missing and archived null-price provenance; updated README/CHANGES and this handoff (`.venv/bin/python -m pytest tests/eval -q`: 2115 passed in 388.16s; `git diff --check`: exit 0; inline scope/STATUS audit: PASS, 11 exact authorized paths, r5/v2, worktree .venv, six headings, zero staged/deleted paths; frozen inputs/reports/rates/interfaces unchanged).
+
 - Implemented approved recovery-subset estimate matching, exact non-task-setting refusals and unchanged ordinary-run matching; recorded matched estimate, selected bound and reasons for all three recovery paths, including interruptions; updated README/CHANGES and this handoff (`.venv/bin/python -m pytest tests/eval -q`: 2092 passed in 410.02s; `git diff --check`: exit 0; inline scope/STATUS audit: PASS, 11 authorized paths, six headings, zero staged/deleted paths; frozen tasks/reports/interfaces unchanged).
 
 - Verified the complete evaluation package after the deadline-tail follow-up, updated README/CHANGES and this handoff, and preserved frozen inputs/interfaces without staging or commits (`.venv/bin/python -m pytest tests/eval -q`: 2072 passed in 387.67s; `git diff --check`: exit 0; inline scope/STATUS audit: PASS, seven exact authorized paths, six headings, no source-location leakage, zero staged/deleted paths).
@@ -101,6 +103,8 @@
 
 ## Remaining
 
+- Host/Claude: transfer this per-request context pricing fix and regrade the retained v2 baseline B run with its original pinned inputs/graders. Review the 22 formerly-null calls, pricing_evidence turn_count/max_input_tokens/context_bound_input_tokens/exceeded_turn_count, recovered cost_per_pass and repricing.previous_usage/previous_provenance. Preserve historical snapshot bytes and mixed snapshot pins. This offline worktree did not access or repair the host report.
+
 - Host/Claude: transfer this approved-subset cost-gate fix, then retry the finished full-v2-harness recovery with the original pinned inputs/graders and approved full-v2-harness estimate. Check stderr's selected paid-call bound and run-diagnostics.json.recovery_estimate (matched estimate, bound, reasons). This worktree made no host calls or actual report repairs; all other configuration fields must remain identical.
 
 - Host/Claude: transfer this deadline-tail follow-up and regrade the retained v2 baseline B run with its original pinned inputs/graders. The user reports the exit-1 casualty now reclassifies after 559aa1e; confirm v2-cache-invalidation-feature-plus-test also becomes executor_transport_failure with the supplied exit -9/no-turn.failed tail. Then use rerun_invalid with --reasons executor_transport_failure in a fresh output and review both outage tasks, audit/pricing, report-pinned provenance and retained prior spending. Synthetic retained regrade passes here; this worktree did not access or repair the actual host run.
@@ -131,6 +135,9 @@
 - Run the full repository suite once before merge on the host. This session runs tests/eval only and makes no live executor/controller/judge calls.
 
 ## Decisions
+
+- Apply the context bound to native requests and require exact request/call token totals: cumulative session input is not a request context window, and later resume records must not unlock an earlier call.
+- Preserve known historical prices and archive prior null usage/provenance when recovering prices: metadata snapshot pins and mixed Standard/Fast provenance remain valid under r5-fixes-005. Keep oversized requests null with long_context_rate_missing and unproved large sessions null with request_usage_missing.
 
 - Accept estimated task subsets only through the explicit recovery gate: rerun_invalid, rerun_unaccounted and continue_day2 compare every non-task field exactly; ordinary run keeps exact matching and the existing below-ten exemption.
 - Retain recovery estimate evidence in diagnostics and provenance, including interrupted recoveries: the host can review the matched estimate, selected-task bound and selection reasons; continuation bounds conservatively include both days.
@@ -227,6 +234,8 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval/test_request_pricing.py tests/eval/test_recovery_pricing.py -q`
+
 - `.venv/bin/python -m pytest tests/eval/test_recovery_estimates.py tests/eval/test_restart_recovery.py tests/eval/test_unaccounted_recovery.py tests/eval/test_continue_day2.py -q`
 
 - `.venv/bin/python -m pytest tests/eval/test_executor_transport.py -q`
@@ -282,6 +291,8 @@
 - Keep C skeletons unfilled until the user authors them; v2 public task inputs are now frozen. Do not change them after this metadata-only freeze; final host digest and Role 1 record remain pending.
 
 ## Assumptions
+
+- The 22-of-80 baseline-B finding, native token totals, largest single-request observation and per-request billing rule are supplied by the user. This session uses only this worktree's .venv, synthetic graders/native records and mocked transports; no actual host report, private grader root, network, model call, other checkout, staging or commit is involved.
 
 - The full-v2 harness approval, sixteen pre-executor outage invalidities and 132-call recovery refusal are user-supplied host findings. Recovery subset equality ignores only tasks; retained population and all other settings stay exact. This session uses only this worktree's .venv, synthetic estimates/graders and mocks, with no actual private-root access, live models, staging or commits.
 

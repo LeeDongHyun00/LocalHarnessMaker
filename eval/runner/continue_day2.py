@@ -235,14 +235,19 @@ def continue_day2(private_root: Path, source: Path, out: Path, *,
         for call in added_controls:
             call['call_id'] = call['call_id'].replace('-control-', '-continuation-control-', 1)
         extra.extend(added_controls)
-        continued['calls'] = copy.deepcopy(old['calls']) + extra
+        from eval.runner.pricing import reprice_retained_calls
+        recovered = copy.deepcopy(old)
+        historical_provenance = reprice_retained_calls(recovered, source_state['tasks'][task_id],
+                                                      original['metadata']['pricing'])
+        continued['calls'] = recovered['calls'] + extra
         executor_usd = total([c['usage']['usd'] for c in continued['calls'] if c['purpose'] == 'executor'])
-        control_usd = total([old['costs']['control_usd'], added_control_usd])
+        control_usd = total([recovered['costs']['control_usd'], added_control_usd])
         continued['costs'] = {'executor_usd': executor_usd, 'control_usd': control_usd,
                               'total_usd': total([executor_usd, control_usd])}
         continued['done_claims'] = copy.deepcopy(old['done_claims'])
         from eval.runner.pricing import preserve_provenance
-        preserve_provenance(continued, out / task_id, prior=old, pricing=pricing, additional=control_provenance)
+        preserve_provenance(continued, out / task_id, prior=old, pricing=pricing,
+                            additional=historical_provenance + control_provenance)
         entry = state['tasks'][task_id]
         day1 = [s for s in entry['segments'] if s.get('day', 1) == 1]
         day2 = [s for s in entry['segments'] if s.get('day') == 2]

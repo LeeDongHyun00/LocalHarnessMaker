@@ -23,7 +23,7 @@ from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audi
 from eval.runner import transport
 from eval.runner.limits import BACKOFF_SECONDS, UsageLimitError, capacity_message, capacity_refusal_without_items, usage_limit_message
 from eval.runner.process import ProcessResult, run_process
-from eval.runner.telemetry import collect, collect_runs, applied_tier_records, capture_tier, native_token_delta, native_token_totals, records, session_id, recover_partial_usage
+from eval.runner.telemetry import collect, collect_runs, applied_tier_records, capture_tier, native_token_delta, native_token_totals, native_request_usage, records, session_id, recover_partial_usage
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -701,6 +701,8 @@ def run(
                 native_usage = native_token_delta(tokens_before, native_token_totals(native_changed))
                 if native_usage is not None and not interrupted and final_process.returncode != -2:
                     segment["native_usage"] = native_usage
+                    segment["native_request_usage"] = native_request_usage(native_changed, native_usage,
+                                                                           before=tokens_before)
                     segment["usage_evidence"] = "Native event_msg.token_count cumulative delta; output includes reasoning"
                 segment["native_logs"] = [str(p) for p in native_changed]
                 transport_failure = transport.classify(segment, runtime, private.redact)

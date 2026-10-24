@@ -249,6 +249,77 @@ def native_token_delta(before: dict[str, tuple[int, dict[str, int]]],
     return {k: sum(d[k] for d in deltas) for k in deltas[0]} if deltas else None
 
 
+def request_usage(events: list[dict[str, Any]], *, offset: int = 0,
+                  segment: dict[str, Any] | None = None) -> list[dict[str, int]] | None:
+    """Read native request counters, excluding repeated total/rate-limit updates.
+
+    Scan earlier counters even when selecting a resumed process so an absent
+    last_token_usage can use its actual preceding cumulative counter.
+    """
+    keys = ('input_tokens', 'cached_input_tokens', 'output_tokens')
+
+    def counts(value: Any) -> dict[str, int] | None:
+        if not isinstance(value, dict) or not all(type(value.get(k)) is int and value[k] >= 0 for k in keys):
+            return None
+        return {k: value[k] for k in keys}
+
+    previous = dict.fromkeys(keys, 0)
+    result = []
+    index = 0
+    start = _instant((segment or {}).get('started_at'))
+    end = _instant((segment or {}).get('exited_at'))
+    for event in events:
+        payload = event.get('payload', {})
+        if event.get('type') != 'event_msg' or not isinstance(payload, dict) or payload.get('type') != 'token_count':
+            continue
+        info = payload.get('info')
+        if not isinstance(info, dict):
+            continue
+        index += 1
+        current = counts(info.get('total_token_usage'))
+        delta = {k: current[k] - previous[k] for k in keys} if current is not None else None
+        if current == previous:
+            continue
+        if current is not None:
+            previous = current
+        when = _instant(event.get('timestamp'))
+        if index <= offset or (start is not None and end is not None and when is not None
+                               and not start <= when <= end):
+            continue
+        turn = counts(info.get('last_token_usage'))
+        if info.get('last_token_usage') is not None and turn is None:
+            return None
+        if turn is None:
+            turn = delta
+        elif delta is not None and turn != delta:
+            return None
+        if (turn is None or any(v < 0 for v in turn.values()) or
+                turn['cached_input_tokens'] > turn['input_tokens']):
+            return None
+        result.append(turn)
+    return result or None
+
+
+def native_request_usage(paths: list[Path], totals: dict[str, int], *,
+                         before: dict[str, tuple[int, dict[str, int]]] | None = None,
+                         segment: dict[str, Any] | None = None) -> list[dict[str, int]] | None:
+    """Accept a process's request evidence only when it reproduces its usage.
+
+    Historical streams may contain later resumes. Timestamp selection and an
+    exact totals check prevent borrowing their requests to price an old call.
+    """
+    turns = []
+    for path in dict.fromkeys(paths):
+        selected = request_usage(records(path), offset=(before or {}).get(str(path), (0, {}))[0],
+                                 segment=segment)
+        if selected:
+            turns.extend(selected)
+    if turns and all(sum(t[k] for t in turns) == totals.get(k) for k in
+                     ('input_tokens', 'cached_input_tokens', 'output_tokens')):
+        return turns
+    return None
+
+
 def applied_tier_records(paths: list[Path]) -> dict[str, list[dict[str, Any]]]:
     """Read applied records separately so later resumes cannot reprice old calls."""
     return {str(path): [event for event in records(path) if event.get("type") == "event_msg"

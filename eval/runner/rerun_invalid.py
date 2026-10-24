@@ -264,11 +264,20 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         provenance['tasks'].append(evidence)
         recovered_state['tasks'].pop(task_id)
         from eval.runner.control_accounting import prelaunch_collision_cost
-        prior_control = old['costs']['control_usd']
+        historical = copy.deepcopy(old)
+        historical_rows = []
+        if not _unaccounted:
+            from eval.runner.pricing import reprice_retained_calls, preserve_provenance, retained_provenance
+            rows = reprice_retained_calls(historical, state['tasks'][task_id], original['metadata']['pricing'])
+            preserve_provenance(historical, out / task_id, prior=old,
+                                pricing=original['metadata']['pricing'], additional=rows)
+            historical_rows = retained_provenance(historical, original['metadata']['pricing'])
+        prior_control = historical['costs']['control_usd']
         if prior_control is None:
             prior_control = prelaunch_collision_cost(old)
         recovered_state.setdefault('fresh_reruns', {})[task_id] = {
-            'rerun_id': evidence['rerun_id'], 'calls': [] if _unaccounted else copy.deepcopy(old['calls']),
+            'rerun_id': evidence['rerun_id'], 'calls': [] if _unaccounted else historical['calls'],
+            'pricing_provenance': historical_rows,
             'control_usd': 0 if _unaccounted else prior_control,
             'source_run_id': original['metadata']['run_id'],
             'executor_transport_failures': causes_by_task.get(task_id, []) if not _unaccounted else []}

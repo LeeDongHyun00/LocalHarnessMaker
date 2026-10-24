@@ -141,8 +141,9 @@ gpt-6-luna uses priority. Per-process `pricing_evidence` and the pricing artifac
 identify inference from the model default. Native `default` maps to Standard.
 Explicit requests still require matching applied evidence; missing/different
 tiers invalidate the task. Unsupported tiers/models remain unpriced.
-Control pricing reads only service_tier on the controller's control_call line.
-Absent or unsupported control tiers have null price and cost. pricing-provenance.json pins
+Control pricing uses service_tier on the controller's control_call line, then
+the known model default when omitted/null. Unsupported tiers/models have null
+price and cost. pricing-provenance.json pins
 per-call tier, source evidence and selected snapshot through task artifacts.
 
 [pilot-v2-a.yaml](configs/pilot-v2-a.yaml) uses full A's gpt-6.1-sol / medium,
@@ -557,14 +558,42 @@ pins Sol 6 at 2/.20/10 without modifying the original two-model snapshot.
 All snapshots retain source/date/rates inside metadata.pricing.source's pinned
 catalog serialization, compatible with the existing closed report schema.
 Each call's pricing_ref identifies the selected original snapshot; the per-task
-pricing artifact retains observed tiers and source hashes. Unknown models/tiers,
-long-context calls and incomplete usage remain null.
+pricing artifact retains observed tiers and source hashes. Unknown models/tiers
+and incomplete usage remain null.
+
+The snapshot's 272K short-context limit applies to each model request, including
+cached input, rather than the sum of a Codex session. Native token_count records
+supply last_token_usage, or consecutive total_token_usage differences when the
+last counter is absent. Repeated cumulative/rate-limit updates do not add turns.
+New processes capture only their new records; retained recovery selects the
+process timestamps when available and requires the request sums to equal the
+call's complete input/cache/output accounting. Later resumes cannot supply an
+earlier process's request evidence. Output already includes reasoning once.
+
+When every request is within the bound, the call totals use the pinned rates.
+pricing-provenance.json's pricing_evidence records turn_count, max_input_tokens,
+context_bound_input_tokens and exceeded_turn_count. An observed request above
+the bound remains unpriced with reason=long_context_rate_missing; no long-context
+rate is pinned in the current catalog. Missing request evidence for a cumulative
+input above the bound remains unpriced with reason=request_usage_missing. A
+smaller cumulative input provides a conservative upper bound when request
+records are unavailable; it does not claim an observed turn count.
+
+run, regrade, rerun_invalid, rerun_unaccounted and continue_day2 share this rule,
+as do control calls with retained native token_count evidence in their
+control_cli_events envelope. An HTTP control generation is a single request.
+Regrade recovers previously-null prices only when the retained token counts
+are identical and complete. Existing prices and metadata snapshot bytes remain
+historical; the replacement provenance pins its actual snapshot and archives
+previous_usage/previous_provenance under repricing. Mixed snapshots remain valid
+as specified by r5-fixes-005. Infrastructure reruns retain recovered historical
+spending; rerun_unaccounted keeps its existing fresh-session replacement policy.
 
 The gpt-6-luna CLI default tier is priority. Retained version 1 control calls
 were priced at Standard rates although they ran at priority. The final evaluation
 must disclose this historical underpricing; no retained version 1 report is
-rewritten. New control lines without a tier stay unknown, including old
-controller versions that do not emit one. No controller change is required here.
+rewritten. New control lines without a tier use the known model default and
+record that inference; unknown models remain unpriced. No controller change is required here.
 Subscription usage is not zero-dollar
 API usage. Historical reports are preserved. The runner prices each retained
 `control_call` stderr line (including internal retries and HTTP fallback) with
