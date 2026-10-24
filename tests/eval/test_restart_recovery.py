@@ -229,9 +229,15 @@ def test_selective_fresh_rerun_regrades_rest_and_preserves_costs(setup: tuple[Pa
         grades.append(kwargs['cwd'])
         return run_process(argv, **kwargs)
 
+    from tests.eval.test_recovery_estimates import install_estimate
+    matched = install_estimate(state['config'], tmp_path, monkeypatch)
     out = tmp_path / 'rerun'
     new = json.loads(rerun_invalid.rerun_invalid(root, source, out, {'execution_interrupted'},
                                                 execute=fresh_only, version=VERSION).read_text())
+    estimate = json.loads((out / 'run-diagnostics.json').read_text())['recovery_estimate']
+    assert estimate == {'matched_estimate': matched, 'recovery_subset': True,
+                        'paid_call_bound': core.paid_call_bound(dict(state['config'], tasks=['bug-chunk-tail'])),
+                        'reasons': ['execution_interrupted']}
     assert executor.calls == 1 and len(grades) == 2  # one regrade + one fresh run
     assert all(t['outcome'] == 'pass' for t in new['tasks'])
     assert new['accounting']['total_cost_usd'] == pytest.approx(original['accounting']['total_cost_usd'] * 1.5)
@@ -363,3 +369,27 @@ def test_capacity_and_restart_missing_logs_are_infrastructure_only(capacity: boo
     changed = copy.deepcopy(audit)
     changed.update(status='inconclusive', errors=['unresolved_operand:exec-1.jsonl:1'])
     assert not rerun_invalid.eligible(task, entry, changed)
+
+
+def test_interrupted_recovery_retains_estimate_diagnostics(setup: tuple[Path, Path, Path],
+                                                          monkeypatch: pytest.MonkeyPatch,
+                                                          tmp_path: Path) -> None:
+    from tests.eval.test_recovery_estimates import install_estimate
+    root, config, source = infrastructure_source(setup, monkeypatch, tmp_path)
+    recorded = json.loads(config.read_text())
+    matched = install_estimate(recorded, tmp_path, monkeypatch)
+
+    def interrupted(*args: Any, **kwargs: Any) -> Path:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(core, 'run', interrupted)
+    out = tmp_path / 'interrupted-recovery'
+    with pytest.raises(KeyboardInterrupt):
+        rerun_invalid.rerun_invalid(root, source, out, {'execution_interrupted'},
+                                    execute=run_process, version=VERSION)
+    record = json.loads((out / 'run-diagnostics.json').read_text())['recovery_estimate']
+    assert record['matched_estimate'] == matched
+    assert record['paid_call_bound'] == core.paid_call_bound(dict(recorded, tasks=['bug-chunk-tail']))
+    assert record['reasons'] == ['execution_interrupted']
+    provenance = json.loads((out / 'rerun-invalid.json').read_text())
+    assert provenance['status'] == 'incomplete' and provenance['cost_estimate'] == record

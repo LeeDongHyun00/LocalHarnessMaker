@@ -700,7 +700,24 @@ These are planning figures, not measurements. Usage limits are no longer a
 planning concern. The harness has never run live; Claude runs the host smoke
 next. Any exact bundled `configs/NAME.yaml` with `reports/NAME-estimate.md`
 passes the estimate guard; historical pilot/full mappings still work. Changing
-a config requires its own matching published estimate. Estimates do not grant
+a config requires its own matching published estimate. Recovery operations
+`rerun_invalid`, `rerun_unaccounted` and `continue_day2` may instead match a
+subset of the estimated config's `tasks`; every other field must equal the
+estimated config, including task population, model, effort, harness, backend,
+limits, tier, task root and seed. Ordinary `run` still requires an exact match
+for batches of ten or more paid calls. Recovery stderr reports the selected
+subset's `paid_call_bound` and matched estimate path with the note
+“recovery subset of an approved configuration”. The bound includes both days
+for selected two-session tasks, conservatively including retained day 1 in a
+continuation; new judge criteria still require a revised bound.
+
+Recovery `run-diagnostics.json.recovery_estimate` records `matched_estimate`
+(repository-relative, or null for an unestimated batch below ten calls),
+`paid_call_bound`, `recovery_subset` and `reasons`. Reasons are the requested
+invalidity selectors, the interruption-only missing-usage cause for
+`rerun_unaccounted`, or the two audit/handoff causes for `continue_day2`.
+The same record is retained as `cost_estimate` in recovery provenance and
+survives an interrupted recovery's diagnostics. Estimates do not grant
 execution approval.
 
 Claude's host smoke (one two-session task, harness off, medium; no run here):

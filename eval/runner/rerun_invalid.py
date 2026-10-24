@@ -229,7 +229,9 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
     read_version = version if callable(version) else (lambda: version) if version else core.installed_version
     if read_version() != config['codex_version']:
         raise ValueError('Installed Codex version differs')
-    core.require_call_estimate(dict(config, tasks=selected))
+    estimate = core.require_call_estimate(dict(config, tasks=selected), recovery=True)
+    estimate['reasons'] = (['executor_usage_missing_after_infrastructure_interruption']
+                           if _unaccounted else sorted(reasons))
     # Regrade validates source/config/task-set provenance before creating output.
     # Selected tasks may have no segments/exit hash because no executor launched.
     regrade.regrade(private_root, source, out, execute=execute, _fresh_tasks=frozenset(selected))
@@ -242,6 +244,7 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
                   'source_report_sha256': digest(source_bytes),
                   'source_checkpoint_sha256': digest((source / 'checkpoint.json').read_bytes()),
                   'requested_reasons': sorted(reasons), 'selected_tasks': selected, 'status': 'pending',
+                  'cost_estimate': estimate,
                   'audit_code_version': regrade.audit_code_version() | {
                       name: digest((Path(__file__).parent / name).read_bytes())
                       for name in ('core.py', 'harness.py', 'rerun_invalid.py', 'rerun_unaccounted.py')}, 'tasks': []}
@@ -280,6 +283,10 @@ def rerun_invalid(private_root: Path, source: Path, out: Path, reasons: set[str]
         provenance['status'] = 'incomplete'
         core.write_json(provenance_path, provenance)
         raise
+    finally:
+        diagnostics = json.loads((out / 'run-diagnostics.json').read_text())
+        diagnostics['recovery_estimate'] = estimate
+        core.write_json(out / 'run-diagnostics.json', diagnostics)
     fresh = json.loads((out / 'report.json').read_text())
     new_by_id = {t['task_id']: t for t in fresh['tasks']}
     base['tasks'] = [new_by_id[t['task_id']] if t['task_id'] in selected else t for t in base['tasks']]

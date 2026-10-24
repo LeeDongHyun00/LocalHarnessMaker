@@ -99,9 +99,15 @@ def test_fresh_replacement_regrades_rest_and_survives_recovery(setup: tuple[Path
             path.write_text(path.read_text().replace('len(items)', 'len(items) - 1'))
         return result
 
+    from tests.eval.test_recovery_estimates import install_estimate
+    matched = install_estimate(state['config'], tmp_path, monkeypatch)
     out = tmp_path / 'replaced'
     new = json.loads(rerun_unaccounted.rerun_unaccounted(root, source, out,
         execute=execute, version=VERSION).read_text())
+    estimate = json.loads((out / 'run-diagnostics.json').read_text())['recovery_estimate']
+    assert estimate == {'matched_estimate': matched, 'recovery_subset': True,
+                        'paid_call_bound': core.paid_call_bound(dict(state['config'], tasks=['bug-chunk-tail'])),
+                        'reasons': ['executor_usage_missing_after_infrastructure_interruption']}
     assert executor.calls == 1 and len(grades) == 2
     selected = next(t for t in new['tasks'] if t['task_id'] == 'bug-chunk-tail')
     old = next(t for t in original['tasks'] if t['task_id'] == selected['task_id'])

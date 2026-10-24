@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from eval.runner.core import REPOSITORY, IncompleteRun, load_config, run
+from eval.runner.core import REPOSITORY, IncompleteRun, load_config, run, require_call_estimate
 from eval.runner.audit import PrivateGraders
 from eval.runner.process import ProcessResult, run_process
 
@@ -885,7 +885,12 @@ def two_session_config(setup: tuple[Path, Path, Path], monkeypatch: pytest.Monke
     from eval.runner import core
     root, config, out = setup
     if harness_on:
-        monkeypatch.setattr(core, 'require_call_estimate', lambda *args: None)
+        def estimated(batch: dict[str, Any], judges: dict[str, int] | None = None, *,
+                      recovery: bool = False) -> dict[str, Any]:
+            return {'matched_estimate': None, 'paid_call_bound': core.paid_call_bound(batch, judges),
+                    'recovery_subset': False}
+
+        monkeypatch.setattr(core, 'require_call_estimate', estimated)
     two_task_config(root, config, monkeypatch, tmp_path)
     public = core.REPOSITORY / 'eval/tasks/bug-chunk-tail'
     meta = json.loads((public / 'meta.json').read_text())

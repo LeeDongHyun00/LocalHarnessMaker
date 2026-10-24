@@ -105,16 +105,22 @@ def continuation_executor(executor: TwoSessionExecutor, source_runtime: Path) ->
 
 
 def test_continuation_reuses_runner_and_preserves_source(stopped: tuple[Path, Path, TwoSessionExecutor],
-                                                        tmp_path: Path) -> None:
+                                                        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     root, source, executor = stopped
     old_report = json.loads((source / 'report.json').read_text())
     old_state = json.loads((source / 'checkpoint.json').read_text())
     old_entry = old_state['tasks']['bug-chunk-tail']
     old_runtime = Path(old_entry['runtime'])
     before, runtime_before = snapshot(source), snapshot(old_runtime)
+    from tests.eval.test_recovery_estimates import install_estimate
+    matched = install_estimate(old_state['config'], tmp_path, monkeypatch)
     out = tmp_path / 'continued'
     report_path = continue_day2.continue_day2(root, source, out,
         execute=continuation_executor(executor, old_runtime), version=VERSION)
+    estimate = json.loads((out / 'run-diagnostics.json').read_text())['recovery_estimate']
+    assert estimate == {'matched_estimate': matched, 'recovery_subset': True,
+                        'paid_call_bound': core.paid_call_bound(dict(old_state['config'], tasks=['bug-chunk-tail'])),
+                        'reasons': sorted(continue_day2.RECOVERABLE)}
     report = json.loads(report_path.read_text())
     task = report['tasks'][0]
     assert task['outcome'] == 'pass' and task['attempts'] == 2
