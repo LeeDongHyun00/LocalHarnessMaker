@@ -1,5 +1,151 @@
 # Verifier CLI
 
+## Version 3 hook operations
+
+Implemented under the user's 2026-10-25 approval of decision 0011, the schema
+freeze and these CLI additions. The checked-in proposal labels do not supersede
+that approval. Use this worktree's `.venv/bin/python`:
+
+```text
+python -m verifier check --requirements FILE --workspace DIR --session-id ID --artifacts DIR --round N [--claim-audit FILE] [--final-message FILE]
+python -m verifier ledger-validate --ledger FILE --workspace DIR --session-id ID --artifacts DIR
+```
+
+`DIR` for artifacts must be the exact canonical workspace directory
+`.localharness/v3/sessions/<sha256-of-UTF-8-session_id>/`. Requirements and ledger
+inputs must be its `requirements.json` and `ledger.json`; optional audit and
+final-message inputs must already be retained within that session directory.
+Paths reject absolute relative-artifact references, parent traversal and
+symlinks (including aliases that point inside). Workspace paths may contain
+spaces. All JSON publication is atomic; evidence files are immutable,
+content-addressed snapshots under `evidence/`. Session-directory locking
+serializes concurrent checks, ledger validation and bookkeeping reservation.
+
+`check` validates the requirements schema, native ID/directory, contiguous
+R-n rows, prompt hash/source excerpts, question references and successful
+requirements call reference. Accounting is checked offline for schema, phase,
+session/model identity, duplicate calls/phases and the two-call limit. Pin
+availability and trusted code derivation remain Role 2/3 responsibilities.
+The verifier never imports controller or calls a model on this path.
+
+Every row produces pass, fail or unverifiable. `file_exists` retains the exact
+file bytes or a missing-file observation. `file_unchanged` compares the exact
+bytes with the pre-edit SHA-256. `signature_snapshot` uses non-importing Python
+AST extraction; capture baselines with
+`verifier.python_identity.signature_snapshot_bytes(source_bytes, identifiers)`.
+Its canonical bytes are compact UTF-8 JSON pairs `[requested_identifier,
+observed_signature]`, in configured order, followed by a newline. Identifiers
+can be qualified names or signature spellings; missing signatures become null
+and differ from a baseline containing them. Body-only edits preserve signatures.
+Other languages, syntax/extraction failures and ambiguous bindings are
+unverifiable. This is a shared helper for Role 3's pre-edit capture, not a new CLI.
+
+`named_command` and `test_command` requirement kinds both use schema check type
+`command`. The argv adapter reuses the Python allowlist (`-c`, `py_compile`,
+unittest/discovery and pytest); unsupported executables/options are unavailable.
+It executes with `shell=False`, a bounded deadline, process-group cleanup,
+credential-free environment and the existing Seatbelt network/outside-write
+denials. `cwd` is confined inside the workspace; the write boundary stays the
+whole workspace, including its artifact directory. Commands are never run
+unsandboxed. A host without usable Seatbelt reports unverifiable.
+`input_immutability` retains before/after bytes and compares declared input
+hashes as well as the probe's expected exit. Missing pre-probe dependencies,
+exceptions, denied resources, timeouts and runner errors are unverifiable;
+completed differing exits, missing named outputs and changed hashes/signatures
+fail. Assertion/test failures remain deterministic failures. Raw stdout/stderr
+are preserved, including non-UTF-8 bytes; JSON execution evidence retains argv,
+cwd, exit, expected exit and deadline. Excerpts are limited to 2,000 characters.
+Unavailable checks and unanswered questions cannot pass or authorize repair.
+
+`check` writes `completion-report.json` and exits 0 whenever it publishes a
+report, including failures. Its only stdout is one JSON line:
+
+```json
+{"overall":"fail","failed_rows":["R-1"],"unverifiable_rows":[],"retry_warranted":true}
+```
+
+Overall pass requires at least one row and every row passing. Computation,
+provenance or publication errors exit 2 with stderr and no summary. Total budget
+defaults to `HARNESS_VERIFY_BUDGET_SECONDS=450`, with the existing two-second
+cleanup reserve; each command is capped at 120 seconds. Checks not started
+within budget stay unverifiable. No `llm_judge` is allowed or delegated here.
+
+The audit input is exactly the completion schema's `claim_audit` object. The
+verifier checks its original-message hash, cited files/hashes/excerpts, known
+row IDs and successful claim-audit call reference. Bad citations become
+unsupported and are removed from structured references; the original audit is
+retained in immutable evidence for inspection. A malformed/unverifiable audit
+or missing final message produces an unavailable audit. Audit opinions never
+override check status or cause repair. After repair/bookkeeping the original
+audited message/hash is preserved and a changed current message marks it stale;
+no new audit is requested. Historical lexical claims extraction remains in
+`verifier.claims` for existing consumers.
+
+Round 1 reserves `retry.used=1` and the failing IDs before publishing its first
+`retry_warranted=true` summary. Only executed deterministic failures reserve it.
+Round 2 requires this persisted reservation, retains the original failed IDs,
+never warrants another repair and advises human review on repeated failure.
+Duplicate rounds reuse checked results, refresh final-message/audit freshness
+and return `retry_warranted=false`; they cannot spend another repair or audit.
+Requirements must remain unchanged between rounds. Immutable report snapshots
+retain earlier rounds in `evidence/`; the canonical report is the latest state.
+
+Role 2 imports the exact Stop texts from [stop_text.py](stop_text.py):
+`REPAIR_INSTRUCTION` through `repair_instruction(report, artifacts)` and
+`LEDGER_REQUEST` through `reserve_ledger_request(artifacts)`. Use the repair
+renderer only when the CLI summary warrants retry; it renders only failed rows
+and their verified concrete evidence. The ledger reservation writes
+`evidence/ledger-request.txt` before returning its text and returns `None` on
+duplicate Stops. It requires repair to settle first. This separate bookkeeping
+request allows no application edits, requires `validation=null`, and preserves
+the application completion claims/evidence in the final response. An invalid
+ledger gets an advisory, never another bookkeeping block. After that final
+message, call `check` again with the settled round to refresh freshness without
+re-running checks. Role 2 remains responsible for issuing native Stop blocks
+and consuming these durable reservations exactly once.
+
+`ledger-validate` extracts every listed Python identifier without importing
+workspace code. Names are explicit function/class/import/assignment bindings;
+qualified nested names are supported. Signatures use canonical AST spelling
+(including async, argument annotations/defaults and return annotations).
+Constants are literal bindings, either a bare name or `NAME = literal` for an
+exact syntax-tree value. Referenced paths must be confined Python files; names
+in strings/comments, unsupported languages, ambiguous bindings, missing or
+changed identifiers cannot establish validity. This validates identity/presence,
+not the wisdom of decisions. It checks decision/open-item IDs, exact previous
+validation coverage and all prior file/identifier hashes when revalidating,
+then fills a fresh hook-owned validation block. Executor-populated validation
+never bypasses extraction. Valid ledgers are copied atomically to
+`.localharness/v3/latest-ledger.json` under a separate root lock. Invalid current
+ledgers do not replace the last valid copy; Role 2 must enforce the latest prior
+session identity and must not silently inject an older copy. To revalidate for
+SessionStart, validate the selected prior session's `ledger.json` against the
+current workspace and compare its identity with the selected latest ledger;
+an advisory prevents injection.
+
+Ledger exit codes: 0 valid (stdout supplied ledger path), 1 invalid (stdout
+visible advisory), 2 internal error (stderr only). Structurally valid ledgers
+with missing/mismatched identifiers are saved with `validation.status=invalid`;
+malformed schema/identity inputs are preserved and rejected.
+An invalid measured validation remains invalid on repeated validation; recording
+new hashes must not silently rehabilitate a stale ledger. A fresh executor
+ledger is required in a later authorized session, without another Stop loop.
+
+Verification: `.venv/bin/python -m pytest tests/verifier -q`. The v3 fixtures
+cover pass/fail/unverifiable for every supported check/requirement kind,
+path escapes, exact raw evidence, unsupported citations, stale audits,
+round/Stop idempotence, bookkeeping reservation, ledger extraction/coverage/hash
+validation and schema validation. Subprocess check outcomes are injected;
+these fixtures are not host command-isolation acceptance. All eight existing
+Seatbelt cases (six original plus two unittest cases), live Stop/SessionStart,
+two-project smoke runs, Role 2/3 baseline/audit integration and host timing remain
+pending. No nested Codex, network, model or sandbox-exec runs are required here.
+
+## Historical version 1/2 operations
+
+The remainder describes retained contract/judge/handoff and review behavior.
+Its judge and retry rules do not apply to the version 3 hook operations above.
+
 Run from the repository root with Python 3.11 or newer:
 
 ```text

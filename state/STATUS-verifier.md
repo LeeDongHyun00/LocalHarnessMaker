@@ -1,5 +1,10 @@
 ## Done
 
+- Implemented the user-approved v3 check and ledger-validate CLIs while retaining historical contract/handoff/sample operations; deterministic checks, confined native-session artifacts, exact immutable raw evidence, offline schema/provenance/accounting checks, canonical Python signature baselines and sandboxed argv execution have synthetic and actual-module-entry-point coverage (.venv/bin/python -m pytest tests/verifier -q: 669 passed, 8 host-only Seatbelt skips in 11.85s).
+- Implemented durable one-repair reservation, round-two exhaustion/advice, duplicate-Stop result reuse, original-message retention, unsupported citation filtering and stale-audit updates; no v3 judge/controller/model calls are made (.venv/bin/python -m pytest tests/verifier -q: 669 passed, 8 skipped; 103 new v3 cases include every supported check kind's pass/fail/unverifiable outcomes and path/hash/continuation regressions).
+- Published exact repair and ledger-writing texts in verifier/stop_text.py, with failed-row-only evidence rendering and an at-most-once, fsynced ledger-request marker; implemented Python ledger identity extraction, complete validation coverage/hash checks and atomic latest-ledger copying, including rejection of stale hashes and repeated validation of invalid ledgers (.venv/bin/python -m pytest tests/verifier -q: 669 passed, 8 skipped; schema-valid report/ledger artifacts and real CLI subprocess fixtures).
+- Documented CLI behavior, baseline encoding, exact package integration locations and host limitations in verifier/README.md; marked retained v1/v2 judge behavior historical and updated this handoff (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
+
 - Fixed sampling of the completed full-harness layout: version-1 report validation, repository-relative retained paths and hash-checked result.json inline verdicts, while preserving standalone verdict/day-1/day-2 support, task-type rounds and report grading context (.venv/bin/python -m verifier sample --reports eval/reports/full-harness --n 20 --out /tmp/lhm-verifier-review-78912e5238cc4e51a2bb6bfb13723f71.json: exit 0, stderr verifier sample selected=20 available=142 seed=42; all four task types represented).
 - Added the user-requested optional sample --out with the existing default destination unchanged, plus synthetic retained-layout fixtures covering inline/standalone/coexisting verdicts, restarted two-session attempt numbers, grading provenance, determinism, input preservation and corrupt input errors (.venv/bin/python -m pytest tests/verifier -q: 566 passed, 8 host-only Seatbelt skips in 6.79s).
 - Confirmed the external report and all 120 task result files were unchanged and documented the correction in verifier/README.md and verifier/CHANGES.md (.venv/bin/python inline read-only SHA-256 comparison before/after sampling: report and 120 task results unchanged: True; inline inventory: 142 verdicts and zero standalone verdict files).
@@ -56,7 +61,10 @@
 
 ## Remaining
 
-- First priority, pending Claude: run claim extraction/sidecar generation on a live harness final report, manually compare every criterion claim/clause/status and reconcile summary counts; verify Role 5 ingestion supplies the false_done_rate denominator while preserving claimed-and-unverifiable separately. No live report or runner integration ran here; eval/ remains unchanged and synthetic accuracy does not measure live accuracy.
+- V3 first priority, pending host/Role 2/3 integration: wire the approved CLI operations and verifier.stop_text functions into native Stop/SessionStart; use python_identity.signature_snapshot_bytes for pre-edit baselines and supply retained claim-audit objects/accounting. Verify one application repair, one separate ledger continuation, refreshed final-message hashes, invalid-ledger advisory/no older-memory injection and two non-evaluation project/two-session smoke evidence. No live hooks, model calls or nested Codex ran here.
+- V3 host verification: run .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v (all eight cases: six original plus two unittest discovery cases); exercise the new argv adapter's subdirectory cwd with the whole-workspace write boundary, no network/outside writes, raw output and process-tree cleanup. These boundaries are reused and mocked, not host-accepted by this session.
+- V3 performance: measure deterministic report/ledger overhead separately from project command execution on the host; no live timing/quality/cost acceptance is claimed. Python-only extraction and the conservative existing command allowlist leave unsupported checks unverifiable.
+- Historical pending integration, lower priority than v3: run claim extraction/sidecar generation on a live harness final report, manually compare every criterion claim/clause/status and reconcile summary counts; verify Role 5 ingestion supplies the false_done_rate denominator while preserving claimed-and-unverifiable separately. No live report or runner integration ran here; eval/ remains unchanged and synthetic accuracy does not measure live accuracy.
 
 - Pending Claude's host run: all six existing Seatbelt tests and the two new passing/failing unittest discover cases. Host command: .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v. Historical host passes below do not verify this change; no sandbox-exec ran here.
 - Pending host integration for this change: rerun the proposed-system smoke and confirm judged unverifiable items and contract-invalid file/regex paths stop without spending remaining executor attempts, judge fail items still retry, and plausible missing paths remain actionable. Also confirm unittest criteria execute. No network, nested Codex, live model calls or sandbox-exec ran here.
@@ -69,6 +77,13 @@
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
 ## Decisions
+
+- The user's explicit 2026-10-25 schema freeze and exact CLI authorization supersede the still-proposed labels in checked-in shared documents: implement only the two authorized v3 operations without editing shared interfaces or other roles' paths.
+- V3 reservations are persisted in the completion report and an exclusive evidence/ledger-request.txt marker: duplicate Stops cannot spend another repair, audit or ledger request; Role 2 consumes the summary and exact package texts.
+- Reuse the existing fail-closed Python/Seatbelt runner with an argv adapter and raw-byte capture: retain bounded execution, credential isolation and process-group cleanup without an unsandboxed fallback or historical behavior changes.
+- Canonical Python AST snapshot encoding and ledger identity syntax are documented package helpers: Role 3 must use the same baseline helper; unsupported/ambiguous extraction is unavailable, never semantic guesswork.
+- Retain invalid citations only in the immutable original audit snapshot, removing them from structured evidence references: unsupported claims cannot create invalid artifact paths/hashes or change deterministic verdicts.
+- Preserve the last valid latest-ledger copy on invalid current input and require Role 2's prior-session identity gate: never silently inject older memory; repeated validation cannot rehabilitate a stale/invalid measured ledger.
 
 - Honor the user's explicit sample --out request despite the earlier no-new-flags sampling decision: only the verifier-owned sampler CLI changes; shared schemas and other commands remain unchanged.
 - Validate version-1 reports against the exact JSON schema preserved in decision 0003: decision 0009 preserves those reports without fabricating the absent task_false_done_rate metric.
@@ -123,6 +138,9 @@
 
 ## Verify commands
 
+- .venv/bin/python -m pytest tests/verifier -q (latest session: 669 passed, 8 skipped in 11.85s; skips require host Seatbelt).
+- git diff --check -- verifier tests/verifier state/STATUS-verifier.md (latest session: exit 0, no output).
+
 - .venv/bin/python -m verifier sample --reports eval/reports/full-harness --n 20 --out /tmp/lhm-verifier-review-78912e5238cc4e51a2bb6bfb13723f71.json
 
 - .venv/bin/python -m pytest tests/verifier -q
@@ -134,6 +152,8 @@
 
 ## Do not touch
 
+- This v3 session: only verifier/, tests/verifier/ and state/STATUS-verifier.md are writable scope; shared schemas/CLIs/docs, controller/, plugin/, eval/, other roles' files and .git remain untouched. Never read eval/tasks*/ or private grader paths.
+
 - schemas/, docs/, root configuration, other roles' implementations/tests/STATUS files, and concurrent changes. This session owns only verifier/, tests/verifier/ and state/STATUS-verifier.md.
 - Shared schema, CLI and hook interfaces; never import controller into verifier or expose private graders to it.
 - verifier/sandbox.py isolation rules; do not weaken safety to make nested sandbox tests pass.
@@ -141,6 +161,13 @@
 - .git contents, staging, commits, file deletion, git history rewriting, external service configuration, secrets, network access, nested Codex, live model calls and sandbox-exec in the current environment.
 
 ## Assumptions
+
+- This session follows the user's explicit v3 approval and priority order despite stale proposal wording in shared documents; no further approval or interface proposal is needed for the two supplied CLI shapes.
+- All v3 artifact inputs are already retained in the canonical native-session directory; Role 2/3 own pin verification, trustworthy request/configuration derivation and visible question handling. The verifier validates references and does not invent user answers or executable oracles.
+- The schema represents test_command as a requirement kind whose check type is command; no separate test_command check schema is added. Unsupported executable/language/platform support stays unverifiable or invalid rather than extending the shared schema.
+- Signature baselines use the newly documented Python AST helper's canonical bytes; previous hash encodings are not inferred or guessed. Ledger constants accept a bare literal binding name or NAME = literal when its exact value must be pinned.
+- Tests use injected command outcomes plus real verifier CLI subprocesses that do not invoke models/sandbox-exec. All eight existing host-only Seatbelt tests remain pending; historical passes do not validate this change. Only the verifier package suite ran; the full repository suite is still required before a future merge.
+- No PR, staging or commit was performed; .git is read-only. The final report supplies the exact owned-path commit plan and a Conventional Commit message.
 
 - The supplied external report is read-only. The files present during this session contain 142 inline verdicts across 120 task results, not the reported 147; no missing verdicts are invented or obtained from unlisted files. No standalone verdict artifacts are listed or present in that report snapshot.
 - Source precedence is per task: listed standalone verdicts are authoritative when present; otherwise listed result.json supplies verdicts. The review unit remains a verdict, with all criterion items unchanged and final task grading alongside it, not an inferred per-attempt grading result.
