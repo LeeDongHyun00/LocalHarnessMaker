@@ -14,6 +14,8 @@ from verifier.check import check_contract
 from verifier.handoff_validate import HandoffInputError, validate_handoff
 from verifier.processes import Shutdown, shutdown_scope
 from verifier.sample import OUTPUT_NAME, SampleInputError, sample_report
+from verifier.ledger import InvalidLedger, validate_ledger
+from verifier.v3_report import check_requirements
 
 
 class InputParser(argparse.ArgumentParser):
@@ -26,11 +28,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = InputParser(prog="python -m verifier")
     commands = parser.add_subparsers(dest="operation", required=True, parser_class=InputParser)
     check = commands.add_parser("check")
-    check.add_argument("--contract", required=True, type=Path)
+    source = check.add_mutually_exclusive_group(required=True)
+    source.add_argument("--contract", type=Path)
+    source.add_argument("--requirements", type=Path)
     check.add_argument("--workspace", required=True, type=Path)
-    check.add_argument("--transcript", required=True, type=Path)
-    check.add_argument("--attempt", required=True, type=int)
-    check.add_argument("--out", required=True, type=Path)
+    check.add_argument("--transcript", type=Path)
+    check.add_argument("--attempt", type=int)
+    check.add_argument("--out", type=Path)
+    check.add_argument("--session-id")
+    check.add_argument("--artifacts", type=Path)
+    check.add_argument("--round", dest="round_number", type=int)
+    check.add_argument("--claim-audit", type=Path)
+    check.add_argument("--final-message", type=Path)
+    ledger = commands.add_parser("ledger-validate")
+    ledger.add_argument("--ledger", required=True, type=Path)
+    ledger.add_argument("--workspace", required=True, type=Path)
+    ledger.add_argument("--session-id", required=True)
+    ledger.add_argument("--artifacts", required=True, type=Path)
     handoff = commands.add_parser("validate-handoff")
     handoff.add_argument("--handoff", required=True)
     sample = commands.add_parser("sample")
@@ -38,6 +52,39 @@ def main(argv: Sequence[str] | None = None) -> int:
     sample.add_argument("--n", type=int, default=20)
     sample.add_argument("--out", type=Path)
     args = parser.parse_args(argv)
+    if args.operation == "ledger-validate":
+        try:
+            result = validate_ledger(args.ledger, args.workspace, args.session_id, args.artifacts)
+        except InvalidLedger as exc:
+            print(f"Ledger advisory: {exc}; ledger will not be injected.")
+            return 1
+        except Exception as exc:
+            print(f"internal error: {type(exc).__name__}: {exc}", file=sys.stderr)
+            return 2
+        if result["validation"]["status"] != "valid":
+            print(f"Ledger advisory: {result['validation']['reason']}; ledger will not be injected.")
+            return 1
+        print(args.ledger)
+        return 0
+    if args.operation == "check" and args.requirements is not None:
+        try:
+            if any(value is not None for value in (args.contract, args.transcript, args.attempt, args.out)):
+                raise ValueError("historical flags cannot be combined with --requirements")
+            if args.session_id is None or args.artifacts is None or args.round_number is None:
+                raise ValueError("--session-id, --artifacts and --round are required with --requirements")
+            result = check_requirements(args.requirements, args.workspace, args.session_id, args.artifacts,
+                                        args.round_number, args.claim_audit, args.final_message)
+        except (Exception, Shutdown) as exc:
+            print(f"internal error: {type(exc).__name__}: {exc}", file=sys.stderr)
+            return 2
+        print(json.dumps(result, separators=(",", ":")))
+        return 0
+    if args.operation == "check":
+        if any(value is None for value in (args.transcript, args.attempt, args.out)):
+            parser.error("--contract requires --transcript, --attempt and --out")
+        if any(value is not None for value in (args.session_id, args.artifacts, args.round_number,
+                                               args.claim_audit, args.final_message)):
+            parser.error("v3 flags cannot be combined with --contract")
     if args.operation == "sample":
         try:
             review = sample_report(args.reports, args.n)

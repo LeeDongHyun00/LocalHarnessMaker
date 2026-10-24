@@ -11,7 +11,7 @@ import ast
 from dataclasses import dataclass
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import shlex
 import subprocess
@@ -33,6 +33,8 @@ class Execution:
     error: str | None = None
     duration: float = 0.0
     cause: Cause = Cause.VERIFIER
+    stdout_bytes: bytes | None = None
+    stderr_bytes: bytes | None = None
 
 
 class Runner(Protocol):
@@ -199,6 +201,27 @@ def run_command(command: str, workspace: Path, timeout: float = 120.0) -> Execut
         return Execution(error=f"command rejected: {exc}", cause=exc.cause)
     except (OSError, RuntimeError) as exc:
         return Execution(error=f"command validation failed: {exc}")
+    return _run_validated(argv, workspace, workspace, timeout, started)
+
+
+def run_argv(argv: list[str], workspace: Path, cwd: Path, timeout: float) -> Execution:
+    """V3 argv adapter: retain the Python allowlist and workspace boundary."""
+    started = time.perf_counter()
+    try:
+        workspace, cwd = workspace.resolve(), cwd.resolve()
+        if not cwd.is_relative_to(workspace) or not cwd.is_dir():
+            return Execution(error="command cwd is outside workspace or missing")
+        if any(".." in Path(token).parts or ".." in PureWindowsPath(token).parts for token in argv):
+            return Execution(error="parent traversal in command argv")
+        safe = command_argv(shlex.join(argv), cwd)
+    except (ValueError, OSError, RuntimeError) as exc:
+        return Execution(error=f"command rejected: {exc}")
+    return _run_validated(safe, workspace, cwd, timeout, started)
+
+
+def _run_validated(
+    argv: list[str], workspace: Path, cwd: Path, timeout: float, started: float,
+) -> Execution:
     sandbox = Path("/usr/bin/sandbox-exec")
     if sys.platform != "darwin" or not sandbox.is_file():
         return Execution(error="sandbox unavailable; command not executed")
@@ -214,7 +237,7 @@ def run_command(command: str, workspace: Path, timeout: float = 120.0) -> Execut
         try:
             process = run_owned(
                 [str(sandbox), "-p", seatbelt_profile(workspace), *argv],
-                cwd=workspace, env=environment, stdin=subprocess.DEVNULL,
+                cwd=cwd, env=environment, stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout,
             )
         except subprocess.TimeoutExpired as exc:
@@ -223,6 +246,7 @@ def run_command(command: str, workspace: Path, timeout: float = 120.0) -> Execut
                 stderr=(exc.stderr or b"").decode("utf-8", errors="replace"),
                 error=f"command timed out after {timeout:g} seconds",
                 duration=time.perf_counter() - started,
+                stdout_bytes=exc.output or b"", stderr_bytes=exc.stderr or b"",
             )
         error = None
         decoded_err = process.stderr.decode("utf-8", errors="replace")
@@ -234,6 +258,7 @@ def run_command(command: str, workspace: Path, timeout: float = 120.0) -> Execut
             exit_code=process.returncode,
             stdout=process.stdout.decode("utf-8", errors="replace"), stderr=decoded_err,
             error=error, duration=time.perf_counter() - started,
+            stdout_bytes=process.stdout, stderr_bytes=process.stderr,
         )
     except LaunchError as exc:
         return Execution(error=f"cannot launch command: {exc}", duration=time.perf_counter() - started)
