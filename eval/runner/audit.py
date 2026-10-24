@@ -16,6 +16,7 @@ from typing import Any, Callable
 from urllib.parse import unquote
 
 from eval.runner.javascript import tool_calls
+from eval.runner.javascript_derived import Reduction, reduce_script
 from eval.runner.fingerprint_history import FingerprintHistory, input_texts
 
 
@@ -809,6 +810,7 @@ def audit_retained_logs(paths: list[Path], private: PrivateGraders, *,
     combined = dict(results[0])
     for key in ('logs', 'matches', 'errors'):
         combined[key] = [item for result in results for item in result[key]]
+    combined['resolutions'] = [item for result in results for item in result.get('resolutions', [])]
     combined['matches'].extend(history.matches())
     combined['status'] = ('access_detected' if combined['matches'] else
                           'inconclusive' if combined['errors'] else 'clean')
@@ -843,6 +845,7 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
     calls: dict[str, str] = {}
     pending_calls: set[str] = set()
     pending_items: set[str] = set()
+    resolutions: list[dict[str, Any]] = []
 
     def leaves(value: Any) -> list[str]:
         if isinstance(value, str):
@@ -862,6 +865,11 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
         terminal = False
         native = False
         session: str | None = None
+        # Helpers belong to one native session stream, never another task/log.
+        # Publish stores only after the corresponding output has been audited.
+        saved: dict[str, Any] = {}
+        saved_session: str | None = None
+        pending_stores: dict[str, Reduction] = {}
         if not data or not data.endswith(b"\n"):
             errors.append(f"empty_or_truncated_log:{path.name}")
         for number, line in enumerate(data.decode("utf-8", errors="replace").removesuffix("\n").split("\n"), 1):
@@ -879,6 +887,10 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                 session = event['payload'].get('session_id', event['payload'].get('id'))
             if not isinstance(session, str):
                 session = None
+            if session != saved_session:
+                saved.clear()
+                pending_stores.clear()
+                saved_session = session
             terminal |= kind in {"turn.completed", "turn.failed", "error"}
             native_kinds = {"session_meta", "turn_context", "response_item", "event_msg",
                             "world_state", "token_usage_record"}
@@ -953,6 +965,28 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             if not tool:
                 continue
             custom, patches, unknown = custom_commands(item) if item_type == "custom_tool_call" else ([], [], False)
+            reduction = None
+            code_script = (item_type == 'custom_tool_call' and tool == 'exec'
+                           and isinstance(item.get('input'), str))
+            if code_script:
+                # Work on a snapshot: rejected scripts must not mutate previous
+                # helper values. Only this parser's complete subset can add trust.
+                reduction = reduce_script(item['input'], json.loads(json.dumps(saved))) if session else None
+                if pending_stores:
+                    errors.append(f'overlapping_code_mode_scripts:{path.name}:{number}')
+                    reduction = None
+                if reduction is not None:
+                    if unknown:
+                        custom = reduction.commands
+                        patches = reduction.patches
+                        unknown = False
+                        resolutions.append({'log': path.name, 'line': number, 'tool': tool,
+                                            'reason': 'derived_from_audited_outputs',
+                                            'evidence_sha256': digest(line.encode())})
+                else:
+                    # Unsupported code may overwrite any key or keep references.
+                    saved.clear()
+                    pending_stores.clear()
             patch_call = item_type in {"function_call", "custom_tool_call"} and tool.endswith("apply_patch")
             if patch_call and item_type == "function_call":
                 arguments = item.get("arguments")
@@ -1102,6 +1136,27 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
                                 "evidence_sha256": digest(line.encode()), "redacted_evidence":
                                 "Private location reached executor context through native metadata." if metadata else
                                 "Observed protected access; see external stream hash."})
+            if code_script and reduction is not None:
+                # Uncertainty anywhere in the input prevents exporting state.
+                if not hits and not unknown and not any(error.endswith(f':{path.name}:{number}') for error in errors):
+                    pending_stores[item.get('call_id', '')] = reduction
+                else:
+                    saved.clear()
+                    pending_stores.clear()
+            elif item_type == 'custom_tool_call_output':
+                stored = pending_stores.pop(item.get('call_id', ''), None)
+                failed = (item.get('is_error') is True or item.get('isError') is True or bool(item.get('error')) or
+                          any(re.search(r'^(?:Script error:|Script running with cell ID|Error executing (?:tool|code))',
+                                        value.lstrip()) for value in leaves(item.get('output'))))
+                if stored is not None and not hits and not failed:
+                    try:
+                        saved = stored.completed(item.get('output'))
+                    except (ValueError, TypeError, RecursionError, OverflowError):
+                        saved.clear()
+                        errors.append(f'unresolved_stored_output:{path.name}:{number}')
+                elif hits or failed:
+                    saved.clear()
+                    pending_stores.clear()
         if require_completion and not native and not terminal and path not in (interrupted_paths or set()):
             errors.append(f"missing_terminal_event:{path.name}")
     if require_completion and (pending_calls or pending_items):
@@ -1115,4 +1170,5 @@ def audit_logs(paths: list[Path], private: PrivateGraders, *, require_completion
             "grader_fingerprints": [digest(p.read_bytes()) for p in private.files],
             "line_fingerprints": sorted(fingerprints),
             "logs": logs, "matches": matches, "errors": errors,
+            "resolutions": resolutions,
             "scope": "Observed tool events and native metadata; a clean audit does not prove isolation."}

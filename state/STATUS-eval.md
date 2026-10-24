@@ -1,5 +1,9 @@
 ## Done
 
+- Verified the final evaluation package with only this worktree's .venv, mocked model transports and synthetic graders; confirmed all changes are in the 11 exact authorized files, with frozen inputs/reports/interfaces unchanged and nothing staged (`.venv/bin/python -m pytest tests/eval -q`: 1828 passed in 368.77s; `git diff --check`: exit 0; inline scope/branch/STATUS/source-location audit: PASS, zero staged/deleted paths).
+- Implemented a bounded static reducer for session-authored FILE manifests, concrete computed-argument auditing, confirmed text-store provenance, source-output access detection and missing/unknown-source refusals; documented the rule and pinned its implementation for regrades (`.venv/bin/python -m pytest tests/eval/test_derived_inputs.py -q`: 73 passed in 2.95s).
+- Preserved both supplied JavaScript excerpts as regression fixtures and classified their prerequisite explicitly: native lines 65 and 75 resolve with a confirmed original_sources store, while standalone excerpts stay inconclusive; no third record was supplied (`.venv/bin/python -m pytest tests/eval/test_derived_inputs.py -q`: 73 passed in 2.95s).
+
 - Fixed the four retained-input/accounting defects with verbatim, hash-pinned source fixtures, conservative operand boundaries, exact historical provenance reconstruction, retained default-tier repricing and the empty prelaunch-collision history correction (`.venv/bin/python -m pytest tests/eval/test_retained_defects.py tests/eval/test_javascript.py tests/eval/test_host_audit_shapes.py -q`: 196 passed in 32.03s).
 - Checked the supplied reports read-only without accessing their historical runtimes: all 120 continuation task provenance entries resolve, its unpriced day-2 call computes $0.0331696, and the selected harness task computes control $0.00468372 / total $0.03405012 (`.venv/bin/python` inline retained-evidence inspection: 120/120 accepted; day2=0.0331696; control=0.004683720000000001; historical prelaunch=0.0; total=0.03405012).
 
@@ -65,6 +69,7 @@
 
 ## Remaining
 
+- Host/Claude: transfer the computed-input audit follow-up and re-audit the complete original baseline-B native streams at a safe boundary. The supplied excerpt has two records of one task, lacks the earlier original_sources store and contains no third record. Establish actual store/output provenance before claiming either historical session clean; keep unknown/missing evidence inconclusive. No historical task/report was re-audited here.
 - Host/Claude: transfer this verbatim-input and recovery-accounting follow-up, then regrade the retained continuation and harness recovery with original pinned inputs/private graders. Confirm all retained task provenance validates, the day-2 session is priced at the model default, and the selected harness task totals $0.03405012. This session checked supplied copies read-only and synthetic regrade paths; no host regrade or quality result is claimed.
 - Host/Claude: publish the user-supplied host population digest 12e7574905a6c6e4f7f49a85eacad38899fa5f0d221a3c93939a83ab13b6f041, type/family counts and 2026-10-24 freeze date through Role 1 in docs/eval-freeze-v2.md. The supplied B digest 3af558f5f0993bcac598c4f71772b14e884ea54a106a4988b2dd3d2f23a12b09 identifies only its 80-task selection. This worktree already has B's ordered 100-task task_population; ensure the main checkout uses it for report population identity. No host digest was recomputed here.
 - Host only, after validation/freeze and spending approval: transfer the full-v2 A/B/harness configs and matched Fast estimates to the main checkout. This worktree must not run executor/controller/judge models. Re-estimate dynamic judge slots before a harness batch.
@@ -85,6 +90,9 @@
 
 ## Decisions
 
+- Require both source closure and concrete computed-argument auditing before derived_from_audited_outputs: pure strings can synthesize a private path absent from their source fragments.
+- Export only confirmed text stores within one native session stream, with paired raw output evidence for tool-result fields: unsupported code, transformed/missing output, unknown keys and ambiguous concurrency cannot establish trust.
+- Preserve the two supplied excerpts and report the missing third record without reconstruction: inferred source records cannot satisfy STOP-E4.
 - Resolve the whole retained code-mode input: the unresolved operand was the inline literal-array loop after the four-file patch, rather than escaped patch bodies. Keep static non-path session controls outside operand resolution.
 - Recover overwritten legacy provenance only through exact historical SHA-256 reconstruction: the retained calls reproduce all 119 original fallback artifact pins; no new historical pin is fabricated.
 - Fill previously unpriced retained calls only with complete usage and verified omitted/null exit-tier captures: retain known historical Standard prices and record model-default inference during regrade.
@@ -151,6 +159,7 @@
 
 ## Verify commands
 
+- `.venv/bin/python -m pytest tests/eval -q`
 - .venv/bin/python -m pytest tests/eval/test_retained_defects.py -q
 
 - .venv/bin/python -m pytest tests/eval/test_host_audit_shapes.py tests/eval/test_control_failures.py -q
@@ -192,6 +201,8 @@
 
 ## Assumptions
 
+- The supplied read-only excerpt is the complete available record bundle for this job; it contains two records, not three, and no earlier original_sources store. Synthetic provenance tests do not establish actual historical session cleanliness.
+- The computed-input reducer intentionally accepts a bounded ASCII/LF and safe-integer subset; other code or unobservable tool values remain inconclusive rather than inheriting trust.
 - This session is r5/v2 at f1fa062 in the authorized worktree. Supplied evidence copies are read-only inputs; their locations are not written into repository files. Offline retained-data pricing and synthetic repeated regrades establish the fixes without host grading or new model calls.
 
 - This offline audit session consumes Role 3 deadline diagnostics as a control_failure line followed by a JSON object with reason=deadline. The two reported inconclusive host shapes are user-supplied observations; this checkout already resolves the supplied multi-file literal. Only this worktree's .venv, synthetic graders/logs and mocked model transports are used; no host re-audit, model calls or actual private-root access is claimed.
