@@ -18,7 +18,15 @@ def execute(event: str, started: float, payload: dict[str, Any]) -> int:
     try:
         if not isinstance(payload, dict) or payload.get("hook_event_name") != event:
             raise ValueError("hook event does not match entry point")
-        from _runtime import Runtime
+        # Explicit legacy mode keeps v1/v2 captures reproducible. New installs
+        # and ordinary sessions use v3; stub fixtures remain historical.
+        if os.environ.get('HARNESS_INTERFACE_VERSION') == '2' or os.environ.get('HARNESS_STUB') == '1':
+            from _runtime import Runtime
+        else:
+            root = str(Path(__file__).resolve().parents[2])
+            if root not in sys.path:
+                sys.path.insert(0, root)
+            from plugin.hooks._v3_runtime import Runtime
         runtime = Runtime(payload)
         response = runtime.dispatch(event)
         cli_seconds = runtime.cli_seconds

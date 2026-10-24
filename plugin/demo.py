@@ -125,6 +125,7 @@ def launch(metadata: dict[str, Any], stage: str, run: Runner = run_group,
     """Launch exactly one executor process per stage; hooks own verification."""
     out = Path(metadata["out"])
     child_env = dict(os.environ)
+    child_env['HARNESS_INTERFACE_VERSION'] = '2'
     # This is a direct-user hook demo, unlike the independent evaluation runner.
     child_env.pop("HARNESS_NESTED", None)
     child_env.update(CODEX_HOME=metadata["codex_home"],

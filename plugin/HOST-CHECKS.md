@@ -1,3 +1,20 @@
+# Version 3 host-only capture
+
+After Roles 3/4 land, run `.venv/bin/python -m plugin.host_checks v3-prepare
+--out /tmp/lhm-v3-host-capture`. Follow the printed first-session command,
+review the numbered table and question pause, answer using the actual question
+ID in JSON, and wait for the report and separate ledger continuation before
+exiting. Run the printed second-session command and verify HARNESS_LEDGER is
+visible without restating the label. Then run `.venv/bin/python -m
+plugin.host_checks v3-check --out /tmp/lhm-v3-host-capture`.
+
+Preparation performs help-only integration checks and isolated installation;
+it never starts an executor automatically. Both interactive scripts retain
+hook trust/terminal evidence and use v3 with HARNESS_NESTED unset. Review the
+terminal captures as well as the offline artifact audit. No v3 host run was
+performed in the network-disabled workspace-write implementation session.
+The procedures below retain the explicitly selected historical v1/v2 path.
+
 # Host installation checks
 
 These procedures require a host with the logged-in Codex CLI and macOS `/usr/bin/script`. Run from the repository root with `.venv` available. They are prepared procedures, not recorded live successes. Do not run them during an evaluation batch. Each trust/silence procedure uses two executor sessions at `gpt-6.1-sol`, low effort; control calls use stub fixtures. No task approval or real controller call is needed.
