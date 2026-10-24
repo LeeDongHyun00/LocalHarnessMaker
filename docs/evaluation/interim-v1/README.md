@@ -1,6 +1,7 @@
 # Interim evaluation on task set version 1 (2026-10-24)
 
 Superseded on 2026-10-24 by docs/evaluation/final-v1/, which uses the complete, priced reports. Kept as the record of the interim state.
+
 Written by Claude from the recovered version 1 reports on main at 51d2e52. Interim: the overall cost metrics are still undefined because one task per run has no cost yet (restart casualties and a fresh rerun whose control calls are unpriced; r5-fixes-005 and the running recovery chain resolve this). Per-type cost ratios are complete for bug_fix and constrained_refactoring and are reported here. Nothing in this directory is a headline result.
 
 Inputs, all valid under the approved rule: harness = eval/reports/full-harness-recovered3 (120 tasks, Sol medium plus gpt-6-luna control, 3 attempts per day); A = eval/reports/full-a-continued2 (120 tasks, Sol medium alone); B = eval/reports/full-b-regrade (100 single-session tasks, Sol max alone). Same task set digest, seed and codex-cli 0.163.0-alpha.11.1. Paired task-cluster bootstrap, 10000 resamples, 95 percent intervals. Tables: harness-vs-a.md and harness-vs-b.md.
