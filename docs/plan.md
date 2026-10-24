@@ -123,6 +123,10 @@ Notion reserves 11/11–11/13 for final experiments, human checks, fixes and doc
 | Input analyzer | Week 1 designs difficulty-to-effort rules; week 2 implements token counting, difficulty, effort selection and cost calculation. | Controller D-1 requires `analyze.py` effort rules v1 by 10/27, and its First task starts token counting/cost implementation immediately. Both timings are retained. |
 | Optional QLoRA | Week 3 lists an optional first trial; the model strategy and week 4 schedule place optional training in week 4. | Resolved by decision 0007 on 10/23: Controller D-5 is dropped, as is D-3 local control. |
 
+## Open decisions
+
+- [Decision 0010](decisions/0010-reservations-r2-grader.md) proposes remedies for the reservations R2 grader ambiguity; user approval is pending before any grader, digest or headline-population change.
+
 ## Assumptions
 
 - The supplied export is the design baseline for this document; no live Notion access or external factual verification is implied.

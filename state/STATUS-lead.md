@@ -1,5 +1,7 @@
 ## Done
 
+- Published proposed decision 0010 with attributed reservations R2 diagnosis, three comparison/freeze options, Role 5/Claude recommendation and conditional owner steps; linked it under Open decisions in docs/plan.md. No decisions index exists in docs/decisions/README.md or AGENTS.md, so no index edit was made (`.venv/bin/python -m pytest tests/lead -q`: 104 passed in 4.20s).
+
 - Published docs/eval-freeze-v2.md with the supplied 2026-10-24 Claude host evidence at main commit 9097281: digest, 100-task/20-family inventory, validation, calibration, shared-template limitation, immutable version 2 and post-freeze anti-contamination rule; moved fresh full A/B/harness runs to W2 in docs/plan.md. Host findings are attributed, not rerun here (`.venv/bin/python -m pytest tests/lead -q`: 104 passed; `git diff --check -- docs/eval-freeze-v2.md docs/plan.md state/STATUS-lead.md`: exit 0, no output).
 
 - Published user-approved interface version 2 under decision 0009: required task_false_done_rate, claimed_complete_task unit, valid-task-only numerator/denominator, missing-final exclusions and version 1 compatibility; updated example, AGENTS.md, interfaces and Role 5 prompt without changing eval/ or any other report field (`make validate-schemas`: Validated 6 draft 2020-12 schemas and 8 examples; `.venv/bin/python -m pytest tests/lead -q`: 104 passed in 4.07s).
@@ -31,6 +33,8 @@
 
 ## Remaining
 
+- Await the user's decision on proposed 0010. If accepted, Role 5 amends/validates the five private graders and computes the revised digest; Claude verifies on the host and records it in docs/eval-freeze-v2.md; every v2 report needs equal retained-artifact regrading and final disclosure of both gradings. No remedy or freeze exception is authorized by this proposal.
+
 - Role 5 follow-up for published interface version 2: implement task_false_done_rate in eval/metrics.py and the report builder using verifier/claims.py rules on the retained final message of the last session; validate valid-task-only populations, missing-final exclusions/reasons, bootstrap behavior and dual-version tools. Publication does not establish implementation or measurement. Host evaluation remains untouched.
 - D-6 docs/qa.md and docs/slides/outline.md remain deferred to a separate continuation after this user-prioritized freeze publication, with measured/pending labels and evidence sources only.
 
@@ -46,6 +50,10 @@
 - Role 5 expected failure: tests/eval/test_runner.py::test_stop_e1_partial_report_is_invalid_with_counts reports that aggregate-only halt invalidity would require a frozen-schema revision. Recorded only; no schema or eval change was made by this lead session.
 
 ## Decisions
+
+- Keep 0010 proposed, awaiting the user: the current instruction authorizes documentation only; graders, tasks, reports and the frozen digest remain unchanged.
+- Use prompts/01-tech-lead.md as the requested Role 1 prompt: prompts/01-lead.md is absent and the repository contains this matching role prompt. This session's user-prioritized proposal supersedes the historical Remaining order.
+- Preserve approved baseline B task scope in the proposed 95-task analysis: comparisons involving B use the same eligible single-session subset, rather than implying B has two-session results.
 
 - Publish the version 2 freeze from user-supplied Claude host findings at 9097281, dated 2026-10-24: the user prioritizes this separate immutable record and moves full A/B/harness measurements into W2; no runtime, interface or historical freeze record changes are needed.
 
@@ -78,6 +86,8 @@
 - Retain the historical analyzer timing disagreement: decision 0007 resolves the QLoRA disagreement by dropping training and supersedes conflicting measurement dates with the approved W1–W3 windows.
 
 ## Verify commands
+
+- git diff --check -- docs/decisions/0010-reservations-r2-grader.md docs/plan.md state/STATUS-lead.md
 
 - git diff --check -- docs/eval-freeze-v2.md docs/plan.md state/STATUS-lead.md
 
@@ -113,7 +123,7 @@
 
 ## Do not touch
 
-- This session: eval/, docs/weekly/, docs/handoff/, CLAUDE.md, other roles' implementation/tests/STATUS and read-only .git; no staging, commits, network, nested Codex, live model calls or macOS sandbox-exec. Edit only docs/eval-freeze-v2.md, docs/plan.md and state/STATUS-lead.md. Historical session scopes below do not restrict this publication.
+- This session: eval/, schemas/, task sets, docs/weekly/, docs/handoff/, docs/evaluation/, CLAUDE.md, other roles' implementation/tests/STATUS and read-only .git; no staging, commits, network, nested Codex, live model calls or macOS sandbox-exec. Edit only docs/decisions/0010-reservations-r2-grader.md, docs/plan.md and state/STATUS-lead.md. Historical session scopes below do not restrict this proposal.
 
 - Version 1 interfaces without new user approval, a decision record and a version increment.
 - Other roles' implementation files/tests/STATUS, including concurrent controller, verifier, plugin and eval work. The earlier decision-0008 session edited its decision, plan, version 1 freeze notice and lead STATUS; that historical scope does not authorize further edits here.
@@ -123,8 +133,10 @@
 
 ## Assumptions
 
+- The requested prompts/01-lead.md refers to the existing prompts/01-tech-lead.md; no alternative lead prompt was found. The reservations findings are supplied by the user and the 2026-10-24 Role 5/Claude weekly diagnosis, not independently measured here.
+- No PR was requested; decision 0010 and this STATUS provide its change summary and assumptions. Commit plan: docs/decisions/0010-reservations-r2-grader.md, docs/plan.md and state/STATUS-lead.md; message `docs: propose reservations R2 grader remedies`. No staging or commit is performed.
 - Version 2 inventory, frozen metadata, digest, validation, calibration and template limitation are user-supplied Claude host findings dated 2026-10-24 at main commit 9097281; this offline session does not independently verify them. The supplied pilot CI has no stated confidence level or interval method, so neither is inferred.
-- No PR was requested; this STATUS and the freeze record provide the change summary and assumptions for a future PR. The current commit plan contains only docs/eval-freeze-v2.md, docs/plan.md and state/STATUS-lead.md; no staging or commit is performed.
+- Historical freeze-publication session: no PR was requested; its STATUS and freeze record provided the change summary and assumptions, with docs/eval-freeze-v2.md, docs/plan.md and state/STATUS-lead.md in that session's commit plan; no staging or commit was performed.
 
 - Decision 0009 approval and the valid-task-only population resolution are explicit user instructions dated 2026-10-23; no additional population assumption is made.
 - Existing artifact references carry final-message provenance and exclusion reasons without new per-task fields; Role 5 owns runtime integration and dual-version tool validation. No historical report migration or measured result is inferred.
