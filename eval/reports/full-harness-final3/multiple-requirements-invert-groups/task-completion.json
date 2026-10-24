@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "74ce993526d4f36845caa8e01fc78a7957f8c74a2d7f8cb01ced70660debebb3",
+  "final_message": {
+    "path": "eval/reports/full-harness-final3/multiple-requirements-invert-groups/final-1.md",
+    "sha256": "7f56ff8faa5c22ec2ace19f695bcc3fe92fdc3f3c33a5c392720593fe52517a8"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

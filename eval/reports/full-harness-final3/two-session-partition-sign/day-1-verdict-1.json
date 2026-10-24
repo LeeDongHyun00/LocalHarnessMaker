@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+partition\\s*\\(\n2: \n3: \n4: def partition(items: list[int]) -> tuple[list[int], list[int], list[int]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, partition declares a tuple of three list[int] results, creates three fresh lists, iterates through items once and appends each item to its matching list before returning (negatives, zeros, positives). The code only reads the input collection, so it does not mutate it.",
+      "reason": "The typed API partitions integers into negative, zero, and positive lists in that order, preserving relative order and duplicates without mutating the input."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s*def\\s+test_\\w+\\s*\\(\n9:     def test_mixed_values_preserve_order_and_duplicates(self) -> None:\n14: \n15:     def test_empty_input(self) -> None:\n17: \n18:     def test_single_partition_inputs(self) -> None:\n26: \n27:     def test_input_is_unchanged_and_output_lists_are_independent(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.PartitionTests.test_empty_input) ... ok\ntest_input_is_unchanged_and_output_lists_are_independent (test_solution.PartitionTests.test_input_is_unchanged_and_output_lists_are_independent) ... ok\ntest_mixed_values_preserve_order_and_duplicates (test_solution.PartitionTests.test_mixed_values_preserve_order_and_duplicates) ... ok\ntest_single_partition_inputs (test_solution.PartitionTests.test_single_partition_inputs) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?si)(?=.*design decisions)(?=.*python -m unittest discover -v)\n1: # Day 1 handoff\n2: \n3: ## Design decisions",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

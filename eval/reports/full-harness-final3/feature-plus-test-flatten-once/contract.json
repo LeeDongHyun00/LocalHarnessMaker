@@ -1,0 +1,86 @@
+{
+  "task_summary": "Implement one-level list flattening in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Edit solution.py and public tests.",
+    "Flatten exactly one list level, preserve order, ignore empty inner lists, return a new list, and do not modify inner lists or mutate input collections.",
+    "Maintain type hints; no algorithmic complexity constraint is imposed.",
+    "Verify with python -m unittest discover -v.",
+    "test_solution.py must contain at least two passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py is present and defines the public flatten function with type hints.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+flatten\\s*\\([^\\n]*\\)\\s*->\\s*[^\\n]+:"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py is present and defines at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:^|\\n)\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?(?:^|\\n)\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "Tests cover ordinary, boundary, and empty inputs and exercise the public flatten API.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Decide whether the tests visibly exercise the public flatten API and cover ordinary nested-list input, boundary cases, and empty input. The rubric is satisfied only when those cases are evident from the test code."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The implementation and tests pass the requested unittest discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "test_solution.py contains at least two passing unittest test methods exercising the public API.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The supplied task workspace is the relative-path workspace for the proposed checks; workspace contents have not been inspected.",
+    "solution.py and test_solution.py may not exist yet and may be created.",
+    "The public function name is flatten, as specified by the request.",
+    "Tests are discoverable by the requested command python -m unittest discover -v."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=834; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34901,
+    "output_tokens": 1179,
+    "usd": 0.00273176
+  }
+}

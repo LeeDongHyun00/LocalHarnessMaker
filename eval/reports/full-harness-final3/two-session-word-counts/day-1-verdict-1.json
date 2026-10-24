@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "llm_judge: In `solution.py`, `words(text: str) -> dict[str, int]` uses `text.split()` for arbitrary whitespace, casefolds each token before counting, and leaves punctuation intact. The new `counts` mapping stays empty for empty or whitespace-only input and is freshly built on each call.",
+      "reason": "The public `words` API meets the specified behavior and has a return type hint. It accepts a string, so it does not mutate input collections."
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:.*?){3}\n9:     def test_counts_repeated_words(self):\n10:         self.assertEqual(words(\"apple banana apple\"), {\"apple\": 2, \"banana\": 1})\n11: \n12:     def test_splits_arbitrary_whitespace(self):\n13:         self.assertEqual(words(\" \\tOne\\ntwo\\r\\none\\vthree\\ftwo\\u2003one \"),\n14:                          {\"one\": 3, \"two\": 2, \"three\": 1})\n15: \n16:     def test_casefolds_unicode(self):\n19:     def test_preserves_punctuation(self):\n20:         self.assertEqual(words(\"Hello, HELLO, hello! hello\"),",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_casefolds_unicode (test_solution.WordsTests.test_casefolds_unicode) ... ok\ntest_counts_repeated_words (test_solution.WordsTests.test_counts_repeated_words) ... ok\ntest_empty_and_whitespace_only (test_solution.WordsTests.test_empty_and_whitespace_only) ... ok\ntest_input_is_unchanged_and_results_are_independent (test_solution.WordsTests.test_input_is_unchanged_and_results_are_independent) ... ok\ntest_preserves_punctuation (test_solution.WordsTests.test_preserves_punctuation) ... ok\ntest_splits_arbitrary_whitespace (test_solution.WordsTests.test_splits_arbitrary_whitespace) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: HANDOFF.md lists decisions about whitespace splitting, Unicode case folding, punctuation, fresh dictionaries, and Python 3.11+; its verification block contains `python -m unittest discover -v`.",
+      "reason": "HANDOFF.md records multiple design decisions and includes the exact requested verification command."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

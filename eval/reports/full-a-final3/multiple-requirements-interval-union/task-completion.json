@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "3e4a0eb7a4966e4fb9d919cda2559a0024bce69e27f09e7689e844b7de884a18",
+  "final_message": {
+    "path": "eval/reports/full-a-final3/multiple-requirements-interval-union/final-1.md",
+    "sha256": "a90ece15504efce730e03223125164c03c8b64d8b3fef6662517af66797c5091"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

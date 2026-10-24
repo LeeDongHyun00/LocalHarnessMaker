@@ -1,0 +1,100 @@
+{
+  "task_summary": "Repair normalize in solution.py, add its public behavior specification as a docstring, and add public API regression tests in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; edit solution.py and public tests.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Maintain type hints and do not mutate input collections.",
+    "Normalize CRLF and lone CR to LF; preserve existing LF, all other characters, and the number of line breaks; do not strip trailing newlines.",
+    "Add at least 3 passing unittest test methods exercising the public API.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains the normalize function definition.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+normalize\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "solution.py documents the specified public normalization behavior in a docstring.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and determine whether the public normalize specification is documented in a docstring, including conversion of CRLF and lone CR to LF; preservation of existing LF, other characters, and the number of line breaks; and retention of trailing newlines."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least three unittest test methods exercising the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[^\\n]*\\n.*?){3}"
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The implementation and tests preserve type hints, avoid mutating input collections, and observe the requested scope.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether the normalize implementation maintains type hints and does not mutate input collections, and whether the tests exercise the public API. Assess only facts visible in these files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "Paths are relative to the supplied task workspace.",
+    "solution.py and test_solution.py may not exist yet and may be created or edited.",
+    "The existing public API signature and accepted input type are not specified; preserve them if present and do not invent a new API beyond the requested normalize behavior.",
+    "The unittest suite is discoverable using the requested command python -m unittest discover -v."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=837; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34917,
+    "output_tokens": 1320,
+    "usd": 0.00145602
+  }
+}

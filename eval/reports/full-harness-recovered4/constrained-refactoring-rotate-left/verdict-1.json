@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def rotate\\b.*?def rotate_legacy\\b.*?def _[A-Za-z0-9_]+\\b\n4: def rotate(items: list[int], steps: int) -> list[int]:\n5:     return _rotate(items, steps)\n6: \n7: \n8: def rotate_legacy(items: list[int], steps: int) -> list[int]:\n9:     return _rotate(items, steps)\n10: \n11: \n12: def _rotate(items: list[int], steps: int) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def test_[A-Za-z0-9_]+\\s*\\(self\\s*\\).*?){2}\n7:     def test_rotation_and_input_immutability(self):\n8:         for function in (rotate, rotate_legacy):\n9:             for steps, expected in (\n10:                 (0, [1, 2, 3]),\n11:                 (1, [2, 3, 1]),\n12:                 (4, [2, 3, 1]),\n13:                 (-1, [3, 1, 2]),\n14:                 (-4, [3, 1, 2]),\n15:                 (3, [1, 2, 3]),\n16:             ):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_and_singleton_inputs (test_solution.RotateTests.test_empty_and_singleton_inputs) ... ok\ntest_invalid_steps_preserve_error_and_input (test_solution.RotateTests.test_invalid_steps_preserve_error_and_input) ... ok\ntest_rotation_and_input_immutability (test_solution.RotateTests.test_rotation_and_input_immutability) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, `rotate(items: list[int], steps: int) -> list[int]` and `rotate_legacy(items: list[int], steps: int) -> list[int]` each return `_rotate(items, steps)`. The shared `_rotate` returns `[]` for empty input or `items[steps:] + items[:steps]`, which does not modify `items`.",
+      "reason": "Both public functions retain typed public definitions and delegate to the same private helper. The visible implementation builds and returns a new list using slicing and concatenation, without mutating the input."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

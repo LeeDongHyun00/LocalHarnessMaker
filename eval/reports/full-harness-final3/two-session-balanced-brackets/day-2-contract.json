@@ -1,0 +1,109 @@
+{
+  "task_summary": "Extend the existing public API with balanced_many(cases: list[tuple]) -> list, preserving the Day 1 API, adding unittest coverage, and recording verification evidence in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Preserve the Day 1 public API and behavior.",
+    "Do not mutate cases or their argument tuples.",
+    "Return results in case order; return [] when cases is empty; propagate the first exception unchanged.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines the balanced_many function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+balanced_many\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "balanced_many implements ordered per-case calls to balanced, returns an empty list for no cases, and propagates exceptions without changing them.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files and assess whether solution.py implements balanced_many(cases: list[tuple]) -> list by calling the existing balanced API once per case with that tuple's positional arguments, preserving case order, returning [] for no cases, and allowing the first exception to propagate unchanged. Also assess whether cases and their argument tuples are left unmodified. Do not infer behavior absent from the files."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods, including coverage of balanced_many.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for c in tree.body if isinstance(c, ast.ClassDef) for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3; assert any(\"many\" in n.name.lower() or \"batch\" in n.name.lower() for n in methods)'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest suite passes using the handoff's verification command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "HANDOFF.md records the verification command and its observed result.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?s)python\\s+-m\\s+unittest\\s+discover\\s+-v.*?(?:passed|pass).*?(?:test|tests)"
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The existing solution module remains syntactically valid.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for c in tree.body if isinstance(c, ast.ClassDef) for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3; assert any(\"many\" in n.name.lower() or \"batch\" in n.name.lower() for n in methods)'",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "Relative file paths are interpreted from the supplied task workspace; the runner-provided workspace is available.",
+    "The target files may not exist yet and may be created as needed.",
+    "The handoff's existing solution.py and test_solution.py artifacts are context only; their current contents are not verified here.",
+    "The requested unittest discovery command is the verification command to run and document in HANDOFF.md; the observed result must be filled in after execution.",
+    "The exact argument arity and expected result cases for balanced_many are not otherwise specified; tests should derive each call's expected result from the existing balanced API without changing that API's behavior."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=608; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17636,
+    "output_tokens": 894,
+    "usd": 0.00086276
+  }
+}

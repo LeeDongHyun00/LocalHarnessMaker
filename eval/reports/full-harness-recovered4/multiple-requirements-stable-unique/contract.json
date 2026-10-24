@@ -1,0 +1,84 @@
+{
+  "task_summary": "Repair `unique` in `solution.py`, document its public specification, and add regression tests in `test_solution.py` using Python 3.11+ and the standard library.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Edit `solution.py` and public tests.",
+    "Do not access parent repositories or external services.",
+    "Preserve input values and collection order; do not mutate input collections.",
+    "Maintain type hints.",
+    "Use Python 3.11+ and the standard library.",
+    "No algorithmic complexity constraint is imposed.",
+    "`test_solution.py` must contain at least 3 passing unittest test methods exercising the public API.",
+    "Retain all stated behavior and compatibility requirements."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The `solution.py` module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "`solution.py` contains the public specification as a docstring.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read `solution.py` and assess whether the public `unique` API has a docstring that specifies: each string is returned once in first-occurrence order, empty input returns `[]`, equality is case-sensitive, and input collections are not mutated. Assess only content visible in the file."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "`test_solution.py` contains at least three unittest test methods that exercise the public API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?=.*\\bclass\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:)(?=(?:.*\\n\\s+def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:){3,})"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The requested unittest discovery command succeeds.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; `solution.py` and `test_solution.py` may not exist yet and may be created.",
+    "The `unique` function is expected to be the public API implemented in `solution.py`; its current signature and input collection type are unspecified and must be preserved if present.",
+    "The requested unittest discovery command is assumed to discover `test_solution.py` from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=797; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17395,
+    "output_tokens": 568,
+    "usd": 0.00067566
+  }
+}

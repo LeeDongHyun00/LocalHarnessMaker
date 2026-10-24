@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "b40826202b7c69271393109a22c966b65bfcc46c107332c27f7656bc62269773",
+  "final_message": {
+    "path": "eval/reports/full-harness-final3/feature-plus-test-stable-unique/final-1.md",
+    "sha256": "13b5cc4a064a1f376098f94999745bb833112cd71df33b142ae5c6d23b120b36"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `unique` with type hints, preserving first-occurrence order, case-sensitive equality, and input immutability"
+  ],
+  "undefined_reason": null
+}

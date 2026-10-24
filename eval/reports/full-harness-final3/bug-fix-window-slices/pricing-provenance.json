@@ -1,0 +1,23 @@
+[
+  {
+    "call_id": "bug-fix-window-slices-exec-1",
+    "observed_service_tier": null,
+    "basis": "Retained original accounting; no per-call tier observation available.",
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "pricing_snapshot_sha256": "bdf17583580200967394ead052fb515d5ba77f5311555cbe0b0bc8265efe691b"
+  },
+  {
+    "call_id": "bug-fix-window-slices-control-1",
+    "observed_service_tier": null,
+    "basis": "Retained original accounting; no per-call tier observation available.",
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "pricing_snapshot_sha256": "bdf17583580200967394ead052fb515d5ba77f5311555cbe0b0bc8265efe691b"
+  },
+  {
+    "call_id": "bug-fix-window-slices-control-2",
+    "observed_service_tier": null,
+    "basis": "Retained original accounting; no per-call tier observation available.",
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "pricing_snapshot_sha256": "bdf17583580200967394ead052fb515d5ba77f5311555cbe0b0bc8265efe691b"
+  }
+]

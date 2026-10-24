@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def parse_pairs\\b.*?def parse_pairs_legacy\\b.*?def _[A-Za-z_]\\w*\\s*\\(\n4: def parse_pairs(text: str) -> dict[str, str]:\n5:     return _parse_pairs(text)\n6: \n7: \n8: def parse_pairs_legacy(text: str) -> dict[str, str]:\n9:     return _parse_pairs(text)\n10: \n11: \n12: def _parse_pairs(text: str) -> dict[str, str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(t)) >= 2'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_blank_input_and_independent_results (test_solution.ParsePairsTests.test_blank_input_and_independent_results) ... ok\ntest_invalid_records_preserve_error_message (test_solution.ParsePairsTests.test_invalid_records_preserve_error_message) ... ok\ntest_records_whitespace_duplicates_and_empty_values (test_solution.ParsePairsTests.test_records_whitespace_duplicates_and_empty_values) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

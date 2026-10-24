@@ -1,0 +1,35 @@
+import unittest
+
+from solution import ordinal, ordinal_legacy
+
+
+class OrdinalTests(unittest.TestCase):
+    def test_nonnegative_ordinals(self):
+        cases = {
+            0: '0th', 1: '1st', 2: '2nd', 3: '3rd', 4: '4th',
+            10: '10th', 11: '11th', 12: '12th', 13: '13th',
+            20: '20th', 21: '21st', 22: '22nd', 23: '23rd',
+            101: '101st', 111: '111th', 112: '112th', 113: '113th',
+            121: '121st', 122: '122nd', 123: '123rd',
+        }
+        original = cases.copy()
+        for function in (ordinal, ordinal_legacy):
+            for value, expected in cases.items():
+                with self.subTest(function=function.__name__, value=value):
+                    result = function(value)
+                    self.assertIsInstance(result, str)
+                    self.assertEqual(result, expected)
+        self.assertEqual(cases, original)
+
+    def test_negative_values_raise(self):
+        for function in (ordinal, ordinal_legacy):
+            for value in (-1, -11, -100):
+                with self.subTest(function=function.__name__, value=value):
+                    with self.assertRaisesRegex(
+                        ValueError, '^nonnegative value required$'
+                    ):
+                        function(value)
+
+
+if __name__ == '__main__':
+    unittest.main()

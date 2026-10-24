@@ -1,0 +1,42 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` defines `last_index(items: list[str], target: str) -> int | None`."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`test_solution.py` contains at least three unittest methods; six tests passed."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`HANDOFF.md` records design decisions and the specified unittest verification command."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`python -m py_compile solution.py test_solution.py` exited successfully."
+    },
+    {
+      "criterion_id": "SC-5",
+      "artifact": "`python -m unittest discover -v` passed all six tests."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Scan the list with `enumerate`, retaining each matching index and returning the last one; use `None` when there is no match.",
+      "why": "This implements last zero-based match behavior, including empty and absent cases, without mutating the input."
+    },
+    {
+      "what": "Use ordinary string equality for matching.",
+      "why": "The public behavior requires case-sensitive matching."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py test_solution.py",
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services."
+  ]
+}

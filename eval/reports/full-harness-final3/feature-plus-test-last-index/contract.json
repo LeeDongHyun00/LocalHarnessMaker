@@ -1,0 +1,99 @@
+{
+  "task_summary": "Implement `last_index` in `solution.py` and add standard-library `unittest` coverage in `test_solution.py` for ordinary, boundary, and empty inputs, preserving the stated API and constraints.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Return the last zero-based index equal to the target, or `None` when absent; empty input returns `None`; matching is case-sensitive.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "`test_solution.py` must contain at least two passing unittest methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The implementation module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "`solution.py` defines a type-annotated `last_index` function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^def\\s+last_index\\s*\\([^\\n]*\\)\\s*->\\s*[^\\n:]+\\s*:"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "`test_solution.py` exists.",
+      "check": {
+        "type": "file_exists",
+        "path": "test_solution.py"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "`test_solution.py` contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:^|\\n)\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?\\n\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The requested unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "Tests exercise ordinary, boundary, and empty input cases through the public API and do not mutate input collections.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files. Assess whether `test_solution.py` contains standard-library unittest tests that call the public `last_index` API and cover ordinary matching and absent-target cases, boundary positions (including the first or last index), and empty input. Also assess whether the implementation visibly avoids mutating input collections. Do not rely on runtime or terminal output."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "Paths are relative to the supplied task workspace.",
+    "`solution.py` and `test_solution.py` may not exist yet and may be created.",
+    "The request does not provide a function signature or collection type; the implementation should choose a type-annotated signature consistent with the specified public behavior and Python 3.11+ standard-library constraints.",
+    "The `unittest` suite is assumed discoverable by `python -m unittest discover -v` from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=836; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17394,
+    "output_tokens": 698,
+    "usd": 0.00092488
+  }
+}

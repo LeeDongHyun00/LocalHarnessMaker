@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+runs_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\b\n16: def runs_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?=(?:.*?def\\s+test_[A-Za-z0-9_]+\\s*\\().*?){3}.*?def\\s+test_[A-Za-z0-9_]*runs_many[A-Za-z0-9_]*\\s*\\(\n1: \"\"\"Regression tests for the public runs API.\"\"\"\n2: \n3: import unittest\n4: from unittest.mock import call, patch\n5: \n6: from solution import runs, runs_many\n7: \n8: \n9: class RunsTests(unittest.TestCase):\n10:     def test_empty_input(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_adjacent_equal_values_are_counted (test_solution.RunsTests.test_adjacent_equal_values_are_counted) ... ok\ntest_empty_and_unicode_strings (test_solution.RunsTests.test_empty_and_unicode_strings) ... ok\ntest_empty_input (test_solution.RunsTests.test_empty_input) ... ok\ntest_input_is_not_mutated (test_solution.RunsTests.test_input_is_not_mutated) ... ok\ntest_nonadjacent_equal_values_remain_separate (test_solution.RunsTests.test_nonadjacent_equal_values_remain_separate) ... ok\ntest_runs_many_empty (test_solution.RunsTests.test_runs_many_empty) ... ok\ntest_runs_many_preserves_order_and_inputs (test_solution.RunsTests.test_runs_many_preserves_order_and_inputs) ... ok\ntest_runs_many_propagates_first_exception_unchanged (test_solution.RunsTests.test_runs_many_propagates_first_exception_unchanged) ... ok\ntest_runs_many_unpacks_positional_arguments (test_solution.RunsTests.test_runs_many_unpacks_positional_arguments) ... ok\ntest_single_value (test_solution.RunsTests.test_single_value) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(python\\s+-m\\s+unittest\\s+discover\\s+-v).*?(passed|pass|successful|success|tests?\\s+ran)\n33: python -m unittest discover -v\n34: ```\n35: \n36: - `python -m py_compile solution.py test_solution.py`: passed, exit code 0.\n37: - `python -m unittest discover -v`: passed, exit code 0; observed",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "unverifiable",
+      "evidence": "llm_judge: In solution.py, runs_many uses `[runs(*case) for case in cases]`, which invokes runs once per case in order, returns [] when cases is empty, and naturally propagates the first exception unchanged. The visible runs implementation builds a new output list and does not modify its input; runs_many also does not modify the cases. HANDOFF.md states the day-1 signature is `runs(items: list[str]) -> list[tuple[str, int]]` and says it was left unchanged, but the original day-1 handoff/interface description needed for comparison is unavailable.",
+      "reason": "The visible code supports the batch behavior, but the required handoff context describing the day-1 interface is not available for comparison. The artifact’s HANDOFF.md claims the interface was preserved, but that claim alone does not establish compatibility against the original interface."
+    }
+  ],
+  "overall": "fail",
+  "reinstruct_message": null,
+  "attempt": 1
+}

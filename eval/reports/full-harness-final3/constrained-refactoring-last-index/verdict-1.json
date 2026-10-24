@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def last_index\\b.*?def last_index_legacy\\b.*?def _[A-Za-z0-9_]+\\b\n4: def last_index(items: list[str], target: str) -> int | None:\n5:     return _last_index(items, target)\n6: \n7: \n8: def last_index_legacy(items: list[str], target: str) -> int | None:\n9:     return _last_index(items, target)\n10: \n11: \n12: def _last_index(items: list[str], target: str) -> int | None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 2'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: solution.py defines last_index(items: list[str], target: str) -> int | None and last_index_legacy with the same signature; each delegates to _last_index, whose reverse loop returns the last matching zero-based index or None. test_solution.py imports both public names and exercises matching, empty/absent, case-sensitive, immutability, and invalid-input behavior for each. The visible source supports the stated behavior and error cases.",
+      "reason": "Both public functions delegate to the shared private helper and retain matching signatures and return annotations. The helper scans backward using equality and returns the matching index or None; it does not mutate the input. The tests cover both functions' expected matches, empty and absent inputs, case sensitivity, immutability, and TypeError behavior for None and iterators. Imports and public names are compatible with the visible test imports."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_absent_empty_and_case_sensitive_matches (test_solution.LastIndexTests.test_absent_empty_and_case_sensitive_matches) ... ok\ntest_invalid_input_preserves_type_error (test_solution.LastIndexTests.test_invalid_input_preserves_type_error) ... ok\ntest_last_match_and_input_immutability (test_solution.LastIndexTests.test_last_match_and_input_immutability) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

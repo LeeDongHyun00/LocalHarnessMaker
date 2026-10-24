@@ -1,0 +1,10 @@
+{
+  "task_id": "two-session-partition-sign",
+  "source_report_sha256": "2e616c1eb9d3291e1c076f44b26486f91183f7228e1e4163b54e47dab6e69de0",
+  "workspace_verification": "published_workspace_copy",
+  "published_file_count": 3,
+  "workspace_file_count": 3,
+  "hashes_compared": 3,
+  "mtimes_checked": 3,
+  "last_exit_time_ns": 1792744878501575000
+}

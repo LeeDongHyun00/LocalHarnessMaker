@@ -1,0 +1,89 @@
+{
+  "task_summary": "Implement the requested word-counting behavior in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Split text on arbitrary whitespace, casefold each token, and count tokens; retain punctuation as part of each token.",
+    "Return {} for empty or whitespace-only text.",
+    "Maintain type hints and do not mutate input collections.",
+    "Add at least two passing unittest methods covering ordinary, boundary, and empty inputs; verify with unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The test module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The implementation and tests contain the requested word-count behavior and unittest coverage.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Determine whether the public implementation splits text on arbitrary whitespace, casefolds each token before counting it, preserves punctuation within tokens, and returns {} for empty or whitespace-only input. Check that type hints are maintained, input collections are not mutated, and test_solution.py contains at least two unittest test methods exercising ordinary, boundary, and empty inputs. Assess only content visible in these files."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "Unittest discovery completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files solution.py and test_solution.py are relative to the supplied workspace; either may not exist yet and may be created.",
+    "The requested implementation is a public word-counting API, but its function name and exact signature are unspecified; the contract leaves those choices for review and implementation.",
+    "The stated ordinary, boundary, and empty-input coverage is interpreted as requiring tests for token counting, whitespace splitting and casefolding, plus empty and whitespace-only text."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=853; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 21157,
+    "output_tokens": 529,
+    "usd": 0.00073284
+  }
+}

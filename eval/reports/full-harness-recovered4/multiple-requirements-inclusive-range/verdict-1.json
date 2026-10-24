@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, `inclusive(start: int, stop: int) -> list[int]` has a docstring specifying inclusion of both endpoints, +1 ascending, -1 descending, and singleton output for equal endpoints. Its step selection and `range(start, stop + step, step)` implement those behaviors.",
+      "reason": "The visible solution.py documents the public API and implements the specified inclusive sequence in both directions, including equal endpoints."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?=(?:.*?\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\(\\s*self\\s*\\))){3}\n1: import unittest\n2: \n3: from solution import inclusive\n4: \n5: \n6: class InclusiveTests(unittest.TestCase):\n7:     def test_ascending_includes_both_endpoints(self):\n8:         self.assertEqual(inclusive(2, 5), [2, 3, 4, 5])\n9: \n10:     def test_descending_preserves_traversal_order(self):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_ascending_includes_both_endpoints (test_solution.InclusiveTests.test_ascending_includes_both_endpoints) ... ok\ntest_crosses_zero_in_both_directions (test_solution.InclusiveTests.test_crosses_zero_in_both_directions) ... ok\ntest_descending_preserves_traversal_order (test_solution.InclusiveTests.test_descending_preserves_traversal_order) ... ok\ntest_equal_endpoints_return_singleton (test_solution.InclusiveTests.test_equal_endpoints_return_singleton) ... ok\ntest_preserves_input_values_and_collection_order (test_solution.InclusiveTests.test_preserves_input_values_and_collection_order) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

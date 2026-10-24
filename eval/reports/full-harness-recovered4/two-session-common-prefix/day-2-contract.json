@@ -1,0 +1,94 @@
+{
+  "task_summary": "Extend the existing public API with common_many(cases: list[tuple]) -> list, preserve the day-1 API, add unittest coverage, and update HANDOFF.md with verification evidence.",
+  "constraints": [
+    "Keep the day-1 API compatible.",
+    "Do not mutate cases or their arguments.",
+    "Return results in case order, return [] for no cases, and propagate the first exception unchanged.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines the public common_many function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^def\\s+common_many\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py contains at least three unittest test methods, including batch coverage.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); n=[x.name for c in t.body if isinstance(c, ast.ClassDef) for x in c.body if isinstance(x, ast.FunctionDef) and x.name.startswith(\"test_\")]; assert len(n) >= 3 and any(\"many\" in s.lower() or \"batch\" in s.lower() for s in n)'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The named Python implementation and unittest files compile.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest suite passes using the handoff-provided discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "HANDOFF.md records the unittest verification command and an observed result.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?s)(?=.*python -m unittest discover -v)(?=.*(?:passed|pass|tests? run|OK))"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The runner-provided workspace is the relative-path root, and the files named in the handoff are available there or may be created if absent.",
+    "The handoff's existing `common(items: list[str]) -> str` API and implementation are the day-1 API to preserve; its specified behavior remains unchanged.",
+    "`common_many` will invoke `common` once for each tuple's positional arguments, in order, and allow the first raised exception to propagate unchanged; no additional behavior is inferred.",
+    "`test_solution.py` is discoverable with `python -m unittest discover -v`, as indicated by the handoff; this remains to be verified.",
+    "HANDOFF.md's required observed verification result must be recorded after the verification command is run; this contract does not assert that the command has already been run."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=604; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 21469,
+    "output_tokens": 670,
+    "usd": 0.00131838
+  }
+}

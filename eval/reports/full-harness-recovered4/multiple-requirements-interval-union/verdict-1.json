@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+union\\s*\\(\n2: \n3: \n4: def union(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, the union docstring says it merges overlapping or touching closed intervals sorted by start, raises ValueError if a start exceeds its end, returns [] for empty input, and does not mutate the input collection, interval values, or order.",
+      "reason": "The public `union` function docstring states all required behaviors."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\(\n7:     def test_merges_overlapping_and_touching_intervals_in_start_order(self) -> None:\n10: \n11:     def test_nested_duplicate_and_point_intervals(self) -> None:\n16: \n17:     def test_empty_input(self) -> None:\n19: \n20:     def test_invalid_interval_raises_and_preserves_input(self) -> None:\n26: \n27:     def test_preserves_input_values_and_collection_order(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: In test_solution.py, `UnionTests(unittest.TestCase)` defines five `test_` methods that call `union`; the interval test expects `[(-4, -2), (1, 10), (12, 14)]`, empty input expects `[]`, invalid input uses `assertRaises(ValueError)`, and preservation tests compare against a saved copy and check interval identity. In solution.py, `union` rejects `start > end`, sorts a separate iteration with `sorted(intervals)`, and builds a new merged list.",
+      "reason": "test_solution.py uses unittest and has five test methods exercising the public union API. The tests cover overlapping and touching closed intervals with start-sorted output, empty input, ValueError for an invalid interval, and input value and collection-order preservation without mutation. solution.py implements the described union behavior."
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.UnionTests.test_empty_input) ... ok\ntest_invalid_interval_raises_and_preserves_input (test_solution.UnionTests.test_invalid_interval_raises_and_preserves_input) ... ok\ntest_merges_overlapping_and_touching_intervals_in_start_order (test_solution.UnionTests.test_merges_overlapping_and_touching_intervals_in_start_order) ... ok\ntest_nested_duplicate_and_point_intervals (test_solution.UnionTests.test_nested_duplicate_and_point_intervals) ... ok\ntest_preserves_input_values_and_collection_order (test_solution.UnionTests.test_preserves_input_values_and_collection_order) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,91 @@
+{
+  "task_summary": "Implement `partition` in `solution.py` and add standard-library `unittest` tests in `test_solution.py` for the specified partition behavior.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Return negatives, zeros, and positives as three lists in that order, preserving relative order and duplicates within each list.",
+    "Maintain type hints and do not mutate input collections.",
+    "Add at least two passing `unittest` test methods that exercise the public API.",
+    "Verify with `python -m unittest discover -v`.",
+    "No algorithmic complexity constraint is imposed."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module exists in the workspace.",
+      "check": {
+        "type": "file_exists",
+        "path": "solution.py"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The solution module compiles as Python.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public tests file exists in the workspace.",
+      "check": {
+        "type": "file_exists",
+        "path": "test_solution.py"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The tests include at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)def test_\\w+\\s*\\([^)]*\\):.*?def test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "Standard-library unittest discovery completes successfully for the workspace tests.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named relative paths `solution.py` and `test_solution.py` are interpreted relative to the supplied task workspace; either target may not exist yet and may be created.",
+    "The public function name and exact signature for the partition API are unspecified; define and test a suitable public API without changing the requested return behavior.",
+    "The task does not supply existing code or tests, so there is no known compatibility surface beyond the stated behavior and constraints.",
+    "Unittest discovery is assumed to find `test_solution.py` from the workspace root using the requested command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=833; distinct_files=2; tests_requested=true; requirement_segments=14; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34897,
+    "output_tokens": 1145,
+    "usd": 0.00136652
+  }
+}

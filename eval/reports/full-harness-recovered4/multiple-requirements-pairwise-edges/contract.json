@@ -1,0 +1,94 @@
+{
+  "task_summary": "Repair adjacent-pair behavior in solution.py, document its public specification, and add unittest regression coverage in test_solution.py.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "Return overlapping adjacent pairs in input order; return [] when there are fewer than two items.",
+    "Add at least 3 passing unittest methods exercising the public API.",
+    "Verify using unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public specification is documented in a docstring in solution.py.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)\"\"\".*?(overlapping|adjacent).*?(input order|order).*?\"\"\"|''' .*?(overlapping|adjacent).*?(input order|order).*?'''"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\") for c in tree.body if isinstance(c, ast.ClassDef) for n in c.body) >= 3'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The regression tests cover overlapping adjacent pairs in input order, the fewer-than-two-items case, and preservation of inputs and collection order as specified.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether the implementation returns overlapping adjacent pairs in input order, returns an empty list for inputs with fewer than two items, preserves input collections without mutation, and maintains type hints; assess whether the tests exercise these requirements through the public API. Base the assessment only on visible file contents."
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command succeeds.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The supplied workspace is the relative working directory for all paths and commands.",
+    "solution.py and test_solution.py may not exist yet and may be created.",
+    "The public API name and exact input collection types are not specified; tests and documentation should follow the API defined by the existing task files if present, or the implementation chosen for this task.",
+    "The docstring may be a module or public function docstring as appropriate to the API.",
+    "Unittest discovery from the workspace root with the default pattern will find test_solution.py."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=823; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17410,
+    "output_tokens": 643,
+    "usd": 0.00071466
+  }
+}

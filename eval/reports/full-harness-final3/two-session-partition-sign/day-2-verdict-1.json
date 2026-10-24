@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+partition_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\n21: def partition_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: In `solution.py`, `return [partition(*case) for case in cases]` expands each tuple positionally and preserves case order; the empty comprehension returns `[]`, and no exception is caught or transformed. The tests in `test_solution.py` corroborate call count/arguments and result order, empty-batch behavior, and exception identity with no subsequent calls.",
+      "reason": "SC-2 is satisfied: `partition_many` uses a list comprehension that invokes `partition(*case)` once per case in iteration order. It returns `[]` for empty input, and an exception naturally propagates unchanged and stops the comprehension."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge evidence: `solution.py` initializes separate `negatives`, `zeros`, and `positives` lists, iterates over `items`, appends each item to its matching list, and returns `(negatives, zeros, positives)`. `partition_many` is `return [partition(*case) for case in cases]`; neither implementation mutates its inputs. `test_solution.py` additionally checks order and duplicates, input preservation, and that batch results are independent.",
+      "reason": "llm_judge: `solution.py` retains the described `partition(items: list[int])` API and returns three newly created lists as a tuple in negative, zero, positive order. Its single pass appends values in encounter order, preserving duplicates, without modifying the input. `partition_many` uses a list comprehension to call `partition(*case)` in case order and does not assign to or alter cases or their argument values."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_batch_preserves_order_and_inputs (test_solution.PartitionManyTests.test_batch_preserves_order_and_inputs) ... ok\ntest_calls_partition_once_per_case_with_positional_arguments (test_solution.PartitionManyTests.test_calls_partition_once_per_case_with_positional_arguments) ... ok\ntest_empty_batch_does_not_call_partition (test_solution.PartitionManyTests.test_empty_batch_does_not_call_partition) ... ok\ntest_first_exception_propagates_unchanged_and_stops_batch (test_solution.PartitionManyTests.test_first_exception_propagates_unchanged_and_stops_batch) ... ok\ntest_empty_input (test_solution.PartitionTests.test_empty_input) ... ok\ntest_input_is_unchanged_and_output_lists_are_independent (test_solution.PartitionTests.test_input_is_unchanged_and_output_lists_are_independent) ... ok\ntest_mixed_values_preserve_order_and_duplicates (test_solution.PartitionTests.test_mixed_values_preserve_order_and_duplicates) ... ok\ntest_single_partition_inputs (test_solution.PartitionTests.test_single_partition_inputs) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: HANDOFF.md, under “Verification,” lists `python -m py_compile solution.py test_solution.py` with exit code 0 and no output, and `python -m unittest discover -v` with exit code 0, 8 tests run, and `OK`.",
+      "reason": "HANDOFF.md records both verification commands and their observed results."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

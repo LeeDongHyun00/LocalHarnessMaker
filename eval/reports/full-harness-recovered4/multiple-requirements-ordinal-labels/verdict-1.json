@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)(?=.*(?:ordinal|suffix))(?=.*(?:11|teen))(?=.*(?:zero|0th))(?=.*(?:negative|ValueError)).*\n1: \"\"\"Public task implementation.\"\"\"\n2: \n3: \n4: def ordinal(value: int) -> str:\n5:     \"\"\"Format a nonnegative integer with its English ordinal suffix.\n6: \n7:     Final digits 1, 2, and 3 use 'st', 'nd', and 'rd'; all others use\n8:     'th'. Values ending in 11, 12, or 13 always use 'th', including\n9:     111, 112, and 113. Zero is '0th'. Negative values raise ValueError.\n10:     The input value is preserved.",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^def\\s+\\w+\\s*\\([^\\n]*\\)\\s*->\\s*[^:]+:\n4: def ordinal(value: int) -> str:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:.*?){3}\n7:     def test_regular_suffixes(self):\n8:         for value, expected in (\n9:             (1, '1st'), (2, '2nd'), (3, '3rd'), (4, '4th'),\n10:             (10, '10th'), (21, '21st'), (22, '22nd'), (23, '23rd'),\n11:             (24, '24th'), (101, '101st'), (102, '102nd'), (103, '103rd'),\n12:         ):\n13:             with self.subTest(value=value):\n14:                 self.assertEqual(ordinal(value), expected)\n15: \n16:     def test_teen_exceptions(self):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_input_values_and_collection_order_are_preserved (test_solution.OrdinalTests.test_input_values_and_collection_order_are_preserved) ... ok\ntest_negatives_raise_value_error (test_solution.OrdinalTests.test_negatives_raise_value_error) ... ok\ntest_regular_suffixes (test_solution.OrdinalTests.test_regular_suffixes) ... ok\ntest_teen_exceptions (test_solution.OrdinalTests.test_teen_exceptions) ... ok\ntest_zero (test_solution.OrdinalTests.test_zero) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

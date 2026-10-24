@@ -1,0 +1,49 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+flatten_many\\s*\\(\\s*cases\\s*:\\s*list\\[tuple\\]\\s*\\)\\s*->\\s*list\\s*:\n14: def flatten_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); methods=[n.name for c in ast.walk(t) if isinstance(c, ast.ClassDef) and any((isinstance(b, ast.Name) and b.id == \"TestCase\") or (isinstance(b, ast.Attribute) and b.attr == \"TestCase\") for b in c.bases) for n in c.body if isinstance(n, ast.FunctionDef) and n.name.startswith(\"test\")]; assert len(methods) >= 3 and any(\"batch\" in n.lower() for n in methods)'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_batch_does_not_mutate_cases_or_arguments (test_solution.FlattenManyTests.test_batch_does_not_mutate_cases_or_arguments) ... ok\ntest_batch_empty_input (test_solution.FlattenManyTests.test_batch_empty_input) ... ok\ntest_batch_expands_positional_arguments (test_solution.FlattenManyTests.test_batch_expands_positional_arguments) ... ok\ntest_batch_preserves_case_order (test_solution.FlattenManyTests.test_batch_preserves_case_order) ... ok\ntest_batch_propagates_first_exception_unchanged (test_solution.FlattenManyTests.test_batch_propagates_first_exception_unchanged) ... ok\ntest_empty_input_returns_new_list (test_solution.FlattenTests.test_empty_input_returns_new_list) ... ok\ntest_flattens_exactly_one_level (test_solution.FlattenTests.test_flattens_exactly_one_level) ... ok\ntest_ignores_empty_inner_lists (test_solution.FlattenTests.test_ignores_empty_inner_lists) ... ok\ntest_preserves_order_and_duplicates (test_solution.FlattenTests.test_preserves_order_and_duplicates) ... ok\ntest_returns_new_list_without_mutating_inputs (test_solution.FlattenTests.test_returns_new_list_without_mutating_inputs) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.002s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?s)(python\\s+-m\\s+unittest\\s+discover\\s+-v).*?(passed|OK).*?(tests?|exit\\s+0)\n32: python -m unittest discover -v\n33: ```\n34: \n35: Observed on 2026-10-23:\n36: \n37: - `python -m py_compile solution.py`: passed, exit 0.\n38: - `python -m unittest discover -v`: OK; all 10 tests passed, exit 0",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "llm_judge: In test_solution.py, test_batch_preserves_case_order asserts the ordered results; test_batch_empty_input asserts [] and that the result is a new list; test_batch_propagates_first_exception_unchanged asserts the caught exception is the identical first_error and that only the first two calls occurred; test_batch_does_not_mutate_cases_or_arguments checks unchanged case values and object identities, and that modifying a result does not alter cases. The relevant implementation in solution.py iterates cases in order and calls flatten(*case).",
+      "reason": "test_solution.py contains unittest assertions covering all four required behaviors of flatten_many."
+    },
+    {
+      "id": "SC-7",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+flatten\\s*\\(\n9: def flatten(items: list[list[T]]) -> list[T]:",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

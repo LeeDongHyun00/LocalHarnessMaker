@@ -1,0 +1,100 @@
+{
+  "task_summary": "Extend the existing public API with pairs_many, add unittest coverage, and update HANDOFF.md with verification evidence while preserving the Day 1 API.",
+  "constraints": [
+    "Preserve the existing pairs API and its compatibility.",
+    "pairs_many(cases: list[tuple]) -> list must call pairs once per case using that tuple's positional arguments, return results in case order, return [] when cases is empty, and propagate the first exception unchanged.",
+    "Do not mutate cases or the arguments supplied in them.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result.",
+    "Work only within the supplied task workspace."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains a pairs_many definition with the requested parameter and return annotations.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+pairs_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "pairs_many invokes pairs for each case with positional arguments, preserves result order, handles no cases, propagates exceptions, and does not mutate cases or their arguments.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py. Determine whether pairs_many calls the existing pairs function once per case by unpacking each tuple as positional arguments, returns a list in input case order (including an empty list for no cases), naturally propagates the first exception unchanged, and does not mutate cases or their argument tuples. Confirm the existing pairs API remains compatible with the Day 1 implementation. Assess only what is visible in the file."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least three unittest test methods, including coverage for pairs_many batch behavior.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:\\s*.*?){1,}"
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest suite passes, with at least three test methods including batch coverage.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "HANDOFF.md records the verification command and its observed result.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read HANDOFF.md and confirm it records the verification command `python -m unittest discover -v` and an observed passing result for that command. Assess the documentation text only; do not infer execution from other files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named paths solution.py, test_solution.py, and HANDOFF.md are relative to the supplied task workspace; requested targets may not exist yet and may be created.",
+    "The Day 1 public API and implementation are available as described in the handoff data; compatibility means preserving its existing pairs behavior and interface.",
+    "The request does not specify pairs_many's type-hint style beyond its stated signature; the check expects the signature to use list[tuple] and -> list.",
+    "The existing unittest discovery command `python -m unittest discover -v` is assumed to discover the suite in this workspace.",
+    "HANDOFF.md will record the actual observed result of the unittest command after it is run; this contract does not claim verification has occurred."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=602; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17744,
+    "output_tokens": 818,
+    "usd": 0.00083556
+  }
+}

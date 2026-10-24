@@ -1,0 +1,86 @@
+{
+  "task_summary": "Repair the clamp implementation in solution.py, document its public specification, and add regression tests in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve input values and collection order; do not mutate input collections.",
+    "Maintain type hints.",
+    "Clamp values into the inclusive [low, high] range; raise ValueError when low > high; equal bounds are valid.",
+    "test_solution.py must contain at least 3 passing unittest test methods exercising the public API.",
+    "Verify using unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The clamp implementation is present in solution.py.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^def clamp\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public specification is documented as a docstring in solution.py.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)^def clamp\\s*\\([^)]*\\)[^:]*:\\s*(?:\"\"\"|''').*?(?:\"\"\"|''')"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The implementation and tests are syntactically valid Python.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The regression tests pass under unittest discovery.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The public API function is named clamp and is defined in solution.py, inferred from the request to repair clamp in that named file.",
+    "The requested unittest discovery command is interpreted exactly as `python -m unittest discover -v`; it is assumed the tests can be discovered by this command.",
+    "The request does not specify input types or the exact clamp signature; preserve or establish compatible type hints and public API details based on the supplied task materials.",
+    "Removed invalid criterion SC-4: invalid Python regex: unbalanced parenthesis at position 84; put global inline flags at the start. Its requirement remains unverified and needs user review.",
+    "Removed invalid criterion SC-6: llm_judge must be decidable from workspace files alone; use a command criterion for execution evidence. Its requirement remains unverified and needs user review."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=797; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34921,
+    "output_tokens": 1467,
+    "usd": 0.00287776
+  }
+}

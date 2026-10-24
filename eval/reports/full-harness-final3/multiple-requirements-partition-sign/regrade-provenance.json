@@ -1,0 +1,10 @@
+{
+  "task_id": "multiple-requirements-partition-sign",
+  "source_report_sha256": "2e616c1eb9d3291e1c076f44b26486f91183f7228e1e4163b54e47dab6e69de0",
+  "workspace_verification": "published_workspace_copy",
+  "published_file_count": 2,
+  "workspace_file_count": 2,
+  "hashes_compared": 2,
+  "mtimes_checked": 2,
+  "last_exit_time_ns": 1792742806427437000
+}

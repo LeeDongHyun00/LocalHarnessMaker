@@ -1,0 +1,107 @@
+{
+  "task_summary": "Implement run-length encoding of adjacent equal strings in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "Encode adjacent equal strings as (value, count) pairs; nonadjacent equal values form separate runs; empty input returns [].",
+    "Add at least two passing unittest test methods exercising the public API, covering ordinary, boundary, and empty inputs, or invalid numeric inputs if no collection is accepted.",
+    "Verify using unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The implementation module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public tests module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "solution.py defines a run-length encoding callable.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:.*?){2}"
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "The implementation and tests preserve the requested run behavior, type hints, non-mutation, standard-library-only scope, and input coverage.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether the public implementation accepts a collection of strings and returns adjacent run-length pairs (value, count), starts a new run when equal values are nonadjacent, returns [] for empty input, maintains type hints, and does not mutate its input. Assess whether at least two unittest methods exercise the public API across ordinary, boundary, and empty cases. Judge only content visible in these files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named paths solution.py and test_solution.py are relative to the supplied task workspace; either target may not exist yet and may be created.",
+    "The requested operation name and exact public API are unspecified; implementation and tests may choose a reasonable callable name and signature in solution.py and use that API consistently.",
+    "The request's coverage of ordinary, boundary, and empty inputs is interpreted as requiring tests for all three categories."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=839; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17399,
+    "output_tokens": 655,
+    "usd": 0.00071956
+  }
+}

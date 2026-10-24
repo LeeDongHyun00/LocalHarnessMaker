@@ -1,0 +1,91 @@
+{
+  "task_summary": "Fix strip_prefix in solution.py without changing its signature, and add a small unittest regression test in test_solution.py. Preserve the stated public behavior, type hints, and compatibility requirements.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Remove exactly one matching prefix; leave text unchanged for a nonmatching or empty prefix; do not strip individual characters or repeated prefixes.",
+    "Maintain type hints and do not mutate input collections.",
+    "Add at least one passing unittest test method in test_solution.py that exercises the public API.",
+    "Verify with unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles with Python.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py compiles with Python.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "Unittest discovery completes successfully, including the regression test.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The regression test file contains at least one unittest-style test method.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s*def test_\\w+\\s*\\("
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named filenames are relative to the supplied task workspace; either file may not exist yet and may be created.",
+    "The function definition and its existing signature are in solution.py, as indicated by the request.",
+    "The regression test should import and exercise the public API exposed by solution.py; its exact name and signature are not specified in the request.",
+    "The requested unittest discovery command is supported as written; the available suite is discoverable with Python's default unittest discovery settings."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=795; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17387,
+    "output_tokens": 482,
+    "usd": 0.00063186
+  }
+}

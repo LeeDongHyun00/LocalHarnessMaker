@@ -1,0 +1,93 @@
+{
+  "task_summary": "Refactor `invert` and `invert_legacy` in `solution.py` to use one private helper, preserve their compatibility and behavior, and add public API tests in `test_solution.py`.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve both function signatures, return types, error behavior, input immutability, imports, public names, and type hints.",
+    "Group input keys by value, preserving dictionary insertion order in each key list; empty input returns `{}`.",
+    "Do not mutate input collections; no algorithmic complexity constraint is imposed.",
+    "`test_solution.py` must contain at least two passing `unittest` test methods exercising the public API.",
+    "Verify with `python -m unittest discover -v`."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The named implementation module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The implementation exposes both requested public function definitions and a private helper definition.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)def invert\\s*\\(|def invert_legacy\\s*\\(|def _[A-Za-z_]\\w*\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public tests include at least two unittest test methods.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 2'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The requested unittest discovery command succeeds.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 2'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "Paths are interpreted relative to the supplied task workspace.",
+    "`solution.py` and `test_solution.py` may not exist yet and may be created.",
+    "The private helper's name and location within `solution.py` are not specified; the regex criterion accepts any private function definition there.",
+    "The request does not provide existing signatures, expected error cases, or concrete examples beyond empty input and insertion-order grouping; those compatibility details must be determined from supplied workspace files before implementation.",
+    "Unittest discovery is assumed to find the public tests using the requested command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=850; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17400,
+    "output_tokens": 658,
+    "usd": 0.00072116
+  }
+}

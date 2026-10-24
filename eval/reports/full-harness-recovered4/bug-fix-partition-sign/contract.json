@@ -1,0 +1,83 @@
+{
+  "task_summary": "Fix partition behavior in solution.py without changing its signature, and add a small regression test in test_solution.py.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve the existing partition signature and maintain type hints.",
+    "Return negatives, zeros, and positives as three lists in that order, preserving relative order and duplicates within each partition.",
+    "Do not mutate input collections; no algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least one passing unittest test method exercising the public API.",
+    "Verify using unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The implementation and regression test files compile as Python.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The regression test module contains at least one unittest test method.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?m)^\\s*def test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The discovered unittest suite passes.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The implementation and regression test preserve the requested behavior and constraints, including the existing signature, type hints, partition order, stable ordering and duplicates, and no input mutation.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Determine whether partition keeps its existing signature and type hints, returns three lists ordered as negatives, zeros, positives, preserves relative order and duplicates within each list, and does not mutate input collections. Also assess whether the regression test exercises the public API and meaningfully covers the requested behavior. Judge only what is visible in these files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative paths in the supplied workspace; they may not exist yet and may be created.",
+    "The existing partition signature and its location in solution.py can be inspected during implementation; no specific signature is provided here.",
+    "The regression test can exercise the public API through the partition function imported or defined in solution.py.",
+    "The requested unittest discovery command is supported by the workspace's Python environment."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=769; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17381,
+    "output_tokens": 536,
+    "usd": 0.00065826
+  }
+}

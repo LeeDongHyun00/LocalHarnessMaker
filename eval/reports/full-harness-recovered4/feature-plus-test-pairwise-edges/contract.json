@@ -1,0 +1,89 @@
+{
+  "task_summary": "Implement overlapping adjacent pairs in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Preserve type hints and do not mutate input collections.",
+    "Return overlapping adjacent pairs in input order; inputs with fewer than two items return [].",
+    "Include at least 2 passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The solution module defines a callable for producing adjacent pairs.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public implementation returns overlapping adjacent pairs in order, returns an empty list for fewer than two items, preserves type hints, and does not mutate its input.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py. Determine whether the public implementation produces overlapping adjacent pairs in input order, returns [] for inputs with fewer than two items, includes type hints, and leaves input collections unchanged. Judge only content visible in the file."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least two unittest test methods exercising the public API across ordinary, boundary, and empty inputs.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\):.*?def\\s+test_\\w+\\s*\\(.*?def\\s+test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The public API name and signature are not specified; the implementation and tests will use an appropriate API defined in solution.py.",
+    "Unittest discovery is expected to discover test_solution.py from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=837; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17407,
+    "output_tokens": 559,
+    "usd": 0.0020202
+  }
+}

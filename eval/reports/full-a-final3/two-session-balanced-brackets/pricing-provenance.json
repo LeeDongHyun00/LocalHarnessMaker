@@ -1,0 +1,29 @@
+[
+  {
+    "call_id": "two-session-balanced-brackets-exec-1",
+    "observed_service_tier": null,
+    "basis": "Retained original accounting; no per-call tier observation available.",
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "pricing_snapshot_sha256": "bdf17583580200967394ead052fb515d5ba77f5311555cbe0b0bc8265efe691b"
+  },
+  {
+    "call_id": "two-session-balanced-brackets-exec-2",
+    "observed_service_tier": "standard",
+    "basis": "Tier inferred from the model default during regrade; retained applied service_tier omitted/null",
+    "captured_records": [
+      {
+        "native_log": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/codex-home/sessions/2026/10/24/rollout-2026-10-24T00-02-01-01a16948-7fb4-7313-b216-1a0878060ac2.jsonl",
+        "record_sha256": "dc2607015aa3110467ae032e264653096ba3afac3533fb85bd10fb5ed2c7310c",
+        "observed_service_tier": null
+      }
+    ],
+    "pricing_ref": "openai-standard-short-2026-10-22-v1",
+    "native_sources": [
+      {
+        "path": "/private/var/folders/1s/swm_fg0j7dv02dm24jfkw8vc0000gn/T/lhm-eval-continue-x2kw1ydm/codex-home/sessions/2026/10/24/rollout-2026-10-24T00-02-01-01a16948-7fb4-7313-b216-1a0878060ac2.jsonl",
+        "sha256": "03e11416ab3b0ca2c51a5d12d5907b213103edf041936b96fe8e8a4d41114156"
+      }
+    ],
+    "pricing_snapshot_sha256": "bdf17583580200967394ead052fb515d5ba77f5311555cbe0b0bc8265efe691b"
+  }
+]

@@ -1,0 +1,35 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py:11` defines type-hinted `interleave(left, right)` for iterable inputs and returns a new list."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`test_solution.py` has six unittest methods; the AST check confirmed at least three."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`python -m unittest discover -v` exited 0; all six tests passed."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`HANDOFF.md` records design decisions and the verification command."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Use iterators to alternate left then right and append the remaining iterator in order when one is exhausted.",
+      "why": "Preserves the required order, including values such as `None`, without relying on a sentinel."
+    },
+    {
+      "what": "Return a new list with generic type hints; leave input collections unchanged.",
+      "why": "Supports iterable inputs and avoids mutating caller-owned collections. Iterator inputs are consumed."
+    }
+  ],
+  "verify_commands": [
+    "python -m unittest discover -v"
+  ],
+  "do_not_touch": []
+}

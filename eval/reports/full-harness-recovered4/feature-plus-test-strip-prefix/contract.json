@@ -1,0 +1,82 @@
+{
+  "task_summary": "Implement strip_prefix in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Remove exactly one matching prefix. A nonmatching or empty prefix leaves text unchanged. Do not strip individual characters or repeated prefixes.",
+    "Maintain type hints and do not mutate input collections.",
+    "Include at least 2 passing unittest test methods that exercise the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py defines a public strip_prefix function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^def strip_prefix\\b"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:^|\\n)\\s+def test_\\w+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?(?:\\n\\s+def test_\\w+\\s*\\([^)]*\\)\\s*:)"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "Unittest discovery runs the suite successfully, including the requested public API coverage.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "Assume the public API accepts text and prefix values as strings, because no parameter types or signature were specified.",
+    "The specific test cases for ordinary, boundary, and empty inputs can be selected to demonstrate the stated public behavior.",
+    "Unittest discovery from the workspace root will find test_solution.py and its tests."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=859; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34911,
+    "output_tokens": 1175,
+    "usd": 0.00273076
+  }
+}

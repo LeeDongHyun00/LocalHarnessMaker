@@ -1,0 +1,66 @@
+{
+  "task_summary": "Implement parse_pairs in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "parse_pairs must split nonempty newline-separated key=value records at the first equals sign, strip both sides, ignore blank lines, and let the last repeated key win.",
+    "Raise ValueError for lines missing an equals sign or having an empty key; allow empty values.",
+    "Add at least two passing unittest methods exercising the public API, covering ordinary, boundary, and empty inputs, or invalid numeric inputs if no collection is accepted.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines the typed public function parse_pairs.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+parse_pairs\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py includes at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:^|\\n)\\s*def\\s+test_\\w+\\s*\\([^)]*\\).*?(?:^|\\n)\\s*def\\s+test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The solution passes standard-library unittest discovery.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The files solution.py and test_solution.py are relative to the supplied task workspace; they may not exist yet and may be created.",
+    "The parse_pairs input and return types are not specified; choose and document reasonable type hints consistent with the stated key/value parsing behavior.",
+    "The discovery command runs in the supplied task workspace using Python 3.11+ and the standard library."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=944; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 21174,
+    "output_tokens": 455,
+    "usd": 0.0023449
+  }
+}

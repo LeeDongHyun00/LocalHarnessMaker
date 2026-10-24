@@ -1,0 +1,92 @@
+{
+  "task_summary": "Refactor strip_prefix and strip_prefix_legacy in solution.py to share one private helper, preserving stated behavior and compatibility, and add public API tests in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve both public signatures, return types, error behavior, input immutability, imports, and public names.",
+    "Remove exactly one matching prefix; a nonmatching or empty prefix leaves text unchanged. Do not strip individual characters or repeated prefixes.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least 2 passing unittest test methods exercising the public API."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains definitions for both public functions and a private helper that they can delegate to.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)(?=.*^def strip_prefix\\b)(?=.*^def strip_prefix_legacy\\b)(?=.*^def _[A-Za-z_]\\w*\\b).*"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?=.*^\\s+def test_[A-Za-z_]\\w*\\s*\\().*(?:(?=.*^\\s+def test_[A-Za-z_]\\w*\\s*\\().*)"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest suite passes under the requested discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The shared helper implements the required single-prefix behavior, while preserving public signatures, type hints, return types, error behavior, input immutability, and compatible imports and public names.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files and assess whether strip_prefix and strip_prefix_legacy delegate their shared algorithm to one private helper, preserve their signatures, return types, error behavior, input immutability, type hints, imports and public names, and remove exactly one matching prefix. Confirm from the code that a nonmatching or empty prefix leaves text unchanged and that individual characters or repeated prefixes are not stripped. Judge only evidence visible in workspace files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are interpreted as relative paths in the supplied workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The request does not specify concrete test cases or legacy signatures; tests and implementation should preserve existing behavior discoverable from the supplied workspace without inventing new API details.",
+    "The phrase 'at least 2 passing unittest test methods' is interpreted as at least two test methods in test_solution.py that exercise the public API and pass under the requested discovery command.",
+    "Python 3.11+ is available to run the proposed compile and unittest commands."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=896; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17404,
+    "output_tokens": 720,
+    "usd": 0.00075256
+  }
+}

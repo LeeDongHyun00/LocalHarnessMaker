@@ -1,0 +1,51 @@
+{
+  "task_summary": "Fix `chunking.chunked` to split lists into consecutive chunks of a requested positive size, preserving items and order, allowing a shorter final chunk, returning an empty list for empty input, preserving the function signature, and leaving the input list unmodified.",
+  "constraints": [
+    "Preserve the existing function signature.",
+    "Do not modify the input list."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The named Python module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile chunking.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The function partitions input into consecutive chunks of the requested positive size, preserves every item and its order, allows a shorter final chunk, and returns an empty list for empty input without modifying the input list; its existing signature is preserved.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read the workspace files. Assess whether `chunking.chunked` preserves its existing signature and implements the requested behavior: consecutive chunks of the requested positive size, every item retained in order, a possibly shorter final chunk, empty output for empty input, and no mutation of the input list. Base the assessment only on code and content visible in the files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile chunking.py",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named module `chunking` maps to the relative workspace Python file `chunking.py`; this path is inferred and unconfirmed.",
+    "The target file may not exist yet and may be created.",
+    "The request does not specify behavior for non-positive chunk sizes; no behavior for those inputs is assumed."
+  ],
+  "reasoning_effort": {
+    "value": "medium",
+    "rationale": "effort-v1: utf8_byte_bound=310; distinct_files=1; tests_requested=false; requirement_segments=6; score=3"
+  },
+  "cost_estimate": {
+    "input_tokens": 34752,
+    "output_tokens": 715,
+    "usd": 0.00113702
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)\\bdef\\s+common\\s*\\(|\\bdef\\s+common_legacy\\s*\\(|\\bdef\\s+_[A-Za-z_]\\w*\\s*\\(\n4: def _common_prefix(items: list[str]) -> str:\n14: def common(items: list[str]) -> str:\n18: def common_legacy(items: list[str]) -> str:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s+def\\s+test_[A-Za-z_]\\w*\\s*\\(\n7:     def test_common_prefix(self) -> None:\n23: \n24:     def test_empty_and_single_item(self) -> None:\n29: \n30:     def test_input_is_unchanged(self) -> None:\n37: \n38:     def test_invalid_elements_preserve_errors(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_common_prefix (test_solution.CommonTests.test_common_prefix) ... ok\ntest_empty_and_single_item (test_solution.CommonTests.test_empty_and_single_item) ... ok\ntest_input_is_unchanged (test_solution.CommonTests.test_input_is_unchanged) ... ok\ntest_invalid_elements_preserve_errors (test_solution.CommonTests.test_invalid_elements_preserve_errors) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` defines `common(items: list[str]) -> str` and `common_legacy(items: list[str]) -> str`, each returning `_common_prefix(items)`. `_common_prefix` starts with the first item and shortens the prefix until each item starts with it; empty input returns `''`. `test_solution.py` imports both public names and has four unittest methods. Tests include case-sensitive `['Alpha', 'alpha']`, empty and single-item cases, input-copy comparisons, and expected `AttributeError`/`TypeError` cases.",
+      "reason": "Both public functions retain the same `list[str] -> str` signatures and delegate to `_common_prefix`. The helper returns the longest case-sensitive prefix, including `''` for empty input, and does not mutate the list. Tests cover both public functions, their return types, empty and single-item input, unchanged inputs, and invalid-element errors; there are at least two unittest methods exercising the public API."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

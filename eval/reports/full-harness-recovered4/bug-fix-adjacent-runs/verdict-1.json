@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` defines the typed `runs` signature, appends or replaces entries in `result`, and never writes to `items`. `test_solution.py` also checks that the input list is preserved.",
+      "reason": "The implementation retains the public `runs(items: list[str]) -> list[tuple[str, int]]` signature and uses type hints for its parameter, return value, and result. It builds a separate result list and only iterates over the input, so it does not mutate the input collection."
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "llm_judge: solution.py compares each value only with the most recent run, increments that run's count when equal, otherwise appends a new (value, 1) pair, then returns the result. With no items, the result remains [].",
+      "reason": "The implementation groups only consecutive equal values into (value, count) tuples and returns an empty list for empty input."
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\).*?def\\s+test_\\w+\\s*\\(\n6: class RunsTests(unittest.TestCase):\n7:     def test_adjacent_runs_and_input_preserved(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_adjacent_runs_and_input_preserved (test_solution.RunsTests.test_adjacent_runs_and_input_preserved) ... ok\ntest_empty_input (test_solution.RunsTests.test_empty_input) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

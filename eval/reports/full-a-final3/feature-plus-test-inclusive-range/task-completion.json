@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "c06c21b3641aee0cb91440c485b335805def945ec7a65e9f5744505685646d20",
+  "final_message": {
+    "path": "eval/reports/full-a-final3/feature-plus-test-inclusive-range/final-1.md",
+    "sha256": "04ae3c2a5221cdae9655b2d122013452183239c59b8e2cf68a4d452776796916"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `inclusive` with ascending and descending steps, inclusive endpoints, and singleton results for equal endpoints"
+  ],
+  "undefined_reason": null
+}

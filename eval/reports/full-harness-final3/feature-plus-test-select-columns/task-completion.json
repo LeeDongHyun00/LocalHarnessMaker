@@ -1,0 +1,16 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "321d6f502f14c69f3f76bfb02e5704cce0165b93f950542fba1bf30062fa0f5a",
+  "final_message": {
+    "path": "eval/reports/full-harness-final3/feature-plus-test-select-columns/final-1.md",
+    "sha256": "ab1407f2ede37a152767a1f578cb14fdb3b2d271eccc34a8a1538c0a7c72cac0"
+  },
+  "claimed_complete": true,
+  "claim_evidence": [
+    "Implemented `select` with type hints, preserving row and column order, omitting missing keys, deduplicating columns, and returning fresh dictionaries without mutating inputs"
+  ],
+  "undefined_reason": null
+}

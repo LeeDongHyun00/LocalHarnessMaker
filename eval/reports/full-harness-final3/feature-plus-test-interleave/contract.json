@@ -1,0 +1,108 @@
+{
+  "task_summary": "Implement the interleave public API in solution.py and add standard-library unittest coverage in test_solution.py, preserving the stated behavior and constraints.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Alternate left then right items; append any remainder from the longer input in order. Empty inputs are valid.",
+    "Maintain type hints and do not mutate input collections.",
+    "Add at least two passing unittest test methods exercising the public API.",
+    "Verify with unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The implementation module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The public API exposes an interleave function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+interleave\\s*\\("
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public tests include at least two unittest test methods.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\") for node in ast.walk(tree)) >= 2'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The test module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The public unittest suite passes under the requested discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\") for node in ast.walk(tree)) >= 2'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The public function is named interleave and is defined in solution.py, based on the request's named implementation file and API name.",
+    "The function accepts two collection inputs; their exact types and return type are unspecified, so type hints should match the chosen implementation without assuming a particular collection API.",
+    "Unittest discovery from the workspace root finds test_solution.py using the standard default pattern."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=821; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 38660,
+    "output_tokens": 1422,
+    "usd": 0.00341348
+  }
+}

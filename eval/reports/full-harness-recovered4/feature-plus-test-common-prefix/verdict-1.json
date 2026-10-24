@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^def\\s+common\\s*\\(\n4: def common(items: list[str]) -> str:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [node for cls in tree.body if isinstance(cls, ast.ClassDef) for node in cls.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith(\"test\")]; assert len(methods) >= 2'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_boundary_inputs (test_solution.CommonTests.test_boundary_inputs) ... ok\ntest_empty_inputs (test_solution.CommonTests.test_empty_inputs) ... ok\ntest_input_is_not_mutated (test_solution.CommonTests.test_input_is_not_mutated) ... ok\ntest_ordinary_prefixes (test_solution.CommonTests.test_ordinary_prefixes) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

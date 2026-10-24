@@ -1,0 +1,65 @@
+{
+  "task_summary": "Extend the existing public API with windows_many(cases: list[tuple]) -> list, preserving the day-1 API, input immutability, case order, empty input behavior, and first-exception propagation. Add unittest coverage and record verification evidence in HANDOFF.md.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Preserve the existing day-1 windows API.",
+    "Do not mutate cases or arguments.",
+    "Keep at least three passing unittest test methods in test_solution.py, including batch coverage.",
+    "HANDOFF.md must record the verification command and its observed result."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py defines windows_many with the requested signature.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+windows_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py contains at least three unittest test methods, including a method whose name indicates batch coverage.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n.name for c in tree.body if isinstance(c, ast.ClassDef) for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3 and any(\"batch\" in name.lower() for name in methods)'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "HANDOFF.md includes the unittest verification command and a recorded observed result.",
+      "check": {
+        "type": "regex",
+        "path": "HANDOFF.md",
+        "pattern": "(?s)python -m unittest discover -v.*(passed|success|exit code 0)"
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The supplied handoff describes the existing implementation and prior verification as context; the workspace files may differ and should be inspected during execution.",
+    "The requested target files are solution.py, test_solution.py, and HANDOFF.md, as identified by the supplied handoff; they may not exist yet and may be created.",
+    "The handoff's recorded unittest discovery command is the intended verification command.",
+    "The HANDOFF.md evidence requirement means recording the command and the actual result observed when verification is run."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=606; distinct_files=2; tests_requested=true; requirement_segments=7; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17664,
+    "output_tokens": 541,
+    "usd": 0.00068906
+  }
+}

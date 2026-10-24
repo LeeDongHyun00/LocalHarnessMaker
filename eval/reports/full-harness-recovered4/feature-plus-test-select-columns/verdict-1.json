@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s*def test_\\w+\\s*\\(\n9:     def test_selects_columns_in_requested_order_and_preserves_rows(self) -> None:\n24: \n25:     def test_missing_and_repeated_columns(self) -> None:\n35: \n36:     def test_empty_rows(self) -> None:\n39: \n40:     def test_empty_columns_return_independent_empty_dictionaries(self) -> None:\n50: \n51:     def test_all_columns_missing(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_all_columns_missing (test_solution.SelectTests.test_all_columns_missing) ... ok\ntest_empty_columns_return_independent_empty_dictionaries (test_solution.SelectTests.test_empty_columns_return_independent_empty_dictionaries) ... ok\ntest_empty_rows (test_solution.SelectTests.test_empty_rows) ... ok\ntest_missing_and_repeated_columns (test_solution.SelectTests.test_missing_and_repeated_columns) ... ok\ntest_selects_columns_in_requested_order_and_preserves_rows (test_solution.SelectTests.test_selects_columns_in_requested_order_and_preserves_rows) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def select\\s*\\([^\\n]*\\)\\s*->\\s*[^:]+:\n2: \n3: \n4: def select(rows: list[dict[str, int]], columns: list[str]) -> list[dict[str, int]]:",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

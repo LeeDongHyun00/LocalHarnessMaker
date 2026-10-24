@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+balanced\\s*\\(\n2: \n3: \n4: def balanced(text: str) -> bool:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, balanced() has a docstring that says (), [] and {} must be correctly nested, other characters are ignored, unmatched opening or closing brackets return False, and empty text returns True.",
+      "reason": "The balanced public API’s docstring specifies all required behavior."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:(?:^|\\n)\\s*def\\s+test\\w*\\s*\\([^)]*\\)\\s*:[^\\n]*\\n.*?){3}\n6: class BalancedTests(unittest.TestCase):\n7:     def test_valid_nesting(self):\n8:         for text in ('()', '[]', '{}', '{[()]}', '()[]{}', '([]{})'):\n9:             with self.subTest(text=text):\n10:                 self.assertTrue(balanced(text))\n11: \n12:     def test_ignored_characters_and_empty_text(self):\n13:         for text in ('', 'plain text', 'a {b [c (d) e] f}!', '\\n[你好]\\t'):\n14:             with self.subTest(text=text):\n15:                 self.assertTrue(balanced(text))",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: `test_solution.py` imports `balanced` from `solution`. `test_valid_nesting` covers `()`, `[]`, `{}` and nested combinations; `test_ignored_characters_and_empty_text` includes non-bracket text and `''`; `test_unmatched_brackets` checks unmatched openings and closings. Additional methods cover mismatched order and input preservation.",
+      "reason": "The rubric’s requirements are covered by five unittest methods exercising the imported public `balanced` API."
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_ignored_characters_and_empty_text (test_solution.BalancedTests.test_ignored_characters_and_empty_text) ... ok\ntest_incorrect_order_and_mismatched_types (test_solution.BalancedTests.test_incorrect_order_and_mismatched_types) ... ok\ntest_preserves_input_values_and_collection_order (test_solution.BalancedTests.test_preserves_input_values_and_collection_order) ... ok\ntest_unmatched_brackets (test_solution.BalancedTests.test_unmatched_brackets) ... ok\ntest_valid_nesting (test_solution.BalancedTests.test_valid_nesting) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

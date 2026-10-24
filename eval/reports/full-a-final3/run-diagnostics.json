@@ -1,0 +1,978 @@
+{
+  "calibration": false,
+  "task_root": "eval/tasks",
+  "service_tier": null,
+  "source": "eval/reports/full-a-continued2",
+  "source_report_sha256": "75a4fa7f389fc3b51a3eecc783d6fe123e5db4caef0f70f0186e9381dc63a96c",
+  "audit_code_version": {
+    "audit.py": "c201380690744da67b9821e603ceb0fbd33b48f9823b70b68614eea60bf26b83",
+    "javascript.py": "f90e57ad34ad8fad4e282c41293a10710ee31d1f1e941e5cc14d7250661a8ba8",
+    "fingerprint_history.py": "d21f654af2bd0c94b59a38c505375c9b8b1d262d6ab61761fe8550fcecf59e53",
+    "regrade.py": "49bcb2eb86468381efccbda2193669c5932944cb4d5e73b417400ac60f2367de",
+    "telemetry.py": "e2c887e38c76829c481d61f8ffd3cd7130b98aa434a04f1189d1dd11bdcc01b2",
+    "core.py": "76849be45ee8569840d72d212ef31c68f37881d40400fec1f0675d8eeb581f05",
+    "workspace_verification.py": "00ff2a966dd89555430cb7ea48712240e065955784344e0289f731d9569d1b4f"
+  },
+  "workspace_hash_checks": [
+    {
+      "task_id": "feature-plus-test-interval-union",
+      "expected_sha256": "b493e87bd5e9f996203e193b50b0c449f4c0b1210f0142dbfb9e8f97d035c1d7",
+      "observed_sha256": "b493e87bd5e9f996203e193b50b0c449f4c0b1210f0142dbfb9e8f97d035c1d7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-common-prefix",
+      "expected_sha256": "fa7aa669b2e7f372e31c5ed95af3198ddd77f3068505f873ae3743a0e86bf2a4",
+      "observed_sha256": "fa7aa669b2e7f372e31c5ed95af3198ddd77f3068505f873ae3743a0e86bf2a4",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-word-counts",
+      "expected_sha256": "fdcb578715c818756b1294dd6c65b5abed9509f46baca49ad38ded781cb5009c",
+      "observed_sha256": "fdcb578715c818756b1294dd6c65b5abed9509f46baca49ad38ded781cb5009c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-clamp-values",
+      "expected_sha256": "fb1d2fb5b1ea377cc3fca726d15297f535f62558c21a5927c8f4df76ed1157d1",
+      "observed_sha256": "fb1d2fb5b1ea377cc3fca726d15297f535f62558c21a5927c8f4df76ed1157d1",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-merge-counts",
+      "expected_sha256": "05a9564b874ffeca716883e7f131b6d4a1fe46607f4501b5ccaafb4b9c50cfbd",
+      "observed_sha256": "05a9564b874ffeca716883e7f131b6d4a1fe46607f4501b5ccaafb4b9c50cfbd",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-last-index",
+      "expected_sha256": "faf4f6541318700ab7b0e655a3f7e3c3b79aec17ca86da5f54e47a27f2d252a7",
+      "observed_sha256": "faf4f6541318700ab7b0e655a3f7e3c3b79aec17ca86da5f54e47a27f2d252a7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-window-slices",
+      "expected_sha256": "908aa332857d7558347c54fd6c6802a06bde03b4bd1ea9cba5e9ff21b4ea164b",
+      "observed_sha256": "908aa332857d7558347c54fd6c6802a06bde03b4bd1ea9cba5e9ff21b4ea164b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-unique-permutations",
+      "expected_sha256": "26fed63952bdee4244d84a9510dc19fd98c58c74dc0fbc502886aa078c5fdc1c",
+      "observed_sha256": "26fed63952bdee4244d84a9510dc19fd98c58c74dc0fbc502886aa078c5fdc1c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-inclusive-range",
+      "expected_sha256": "3d998faf3152c02cb9ee6538e7edd3677749d9d730c76fe6a6847acc474b5380",
+      "observed_sha256": "3d998faf3152c02cb9ee6538e7edd3677749d9d730c76fe6a6847acc474b5380",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-adjacent-runs",
+      "expected_sha256": "894e4cf7e4c9498d48d8612b6b1b721f399b54ca6554ac789ca1c1e8f000eb04",
+      "observed_sha256": "894e4cf7e4c9498d48d8612b6b1b721f399b54ca6554ac789ca1c1e8f000eb04",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-unique-permutations",
+      "expected_sha256": "fca78f1b51944e28f4e663b403dd3b739df37a5a14adc342a11a14e16234ceb1",
+      "observed_sha256": "fca78f1b51944e28f4e663b403dd3b739df37a5a14adc342a11a14e16234ceb1",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-select-columns",
+      "expected_sha256": "4ffb298d0acf462b2a8d5ea74da773fb43c054f109d279770d1bf7ad20aa705c",
+      "observed_sha256": "4ffb298d0acf462b2a8d5ea74da773fb43c054f109d279770d1bf7ad20aa705c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-window-slices",
+      "expected_sha256": "307f93a33dbc8b4756b2306e8c532a32f5d653d4e03d6a3285b4353e17322e23",
+      "observed_sha256": "307f93a33dbc8b4756b2306e8c532a32f5d653d4e03d6a3285b4353e17322e23",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-rotate-left",
+      "expected_sha256": "50d335ce307919a190d2db25d5aab54877802f26b6169cbdfd0bc021b0122eaf",
+      "observed_sha256": "50d335ce307919a190d2db25d5aab54877802f26b6169cbdfd0bc021b0122eaf",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-adjacent-runs",
+      "expected_sha256": "ecb0a2b66dace02e41f537e20b1dbcc62d2a684b89243ce45a16b038f8e11412",
+      "observed_sha256": "ecb0a2b66dace02e41f537e20b1dbcc62d2a684b89243ce45a16b038f8e11412",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-prefix-sums",
+      "expected_sha256": "4522d4c8d17846744e5f570cfc12f681cd4bc4d004e137ea82694cb7376edf15",
+      "observed_sha256": "4522d4c8d17846744e5f570cfc12f681cd4bc4d004e137ea82694cb7376edf15",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-line-endings",
+      "expected_sha256": "2b20c3f72829b59af4f370767152bc58a7a3fde1473a3b36868d388457e99803",
+      "observed_sha256": "2b20c3f72829b59af4f370767152bc58a7a3fde1473a3b36868d388457e99803",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-flatten-once",
+      "expected_sha256": "6812c3830e4ce131d66c62110bdff19694d547ca9ca26adea8909a82ab029b99",
+      "observed_sha256": "6812c3830e4ce131d66c62110bdff19694d547ca9ca26adea8909a82ab029b99",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-balanced-brackets",
+      "expected_sha256": "75d353a36b194b78dd14f80c3e8909c315ae506fd46e85d679190ecfbbd39c24",
+      "observed_sha256": "75d353a36b194b78dd14f80c3e8909c315ae506fd46e85d679190ecfbbd39c24",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-balanced-brackets",
+      "expected_sha256": "b4161b3f909eefcb14bd6fc13d2231dbaf339ecf848a7a84861e80f35644702e",
+      "observed_sha256": "b4161b3f909eefcb14bd6fc13d2231dbaf339ecf848a7a84861e80f35644702e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-interval-union",
+      "expected_sha256": "483b352a411aa7c5f5bf8d0c02a2da29e7da6d176b23276775491ffcf84522f5",
+      "observed_sha256": "483b352a411aa7c5f5bf8d0c02a2da29e7da6d176b23276775491ffcf84522f5",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-interval-union",
+      "expected_sha256": "eaa385a841f43ed999781691d85142ed76f4bffd9598a40019726c8c32e164a5",
+      "observed_sha256": "eaa385a841f43ed999781691d85142ed76f4bffd9598a40019726c8c32e164a5",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-round-robin",
+      "expected_sha256": "d95e556878f8003acdc2ec95f68f896f52b2fb0d6820799d47c74f2ee3da74d7",
+      "observed_sha256": "d95e556878f8003acdc2ec95f68f896f52b2fb0d6820799d47c74f2ee3da74d7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-last-index",
+      "expected_sha256": "30d7b8c0e5931c6582164742bd454e2a02d620bc02007b780fc2079f547ba38e",
+      "observed_sha256": "30d7b8c0e5931c6582164742bd454e2a02d620bc02007b780fc2079f547ba38e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-window-slices",
+      "expected_sha256": "3ad10982cc04dbb3869bd2b225a696f30d3a035cdc88cc8e963067ff674b41d0",
+      "observed_sha256": "3ad10982cc04dbb3869bd2b225a696f30d3a035cdc88cc8e963067ff674b41d0",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-select-columns",
+      "expected_sha256": "e855dc5f8f0e4577573073a5c85b878be6f12c167ac9e47b2f8f04e384fd6182",
+      "observed_sha256": "e855dc5f8f0e4577573073a5c85b878be6f12c167ac9e47b2f8f04e384fd6182",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-strip-prefix",
+      "expected_sha256": "798a440d8745e6253574aeb7efd96b5b44d88d69e57e9d52febcbcb4dbae11e4",
+      "observed_sha256": "798a440d8745e6253574aeb7efd96b5b44d88d69e57e9d52febcbcb4dbae11e4",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-rotate-left",
+      "expected_sha256": "d70effac034c47e4b5a737fe374c096f42e41e24b203b4f3b010568f90ec9b66",
+      "observed_sha256": "d70effac034c47e4b5a737fe374c096f42e41e24b203b4f3b010568f90ec9b66",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-inclusive-range",
+      "expected_sha256": "8cf9e86e3af98f97420dae28bf4e113072d24ef5b5aa03f5c46b09ce68cb87a9",
+      "observed_sha256": "8cf9e86e3af98f97420dae28bf4e113072d24ef5b5aa03f5c46b09ce68cb87a9",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-ordinal-labels",
+      "expected_sha256": "4d8f2d4f698e4ea133cfd7db6f09445d0f09e4cd7c0cadf27674896871ed7807",
+      "observed_sha256": "4d8f2d4f698e4ea133cfd7db6f09445d0f09e4cd7c0cadf27674896871ed7807",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-last-index",
+      "expected_sha256": "f390f3be3d1e961a5ada7f2be4f6a1db38977a77e65c919234d776c90b983b9f",
+      "observed_sha256": "f390f3be3d1e961a5ada7f2be4f6a1db38977a77e65c919234d776c90b983b9f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-word-counts",
+      "expected_sha256": "352e1296b30efe2e41fefc5feb14b22fa41fe82a709d13dd910919a851b9f168",
+      "observed_sha256": "352e1296b30efe2e41fefc5feb14b22fa41fe82a709d13dd910919a851b9f168",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-window-slices",
+      "expected_sha256": "843613acd0a5606c3d2e9fc246c62472fd5bd97696a5b31bfd9cc82c958e3385",
+      "observed_sha256": "843613acd0a5606c3d2e9fc246c62472fd5bd97696a5b31bfd9cc82c958e3385",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-adjacent-runs",
+      "expected_sha256": "5ee9489abd15b29fa573c0e1767166c8b5482684de5bb6e41e5f2de1f0c06c8f",
+      "observed_sha256": "5ee9489abd15b29fa573c0e1767166c8b5482684de5bb6e41e5f2de1f0c06c8f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-flatten-once",
+      "expected_sha256": "05b0ac8dfc5036925fa26be84b3301d290ad261aec6fd54c027ecbd2fd17f610",
+      "observed_sha256": "05b0ac8dfc5036925fa26be84b3301d290ad261aec6fd54c027ecbd2fd17f610",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-round-robin",
+      "expected_sha256": "d9db738102cbae9abc9552e1e5895deeeeeb6341ab9d1ee82146140d03b12255",
+      "observed_sha256": "d9db738102cbae9abc9552e1e5895deeeeeb6341ab9d1ee82146140d03b12255",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-pairwise-edges",
+      "expected_sha256": "e7be08f97c546719c80f1f12c89dcaf5f99ba1f7a85100f0485b455710d8cfb3",
+      "observed_sha256": "e7be08f97c546719c80f1f12c89dcaf5f99ba1f7a85100f0485b455710d8cfb3",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-clamp-values",
+      "expected_sha256": "f8cc1693095cf08478964e8f41c9d6238e086dba6d4d3eb22f47d1cffe1327a6",
+      "observed_sha256": "f8cc1693095cf08478964e8f41c9d6238e086dba6d4d3eb22f47d1cffe1327a6",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-strip-prefix",
+      "expected_sha256": "46da3d323a1f26a2838885da94047c1a6ae7ef648eae6668d55c2c2c8eef5227",
+      "observed_sha256": "46da3d323a1f26a2838885da94047c1a6ae7ef648eae6668d55c2c2c8eef5227",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-pairwise-edges",
+      "expected_sha256": "e2bc0dfce1476fd31e02b630744d430bb978510952043c0af712b688e4651a1c",
+      "observed_sha256": "e2bc0dfce1476fd31e02b630744d430bb978510952043c0af712b688e4651a1c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-unique-permutations",
+      "expected_sha256": "cfc13f91b9fb5bca736c53f9764ab9e48253bc60b85ec26548687ee3b3709182",
+      "observed_sha256": "cfc13f91b9fb5bca736c53f9764ab9e48253bc60b85ec26548687ee3b3709182",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-prefix-sums",
+      "expected_sha256": "1acb15adfb271d5e8b86edb8523fa408302eb1fdf5aa06b623b17a36e2c4d229",
+      "observed_sha256": "1acb15adfb271d5e8b86edb8523fa408302eb1fdf5aa06b623b17a36e2c4d229",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-line-endings",
+      "expected_sha256": "825b2d95737cd9abd615ec8eaa50fd571a691b9e25eb1dd431a3765c43b908c2",
+      "observed_sha256": "825b2d95737cd9abd615ec8eaa50fd571a691b9e25eb1dd431a3765c43b908c2",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-select-columns",
+      "expected_sha256": "76e180b7844b35cc8191714b14ba96d240b47da50efefaa54ce403d6ee3351bd",
+      "observed_sha256": "76e180b7844b35cc8191714b14ba96d240b47da50efefaa54ce403d6ee3351bd",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-inclusive-range",
+      "expected_sha256": "b19207a1632c2e8b5840275a8e2572823a949bf18e6a43ee92ca0f67800bc7ee",
+      "observed_sha256": "b19207a1632c2e8b5840275a8e2572823a949bf18e6a43ee92ca0f67800bc7ee",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-clamp-values",
+      "expected_sha256": "2c04cc4121170358bcc91f2606b46626dff23e97a8cf8c5a0a1ff0113fd28296",
+      "observed_sha256": "2c04cc4121170358bcc91f2606b46626dff23e97a8cf8c5a0a1ff0113fd28296",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-stable-unique",
+      "expected_sha256": "7c580c7baea9fbb094da486f6241ee95565ea977caf37f2928ebbe7bea55c408",
+      "observed_sha256": "7c580c7baea9fbb094da486f6241ee95565ea977caf37f2928ebbe7bea55c408",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-stable-unique",
+      "expected_sha256": "b9dfc78e766a5b735510574786056592d08282c572f732d6ac674d8471917e16",
+      "observed_sha256": "b9dfc78e766a5b735510574786056592d08282c572f732d6ac674d8471917e16",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-window-slices",
+      "expected_sha256": "3ee4f7fabe48618dd82d304c8edcb56f48c18d41755bc9500fdc5540a9b341be",
+      "observed_sha256": "3ee4f7fabe48618dd82d304c8edcb56f48c18d41755bc9500fdc5540a9b341be",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-prefix-sums",
+      "expected_sha256": "6cad08ad5ecd46ae1666f2bd4b4c788bccd77837a66aeef1d62ed27e8c3d9345",
+      "observed_sha256": "6cad08ad5ecd46ae1666f2bd4b4c788bccd77837a66aeef1d62ed27e8c3d9345",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-common-prefix",
+      "expected_sha256": "b9d71b6946f92e735c33efa60ccea0d57ba71e98582778353e2f89d385a698c8",
+      "observed_sha256": "b9d71b6946f92e735c33efa60ccea0d57ba71e98582778353e2f89d385a698c8",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-last-index",
+      "expected_sha256": "d4bc9416e24c0d927c6fcd0372b57089c097ff79cfe345eb7d0cb4be426eb41f",
+      "observed_sha256": "d4bc9416e24c0d927c6fcd0372b57089c097ff79cfe345eb7d0cb4be426eb41f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-flatten-once",
+      "expected_sha256": "5b8c7fa9fa854f0bff086bb814b2e0c9b16c162727c1ccc3c375b66bc8f8256b",
+      "observed_sha256": "5b8c7fa9fa854f0bff086bb814b2e0c9b16c162727c1ccc3c375b66bc8f8256b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-pairwise-edges",
+      "expected_sha256": "86573c32621b3d535fe03d3949b3f4d75ed0b232a95d5a4eca6a7159e830cf82",
+      "observed_sha256": "86573c32621b3d535fe03d3949b3f4d75ed0b232a95d5a4eca6a7159e830cf82",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-select-columns",
+      "expected_sha256": "2e089dff24cae4309eec7dca84042ef8da27cd737b9d7ef8980eb5a242510ab3",
+      "observed_sha256": "2e089dff24cae4309eec7dca84042ef8da27cd737b9d7ef8980eb5a242510ab3",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-partition-sign",
+      "expected_sha256": "ffc4ab8c79ff3782e26c04c01346ffbe3bbe8a7bc9dd7aaca7cea0cd84ecfc8c",
+      "observed_sha256": "ffc4ab8c79ff3782e26c04c01346ffbe3bbe8a7bc9dd7aaca7cea0cd84ecfc8c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-parse-pairs",
+      "expected_sha256": "9dcbc3c2deba300bfe87662634a7701d958f9323ae0d731e2ab4e8e5c137ee31",
+      "observed_sha256": "9dcbc3c2deba300bfe87662634a7701d958f9323ae0d731e2ab4e8e5c137ee31",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-last-index",
+      "expected_sha256": "11bd28a96e4a04ff66cc7a8032da906b3eceb1753683467025079474902124d7",
+      "observed_sha256": "11bd28a96e4a04ff66cc7a8032da906b3eceb1753683467025079474902124d7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-invert-groups",
+      "expected_sha256": "4dd67c41334506e56ba1beef334458d0251fa6e20af0c4967cfe3934afa2c480",
+      "observed_sha256": "4dd67c41334506e56ba1beef334458d0251fa6e20af0c4967cfe3934afa2c480",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-invert-groups",
+      "expected_sha256": "946bea6e6658548497498fbf26e5a38a8ac6d3875bdc441c515b231a13a3a72a",
+      "observed_sha256": "946bea6e6658548497498fbf26e5a38a8ac6d3875bdc441c515b231a13a3a72a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-common-prefix",
+      "expected_sha256": "e7c4781b76681ecd4c7f11ef5cda403c5ebfff8ce453d160b7c85ebcd25f8c50",
+      "observed_sha256": "e7c4781b76681ecd4c7f11ef5cda403c5ebfff8ce453d160b7c85ebcd25f8c50",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-interleave",
+      "expected_sha256": "62f1e594f2365599de1f141dda9acd0631d2a1f6f7ea25fe49f4b1fcc40baa21",
+      "observed_sha256": "62f1e594f2365599de1f141dda9acd0631d2a1f6f7ea25fe49f4b1fcc40baa21",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-interval-union",
+      "expected_sha256": "d5ff6cb7d8857395b31b91f700c1b5fe9c0c7f4ab5eb4603ba1e176b711cc601",
+      "observed_sha256": "d5ff6cb7d8857395b31b91f700c1b5fe9c0c7f4ab5eb4603ba1e176b711cc601",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-prefix-sums",
+      "expected_sha256": "ceb6d3cba258ce41e7ff7f5a7ac2bf9c680bf6fd20aba936486bb68e7cce0cb5",
+      "observed_sha256": "ceb6d3cba258ce41e7ff7f5a7ac2bf9c680bf6fd20aba936486bb68e7cce0cb5",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-interleave",
+      "expected_sha256": "e29fc56d3ed9d7f80ff432d8a583a1a97487a17b6b826e9b5f03b9d06c8b8248",
+      "observed_sha256": "e29fc56d3ed9d7f80ff432d8a583a1a97487a17b6b826e9b5f03b9d06c8b8248",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-merge-counts",
+      "expected_sha256": "4d6594e4e665a23127ab5c1ace3e4050ff4a6eb5fc1dc57e3f689da13647bbda",
+      "observed_sha256": "4d6594e4e665a23127ab5c1ace3e4050ff4a6eb5fc1dc57e3f689da13647bbda",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-pairwise-edges",
+      "expected_sha256": "12a145913b1d1ef10ac1bca02dc2ad8239b8166414ba58bebebb6590826bd9bf",
+      "observed_sha256": "12a145913b1d1ef10ac1bca02dc2ad8239b8166414ba58bebebb6590826bd9bf",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-chunk-tail",
+      "expected_sha256": "b3e4f8c351ba236dd687e7cc887d731af1a8f277ab475e564ad2e6e4b898c832",
+      "observed_sha256": "b3e4f8c351ba236dd687e7cc887d731af1a8f277ab475e564ad2e6e4b898c832",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-line-endings",
+      "expected_sha256": "68ec586d0c1ddbe82c8b940cb03ce17dd8f73f857ddef58b8afcc91fa3b2b9b1",
+      "observed_sha256": "68ec586d0c1ddbe82c8b940cb03ce17dd8f73f857ddef58b8afcc91fa3b2b9b1",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-line-endings",
+      "expected_sha256": "02630742f3ae8e25ee2ddcdea3ead3af19c63fd32d83adeccd35f9c66f1b62d7",
+      "observed_sha256": "02630742f3ae8e25ee2ddcdea3ead3af19c63fd32d83adeccd35f9c66f1b62d7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-adjacent-runs",
+      "expected_sha256": "731ca011743e2db909862149cd5c78a88816bf1cca2a7d543d969e7b123ca7e8",
+      "observed_sha256": "731ca011743e2db909862149cd5c78a88816bf1cca2a7d543d969e7b123ca7e8",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-rotate-left",
+      "expected_sha256": "ac34cff7f2517e57f4184efdeeb2e32aa1777fbe96d85b23d42b94233378490d",
+      "observed_sha256": "ac34cff7f2517e57f4184efdeeb2e32aa1777fbe96d85b23d42b94233378490d",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-interleave",
+      "expected_sha256": "f1aa9f9d44cd2c972a6438ec7efa886f94db28b737ea2c57368d7d8226138c13",
+      "observed_sha256": "f1aa9f9d44cd2c972a6438ec7efa886f94db28b737ea2c57368d7d8226138c13",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-stable-unique",
+      "expected_sha256": "a5031e9208897469dacea54aa43aa3a36889f12034926b046cc29b99c83dc222",
+      "observed_sha256": "a5031e9208897469dacea54aa43aa3a36889f12034926b046cc29b99c83dc222",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-prefix-sums",
+      "expected_sha256": "7b69c1c82376dcc92867a95bbcfec32f6c33837d971a2fe4ecb7adfc768f61cc",
+      "observed_sha256": "7b69c1c82376dcc92867a95bbcfec32f6c33837d971a2fe4ecb7adfc768f61cc",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-interleave",
+      "expected_sha256": "ce1610a9655f5e3550adfa65ab0270331a3339460c93a2d4c0d00bb94e0473e7",
+      "observed_sha256": "ce1610a9655f5e3550adfa65ab0270331a3339460c93a2d4c0d00bb94e0473e7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-word-counts",
+      "expected_sha256": "d6a4a805a82722704bbcac64e4591fe71f5a7f68cea8d34e3619e263cf1ac49b",
+      "observed_sha256": "d6a4a805a82722704bbcac64e4591fe71f5a7f68cea8d34e3619e263cf1ac49b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-stable-unique",
+      "expected_sha256": "a01fdd1d2b420991c5358ba015810ff0f490cce5136953a0d479deaa353dfb39",
+      "observed_sha256": "a01fdd1d2b420991c5358ba015810ff0f490cce5136953a0d479deaa353dfb39",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-balanced-brackets",
+      "expected_sha256": "f0b25ea5e38aeacbc01629d47e1eca934259723f9f1dcc3bd45c4f114fc95648",
+      "observed_sha256": "f0b25ea5e38aeacbc01629d47e1eca934259723f9f1dcc3bd45c4f114fc95648",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-common-prefix",
+      "expected_sha256": "b96d0952e139f3445f4c9135af015fefe6ec5e20524d2677963299dcab541457",
+      "observed_sha256": "b96d0952e139f3445f4c9135af015fefe6ec5e20524d2677963299dcab541457",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-partition-sign",
+      "expected_sha256": "86c784ca78a1c91aee5aa5ef1632e8d0870e0282ba3c245df2e4b31cf63b6ac1",
+      "observed_sha256": "86c784ca78a1c91aee5aa5ef1632e8d0870e0282ba3c245df2e4b31cf63b6ac1",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-inclusive-range",
+      "expected_sha256": "f0bbf9764e1ff662071a9d5abd1cef53aee7e4c12e70e96b2f54368a9e5fa54d",
+      "observed_sha256": "f0bbf9764e1ff662071a9d5abd1cef53aee7e4c12e70e96b2f54368a9e5fa54d",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-inclusive-range",
+      "expected_sha256": "0ac5e387d069045000c520984170fd7fe06218ea7f23a01b445b4465702be369",
+      "observed_sha256": "0ac5e387d069045000c520984170fd7fe06218ea7f23a01b445b4465702be369",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-parse-pairs",
+      "expected_sha256": "c4e3afdc96355c9064d9b5a35ea1eb220f2b6a0da186c7c1030e9eb169e22290",
+      "observed_sha256": "c4e3afdc96355c9064d9b5a35ea1eb220f2b6a0da186c7c1030e9eb169e22290",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-strip-prefix",
+      "expected_sha256": "0c3e7b07dbb7b3f4cc9f3035874ed88ecce0ca1577a2e1f8feca3c0b8f069d36",
+      "observed_sha256": "0c3e7b07dbb7b3f4cc9f3035874ed88ecce0ca1577a2e1f8feca3c0b8f069d36",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-line-endings",
+      "expected_sha256": "57d6de07e5d4da4fab7eaf33de2e71d24c1a5e6230353551e82b7faabf1ea61b",
+      "observed_sha256": "57d6de07e5d4da4fab7eaf33de2e71d24c1a5e6230353551e82b7faabf1ea61b",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-rotate-left",
+      "expected_sha256": "327fe458dfd06e1de2dbd466c1a98efdcf71f9426af6523c154bbaf10a15fb23",
+      "observed_sha256": "327fe458dfd06e1de2dbd466c1a98efdcf71f9426af6523c154bbaf10a15fb23",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-ordinal-labels",
+      "expected_sha256": "d4fbd4cf6b5e7de158a316fac9227a8f2cc867c285b5c27a9d326002070d668c",
+      "observed_sha256": "d4fbd4cf6b5e7de158a316fac9227a8f2cc867c285b5c27a9d326002070d668c",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-invert-groups",
+      "expected_sha256": "1b9371ea8f0b0980e65fa97444478b16d021a5e01ad45db328b04458d67d629f",
+      "observed_sha256": "1b9371ea8f0b0980e65fa97444478b16d021a5e01ad45db328b04458d67d629f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-strip-prefix",
+      "expected_sha256": "60fadd893f5cfbcc2439d39b0f9ce2e535e130d55ed4cce247229629e69662bc",
+      "observed_sha256": "60fadd893f5cfbcc2439d39b0f9ce2e535e130d55ed4cce247229629e69662bc",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-parse-pairs",
+      "expected_sha256": "9fd4d30e2db15047c8c3c223d8250558fd316bd5b56a386034b2cd2081227d9d",
+      "observed_sha256": "9fd4d30e2db15047c8c3c223d8250558fd316bd5b56a386034b2cd2081227d9d",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-round-robin",
+      "expected_sha256": "efa2ad624430ea00501a408b98b1c023174c6bd484cb96ca2bebb9ad3f64ff7d",
+      "observed_sha256": "efa2ad624430ea00501a408b98b1c023174c6bd484cb96ca2bebb9ad3f64ff7d",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-clamp-values",
+      "expected_sha256": "ded3869053d0983259246b86829a8439103c9afbb578d680c1879098d0e1a21a",
+      "observed_sha256": "ded3869053d0983259246b86829a8439103c9afbb578d680c1879098d0e1a21a",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-partition-sign",
+      "expected_sha256": "54fa87c7f63dd198f40dd18e54a30289d156d1d741068d89e1fe94da9b234ec9",
+      "observed_sha256": "54fa87c7f63dd198f40dd18e54a30289d156d1d741068d89e1fe94da9b234ec9",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-round-robin",
+      "expected_sha256": "3c6e27f587918baffc29693640629c7f33fe89be6b498f8851514e7c6a8bcdac",
+      "observed_sha256": "3c6e27f587918baffc29693640629c7f33fe89be6b498f8851514e7c6a8bcdac",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-interval-union",
+      "expected_sha256": "8a2c1eb6e96f4b3d42139a6ca81f253c4f2e56ce688a8bbf85b5acc4080b0357",
+      "observed_sha256": "8a2c1eb6e96f4b3d42139a6ca81f253c4f2e56ce688a8bbf85b5acc4080b0357",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-flatten-once",
+      "expected_sha256": "60b7531ba37d124a98566048ca1d31ed024103bddeb4b318e1e3a9908b892207",
+      "observed_sha256": "60b7531ba37d124a98566048ca1d31ed024103bddeb4b318e1e3a9908b892207",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-merge-counts",
+      "expected_sha256": "f423283cd9d6b42ed576ac263aeac776bf9433af59c0f7e8245caaeb1ab2af6f",
+      "observed_sha256": "f423283cd9d6b42ed576ac263aeac776bf9433af59c0f7e8245caaeb1ab2af6f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-strip-prefix",
+      "expected_sha256": "6ead6a62d7b1fc3a8b2700841cf1f1f6dcc2e8227584095202ecc03156a89722",
+      "observed_sha256": "6ead6a62d7b1fc3a8b2700841cf1f1f6dcc2e8227584095202ecc03156a89722",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-balanced-brackets",
+      "expected_sha256": "7404ff0768449f3d9042e47c3fd747a98004b972454d7f44bd2f036b9179f777",
+      "observed_sha256": "7404ff0768449f3d9042e47c3fd747a98004b972454d7f44bd2f036b9179f777",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 2,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-merge-counts",
+      "expected_sha256": "3698ff4350594aa71610d70b60f453170d953a078926dbc1d863ae9b7564f4b9",
+      "observed_sha256": "3698ff4350594aa71610d70b60f453170d953a078926dbc1d863ae9b7564f4b9",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-rotate-left",
+      "expected_sha256": "b94ec7879096111b9cc14d256dc099064245e0b706cd117a407d29fbbf2c3a09",
+      "observed_sha256": "b94ec7879096111b9cc14d256dc099064245e0b706cd117a407d29fbbf2c3a09",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-parse-pairs",
+      "expected_sha256": "a8cccb6ad431917d510769b6cd3398e4d6aec7d6417c5b3e7a251aa1ac144807",
+      "observed_sha256": "a8cccb6ad431917d510769b6cd3398e4d6aec7d6417c5b3e7a251aa1ac144807",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-clamp-values",
+      "expected_sha256": "0466dbacd35361722ffc6719d56963e2b69e253b1979150bf0f69b063bead05e",
+      "observed_sha256": "0466dbacd35361722ffc6719d56963e2b69e253b1979150bf0f69b063bead05e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-word-counts",
+      "expected_sha256": "342a0cd8811fdc062be10f192beb3a7c19457fa17d539d3e18d37968a4d9a1c0",
+      "observed_sha256": "342a0cd8811fdc062be10f192beb3a7c19457fa17d539d3e18d37968a4d9a1c0",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-stable-unique",
+      "expected_sha256": "020b91a7d161d103dd7eae6fb5ef8dfb8ecc7cff5efab1888e24aa080fd96431",
+      "observed_sha256": "020b91a7d161d103dd7eae6fb5ef8dfb8ecc7cff5efab1888e24aa080fd96431",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-merge-counts",
+      "expected_sha256": "5bf10663a614608fe0ec8414b8e2f97093cbdd1325bf7fdd9063eba01d348725",
+      "observed_sha256": "5bf10663a614608fe0ec8414b8e2f97093cbdd1325bf7fdd9063eba01d348725",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-pairwise-edges",
+      "expected_sha256": "e8c18b48ac68a2414fae023217f2ea6ed259533278a3afb41b2e172154d4ebea",
+      "observed_sha256": "e8c18b48ac68a2414fae023217f2ea6ed259533278a3afb41b2e172154d4ebea",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-interleave",
+      "expected_sha256": "bc9d001209c435b03f534029b1edadb56d56e966859a361f0d95cb4b34488985",
+      "observed_sha256": "bc9d001209c435b03f534029b1edadb56d56e966859a361f0d95cb4b34488985",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-adjacent-runs",
+      "expected_sha256": "ac0a5de854462d4f1755bde37a1e2ca3327717be09f4d67df3e2865cedbccc1f",
+      "observed_sha256": "ac0a5de854462d4f1755bde37a1e2ca3327717be09f4d67df3e2865cedbccc1f",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-balanced-brackets",
+      "expected_sha256": "33a58b85fd3d38b468cf152ac245a8169607cfe8ebe12e43d1ddccddcf53119e",
+      "observed_sha256": "33a58b85fd3d38b468cf152ac245a8169607cfe8ebe12e43d1ddccddcf53119e",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-ordinal-labels",
+      "expected_sha256": "ff700c31002d75ee2acc7831eb94879ae44b2b80ebacf1f8c1e44721e7883870",
+      "observed_sha256": "ff700c31002d75ee2acc7831eb94879ae44b2b80ebacf1f8c1e44721e7883870",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-partition-sign",
+      "expected_sha256": "ab3657cb72efbe19c23e0aee21ecd9a2d614f82d8835aa99d58353c86080b9a9",
+      "observed_sha256": "ab3657cb72efbe19c23e0aee21ecd9a2d614f82d8835aa99d58353c86080b9a9",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-invert-groups",
+      "expected_sha256": "6714a390de9062ee2ff25b2451c76d65b4ab03e1f9bf64018063afa45c88abbf",
+      "observed_sha256": "6714a390de9062ee2ff25b2451c76d65b4ab03e1f9bf64018063afa45c88abbf",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "bug-fix-flatten-once",
+      "expected_sha256": "d0266297c6a95b4c141d0a776b0e4dadae88ff2312504df4bca8e177541504ea",
+      "observed_sha256": "d0266297c6a95b4c141d0a776b0e4dadae88ff2312504df4bca8e177541504ea",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "feature-plus-test-common-prefix",
+      "expected_sha256": "1b98e5526ad13535867faf79a9e0e23e4ede84d8b7a6cf02f17b0ef4f1c7c622",
+      "observed_sha256": "1b98e5526ad13535867faf79a9e0e23e4ede84d8b7a6cf02f17b0ef4f1c7c622",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-partition-sign",
+      "expected_sha256": "33b6c6497fc5a46587618cce7a715f66706bbde9fcc7e1be200fed193c8641d2",
+      "observed_sha256": "33b6c6497fc5a46587618cce7a715f66706bbde9fcc7e1be200fed193c8641d2",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "multiple-requirements-unique-permutations",
+      "expected_sha256": "477a729fc742d18995fbce8597005afbea7251c60108cb8e61e05ddd9180fec7",
+      "observed_sha256": "477a729fc742d18995fbce8597005afbea7251c60108cb8e61e05ddd9180fec7",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "constrained-refactoring-word-counts",
+      "expected_sha256": "c3335a93f13d5d9023e0beef0e4279fb9c45c13e14c6dc8e6edb44f1bd6372a0",
+      "observed_sha256": "c3335a93f13d5d9023e0beef0e4279fb9c45c13e14c6dc8e6edb44f1bd6372a0",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    },
+    {
+      "task_id": "two-session-invert-groups",
+      "expected_sha256": "88d91e8af39518018406757d46970036aa1fd64aeb718557f2d5757be2644534",
+      "observed_sha256": "88d91e8af39518018406757d46970036aa1fd64aeb718557f2d5757be2644534",
+      "workspace_verification": "workspace_digest",
+      "workspace_digest_version": 1,
+      "matched": true
+    }
+  ]
+}

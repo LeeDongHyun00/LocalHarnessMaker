@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 2,
+  "source_events_sha256": "1fbb46141ca339fa603b6793c6f44ce5774dde49fb2c100dca2b557b9feaebc4",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered4/two-session-flatten-once/final-2.md",
+    "sha256": "499bd58864b830f09129169a0c4187ad6a112784a8303eee495ff27a40674d10"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

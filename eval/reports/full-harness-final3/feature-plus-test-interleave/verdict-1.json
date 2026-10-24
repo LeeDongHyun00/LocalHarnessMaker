@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+interleave\\s*\\(\n2: \n3: \n4: def interleave(left: list[int], right: list[int]) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\") for node in ast.walk(tree)) >= 2'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_inputs (test_solution.InterleaveTests.test_empty_inputs) ... ok\ntest_equal_lengths (test_solution.InterleaveTests.test_equal_lengths) ... ok\ntest_inputs_are_preserved_and_result_is_independent (test_solution.InterleaveTests.test_inputs_are_preserved_and_result_is_independent) ... ok\ntest_same_list_as_both_inputs (test_solution.InterleaveTests.test_same_list_as_both_inputs) ... ok\ntest_single_items_and_repeated_values (test_solution.InterleaveTests.test_single_items_and_repeated_values) ... ok\ntest_unequal_lengths (test_solution.InterleaveTests.test_unequal_lengths) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

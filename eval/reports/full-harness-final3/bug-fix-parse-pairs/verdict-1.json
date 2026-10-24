@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?m)^\\s*def\\s+test_[A-Za-z0-9_]+\\s*\\(\n7:     def test_records(self) -> None:\n13: \n14:     def test_blank_input(self) -> None:\n18: \n19:     def test_invalid_records(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_blank_input (test_solution.ParsePairsTests.test_blank_input) ... ok\ntest_invalid_records (test_solution.ParsePairsTests.test_invalid_records) ... ok\ntest_records (test_solution.ParsePairsTests.test_records) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "llm_judge: solution.py defines parse_pairs(text: str) -> dict[str, str], uses partition('=') to split at the first equals sign, strips key and value, skips blank lines, overwrites repeated keys, permits empty values, and raises ValueError for missing separators or empty keys. test_solution.py exercises parse_pairs directly with repeated keys, embedded equals signs, empty values, blank input, and invalid records. No input collection is passed or mutated.",
+      "reason": "llm_judge: parse_pairs retains the signature parse_pairs(text: str) -> dict[str, str] and implements the specified splitting, trimming, blank-line handling, last-value-wins, empty-value, and ValueError behavior. The regression tests call the public API and cover these cases. The function only reads the input string and does not mutate an input collection."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def invert\\s*\\(|def invert_legacy\\s*\\(|def _[A-Za-z_]\\w*\\s*\\(\n4: def _invert(items: dict[str, str]) -> dict[str, list[str]]:\n11: def invert(items: dict[str, str]) -> dict[str, list[str]]:\n15: def invert_legacy(items: dict[str, str]) -> dict[str, list[str]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 2'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.InvertTests.test_empty_input) ... ok\ntest_groups_keys_in_insertion_order_without_mutating_input (test_solution.InvertTests.test_groups_keys_in_insertion_order_without_mutating_input) ... ok\ntest_input_without_items_preserves_attribute_error (test_solution.InvertTests.test_input_without_items_preserves_attribute_error) ... ok\ntest_unhashable_value_preserves_error_and_input (test_solution.InvertTests.test_unhashable_value_preserves_error_and_input) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

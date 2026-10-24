@@ -1,0 +1,68 @@
+{
+  "task_summary": "Implement contiguous windows in solution.py and add standard-library unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Return all contiguous windows of exactly size, advancing by one.",
+    "Raise ValueError when size <= 0; return [] when size exceeds input length.",
+    "Maintain type hints and do not mutate input collections.",
+    "Include at least two passing unittest methods exercising the public API.",
+    "Cover ordinary, boundary, and empty inputs, or invalid numeric inputs when no collection is accepted.",
+    "Preserve the stated behavior and compatibility requirements."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py contains the implementation and retains type hints.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)def\\s+\\w+\\s*\\([^)]*\\)\\s*->\\s*[^:]+:"
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:\\s*.*?def\\s+test_\\w+\\s*\\(|def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:[\\s\\S]*?def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:)"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The implementation and tests pass unittest discovery.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The workspace paths are relative to the supplied task workspace.",
+    "solution.py and test_solution.py may not exist yet and may be created.",
+    "The public API's function name and exact input collection type are unspecified; tests should exercise the API as implemented and document that choice.",
+    "The unittest discovery command is the requested verification mechanism; a zero exit code indicates discovery and execution completed without reported failures."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=841; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34921,
+    "output_tokens": 1060,
+    "usd": 0.00132642
+  }
+}

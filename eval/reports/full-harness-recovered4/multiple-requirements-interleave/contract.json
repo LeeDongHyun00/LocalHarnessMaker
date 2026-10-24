@@ -1,0 +1,99 @@
+{
+  "task_summary": "Repair the interleave implementation in solution.py, document its public behavior, and add regression tests in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve input values and collection order; do not mutate input collections.",
+    "Maintain type hints.",
+    "Public behavior: alternate left then right items, append any remainder from the longer input in order, and accept empty inputs.",
+    "Add at least 3 passing unittest test methods exercising the public API.",
+    "Verify with python -m unittest discover -v."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains a public specification docstring describing alternating left and right items, preserving the longer input's remainder order, accepting empty inputs, and not mutating inputs.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)\"\"\"(?:(?!\"\"\").)*(?:left|first).*(?:right|second).*(?:remainder|remaining).*(?:empty).*(?:mutat|unchanged)(?:(?!\"\"\").)*\"\"\""
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\")]; assert len(methods) >= 3'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The tests exercise the public API and cover alternating items, remainder order, and empty inputs.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Determine whether the regression tests call the public interleave API and include cases that demonstrate left-then-right alternation, remainder ordering for unequal inputs, and valid empty input behavior. Judge only from the source files."
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery run succeeds.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\")]; assert len(methods) >= 3'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are interpreted as paths relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The public function name and exact signature for the interleave API are not specified; the implementation and tests will use the task's established public API if present, or establish a suitable public API if none exists.",
+    "Unittest discovery without a specified start directory or pattern will discover the intended task tests from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=807; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34903,
+    "output_tokens": 1340,
+    "usd": 0.0041603
+  }
+}

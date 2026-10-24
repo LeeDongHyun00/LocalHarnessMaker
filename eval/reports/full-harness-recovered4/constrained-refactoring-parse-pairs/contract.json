@@ -1,0 +1,112 @@
+{
+  "task_summary": "Refactor parse_pairs and parse_pairs_legacy in solution.py to delegate their shared algorithm to one private helper, preserve compatibility and specified behavior, and add public unittest coverage in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Preserve both function signatures, return types, error behavior, input immutability, imports, and public names.",
+    "Parse newline-separated key=value records, split on the first equals sign, strip both sides, ignore blank lines, and let the last repeated key win.",
+    "Raise ValueError when a nonblank record lacks an equals sign or has an empty key; allow empty values.",
+    "Maintain type hints and do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "test_solution.py must contain at least two passing unittest test methods exercising the public API.",
+    "Verify with unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "solution.py compiles under the active Python interpreter.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "test_solution.py compiles under the active Python interpreter.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "solution.py contains definitions for both public parsing functions and a private helper.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)def parse_pairs\\b.*?def parse_pairs_legacy\\b.*?def _[A-Za-z_]\\w*\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "test_solution.py contains at least two unittest-style test method definitions.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(t)) >= 2'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The unittest discovery suite completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -c 'import ast; from pathlib import Path; t=ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(t)) >= 2'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named relative paths solution.py and test_solution.py are workspace-root-relative; either file may not exist yet and may be created.",
+    "The location and implementation details of the private helper are unspecified; the regex check treats any underscore-prefixed helper function in solution.py as the delegation helper, while code review must confirm both public functions delegate to it.",
+    "The existing signatures, return types, imports, and legacy-specific error behavior must be inferred from supplied workspace files because the request does not enumerate their exact forms.",
+    "The unittest suite is discoverable using the specified command from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=980; distinct_files=2; tests_requested=true; requirement_segments=19; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 34965,
+    "output_tokens": 1394,
+    "usd": 0.00284566
+  }
+}

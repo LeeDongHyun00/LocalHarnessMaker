@@ -1,0 +1,99 @@
+{
+  "task_summary": "Implement `unique` in `solution.py` and add standard-library `unittest` coverage in `test_solution.py` for ordinary, boundary, and empty inputs. Preserve first-occurrence order, case-sensitive equality, input immutability, and type hints; verify using unittest discovery.",
+  "constraints": [
+    "Work only in the supplied task workspace.",
+    "Use Python 3.11+ and the standard library.",
+    "Do not access parent repositories or external services.",
+    "Do not mutate input collections.",
+    "No algorithmic complexity constraint is imposed.",
+    "Retain all stated behavior and compatibility requirements."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "`solution.py` defines a `unique` function.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?m)^\\s*def\\s+unique\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "`test_solution.py` contains at least two unittest test methods.",
+      "check": {
+        "type": "command",
+        "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for c in ast.walk(tree) if isinstance(c, ast.ClassDef) and any((isinstance(b, ast.Name) and b.id == \"TestCase\") or (isinstance(b, ast.Attribute) and b.attr == \"TestCase\") for b in c.bases) for n in c.body) >= 2'",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "`unique` returns each string once in first-occurrence order, treats equality as case-sensitive, returns an empty list for empty input, and does not mutate its input collection.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read `solution.py` and `test_solution.py`. Assess whether the implementation and public tests visibly establish that `unique` returns distinct strings in first-occurrence order, uses case-sensitive equality, returns `[]` for empty input, and leaves its input collection unchanged. Do not infer behavior beyond what the files show."
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The implementation and tests maintain type hints.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read `solution.py` and `test_solution.py`. Assess whether the `unique` public API and relevant test declarations use appropriate Python type hints, without requiring a particular annotation spelling."
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The test module uses standard-library unittest and covers ordinary, boundary, and empty inputs.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read `test_solution.py`. Assess whether it uses the standard-library `unittest` framework and includes tests for ordinary inputs, boundary inputs, and empty input."
+      }
+    },
+    {
+      "id": "SC-6",
+      "description": "Unittest discovery completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for c in ast.walk(tree) if isinstance(c, ast.ClassDef) and any((isinstance(b, ast.Name) and b.id == \"TestCase\") or (isinstance(b, ast.Attribute) and b.attr == \"TestCase\") for b in c.bases) for n in c.body) >= 2'",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative paths in the supplied task workspace; the files may not exist yet and may be created.",
+    "The public API is a function named `unique` in `solution.py`, inferred from the request wording and file names.",
+    "The collection input type and exact signature are unspecified; use an appropriate type-hinted interface for strings without adding unsupported behavior.",
+    "The request permits either ordinary, boundary, and empty-input coverage or invalid-numeric-input coverage when no collection is accepted; assume `unique` accepts a collection and cover ordinary, boundary, and empty inputs.",
+    "The unittest discovery command is expected to discover `test_solution.py` from the workspace root."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=811; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17390,
+    "output_tokens": 919,
+    "usd": 0.00103498
+  }
+}

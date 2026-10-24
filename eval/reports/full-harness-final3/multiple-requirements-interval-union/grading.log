@@ -1,0 +1,7 @@
+test_boundaries_and_errors (test_private_be6c50c2f18e4e8d8bf59c97324b0215.PublicContract.test_boundaries_and_errors) ... ok
+test_input_preservation (test_private_be6c50c2f18e4e8d8bf59c97324b0215.PublicContract.test_input_preservation) ... ok
+test_ordinary (test_private_be6c50c2f18e4e8d8bf59c97324b0215.PublicContract.test_ordinary) ... ok
+test_public_regressions (test_private_be6c50c2f18e4e8d8bf59c97324b0215.PublicContract.test_public_regressions) ... ok
+test_variant_contract (test_private_be6c50c2f18e4e8d8bf59c97324b0215.PublicContract.test_variant_contract) ... ok
+Ran 5 tests in 0.002s
+OK

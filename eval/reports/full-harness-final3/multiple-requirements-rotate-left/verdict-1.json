@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+rotate\\s*\\(\n2: \n3: \n4: def rotate(items: list[int], steps: int) -> list[int]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(node, ast.FunctionDef) and node.name.startswith(\"test\") for node in ast.walk(tree)) >= 3'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_input (test_solution.RotateTests.test_empty_input) ... ok\ntest_left_rotation_modulo_length (test_solution.RotateTests.test_left_rotation_modulo_length) ... ok\ntest_negative_steps_rotate_right (test_solution.RotateTests.test_negative_steps_rotate_right) ... ok\ntest_values_order_and_input_are_preserved (test_solution.RotateTests.test_values_order_and_input_are_preserved) ... ok\ntest_zero_full_turns_and_singleton (test_solution.RotateTests.test_zero_full_turns_and_singleton) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: In solution.py, rotate’s docstring explicitly states each specification point and gives rotate([1, 2, 3], 4) → [2, 3, 1]. In test_solution.py, tests exercise positive modulo rotations, negative steps, empty input for zero/positive/negative steps, value and order preservation with duplicates, unchanged input and a distinct result, plus zero/full turns and singleton behavior.",
+      "reason": "The public rotate API docstring specifies left rotation modulo length, right rotation for negative steps, empty input returning [], and the stated example. Regression tests cover those behaviors and verify input immutability and collection order."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

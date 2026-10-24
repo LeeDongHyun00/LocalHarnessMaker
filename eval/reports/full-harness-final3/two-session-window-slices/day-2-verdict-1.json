@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+windows_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:\n11: def windows_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); methods = [n.name for c in tree.body if isinstance(c, ast.ClassDef) for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test_\")]; assert len(methods) >= 3 and any(\"batch\" in name.lower() for name in methods)'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?s)python -m unittest discover -v.*(passed|success|exit code 0)\n24: python -m unittest discover -v\n25: ```\n26: \n27: Observed result: all 12 tests passed (`Ran 12 tests in 0.003s`, `OK`), exit code 0.",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

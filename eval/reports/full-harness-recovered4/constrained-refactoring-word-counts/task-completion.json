@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "65595e7b0b6e1ac34020f45c767338120a2f9d0c8d0a10eccbbca9510fbb74c4",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered4/constrained-refactoring-word-counts/final-1.md",
+    "sha256": "d49d525d47e70196a3fbcb4d568cc7d5035c5ce7af2667445f2ddb80d3cc62b1"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

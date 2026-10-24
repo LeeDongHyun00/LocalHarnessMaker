@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "fae762ea69c2bb7d8d481a758cc9f75474bbcdb504121f3d1c0f12180a727c22",
+  "final_message": {
+    "path": "eval/reports/full-harness-final3/constrained-refactoring-ordinal-labels/final-1.md",
+    "sha256": "e9d063cb14350d56b13fa49458b6dc2a8ba08106dac2db419576bff277d2c2bf"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

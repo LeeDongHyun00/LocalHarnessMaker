@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def last_index\\b[^:]*:.*?\\\"\\\"\\\"(?=.*last)(?=.*index)(?=.*None)(?=.*case-sensitive)(?=.*mutat).+?\\\"\\\"\\\"\n4: def last_index(items: list[str], target: str) -> int | None:\n5:     \"\"\"Return the last zero-based index equal to target, or None if absent.\n6: \n7:     Empty input returns None. Matching is case-sensitive. This function does\n8:     not mutate input values or change collection order.\n9:     \"\"\"",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:def test_[A-Za-z0-9_]+\\s*\\(self[^)]*\\)\\s*:[^\\n]*\\n.*?){3}\n7:     def test_returns_last_matching_index(self):\n8:         self.assertEqual(last_index([\"a\", \"b\", \"a\", \"c\", \"a\"], \"a\"), 4)\n9:         self.assertEqual(last_index([\"a\", \"b\", \"a\", \"c\"], \"a\"), 2)\n10: \n11:     def test_returns_none_for_absent_target_and_empty_input(self):\n12:         self.assertIsNone(last_index([\"a\", \"b\"], \"c\"))\n13:         self.assertIsNone(last_index([], \"a\"))\n14: \n15:     def test_matching_is_case_sensitive(self):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_matching_is_case_sensitive (test_solution.LastIndexTests.test_matching_is_case_sensitive) ... ok\ntest_preserves_input_values_and_order (test_solution.LastIndexTests.test_preserves_input_values_and_order) ... ok\ntest_returns_last_matching_index (test_solution.LastIndexTests.test_returns_last_matching_index) ... ok\ntest_returns_none_for_absent_target_and_empty_input (test_solution.LastIndexTests.test_returns_none_for_absent_target_and_empty_input) ... ok\ntest_single_match_and_empty_string (test_solution.LastIndexTests.test_single_match_and_empty_string) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

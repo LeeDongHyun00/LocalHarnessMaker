@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_contiguous_windows (test_solution.WindowsTests.test_contiguous_windows) ... ok\ntest_empty_input (test_solution.WindowsTests.test_empty_input) ... ok\ntest_input_is_unchanged_and_windows_are_independent (test_solution.WindowsTests.test_input_is_unchanged_and_windows_are_independent) ... ok\ntest_nonpositive_size_preserves_error_and_input (test_solution.WindowsTests.test_nonpositive_size_preserves_error_and_input) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py",
+      "reason": "required file exists"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)def test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:.*?def test_[A-Za-z0-9_]+\\s*\\([^)]*\\)\\s*:\n7:     def test_contiguous_windows(self):\n8:         for function in (windows, windows_legacy):\n9:             for size, expected in (\n10:                 (1, [[1], [2], [3], [4]]),\n11:                 (2, [[1, 2], [2, 3], [3, 4]]),\n12:                 (4, [[1, 2, 3, 4]]),\n13:                 (5, []),\n14:             ):\n15:                 with self.subTest(function=function.__name__, size=size):\n16:                     result = function([1, 2, 3, 4], size)",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+windows\\s*\\(|^\\s*def\\s+windows_legacy\\s*\\(\n8: \n9: \n10: def windows(items: list[int], size: int) -> list[list[int]]:\n12: \n13: \n14: def windows_legacy(items: list[int], size: int) -> list[list[int]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+_[A-Za-z0-9_]+\\s*\\(\n2: \n3: \n4: def _windows(items: list[int], size: int) -> list[list[int]]:",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

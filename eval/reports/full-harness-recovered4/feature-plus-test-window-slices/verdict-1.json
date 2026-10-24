@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?s)def\\s+\\w+\\s*\\([^)]*\\)\\s*->\\s*[^:]+:\n4: def windows(items: list[int], size: int) -> list[list[int]]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?:class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\)\\s*:\\s*.*?def\\s+test_\\w+\\s*\\(|def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:[\\s\\S]*?def\\s+test_\\w+\\s*\\(self[^)]*\\)\\s*:)\n8: class WindowsTests(unittest.TestCase):\n9:     def test_overlapping_windows(self) -> None:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_boundary_sizes (test_solution.WindowsTests.test_boundary_sizes) ... ok\ntest_empty_input (test_solution.WindowsTests.test_empty_input) ... ok\ntest_input_unchanged_and_windows_independent (test_solution.WindowsTests.test_input_unchanged_and_windows_independent) ... ok\ntest_nonpositive_sizes (test_solution.WindowsTests.test_nonpositive_sizes) ... ok\ntest_overlapping_windows (test_solution.WindowsTests.test_overlapping_windows) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

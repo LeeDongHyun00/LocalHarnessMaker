@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: def\\s+words_many\\s*\\(\\s*cases\\s*:\\s*list\\s*\\[\\s*tuple\\s*\\]\\s*\\)\\s*->\\s*list\\s*:\n13: def words_many(cases: list[tuple]) -> list:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)(?=(?:.*?\\bdef\\s+test_[A-Za-z0-9_]+\\s*\\(\\s*self\\s*\\)\\s*:){3})(?=.*\\bdef\\s+test_[A-Za-z0-9_]*batch[A-Za-z0-9_]*\\s*\\(\\s*self\\s*\\)\\s*:).*\n1: \"\"\"Public regression tests for word counting.\"\"\"\n2: \n3: import unittest\n4: from unittest.mock import call, patch\n5: \n6: from solution import words, words_many\n7: \n8: \n9: class WordsTests(unittest.TestCase):\n10:     def test_counts_repeated_words(self):",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_batch_empty (test_solution.WordsManyTests.test_batch_empty) ... ok\ntest_batch_preserves_order_and_inputs (test_solution.WordsManyTests.test_batch_preserves_order_and_inputs) ... ok\ntest_batch_propagates_first_exception_unchanged (test_solution.WordsManyTests.test_batch_propagates_first_exception_unchanged) ... ok\ntest_batch_unpacks_positional_arguments_without_mutation (test_solution.WordsManyTests.test_batch_unpacks_positional_arguments_without_mutation) ... ok\ntest_casefolds_unicode (test_solution.WordsTests.test_casefolds_unicode) ... ok\ntest_counts_repeated_words (test_solution.WordsTests.test_counts_repeated_words) ... ok\ntest_empty_and_whitespace_only (test_solution.WordsTests.test_empty_and_whitespace_only) ... ok\ntest_input_is_unchanged_and_results_are_independent (test_solution.WordsTests.test_input_is_unchanged_and_results_are_independent) ... ok\ntest_preserves_punctuation (test_solution.WordsTests.test_preserves_punctuation) ... ok\ntest_splits_arbitrary_whitespace (test_solution.WordsTests.test_splits_arbitrary_whitespace) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.002s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "path: HANDOFF.md; pattern: (?is)(python\\s+-m\\s+py_compile\\s+solution\\.py|python\\s+-m\\s+unittest\\s+discover\\s+-v)(?=.*\\b(?:exited|exit(?:\\s+code)?|result|passed)\\b).*\n18: python -m py_compile solution.py\n19: python -m unittest discover -v\n20: ```\n21: \n22: Day 2 adds `words_many(cases: list[tuple]) -> list`, which calls\n23: `words(*case)` sequentially and returns results in case order. Empty input\n24: returns `[]`. Exceptions propagate unchanged and stop further calls. The wrapper\n25: does not modify cases or their arguments. The Day 1 `words` API is unchanged.\n26: \n27: Added four batch tests covering ordering, empty input, unchanged inputs,",
+      "reason": "pattern matched"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

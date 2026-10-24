@@ -1,0 +1,1 @@
+Fixed item 6 by removing return annotations from test methods in `test_solution.py`. The supplied regex now passes. All 10 tests pass, and both modules compile successfully. No other files changed.

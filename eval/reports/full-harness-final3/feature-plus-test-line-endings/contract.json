@@ -1,0 +1,75 @@
+{
+  "task_summary": "Implement normalize in solution.py and add standard-library unittest coverage in test_solution.py for ordinary, boundary, and empty inputs, following the specified newline behavior and compatibility requirements.",
+  "constraints": [
+    "Work only in the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Maintain type hints and do not mutate input collections.",
+    "Normalize CRLF and lone CR to LF while preserving existing LF, all other characters, and the number of line breaks; do not strip trailing newlines.",
+    "Include at least two passing unittest methods that exercise the public API.",
+    "Verify with unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The normalize implementation is present in solution.py.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "def\\s+normalize\\s*\\("
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "The implementation converts CRLF and lone CR to LF, preserves other characters and trailing newlines, and maintains type hints without mutating input collections.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and assess whether normalize has type hints, converts CRLF and lone CR to LF, preserves existing LF and all other characters including trailing newlines, and avoids mutating input collections. Do not infer or require unspecified API details."
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py defines at least two unittest test methods exercising the public normalize API.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*unittest\\.TestCase[^)]*\\).*?def\\s+test_\\w+\\s*\\(.*?def\\s+test_\\w+\\s*\\("
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest suite passes under the requested discovery command.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The requested relative filenames are interpreted as workspace-root paths: solution.py and test_solution.py.",
+    "solution.py and test_solution.py may not exist yet and may be created.",
+    "The public API consists of a function named normalize in solution.py; the specific input and return types are unspecified.",
+    "The test suite is discoverable from the workspace root using the requested unittest discovery command.",
+    "The request does not specify invalid numeric behavior, so the tests will cover ordinary, boundary, and empty inputs if the API accepts a collection."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=851; distinct_files=2; tests_requested=true; requirement_segments=15; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17399,
+    "output_tokens": 556,
+    "usd": 0.0020179
+  }
+}

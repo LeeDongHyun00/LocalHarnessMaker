@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "path: solution.py; pattern: (?m)^\\s*def\\s+unique\\s*\\(\n2: \n3: \n4: def unique(items: list[str]) -> list[str]:",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for c in ast.walk(tree) if isinstance(c, ast.ClassDef) and any((isinstance(b, ast.Name) and b.id == \"TestCase\") or (isinstance(b, ast.Attribute) and b.attr == \"TestCase\") for b in c.bases) for n in c.body) >= 2'\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "llm_judge: In `solution.py`, `unique` iterates through `items`, adds unseen strings to a set, and appends them to `result`, establishing distinct values in first-occurrence order; the set’s string equality is case-sensitive. It returns `result` without modifying `items`. In `test_solution.py`, tests cover order and duplicates, case-sensitive `\"A\"`/`\"a\"`, empty input returning `[]`, and unchanged input collections.",
+      "reason": "Both the implementation and public tests visibly establish all required behaviors of unique."
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` annotates `unique(items: list[str]) -> list[str]`, with `seen: set[str]` and `result: list[str]`. In `test_solution.py`, each test method declares `-> None`, and relevant values such as `items`, `original`, `result`, and `cases` have types.",
+      "reason": "The public `unique` API and relevant test declarations use appropriate type hints."
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: In test_solution.py, `import unittest`, `UniqueTests(unittest.TestCase)`, and `unittest.main()` establish unittest usage. `test_preserves_first_occurrence_order_and_input` and `test_equality_is_case_sensitive` cover ordinary inputs; `test_boundary_inputs` covers singleton, repeated, empty-string, and all-distinct cases; `test_empty_input` explicitly checks an empty list.",
+      "reason": "The test module uses standard-library unittest and covers ordinary, boundary, and empty inputs."
+    },
+    {
+      "id": "SC-6",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_boundary_inputs (test_solution.UniqueTests.test_boundary_inputs) ... ok\ntest_empty_input (test_solution.UniqueTests.test_empty_input) ... ok\ntest_equality_is_case_sensitive (test_solution.UniqueTests.test_equality_is_case_sensitive) ... ok\ntest_preserves_first_occurrence_order_and_input (test_solution.UniqueTests.test_preserves_first_occurrence_order_and_input) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK",
+      "reason": "command matched expected result"
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "30196c9b0bf71e86a38b340a97e3f0b33c53e74d4096064897359c1a8dd51dae",
+  "final_message": {
+    "path": "eval/reports/full-a-final3/bug-fix-common-prefix/final-1.md",
+    "sha256": "ea1b4323a3919d2834dced76fc5170c9b226df593bb5dc9b1aa7cae8318b5150"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

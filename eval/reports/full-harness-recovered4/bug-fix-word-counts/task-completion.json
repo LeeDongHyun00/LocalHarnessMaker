@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "b513620192e0339ab39c853b27796761c17fe2f0cb002bebb6fc343d1ee0f941",
+  "final_message": {
+    "path": "eval/reports/full-harness-recovered4/bug-fix-word-counts/final-1.md",
+    "sha256": "2f6bfce47325d08c01d4b3af27cda9aa1d3f023b4e1048d67216c1fc763f93b0"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

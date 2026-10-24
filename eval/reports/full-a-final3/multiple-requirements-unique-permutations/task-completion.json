@@ -1,0 +1,14 @@
+{
+  "extractor": "verifier/claims.py:claimed_criteria + task-scope-adapter-v1",
+  "extractor_sha256": "cdc44cd33f04eaabcd6af262d526fb5579ba4b8bb306cde2dc07c4caec07c2e0",
+  "adapter_sha256": "a27ffb282b2984ccb9ba44e16a465bb747ecdd5cbdb1ce95fb20f35fe68809b5",
+  "source_segment": 1,
+  "source_events_sha256": "a503d1f45b46ed9f289dae7d62ddd0ad3b8bc317eab24422cfda82a5495937cb",
+  "final_message": {
+    "path": "eval/reports/full-a-final3/multiple-requirements-unique-permutations/final-1.md",
+    "sha256": "3094a399cf97dcab67254a6d3f654cc079b71dcfa9e959fb7a3d75bcb6b0bedf"
+  },
+  "claimed_complete": false,
+  "claim_evidence": [],
+  "undefined_reason": null
+}

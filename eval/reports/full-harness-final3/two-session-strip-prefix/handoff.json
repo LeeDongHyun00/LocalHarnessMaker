@@ -1,0 +1,39 @@
+{
+  "done": [
+    {
+      "criterion_id": "SC-1",
+      "artifact": "`solution.py` compiled successfully (`python -m py_compile solution.py`, exit 0)."
+    },
+    {
+      "criterion_id": "SC-2",
+      "artifact": "`python -m unittest discover -v` passed all 7 tests."
+    },
+    {
+      "criterion_id": "SC-3",
+      "artifact": "`test_solution.py` contains 7 unittest methods; the criterion check exited 0."
+    },
+    {
+      "criterion_id": "SC-4",
+      "artifact": "`HANDOFF.md` contains the phrase “design decisions” and the requested verification command."
+    }
+  ],
+  "remaining": [],
+  "decisions": [
+    {
+      "what": "Kept the signature `strip_prefix(text: str, prefix: str) -> str` and used `str.removeprefix` to remove one literal prefix.",
+      "why": "It preserves the requested behavior for matching, nonmatching, empty, and repeated prefixes."
+    },
+    {
+      "what": "Added regression cases for matching, nonmatching, empty, repeated, character-set, full-match, empty-text, and Unicode inputs.",
+      "why": "These exercise the public API and guard against the specified edge cases."
+    }
+  ],
+  "verify_commands": [
+    "python -m py_compile solution.py",
+    "python -m unittest discover -v",
+    "python -c 'import ast; from pathlib import Path; tree = ast.parse(Path(\"test_solution.py\").read_text()); assert sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith(\"test\") for n in ast.walk(tree)) >= 3'"
+  ],
+  "do_not_touch": [
+    "Do not access parent repositories or external services; work only in the supplied task workspace."
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "task_summary": "Repair the contiguous-window behavior in solution.py, document its public specification in a docstring, and add regression tests in test_solution.py.",
+  "constraints": [
+    "Work only in the supplied task workspace; edit solution.py and public tests.",
+    "Use Python 3.11+ and the standard library; do not access parent repositories or external services.",
+    "Preserve input values and collection order; do not mutate input collections.",
+    "Maintain type hints. No algorithmic complexity constraint is imposed.",
+    "Return every contiguous window of exactly size, advancing by one; raise ValueError when size <= 0; return [] when size exceeds the input length.",
+    "test_solution.py must contain at least three passing unittest test methods exercising the public API.",
+    "Verify using unittest discovery."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "The repaired solution module compiles.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "solution.py contains a public specification docstring.",
+      "check": {
+        "type": "regex",
+        "path": "solution.py",
+        "pattern": "(?s)(?:def\\s+\\w+\\s*\\([^)]*\\)[^:]*:\\s*(?:\\n\\s*)?[\"'][\"'][\"']|def\\s+\\w+\\s*\\([^)]*\\)[^:]*:\\s*(?:\\n\\s*)?[\"']{3}.*?(?:contiguous|window|size).*?[\"']{3})"
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "test_solution.py contains at least three unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)(?:def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:.*?){3}"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The named files are relative to the supplied task workspace; solution.py and test_solution.py may not exist yet and may be created.",
+    "The public API name and signature are unspecified; the regression tests should exercise the API defined or preserved in solution.py.",
+    "The public specification docstring should document the stated window behavior, size validation, and size-exceeds-length result.",
+    "The unittest suite is discoverable using the specified `python -m unittest discover -v` command."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=827; distinct_files=2; tests_requested=true; requirement_segments=16; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17405,
+    "output_tokens": 569,
+    "usd": 0.00067716
+  }
+}

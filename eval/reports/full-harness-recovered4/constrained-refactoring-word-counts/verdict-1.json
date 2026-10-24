@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "SC-1",
+      "status": "pass",
+      "evidence": "command: python -m py_compile solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-2",
+      "status": "pass",
+      "evidence": "command: python -m py_compile test_solution.py\nexit: 0\nstdout (last 50 lines):\n(empty)",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-3",
+      "status": "pass",
+      "evidence": "path: test_solution.py; pattern: (?s)class\\s+\\w+\\s*\\([^)]*TestCase[^)]*\\)\\s*:[\\s\\S]*?def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:\n7: class WordsTests(unittest.TestCase):\n8:     def test_whitespace_casefold_and_punctuation(self):\n9:         text = \"  Straße\\tSTRASSE\\nHello,\\r\\nHELLO,\\vhello\\fword!\\u2003WORD!  \"\n10:         expected = {\"strasse\": 2, \"hello,\": 2, \"hello\": 1, \"word!\": 2}\n11:         for function in (words, words_legacy):\n12:             with self.subTest(function=function.__name__):\n13:                 result = function(text)\n14:                 self.assertIs(type(result), dict)\n15:                 self.assertEqual(result, expected)\n16: ",
+      "reason": "pattern matched"
+    },
+    {
+      "id": "SC-4",
+      "status": "pass",
+      "evidence": "command: python -m unittest discover -v\nexit: 0\nstdout (last 50 lines):\n(empty)\nstderr (last 50 lines):\ntest_empty_text (test_solution.WordsTests.test_empty_text) ... ok\ntest_input_unchanged_and_results_independent (test_solution.WordsTests.test_input_unchanged_and_results_independent) ... ok\ntest_original_invalid_input_errors_and_collection_immutability (test_solution.WordsTests.test_original_invalid_input_errors_and_collection_immutability) ... ok\ntest_public_signatures_and_keyword_calls (test_solution.WordsTests.test_public_signatures_and_keyword_calls) ... ok\ntest_whitespace_casefold_and_punctuation (test_solution.WordsTests.test_whitespace_casefold_and_punctuation) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK",
+      "reason": "command matched expected result"
+    },
+    {
+      "id": "SC-5",
+      "status": "pass",
+      "evidence": "llm_judge: `solution.py` defines `_count_words(text: str) -> dict[str, int]`, which builds a new dict from `text.split()` tokens after casefolding; both `words` and `words_legacy` return `_count_words(text)`. `test_solution.py` checks whitespace/casefold/punctuation behavior, empty and whitespace-only inputs, input immutability and independent results, invalid-input `AttributeError`, argument-count `TypeError`, and public signature annotations. Imports/public names are limited to the visible source and tests: the tests import `words` and `words_legacy` from `solution`.",
+      "reason": "Both public functions delegate to the single private `_count_words` helper. Their signatures and `dict[str, int]` return annotations are preserved; the tests check keyword calls, missing/extra arguments, and `AttributeError` behavior on invalid inputs. The helper uses `split()` for arbitrary whitespace, `casefold()` per token, and leaves punctuation intact; it returns a fresh empty mapping for empty input. The implementation does not mutate its input, and tests check input and result independence."
+    }
+  ],
+  "overall": "pass",
+  "reinstruct_message": null,
+  "attempt": 1
+}

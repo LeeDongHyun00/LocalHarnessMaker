@@ -1,0 +1,99 @@
+{
+  "task_summary": "Refactor `words` and `words_legacy` in `solution.py` to delegate their shared algorithm to one private helper, and update public tests to verify the specified behavior and compatibility requirements.",
+  "constraints": [
+    "Work only within the supplied task workspace; do not access parent repositories or external services.",
+    "Use Python 3.11+ and the standard library.",
+    "Preserve both public signatures, return types, error behavior, input immutability, imports, and public names.",
+    "Tokenize on arbitrary whitespace, casefold each token, retain punctuation as part of tokens, and return `{}` for empty or whitespace-only text.",
+    "Maintain type hints and do not mutate input collections.",
+    "`test_solution.py` must contain at least two passing `unittest` test methods exercising the public API.",
+    "No algorithmic complexity constraint is imposed."
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "`solution.py` compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-2",
+      "description": "`test_solution.py` compiles successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m py_compile test_solution.py",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-3",
+      "description": "The public test file contains at least two unittest test methods.",
+      "check": {
+        "type": "regex",
+        "path": "test_solution.py",
+        "pattern": "(?s)class\\s+\\w+\\s*\\([^)]*TestCase[^)]*\\)\\s*:[\\s\\S]*?def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:[\\s\\S]*?def\\s+test_\\w+\\s*\\([^)]*\\)\\s*:"
+      }
+    },
+    {
+      "id": "SC-4",
+      "description": "The unittest discovery command completes successfully.",
+      "check": {
+        "type": "command",
+        "command": "python -m unittest discover -v",
+        "expected": {
+          "exit_code": 0
+        }
+      }
+    },
+    {
+      "id": "SC-5",
+      "description": "The implementation uses one private helper for the shared algorithm, while preserving the public API and the requested token counting behavior, type hints, error behavior, and input immutability.",
+      "check": {
+        "type": "llm_judge",
+        "rubric": "Read solution.py and test_solution.py. Assess whether words and words_legacy delegate their shared algorithm to one private helper; both public signatures, return types, error behavior, imports, and public names remain compatible; type hints are maintained; inputs are not mutated; and token counting splits on arbitrary whitespace, casefolds each token, preserves punctuation within tokens, and returns an empty mapping for empty or whitespace-only text. Assess only content visible in these files."
+      }
+    }
+  ],
+  "verification": [
+    {
+      "command": "python -m py_compile solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m py_compile test_solution.py",
+      "expected": {
+        "exit_code": 0
+      }
+    },
+    {
+      "command": "python -m unittest discover -v",
+      "expected": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "stop_conditions": [],
+  "assumptions": [
+    "The supplied workspace is the relative-path root for `solution.py` and `test_solution.py`; those files may not exist yet and may be created.",
+    "Because no current signatures or error cases are supplied, preserving their exact signatures, return types, error behavior, and import compatibility requires deriving them from the files and tests present in the supplied workspace.",
+    "The requested unittest discovery command is expected to discover the public suite using Python's default discovery rules."
+  ],
+  "reasoning_effort": {
+    "value": "xhigh",
+    "rationale": "effort-v1: utf8_byte_bound=883; distinct_files=2; tests_requested=true; requirement_segments=17; score=6"
+  },
+  "cost_estimate": {
+    "input_tokens": 17407,
+    "output_tokens": 726,
+    "usd": 0.00075586
+  }
+}
