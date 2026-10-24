@@ -1,5 +1,11 @@
 ## Done
 
+- Implemented the user-approved frozen-v3 requirements and claim-audit CLIs with strict v1 prompts, native gpt-6-luna/low pin enforcement, atomic artifacts, one-shot phase allocations, code-owned derivation, verified citations, stale audits and visible-answer recording; preserved historical operations (.venv/bin/python -m pytest tests/controller -q: 405 passed in 6.86s).
+- Added mocked regressions for every emitted public artifact, unsafe absolute/parent/symlink paths, shell syntax and partial excerpts, configured test/signature/input baselines, schema-invalid output, exact accounting, native failures/timeouts, pin mismatch/disablement, duplicate calls, stale audits and atomic replacement (.venv/bin/python -m pytest tests/controller -q: 405 passed in 6.86s).
+- Authored two 40-request calibration sets from explicitly allowed public v1/v2 prompt excerpts and authored variants: 302 expected rows and 20 expected questions per set; recorded dated pending evidence with null live precision/recall and separately labeled synthetic scorer validation (.venv/bin/python -m pytest tests/controller -q: 405 passed in 6.86s, including fixture/scorer/preview tests).
+- Added controller.measure_v3 with offline saved-response scoring, pin-gated host calls and pre-call planning estimates; both previews refused calls at 40 maximum generations / planning USD 0.048000 per phase (.venv/bin/python -m controller.measure_v3 --phase requirements --out /tmp/v3-requirements-preview.json and --phase claim-audit --out /tmp/v3-claim-audit-preview.json: each exit 1, No calls).
+- Added controller/README.md documenting v3 entry points, conservative check configuration/grammar, Python signature serialization and historical CLIs; updated CHANGES and this handoff without staging or committing (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
+
 - Added construction-time HARNESS_CONTROL_TIMEOUT_SECONDS overrides for codex_cli/cheap_api, finite-positive validation and effective timeout_seconds in control_call logs; preserved config, local deadlines, hook budgets, prompts, routing and output artifacts (.venv/bin/python -m pytest tests/controller -q: 344 passed in 14.15s).
 - Added one control_failure JSON diagnostic per timed-out call with reason=deadline, timeout_seconds, model and backend; covered CLI partial/null usage, urllib/direct HTTP timeouts, stderr, non-timeout classification and honest exit 2 after successful fallback with unknown accounting (.venv/bin/python -m pytest tests/controller -q: 344 passed in 14.15s).
 - Documented the capacity-only change, invalid-override policy and host verification limits in controller/CHANGES.md; no evaluation tasks, live calls or nested Codex were accessed (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
@@ -56,20 +62,18 @@
 
 ## Remaining
 
-- First priority, pending host verification of the capacity parameter: run controller calls with HARNESS_CONTROL_TIMEOUT_SECONDS unset and with a host-selected larger value; verify transport deadlines, control_call.timeout_seconds and one control_failure line per deadline failure, including null usage and missing fallback credentials. Verify HTTP timeout/fallback and unchanged independent plugin hook budgets. Network, nested codex exec, live model calls and macOS sandbox-exec are unavailable here and were not attempted. Do not read or tune from eval/tasks/ or eval/tasks-v2/; decision 0008 remains in force.
-
-- Pending host judge calibration: Claude runs the approved v1/v2 batches on identical fixtures/settings with distinct output files: `.venv/bin/python -m controller.measure_judge --prompt-version v1 --out /tmp/judge-before-v1.json --i-have-approval` and `.venv/bin/python -m controller.measure_judge --prompt-version v2 --out /tmp/judge-after-v2.json --i-have-approval`. Each is at most 24 CLI generations, planning estimate USD 0.052800 (both: 48 generations / USD 0.105600; not caps). Compare accuracy, expected-status confusion matrix, errors, hashes, latency and cost; inspect false fails and file-decidable unverifiable results. No live accuracy improvement is established yet. Network, nested Codex and macOS sandbox-exec remain unavailable and were not attempted.
-
-- Pending host verification of this session's v3 changes: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production-v3.json --i-have-approval` and harness smoke using the host/main checkout after integration. Inspect removed-criterion assumptions, contract_check_gate logs, target stops and file-only judge rubrics. Network, nested Codex, live model calls and macOS sandbox-exec are unavailable here and were not attempted.
-
-- Pending host verification of degraded acceptance with live models and plugin/evaluation integration; network, nested codex exec and macOS sandbox-exec are unavailable here and were not attempted.
-- Pending revised production-pipeline measurement, D-4: Claude reruns `.venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4-production.json --i-have-approval` on the host. The preview prints 90 maximum CLI generations and estimated API-equivalent USD 0.198000 before any calls. Compare both preserved evidence files above; the old post-v2 adapter failures are not evidence of production retry failure. Inspect per-sample quality_gate_fired/generations and total quality_gate_firings/generations/usd. HTTP is deliberately disabled even with a key; local comparison is dropped. Live prompt v3 quality, SC-1/SC-2, SC-4 targets and SC-5 semantic injection resistance remain pending.
-- Pending host verification: configured HTTP fallback with an environment key, production hook guard and retry-budget integration under the 35 s deadlines, and Role 2's 120 s handoff budget. The three primary codex_cli commands and live contract/handoff demo are already completed host checks, as recorded in Done. Network, nested Codex, live model calls and macOS sandbox-exec are unavailable here and were not attempted.
-- Pending host verification, D-1: measure API-equivalent control cost against an executor baseline and empirically calibrate effort v1 from task outcomes. Existing thresholds have only synthetic/fixture calibration; no exact tokenizer dependency is presently needed.
-- D-2 library population requires verified, permitted provenance; do not gather executor/paid-model output for training without the STOP-C3 terms review. The curated seed library is intentionally empty.
-- Before merge: run the full repository suite once in a coordinated host session and verify packaging resources if wheel installation is required. Only controller tests were run here; no staging or commit was performed and .git was read-only.
+- First priority, pending host verification: integrate the frozen-v3 controller commands with Roles 2/4 using a real SessionStart pin-check and exact session artifact path. Verify native model metadata visibility, pin/pricing snapshot format/reference, disabled-pin advisories, no retries, schema/runtime cross-artifact validation and the hook-owned two-call budget. Missing native identity must fail closed. Confirm Role 4 uses controller.v3_checks.signature_bytes-compatible baseline serialization before enabling configured signature checks.
+- Pending host calibration: after reporting/approving the batch estimate, run `.venv/bin/python -m controller.measure_v3 --phase requirements --out /tmp/v3-requirements-host.json --live --pin-check SESSION/pin-check.json --i-have-approval` and the corresponding `--phase claim-audit` command with a distinct output file. Each phase is at most 40 calls / planning USD 0.048000; both are 80 calls / USD 0.096000, not caps. Record live row/question/claim/citation precision and recall, misses, accounting and latency in controller/evidence/. Current dated evidence is explicitly pending; synthetic scorer round trips do not establish model quality.
+- Pending host verification: HARNESS_CONTROL_TIMEOUT_SECONDS unset and with a host-selected positive value; native success/failure/timeout accounting, unknown usage, sub-ten-second call target and combined cost versus executor denominator. Network, nested Codex, live model calls and macOS sandbox-exec were unavailable and were not attempted here.
+- Before merge, coordinate one full repository suite and two non-evaluation hook smokes on the host. Source-tree controller tests pass; wheel resource packaging and production plugin/report integration remain unverified. Historical v1/v2 measurements remain retained history and are not v3 deliverables.
 
 ## Decisions
+
+- Implement the exact two new CLI operations supplied by the user: their explicit 2026-10-25 freeze/authorization supersedes stale proposed-status prose while Role 1 updates shared documents concurrently.
+- Isolate v3 from historical routing: one pinned CLI invocation per phase, no regeneration/fallback, durable allocation before invocation and schema-valid accounting for actual calls; the hook still owns the session budget.
+- Derive executable authority from original request clauses and explicit trusted configuration: partial model excerpts cannot sanitize commands or hide forged citation hashes; unavailable oracles remain unverifiable.
+- Use permitted public prompt excerpts plus authored ambiguity/adversarial variants: the user's explicit calibration exception supersedes older independent-only restrictions for these public prompt files, without permitting grader or evaluation implementation access.
+- Retain the entries below as historical v1/v2 decisions: they do not activate historical retries, fallback, effort selection or llm_judge on the v3 hook path.
 
 - Add only the user-authorized control capacity override and timeout diagnostics: decision 0008 prohibits contract-generation changes informed by version 2 results; no prompts, routing, budgets, schemas, CLI flags or output artifacts changed.
 - Snapshot HARNESS_CONTROL_TIMEOUT_SECONDS separately for each cloud backend at construction and reject explicitly invalid values as input errors: prevent silent fallback to 35 seconds while preserving configured defaults when unset and leaving persistent config/parent environment unchanged.
@@ -106,6 +110,12 @@
 
 ## Verify commands
 
+- Completed offline: `.venv/bin/python -m pytest tests/controller -q` (405 passed in 6.86s).
+- Completed whitespace: `git diff --check -- controller tests/controller state/STATUS-controller.md` (exit 0).
+- Completed no-call previews: `.venv/bin/python -m controller.measure_v3 --phase requirements --out /tmp/v3-requirements-preview.json` and `--phase claim-audit --out /tmp/v3-claim-audit-preview.json` (each exit 1; 40 calls / planning USD 0.048000; no calls).
+- Pending host: both v3 live measurement commands in Remaining, two hook smokes and one coordinated full repository suite.
+- Commands below are historical retained verification notes; no historical measurement was rerun this session.
+
 - Completed offline: .venv/bin/python -m pytest tests/controller -q (344 passed in 14.15s).
 - Completed whitespace check: git diff --check -- controller tests/controller state/STATUS-controller.md (exit 0).
 - Pending host: controller CLI/HTTP calls with unset and host-selected HARNESS_CONTROL_TIMEOUT_SECONDS, real deadline diagnostics/fallback and independent plugin hook-budget enforcement; network, nested Codex, live models and macOS sandbox-exec were not attempted here.
@@ -125,18 +135,24 @@
 
 ## Do not touch
 
-- eval/tasks/ and eval/tasks-v2/ are both forbidden reads; this capacity-only session must not alter prompts, routing, generation behavior, output artifacts or plugin hook budgets based on evaluation results.
+- Read only explicitly permitted public eval/tasks/**/prompt.md and eval/tasks-v2/**/prompt.md when needed for the approved calibration provenance. Do not read task implementations, graders, evaluation runner/reports or held-out v3 material. Historical capacity-only restrictions below describe earlier sessions.
 
 - Keep tests/controller/fixtures/judge-calibration labels outside model input, including their label-bearing paths. The local .gitignore exception preserves the synthetic node_modules omission fixture; it is not an installed dependency.
 
 - Shared schemas/, root configuration, prompts/, verifier/, eval/, plugin/, other roles' tests/status and concurrent user/role changes; ownership is controller/, tests/controller/ and this STATUS file.
-- eval/tasks/ is forbidden reading; do not tune against the evaluation set.
+- Public prompt permission is limited to the user-approved v1/v2 calibration. Do not tune against held-out v3 outcomes or access any private grader path.
 - .git is read-only in this session; do not stage, commit, rewrite history or delete files.
 - Do not run network/live models, nested Codex or macOS sandbox-exec in this environment; all such checks are pending host verification.
 - No verifier imports, new shared fields/interfaces, secrets in files, paid batches of ten or more without an estimate, or model-output training data without terms review.
 - Keep local.enabled=false and retain version 1 fail-closed behavior; D-3/D-5 are dropped and local must never become a hidden fallback.
 
 ## Assumptions
+
+- Current session: the user explicitly froze v3 and authorized the two CLI shapes; old proposed-status prose is stale pending Role 1 publication. No shared schema, CLI specification or hook wire field was edited here.
+- Current session: calibration uses allowed public v1/v2 request excerpts and authored variants; only public prompt.md files were read, never graders or task implementation. Older unread-evaluation statements below refer to previous sessions.
+- Current session: exact-excerpt configuration bindings assert oracle coverage; only supported Python signature extraction/command grammar is available. Unsupported or ambiguous requests remain unavailable. SessionStart supplies pin evidence, hooks supply actual visible answers and deterministic verdicts.
+- Current session: only primary codex_cli is exposed by the requested operations; historical HTTP fallback is excluded. Pin snapshot rates must match controller/prices.yaml. Source-tree tests cannot establish installed resources or live native-record visibility.
+- Current session: all transports were mocked; no network, nested Codex, live models, macOS sandbox-exec, staging, commits or PR creation occurred. CHANGES supplies the reviewable change summary and Assumptions. Older notes below are retained history.
 
 - An explicitly set empty/malformed/nonpositive/nonfinite timeout override is an input error (exit 1); only unset uses the configured deadline. Positive fractional/scientific numeric strings are accepted. Host callers choose their capacity value; the documented 120 seconds is an example, not a measured recommendation.
 - control_failure follows the existing prefix-plus-JSON stderr convention, using reason=deadline and timeout_seconds; one line is emitted per timed-out call, including calls with partial usage or later successful fallback. No new shared schema/CLI/hook field was introduced.

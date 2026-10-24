@@ -1,3 +1,63 @@
+# Frozen v3 hook operations — 2026-10-25
+
+Added the user-approved `controller requirements` and `controller claim-audit`
+entry points, strict v1 extraction prompts, code-owned checks and IDs, native
+model pin enforcement, atomic artifacts and schema-valid accounting. The new
+path makes one gpt-6-luna low-effort CLI invocation per phase, with no retry,
+regeneration or fallback. A session lock and durable phase allocation prevent
+duplicate events from spending another call. Every nested child retains the
+copied-environment HARNESS_NESTED=1 guard.
+
+Pin evidence is checked before calls. Native identity missing/mismatch records
+pin_mismatch, disables later Luna work and exits 2 with an unavailable artifact.
+Failures and timeouts retain known usage priced from the pinned snapshot;
+unknowns stay null. Measured backend latency and existing control_call/deadline
+logs are reused with HARNESS_CONTROL_TIMEOUT_SECONDS. Failed calls are not
+retried. Schema-invalid output and invented excerpts fail without regeneration.
+
+Check derivation accepts exact request-named files/commands, protected-file
+baselines and configured behavior/constraint/test oracles, Python signature
+snapshots and fixture immutability probes. Original source clauses are parsed
+in code so safe partial model excerpts cannot hide shell operators or absolute
+paths. Unsupported/ambiguous cases are unavailable with a reason. Claim paths,
+hashes and citation excerpts are verified in code; a shortened citation cannot
+hide a forged hash in the original final response. Audit opinions never produce
+deterministic pass/fail or repair. Changed final messages retain stale audits.
+Visible answers can be recorded without another provider call.
+
+Each calibration set contains 40 requests (20 public-v1-derived and 20 public-v2-
+derived), 302 expected rows and 20 expected questions, plus authored claims and
+citation/injection/ambiguity variants. Only explicitly permitted public prompt
+files were read. Measurement previews show 40 maximum calls / planning USD 0.048
+per phase; no live calls ran. Dated evidence contains null live precision/recall
+and separately labeled scorer round-trip validation. Row span/kind and question
+concept-anchor scores are lexical measures, not semantic-quality proof.
+
+Historical contract/judge/handoff operations and tests remain compatible.
+controller/README.md documents the new entry points, configuration, conservative
+command grammar, signature serialization and integration requirements.
+
+Validation: `.venv/bin/python -m pytest tests/controller -q` returned
+`405 passed in 6.86s`; exact command results are retained in
+state/STATUS-controller.md. Live pin/version/pricing compatibility, native log
+identity visibility, accuracy, latency/cost targets and hook integration remain
+pending host verification. The full repository suite remains a coordinated
+pre-merge host check. No staging or commit was performed.
+
+## Assumptions
+
+- The user's explicit 2026-10-25 freeze and CLI authorization supersede older
+  proposed-status prose while Role 1 publishes concurrent shared updates.
+- The user explicitly authorizes calibration from v1/v2 public prompt files;
+  graders, task implementation, evaluation reports and v3 material remain unread.
+- The optional checks JSON is internal trusted project configuration, using exact
+  source-excerpt coverage bindings. Missing or unsupported coverage is unavailable.
+- Primary codex_cli is the requested transport; historical fallback is excluded.
+  SessionStart supplies verified pin evidence; hooks supply actual visible answers
+  and own session budgets, deterministic verdicts and evidence provenance.
+- The workspace runtime uses source-tree resources; wheel packaging and Role 4's
+  matching signature serializer need coordinated host verification.
+
 # Control deadline capacity update — 2026-10-24
 
 `HARNESS_CONTROL_TIMEOUT_SECONDS` overrides the configured per-call deadline
