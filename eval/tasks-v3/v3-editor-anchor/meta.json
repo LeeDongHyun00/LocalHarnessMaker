@@ -1,0 +1,10 @@
+{
+  "id": "v3-editor-anchor",
+  "type": "ambiguous_requirement",
+  "domain": "editor",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

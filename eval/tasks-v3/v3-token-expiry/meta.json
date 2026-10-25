@@ -1,0 +1,10 @@
+{
+  "id": "v3-token-expiry",
+  "type": "ambiguous_requirement",
+  "domain": "access_control",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
