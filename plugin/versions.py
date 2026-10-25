@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 import re
 import os
@@ -39,7 +40,8 @@ def verified_versions(path: Path = REGISTRY) -> dict[str, list[str]]:
         raise ValueError('verified versions must be a nonempty list')
     result: dict[str, list[str]] = {}
     for row in rows:
-        if not isinstance(row, dict) or set(row) != {'version', 'evidence'}:
+        if (not isinstance(row, dict) or not {'version', 'evidence'} <= set(row)
+                or set(row) - {'version', 'evidence', 'luna_observation'}):
             raise ValueError('verified version requires version and evidence')
         version = validate_version(row['version'])
         evidence = row['evidence']
@@ -51,3 +53,30 @@ def verified_versions(path: Path = REGISTRY) -> dict[str, list[str]]:
                 raise ValueError('evidence must name a directory inside plugin/evidence')
         result[version] = evidence
     return result
+
+
+def luna_observation(version: str | None, path: Path = REGISTRY) -> dict[str, Any] | None:
+    """Return only a complete, well-formed observation for the exact CLI version."""
+    try:
+        verified_versions(path)
+        row = next(row for row in json.loads(path.read_text()) if row['version'] == version)
+        value = row.get('luna_observation')
+        fields = {'model', 'service_tier', 'observed_at', 'thread_id', 'evidence_sha256'}
+        if not isinstance(value, dict) or set(value) != fields:
+            return None
+        if not isinstance(value['model'], str):
+            return None
+        if any(value[key] is not None and not isinstance(value[key], str)
+               for key in ('service_tier', 'thread_id')):
+            return None
+        timestamp = value['observed_at']
+        if (not isinstance(timestamp, str) or not re.fullmatch(
+                r'\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})', timestamp)
+                or datetime.fromisoformat(timestamp.upper().replace('Z', '+00:00')).tzinfo is None):
+            return None
+        sha = value['evidence_sha256']
+        if sha is not None and (not isinstance(sha, str) or not re.fullmatch('[0-9a-f]{64}', sha)):
+            return None
+        return dict(value)
+    except (OSError, ValueError, TypeError, KeyError, StopIteration):
+        return None

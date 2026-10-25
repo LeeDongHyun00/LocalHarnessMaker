@@ -48,14 +48,36 @@ Direct host demos remove it. No v3 hook calls contract, handoff, judge,
 
 Pin-check exits 0 enabled, 1 disabled with a readable stdout advisory, or 2 for
 an internal/artifact error. It verifies the installed version against
-`VERIFIED_VERSIONS.json`, discovers an advertised `models --json` command, or
-uses a non-generating stdio app-server `initialize` / `initialized` /
-`model/list` probe. It starts no thread and invokes no model. Unsupported,
-truncated or unobservable listings fail closed; display names, prefixes and
-newer model identities never satisfy the exact pin. Model-list bytes and the
-versioned `controller/prices.yaml` snapshot are retained with hashes and a
-pricing reference. The probe's actual behavior on the installed host is pending
-verification; registry membership alone proves neither it nor v3 compatibility.
+`VERIFIED_VERSIONS.json`, tries an advertised `models --json` command first,
+then a non-generating stdio app-server `initialize` / `initialized` /
+`model/list` probe. Each subprocess has a one-second limit within a five-second
+total budget. Pin-check starts no thread and invokes no model. An answered
+listing records `model_evidence.source=listing`; display names, prefixes and
+newer model identities never satisfy the exact pin.
+
+When neither listing facility answers completely, pin-check may use the exact
+installed version's `luna_observation` in the registry. A well-formed observation
+of `gpt-6-luna` enables the pin with `source=probe_observation` and
+`checks.model_listed=true`. It retains a hashed observation snapshot in
+`model_list` and copies the observation's timestamp, thread, tier and original
+evidence hash into `model_evidence`. A different version, mismatched model or
+missing/malformed observation leaves the pin disabled. An answered listing that
+omits Luna also disables it. Enabled results have empty `reason_codes`.
+The versioned `controller/prices.yaml` snapshot and pricing reference are still
+required. The controller's per-call provider identity check enforces the exact
+model on every invocation; registry evidence does not guarantee future calls.
+
+For a new CLI version, first retain and audit its hook compatibility probe,
+then run the minimal pinned Luna probe in [HOST-CHECKS.md](HOST-CHECKS.md).
+Record `luna_observation` with the actual model/tier, RFC 3339 timestamp, thread
+ID and SHA-256 of the verbatim evidence before allowing H3. The registered
+`0.163.0-alpha.11.1` observation was captured on 2026-10-25 KST, thread
+`01a16ee8-a276-7c23-bd00-0fbe69a816a3`, model `gpt-6-luna`, tier `priority`,
+evidence SHA-256 `da10b7331103114c67ff3d26e21e95f54e51aca7faaed888b12cc4e434bf11c2`.
+This supplied observation establishes pin eligibility; v3 integration and host
+smokes remain separate acceptance checks. Deployment requires Role 1's approved
+`model_evidence` schema amendment (decision 0012); tests use a local amended copy
+while that shared schema is pending.
 
 `install.sh --check` delegates the same checks and separately reports missing
 registration/skill, unverified CLI, unavailable/missing exact model and missing
@@ -305,7 +327,8 @@ Use fresh evidence directories and never overwrite earlier captures.
 Only after this audit passes, append the version and evidence paths to the JSON
 list, rerun plugin tests and rerun installation `--check`. The tests audit every
 listed directory against its recorded version and events. The new
-`0.163.0-alpha.11.1` entry remains pending Claude's host probe. A passing hook
+`0.163.0-alpha.11.1` entry has retained hook evidence and the supplied
+2026-10-25 KST Luna observation. A passing hook
 probe does not replace the one-task audit compatibility smoke required before
 large evaluation runs, or establish compatibility for other CLI versions.
 

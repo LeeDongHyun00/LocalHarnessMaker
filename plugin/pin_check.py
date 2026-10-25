@@ -14,7 +14,7 @@ from typing import Any, Callable
 
 from plugin.artifacts import ROOT, confined, digest, read, snapshot, validate, write
 from plugin.hooks._process import run_group
-from plugin.versions import validate_version, verified_versions
+from plugin.versions import luna_observation, validate_version, verified_versions
 
 MODEL = 'gpt-6-luna'
 PRICES = ROOT / 'controller/prices.yaml'
@@ -26,44 +26,47 @@ def inspect_models(codex: str, invoke: Callable[..., Any]) -> tuple[bytes, bool]
     The stdio app-server probe initializes a client and requests model/list only;
     it never creates a thread or invokes a model. Unsupported protocol fails closed.
     """
-    help_result = invoke([codex, '--help'])
-    if help_result.returncode != 0:
-        raise ValueError('Codex help unavailable')
-    commands = {line.strip().split()[0] for line in help_result.stdout.splitlines() if line.strip()}
-    if 'models' in commands:
-        result = invoke([codex, 'models', '--json'])
+    def parse(result: Any, *, rpc: bool = False) -> tuple[bytes, bool]:
         if result.returncode != 0:
             raise ValueError('model listing failed')
-        data = json.loads(result.stdout)
-    else:
-        messages = [
-            {'id': 1, 'method': 'initialize', 'params': {
-                'clientInfo': {'name': 'localharness-pin-check', 'version': '3'}}},
-            {'method': 'initialized', 'params': {}},
-            {'id': 2, 'method': 'model/list', 'params': {'limit': 100}},
-        ]
-        result = invoke([codex, 'app-server'], input=''.join(json.dumps(m) + '\n' for m in messages))
-        if result.returncode != 0:
-            raise ValueError('model/list probe failed')
-        replies = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
-        initialized = [r for r in replies if r.get('id') == 1 and 'result' in r]
-        listings = [r for r in replies if r.get('id') == 2 and 'result' in r]
-        if len(initialized) != 1 or len(listings) != 1:
-            raise ValueError('model/list response missing or ambiguous')
-        data = listings[0]['result']
-    rows = data if isinstance(data, list) else data.get('data', data.get('models'))
-    if isinstance(data, dict) and data.get('nextCursor'):
-        raise ValueError('model listing truncated')
-    if not isinstance(rows, list):
-        raise ValueError('unsupported model listing')
-    identities = []
-    for row in rows:
-        # Only the provider model identity counts, never displayName or aliases.
-        identity = row if isinstance(row, str) else row.get('model', row.get('id'))
-        if not isinstance(identity, str):
-            raise ValueError('missing model identity')
-        identities.append(identity)
-    return result.stdout.encode(), identities.count(MODEL) == 1
+        if rpc:
+            replies = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+            initialized = [r for r in replies if r.get('id') == 1 and 'result' in r]
+            listings = [r for r in replies if r.get('id') == 2 and 'result' in r]
+            if len(initialized) != 1 or len(listings) != 1:
+                raise ValueError('model/list response missing or ambiguous')
+            data = listings[0]['result']
+        else:
+            data = json.loads(result.stdout)
+        rows = data if isinstance(data, list) else data.get('data', data.get('models'))
+        if isinstance(data, dict) and data.get('nextCursor'):
+            raise ValueError('model listing truncated')
+        if not isinstance(rows, list):
+            raise ValueError('unsupported model listing')
+        identities = []
+        for row in rows:
+            # Only provider identity counts, never display names or prefixes.
+            identity = row if isinstance(row, str) else row.get('model', row.get('id'))
+            if not isinstance(identity, str):
+                raise ValueError('missing model identity')
+            identities.append(identity)
+        return result.stdout.encode(), identities.count(MODEL) == 1
+
+    try:
+        help_result = invoke([codex, '--help'])
+        commands = {line.strip().split()[0] for line in help_result.stdout.splitlines() if line.strip()}
+        if help_result.returncode == 0 and 'models' in commands:
+            return parse(invoke([codex, 'models', '--json']))
+    except (OSError, ValueError, TypeError, AttributeError, TimeoutError, subprocess.TimeoutExpired):
+        pass
+    messages = [
+        {'id': 1, 'method': 'initialize', 'params': {
+            'clientInfo': {'name': 'localharness-pin-check', 'version': '3'}}},
+        {'method': 'initialized', 'params': {}},
+        {'id': 2, 'method': 'model/list', 'params': {'limit': 100}},
+    ]
+    return parse(invoke([codex, 'app-server'],
+                        input=''.join(json.dumps(m) + '\n' for m in messages)), rpc=True)
 
 
 def check(session_id: str, directory: Path, codex: str, *,
@@ -85,11 +88,12 @@ def check(session_id: str, directory: Path, codex: str, *,
         if remaining <= 0:
             raise TimeoutError('pin-check budget exhausted')
         return runner(command, shell=False, text=True, capture_output=True, check=False,
-                      timeout=remaining, env={**os.environ, 'HARNESS_NESTED': '1'}, **kwargs)
+                      timeout=min(1.0, remaining), env={**os.environ, 'HARNESS_NESTED': '1'}, **kwargs)
 
     version = None
     reasons: list[str] = []
     checks = {'codex_version_verified': False, 'model_listed': False, 'pricing_covered': False}
+    model_evidence = None
     model_ref = price_ref = None
     pricing_ref = None
     try:
@@ -104,10 +108,24 @@ def check(session_id: str, directory: Path, codex: str, *,
     try:
         model_bytes, checks['model_listed'] = inspect_models(codex, invoke)
         model_ref = snapshot(directory, 'models.txt', model_bytes)
+        model_evidence = {'source': 'listing', 'observed_model': MODEL,
+                          'service_tier': None, 'observed_at': datetime.now(timezone.utc).isoformat(),
+                          'thread_id': None, 'evidence_sha256': digest(model_bytes)}
         if not checks['model_listed']:
+            model_evidence = None
             reasons.append('model_missing')
     except (OSError, ValueError, TypeError, AttributeError, TimeoutError, subprocess.TimeoutExpired):
-        reasons.append('model_list_unavailable')
+        observation = luna_observation(version) if checks['codex_version_verified'] else None
+        if observation is not None and observation['model'] == MODEL:
+            model_ref = snapshot(directory, 'model-observation.json',
+                                 (json.dumps(observation, sort_keys=True) + '\n').encode())
+            model_evidence = {'source': 'probe_observation',
+                              'observed_model': observation['model'],
+                              **{key: observation[key] for key in (
+                                  'service_tier', 'observed_at', 'thread_id', 'evidence_sha256')}}
+            checks['model_listed'] = True
+        else:
+            reasons.append('model_list_unavailable')
     try:
         raw = pricing.read_bytes()
         book = json.loads(raw)
@@ -133,6 +151,8 @@ def check(session_id: str, directory: Path, codex: str, *,
              'codex_version': version, 'checks': checks, 'model_list': model_ref,
              'pricing_snapshot': price_ref, 'pricing_ref': pricing_ref,
              'reason_codes': reasons, 'advisory': advisory}
+    if model_evidence is not None:
+        value['model_evidence'] = model_evidence
     validate(value, 'pin-check.schema.json')
     write(confined(directory, 'pin-check.json'), value)
     return value

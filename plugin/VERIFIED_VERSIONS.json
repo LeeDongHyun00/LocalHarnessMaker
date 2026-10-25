@@ -10,6 +10,13 @@
     "version": "codex-cli 0.163.0-alpha.11.1",
     "evidence": [
       "evidence/2026-10-22-exec-0.163"
-    ]
+    ],
+    "luna_observation": {
+      "model": "gpt-6-luna",
+      "service_tier": "priority",
+      "observed_at": "2026-10-24T17:15:04.670Z",
+      "thread_id": "01a16ee8-a276-7c23-bd00-0fbe69a816a3",
+      "evidence_sha256": "da10b7331103114c67ff3d26e21e95f54e51aca7faaed888b12cc4e434bf11c2"
+    }
   }
 ]

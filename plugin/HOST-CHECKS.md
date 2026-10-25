@@ -1,3 +1,42 @@
+# New CLI version: pinned Luna eligibility
+
+Before H3 on a new version, retain the exact `codex --version`, run and audit
+its hook compatibility probe as described in README, then run one minimal
+pinned probe on the logged-in host outside evaluation workspaces:
+
+```sh
+HARNESS_NESTED=1 codex --no-daemon -a never exec --json \
+  --model gpt-6-luna -c model_reasoning_effort=low --sandbox read-only \
+  'Reply with the single word OK.' > /tmp/luna-NEW-events.jsonl 2> /tmp/luna-NEW-stderr.txt
+```
+
+Retain command, version, exit status, elapsed time and verbatim JSON events.
+Use the returned thread ID to retain the native rollout's
+`thread_settings_applied` record showing actual `model`, `model_provider_id`,
+`service_tier`, `reasoning_effort` and timestamp, together with token usage.
+Check exact `gpt-6-luna`, provider `openai`, effort `low`, successful completion
+and no version drift. Do not derive identity from the requested command alone.
+Preserve this evidence without credentials and compute its SHA-256, for example
+`shasum -a 256 /PATH/TO/verbatim-evidence.txt`.
+
+Add `luna_observation` to that exact version's entry in
+`plugin/VERIFIED_VERSIONS.json`, with `model`, `service_tier`, `observed_at`
+(RFC 3339 with timezone), `thread_id` and `evidence_sha256`. Use the native
+observation timestamp; UTC may be the preceding date in Korea. Archive the
+verbatim evidence for review. The supplied 2026-10-25 KST probe for
+`0.163.0-alpha.11.1` observed `2026-10-24T17:15:04.670Z`, thread
+`01a16ee8-a276-7c23-bd00-0fbe69a816a3`, model `gpt-6-luna`, tier `priority`,
+SHA-256 `da10b7331103114c67ff3d26e21e95f54e51aca7faaed888b12cc4e434bf11c2`.
+Its source report stays read-only outside this repository.
+
+Pin-check always tries listings first, bounded to seconds. Only when neither
+answers does it use the exact-version observation and record
+`model_evidence.source=probe_observation`. After the observation is recorded,
+H3 is allowed subject to installed amended schemas, integration and the usual
+host smoke/access/accounting checks. The controller's per-call identity check
+is the enforcement on actual calls; a recorded observation cannot authorize a
+provider mismatch or model substitution. No new paid probe ran in this sandbox.
+
 # Version 3 host-only capture
 
 After Roles 3/4 land, run `.venv/bin/python -m plugin.host_checks v3-prepare

@@ -9,11 +9,13 @@ from typing import Any
 import pytest
 
 from plugin import pin_check
-from plugin.artifacts import ROOT, read, session_directory, validate
+from plugin.artifacts import ROOT, digest, read, session_directory, validate
+
 
 
 @pytest.mark.parametrize('outcome', ['enabled', 'version', 'missing', 'renamed', 'unobservable', 'pricing', 'timeout', 'rpc', 'rpc_missing', 'rpc_truncated'])
-def test_pin_outcomes(tmp_path: Path, outcome: str) -> None:
+def test_pin_outcomes(tmp_path: Path, outcome: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pin_check, 'luna_observation', lambda version: None)
     directory = session_directory(tmp_path, 'pin-session')
     calls: list[list[str]] = []
     def runner(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
@@ -28,6 +30,8 @@ def test_pin_outcomes(tmp_path: Path, outcome: str) -> None:
         if command[1] == '--help':
             return subprocess.CompletedProcess(command, 0, 'Commands:\n  app-server\n' if outcome.startswith('rpc') else 'Commands:\n  models\n', '')
         if command[1] == 'app-server':
+            if outcome == 'unobservable':
+                return subprocess.CompletedProcess(command, 1, '', 'unsupported')
             assert 'thread/start' not in kwargs['input']
             assert 'model/list' in kwargs['input']
             data = [{'id': 1, 'result': {}}, {'id': 2, 'result': {
@@ -45,6 +49,9 @@ def test_pin_outcomes(tmp_path: Path, outcome: str) -> None:
     validate(value, 'pin-check.schema.json')
     assert value == read(directory / 'pin-check.json')
     assert (value['status'] == 'enabled') == (outcome in {'enabled', 'rpc'})
+    if value['status'] == 'enabled':
+        assert value['model_evidence']['source'] == 'listing'
+        assert value['reason_codes'] == []
     if value['status'] == 'disabled':
         assert value['reason_codes'] and 'cannot be represented as H3' in value['advisory']
     assert all('exec' not in command for command in calls)
@@ -87,3 +94,76 @@ def test_install_check_runs_pin_against_installed_prices(tmp_path: Path, monkeyp
     monkeypatch.setattr(pin_check, 'check', checked)
     assert install.main() == 1
     assert 'model_missing, pricing_missing' in capsys.readouterr().err
+
+
+@pytest.mark.parametrize('case', ['present', 'other_version', 'mismatch', 'malformed'])
+def test_observation_fallback(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str) -> None:
+    from plugin.versions import REGISTRY, luna_observation
+    rows = json.loads(REGISTRY.read_text())
+    row = rows[1]
+    observation = dict(row['luna_observation'])
+    if case == 'other_version':
+        rows[0]['luna_observation'] = row.pop('luna_observation')
+    elif case == 'mismatch':
+        row['luna_observation']['model'] = 'gpt-6-luna-other'
+    elif case == 'malformed':
+        row['luna_observation']['observed_at'] = '2026-10-25'
+    registry = tmp_path / 'versions.json'
+    registry.write_text(json.dumps(rows))
+    monkeypatch.setattr(pin_check, 'luna_observation', lambda version: luna_observation(version, registry))
+    calls: list[str] = []
+    def runner(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        calls.append(command[1])
+        assert kwargs['timeout'] <= 1.0
+        if command[1] == '--version':
+            return subprocess.CompletedProcess(command, 0, row['version'], '')
+        if command[1] == '--help':
+            return subprocess.CompletedProcess(command, 0, 'models', '')
+        if command[1] == 'app-server':
+            messages = [json.loads(line) for line in kwargs['input'].splitlines()]
+            assert [m['method'] for m in messages] == ['initialize', 'initialized', 'model/list']
+        raise subprocess.TimeoutExpired(command, kwargs['timeout'])
+    directory = session_directory(tmp_path, 'observation')
+    value = pin_check.check('observation', directory, '/mock/codex', runner=runner)
+    assert calls == ['--version', '--help', 'models', 'app-server']
+    validate(value, 'pin-check.schema.json')
+    assert value == read(directory / 'pin-check.json')
+    if case == 'present':
+        assert value['status'] == 'enabled' and value['reason_codes'] == []
+        assert value['checks']['model_listed'] is True
+        assert value['model_evidence'] == {
+            'source': 'probe_observation', 'observed_model': observation.pop('model'), **observation}
+        ref = value['model_list']
+        assert digest((directory / ref['path']).read_bytes()) == ref['sha256']
+    else:
+        assert value['status'] == 'disabled'
+        assert value['reason_codes'] == ['model_list_unavailable']
+
+
+def test_failed_models_listing_falls_through_to_rpc() -> None:
+    calls: list[str] = []
+    def invoke(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        calls.append(command[1])
+        if command[1] == '--help':
+            return subprocess.CompletedProcess(command, 0, 'models', '')
+        if command[1] == 'models':
+            return subprocess.CompletedProcess(command, 1, '', 'unsupported')
+        return subprocess.CompletedProcess(command, 0,
+            '{"id":1,"result":{}}\n{"id":2,"result":{"data":[{"model":"gpt-6-luna"}]}}\n', '')
+    _, listed = pin_check.inspect_models('/mock/codex', invoke)
+    assert listed and calls == ['--help', 'models', 'app-server']
+
+
+@pytest.mark.parametrize('listed', [True, False])
+def test_listing_precedes_registry_observation(tmp_path: Path, listed: bool) -> None:
+    def runner(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        output = ('codex-cli 0.163.0-alpha.11.1' if command[1] == '--version' else
+                  'models' if command[1] == '--help' else json.dumps(['gpt-6-luna'] if listed else []))
+        return subprocess.CompletedProcess(command, 0, output, '')
+    value = pin_check.check('missing-listed-model', session_directory(tmp_path, 'missing-listed-model'),
+                            '/mock/codex', runner=runner)
+    if listed:
+        assert value['status'] == 'enabled' and value['reason_codes'] == []
+        assert value['model_evidence']['source'] == 'listing'
+    else:
+        assert value['status'] == 'disabled' and value['reason_codes'] == ['model_missing']

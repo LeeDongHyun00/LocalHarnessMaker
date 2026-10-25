@@ -239,3 +239,40 @@
 ### Assumptions
 
 - See History / Assumptions; format conversion only.
+
+## 2026-10-25 r2-v3-003 Role 2
+
+### Done
+
+- Added listing-first pin evidence, bounded models/app-server fallback with initialized notification, and exact-version Luna observation fallback; enabled artifacts carry model_evidence and empty reason_codes; explicit missing-model listings still disable the pin (.venv/bin/python -m pytest tests/plugin -q: 320 passed, 1 opt-in real Codex test skipped in 30.56s).
+- Recorded the supplied 0.163.0-alpha.11.1 observation: gpt-6-luna, priority, thread 01a16ee8-a276-7c23-bd00-0fbe69a816a3, native timestamp 2026-10-24T17:15:04.670Z; read the external verbatim report without writing there (shasum -a 256 /Users/donghyunlee/Desktop/LocalHarnessMaker/codex-bridge/report-copies/luna-pin-probe-2026-10-25.txt: da10b7331103114c67ff3d26e21e95f54e51aca7faaed888b12cc4e434bf11c2).
+- Added local amended-schema validation for pin and lifecycle tests, covering listing evidence, observation fallback, wrong version, model mismatch, malformed observation, listing precedence and retained snapshot hashes; documented operator probe/registration and controller per-call identity enforcement (.venv/bin/python -m pytest tests/plugin -q: 320 passed, 1 skipped in 30.56s; git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
+
+### Remaining
+
+- Install Role 1's concurrently published decision 0012/schema amendment before deploying these artifacts; this checkout's shared schema still rejects model_evidence. Tests use a temporary local amended schema copy; schemas/ was not edited.
+- Carry forward History / Remaining: integrate Roles 3/4, complete two non-evaluation v3 host smokes and retained trust/bundle/silence checks, measure call latency/cost, and coordinate the full suite once before merge. No live H3 acceptance is claimed by this job.
+
+### Decisions
+
+- Implement the user-approved model_evidence amendment without shared edits: explicit 2026-10-25 authorization resolves the reported r2-v3-002 STOP-1 for this scoped implementation.
+- Retain a hashed observation JSON snapshot in model_list for fallback artifacts: preserve the existing required evidence reference while model_evidence retains the original probe report's hash and provenance.
+- Try advertised models first and app-server next, with one second per subprocess and five seconds total: unavailable listings must leave time for the remaining preflight and never invoke a model.
+- Prefer a complete listing over registry observation, including a missing-model result: historical observation must not override a currently observed absence.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/plugin -q
+- git diff --check -- plugin tests/plugin state/STATUS-plugin.md
+- shasum -a 256 /Users/donghyunlee/Desktop/LocalHarnessMaker/codex-bridge/report-copies/luna-pin-probe-2026-10-25.txt
+
+### Do not touch
+
+- schemas/, docs/, controller/, verifier/, eval/, shared configuration, other roles' STATUS files and the external verbatim evidence report; only plugin/, tests/plugin/ and state/STATUS-plugin.md are authorized here.
+- .git is read-only: do not stage or commit. Preserve immutable historical evidence, exact HARNESS_NESTED=1 zero-byte guards and copied child environments; do not run live Codex/model/network calls in this session.
+
+### Assumptions
+
+- Use the native thread_settings_applied timestamp for observed_at: 2026-10-24T17:15:04.670Z is 2026-10-25 in Asia/Seoul and avoids inventing an observation time from the report's date heading.
+- The supplied host probe is accepted as read-only host evidence; this job verifies its file hash and offline behavior only. The controller's actual per-call identity enforcement remains Role 3-owned.
+- Production validation uses the installed shared schema without a compatibility bypass; Role 1's amendment must accompany deployment. No PR, staging or commit was requested; carry these assumptions into any later PR description.
