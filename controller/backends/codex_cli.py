@@ -19,6 +19,7 @@ from controller.backends.base import Message, Usage, configured_prices, control_
 from controller.backends.cheap_api import structured_schema
 from controller.errors import BackendError, InputError, InvalidGeneration, TransportError
 from controller.settings import PACKAGE_DIR, load_object
+from controller.diagnostics import byte_count, private_paths, trace, trace_failure
 
 logger = logging.getLogger(__name__)
 Runner = Callable[..., subprocess.CompletedProcess[str]]
@@ -143,7 +144,12 @@ class CodexCLIBackend:
                 raise ValueError("Unexpected Codex model execution policy")
         except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
             raise InputError("Invalid Codex CLI configuration or prices") from exc
-        self.executable = resolve_executable(cli)
+        try:
+            self.executable = resolve_executable(cli)
+        except TransportError as exc:
+            trace_failure(exc, message=str(exc))
+            raise
+        trace("executable_resolved", path=self.executable)
         self.runner = runner
         self.clock = clock
         self.persist_session = persist_session
@@ -181,10 +187,24 @@ class CodexCLIBackend:
             child_env["HARNESS_NESTED"] = "1"
             try:
                 try:
-                    result = self.runner(
-                        argv, input=prompt, cwd=workdir, env=child_env, text=True,
-                        capture_output=True, timeout=self.timeout, check=False, shell=False,
-                    )
+                    trace("child_start", argv=[argv[0], *[private_paths(arg) for arg in argv[1:]]],
+                          environment_keys_set=["HARNESS_NESTED"])
+                    child_started = time.monotonic()
+                    try:
+                        result = self.runner(
+                            argv, input=prompt, cwd=workdir, env=child_env, text=True,
+                            capture_output=True, timeout=self.timeout, check=False, shell=False,
+                        )
+                    except (Exception, KeyboardInterrupt, SystemExit) as exc:
+                        trace_failure(exc, message="child execution failed; message redacted")
+                        trace("child_exit", exit_code=None, elapsed_seconds=time.monotonic() - child_started,
+                              stdout_bytes=byte_count(getattr(exc, "stdout", None)),
+                              stderr_bytes=byte_count(getattr(exc, "stderr", None)))
+                        raise
+                    trace("child_exit", exit_code=result.returncode,
+                          elapsed_seconds=time.monotonic() - child_started,
+                          stdout_bytes=byte_count(result.stdout),
+                          stderr_bytes=byte_count(result.stderr))
                     events = result.stdout or ""
                     stderr = result.stderr or ""
                 except subprocess.TimeoutExpired as exc:

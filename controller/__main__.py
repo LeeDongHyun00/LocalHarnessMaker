@@ -18,10 +18,20 @@ from controller.cases import retrieve_cases
 from controller.contract_gen import generate_contract, read_request
 from controller.errors import BackendError, InputError
 from controller.settings import load_object
+from controller.diagnostics import flush_diagnostics, trace, trace_failure
+
+
+class HelpRequested(Exception):
+    """Successful argparse help termination, distinct from a child SystemExit."""
 
 
 class Parser(argparse.ArgumentParser):
     """Align input errors with the shared CLI exit-code convention."""
+
+    def exit(self, status: int = 0, message: str | None = None) -> None:
+        if status == 0:
+            raise HelpRequested()
+        raise InputError(message or "argument parsing failed")
 
     def error(self, message: str) -> None:
         raise InputError(message)
@@ -39,7 +49,7 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
-def main(
+def _main(
     argv: Sequence[str] | None = None, *,
     backend_factory: Callable[[str], Backend] | None = None,
 ) -> int:
@@ -72,6 +82,7 @@ def main(
         subparser.add_argument("--artifacts", required=True, type=Path)
     try:
         args = parser.parse_args(argv)
+        trace("argument_parsing_done", command=args.command)
         if args.command in {"requirements", "claim-audit"}:
             from controller.v3 import run_operation
             options = ({"prompt_path": args.prompt, "config_path": args.config}
@@ -101,18 +112,47 @@ def main(
             validate_handoff_inputs(contract, verdict)
             result = generate_handoff(transcript, contract, verdict, factory(args.backend))
         write_json(args.out, result)
+    except HelpRequested:
+        return 0
     except InputError as exc:
+        trace_failure(exc)
         print(f"controller: {exc}", file=sys.stderr)
         return 1
     except (BackendError, OSError) as exc:
+        trace_failure(exc)
         print(f"controller: {exc}", file=sys.stderr)
         return 2
-    except Exception:
+    except Exception as exc:
+        trace_failure(exc)
         # Never echo remote bodies or credentials through exception text.
-        print("controller: unexpected internal error", file=sys.stderr)
+        print(f"controller: unexpected internal error ({type(exc).__name__})", file=sys.stderr)
         return 2
     print(args.out)
     return 0
+
+
+def main(
+    argv: Sequence[str] | None = None, *,
+    backend_factory: Callable[[str], Backend] | None = None,
+) -> int:
+    """Make every nonzero result observable, including unexpected boundary failures."""
+    code = 2
+    try:
+        code = _main(argv, backend_factory=backend_factory)
+    except SystemExit as exc:
+        trace_failure(exc)
+        print("controller: unexpected SystemExit", file=sys.stderr)
+        code = 2
+    except (Exception, KeyboardInterrupt) as exc:
+        trace_failure(exc)
+        print(f"controller: unexpected internal error ({type(exc).__name__})", file=sys.stderr)
+        code = 2
+    finally:
+        if code:
+            print(f"controller: exiting with status {code}", file=sys.stderr, flush=True)
+        trace("final_exit", exit_code=code)
+        flush_diagnostics()
+    return code
 
 
 if __name__ == "__main__":

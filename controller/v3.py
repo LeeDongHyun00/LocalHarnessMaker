@@ -16,6 +16,7 @@ from jsonschema import Draft202012Validator
 from controller.analyze import Prices, calculate_cost
 from controller.backends.base import Message, Usage
 from controller.errors import BackendError, InputError
+from controller.diagnostics import trace, trace_failure
 from controller.generation import read_text, schema_validator, validate_input
 from controller.settings import load_object, pricing_snapshot
 from controller.v3_checks import confined, derive_check, digest, source_clause
@@ -74,6 +75,7 @@ def artifact_root(directory: Path, session_id: str) -> tuple[Path, Path]:
 def _pin(directory: Path, session_id: str) -> tuple[dict[str, Any], Prices, str]:
     pin = load_object(confined(directory, "pin-check.json"))
     validate_input(pin, "pin-check.schema.json")
+    trace("pin_loaded", status=pin["status"])
     if pin["session_id"] != session_id:
         raise BackendError(f"pin session mismatch: expected {session_id!r}, got {pin['session_id']!r}")
     if pin["status"] != "enabled":
@@ -94,6 +96,7 @@ def _pin(directory: Path, session_id: str) -> tuple[dict[str, Any], Prices, str]
         raise BackendError("exact pinned model absent from model-list evidence")
     book = json.loads(retained["pricing_snapshot"])
     snapshot_path, snapshot_data, snapshot_book = pricing_snapshot()
+    trace("pricing_compared", matches=book == snapshot_book)
     if book != snapshot_book:
         raise BackendError(f"pin pricing snapshot mismatch against package path {snapshot_path}: "
                            f"pin sha256={digest(retained['pricing_snapshot'])}, "
@@ -251,6 +254,7 @@ def run_operation(phase: str, *, session_id: str, artifacts: Path,
                   client_factory: ClientFactory | None = None) -> tuple[Path, int]:
     """Publish one artifact; pin/call failure is exit 2 with an unavailable artifact."""
     directory, workspace = artifact_root(artifacts, session_id)
+    trace("artifact_directory_validated")
     if phase not in {"requirements", "claim_audit"}:
         raise InputError("unknown controller hook phase")
     output = confined(directory, "requirements.json" if phase == "requirements" else "claim-audit.json")
@@ -313,8 +317,10 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
         return output, 2 if previous["status"] == "unavailable" else 0
     prompt_version, system_prompt = select_prompt(phase)
     call_id = f"{phase}-{prompt_version}-1"
+    stage = "pin"
     try:
         _, prices, pricing_ref = _pin(directory, session_id)
+        stage = "pre_call"
         if phase == "claim_audit" and (not text.strip() or requirements["state"] == "unavailable"):
             raise BackendError("final message or requirements unavailable")
         allocation = confined(directory, f"evidence/{phase}-allocation.json")
@@ -365,6 +371,7 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
                 raise BackendError("claim audit failed published schema validation")
             record.update(status="success", error=None)
         except Exception as exc:
+            trace_failure(exc, message="provider call or output validation failed; message redacted")
             mismatch = isinstance(exc, PinMismatch)
             record.update(status="pin_mismatch" if mismatch else "error" if isinstance(exc, IdentityUnobserved)
                           else "timeout" if getattr(client, "timeout", False) else "error",
@@ -396,6 +403,8 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
         if record["status"] != "success":
             logger.error("controller_hook_unavailable %s", record["error"])
     except (BackendError, InputError, OSError, ValueError, KeyError) as exc:
+        trace_failure(exc, message=(str(exc) if stage == "pin" and isinstance(exc, BackendError)
+                                    else "pre-call validation failed; message redacted"))
         print(f"controller: {call_error(exc)}", file=sys.stderr)
         logger.error("controller_hook_unavailable %s: %s", type(exc).__name__, call_error(exc))
         if phase == "requirements":

@@ -411,3 +411,44 @@
 - An unset or empty HARNESS_CODEX uses ordinary lookup; a nonempty invalid override is a configuration failure.
 - Known application bundle availability and production hook success require the host rerun; fake executable fixtures establish lookup and accounting behavior only.
 - No PR was created; the eventual PR must retain these assumptions. Suggested commit: fix(controller): resolve Codex in restricted hook environments.
+
+## 2026-10-26 r3-v3-007 Role 3
+
+### Done
+
+- Added opt-in HARNESS_CONTROLLER_TRACE flushed timestamped JSONL for argument parsing, artifact validation, pin loading, pricing comparison, resolved executable, child argv/environment keys, exit/elapsed/stream byte counts, exceptions and final exit; documented privacy redaction and optional destination behavior (.venv/bin/python -m pytest tests/controller -q: 489 passed in 17.24s).
+- Wrapped the controller CLI boundary so every nonzero return prints a direct controller: stderr diagnostic and flushes handlers/stderr; unexpected exceptions name their type without message disclosure; KeyboardInterrupt and unexpected SystemExit become diagnosed exit 2 while argparse help remains exit 0 (.venv/bin/python -m pytest tests/controller -q: 489 passed in 17.24s, including real module-entry subprocesses with piped stderr).
+- Audited exit behavior: cached unavailable artifacts and caught provider failures previously lacked a guaranteed controller: line; the CLI boundary now covers both. No os._exit call or except BaseException handler exists; the new child KeyboardInterrupt/SystemExit observation re-raises to the diagnosed boundary (rg -n 'os\._exit|except.*BaseException|except.*KeyboardInterrupt|except.*SystemExit' controller: only explicit boundary/child handlers matched).
+- Added offline success/disabled-pin trace order, append behavior, privacy, timeout/spawn/nonzero child outcomes, cached failure, uncaught/setup exceptions, help and handler-flush regressions; no live calls, network, staging or commits (.venv/bin/python -m pytest tests/controller -q: 489 passed in 17.24s).
+
+### Remaining
+
+- Host rerun the instrumented installed-hook smoke with HARNESS_CONTROLLER_TRACE set to a writable file; inspect its last step and stderr to locate the hook-process-only failure. This session establishes observability with offline transports, not the live failure's cause or resolution.
+- Carry forward r3-v3-006 / r3-v3-005 / r3-v3-004 Remaining: live v2 calibration targets, installed-hook integration with Roles 2/4, signature-baseline agreement, two non-evaluation smokes, timing/cost denominators and full-suite checks once before merge.
+
+### Decisions
+
+- Guarantee diagnostics at the CLI boundary: cached returns and logger configuration cannot bypass a direct nonzero stderr line; existing exit codes and artifact shapes remain unchanged.
+- Trace child metadata and stream lengths only: prompts/provider streams are excluded, non-executable home paths are redacted, and potentially sensitive exception messages use a stage message with their type; pin/executable diagnostics retain safe messages.
+- Preserve successful help separately from unexpected SystemExit: a child exit request, including SystemExit(0), must not silently turn interrupted controller work into success.
+- Keep tracing optional and additive: an unwritable destination does not replace the underlying operation's result; every record closes/flushed its file independently.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/controller -q (489 passed in 17.24s; offline mocks and local diagnostic subprocesses only).
+- git diff --check -- controller tests/controller state/STATUS-controller.md (exit 0 before STATUS append; rerun after append).
+- rg -n 'os\._exit|except.*BaseException|except.*KeyboardInterrupt|except.*SystemExit' controller (only diagnosed boundary and re-raising child observation handlers matched).
+- git status --short (only owned controller/, tests/controller/ paths changed before this STATUS append; no staging or commits).
+
+### Do not touch
+
+- Frozen schemas, CLIs, hook interfaces and paths outside controller/, tests/controller/ and state/STATUS-controller.md.
+- Read-only .git, host evidence, private graders and evaluation tasks; no network, live calls, staging or commits.
+- Existing Current state block and completed sections; this ordinary job appends status without consolidation.
+
+### Assumptions
+
+- The host will supply an existing writable parent directory for HARNESS_CONTROLLER_TRACE; absent/unwritable tracing is optional and does not enable provider retries or fallback.
+- Privacy requirements take precedence over retaining raw exception messages that might contain request/provider bodies; trace records retain the exception type and an explicit redacted stage message in those cases.
+- SIGKILL and other uncatchable process termination cannot produce a final Python diagnostic; the last flushed trace step remains available for host investigation.
+- No PR was created; the eventual PR must retain these assumptions. Suggested commit: fix(controller): trace hook execution and diagnose nonzero exits.
