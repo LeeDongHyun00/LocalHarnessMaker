@@ -1,35 +1,27 @@
 # Full v3 A STOP-3 estimate — DRAFT, NOT APPROVED
 
-2026-10-25 construction checkpoint. The wrapped [config](../configs/full-v3-a.yaml)
-lists the nine authored `bug_fix` candidates only. They are unfrozen; 45 tasks
-remain. The design still calls for 54 tasks and 63 sessions. These counts do not
-approve a partial or full evaluation. No model calls were made.
+2026-10-25: the [config](../configs/full-v3-a.yaml) contains all 54 unfrozen
+tasks in lexicographic ID order, identical to H3. There are 45 single-session
+and nine two-session tasks: 63 required sessions, 63 Sol workloads, zero Luna
+calls. Sol is gpt-6.1-sol medium, requested priority/Fast, seed 0. A sets
+HARNESS_NESTED=1 and has no repair or clarification continuation.
 
-| Scope | Tasks | Two-session tasks | Sol workloads | Luna calls |
-| --- | ---: | ---: | ---: | ---: |
-| Current candidate list | 9 | 0 | 9 | 0 |
-| Completed population, pending construction | 54 | 9 | 63 | 0 |
+Use the existing offline `openai-fast-short-2026-10-23-v1` snapshot, not a
+network refresh. Sol rates per million tokens: $4 uncached input, $0.2 cached
+input, $20 output. An assumed workload of 20k uncached + 10k cached input and
+4k output costs $0.162000. Cached tokens are a subset of total input; reasoning
+output is counted once. These are unmeasured scenarios, not spending limits.
+Provider requests within an exec may exceed these workload planning units.
+Retain native usage, failures and invalid costs; unknown accounting stays null.
 
-Sol is gpt-6.1-sol medium, requested priority/Fast, seed 0. A disables hooks and
-has no repair or clarification continuation. Provider requests within one exec
-may exceed these workload counts; actual native accounting must be retained.
+| Scenario | 54 tasks / 63 sessions |
+| --- | ---: |
+| Assumed tokens | $10.206000 |
+| 2× tokens | $20.412000 |
+| 5× tokens | $51.030000 |
 
-The existing offline snapshot `openai-fast-short-2026-10-23-v1` supplies rates
-per million tokens of $4 uncached input, $0.2 cached input and $20 output.
-The unmeasured scenario remains 20,000 uncached + 10,000 cached input and 4,000
-output tokens per workload: $0.162000. Cached tokens are included in total input;
-reasoning/output is counted once.
-
-| Scenario | Current 9 | Planned 54 |
-| --- | ---: | ---: |
-| Assumed tokens | $1.458000 | $10.206000 |
-| 2× tokens | $2.916000 | $20.412000 |
-| 5× tokens | $7.290000 | $51.030000 |
-
-Disjoint calibration material, approved A-only pilot and manual review of five
-outputs remain pending. The 60–85% single-session target is unmeasured. Complete
-the remaining shapes, independent structure/derivation review and host validation
-before freezing public/private inputs. Pin the CLI, model/tier, population and
-price snapshot before execution. Refresh estimates from the pilot; report cost
-and obtain approval before a batch of ten or more paid calls. Current estimates
-are workload scenarios, with no hard spending limit or runtime measurement.
+Claude's independent host review, disjoint calibration pilot/materials, manual
+review of five pilot outputs and separate task freeze remain pending. Pin the
+CLI/model/tier, population and pricing bytes before running. Refresh estimates
+from the pilot and report before any ten-plus paid-call batch. No calls were
+made or authorized by this draft; measured runtime and hard cost cap are absent.

@@ -9,18 +9,8 @@ fail at least one substantive requirement, and all 36 requirements have executed
 coverage. The declared mutation population is exhausted. Equivalence reviews are
 hash-bound and retained privately; no survivor was automatically waived.
 
-| Task ID | Requirements covered | Reference pass | Starter fail | Generated | Targeted | Executed | Killed | Equivalent | Survivors | Errors |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| v3-build-manifest | 4 | 6 | 5 | 14 | 2 | 16 | 16 | 0 | 0 | 0 |
-| v3-config-dispatch | 4 | 6 | 4 | 63 | 2 | 65 | 62 | 3 | 0 | 0 |
-| v3-fixedwidth-plan | 4 | 6 | 2 | 36 | 2 | 38 | 37 | 1 | 0 | 0 |
-| v3-html-events | 4 | 5 | 1 | 15 | 2 | 17 | 16 | 1 | 0 | 0 |
-| v3-journal-codec | 4 | 7 | 4 | 70 | 2 | 72 | 68 | 4 | 0 | 0 |
-| v3-log-sink | 4 | 7 | 3 | 29 | 2 | 31 | 28 | 3 | 0 | 0 |
-| v3-path-reconstruction | 4 | 5 | 1 | 17 | 2 | 19 | 19 | 0 | 0 | 0 |
-| v3-ready-queue | 4 | 5 | 1 | 23 | 2 | 25 | 21 | 4 | 0 | 0 |
-| v3-token-scanner | 4 | 7 | 2 | 89 | 3 | 92 | 86 | 6 | 0 | 0 |
-| Total | 36 | 54 | 23 | 356 | 19 | 375 | 353 | 22 | 0 | 0 |
+Validation counts are maintained only in [VALIDATION.md](VALIDATION.md).
+This file preserves the original shape-session evidence and author pair review.
 
 Uncovered requirements, unexecuted mutants, shared public assertion lines and
 corpus warnings: 0 each. Corpus files: 994 distinct files, 8,946 examined

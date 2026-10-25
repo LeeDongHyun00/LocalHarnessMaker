@@ -1,56 +1,51 @@
 # Full v3 H3 STOP-3 estimate — DRAFT, NOT APPROVED
 
-2026-10-25 construction checkpoint. The wrapped [config](../configs/full-v3-h3.yaml)
-lists the same nine unfrozen `bug_fix` candidates as A. There are no ambiguous or
-two-session tasks in this partial inventory. The completed population remains
-54 tasks, including nine ambiguous and nine two-session tasks. No calls were made.
-The current runner's `harness=true` remains the legacy loop; do not unwrap this
-config as a substitute for plugin mode.
+2026-10-25: the [config](../configs/full-v3-h3.yaml) contains the same ordered
+54 unfrozen tasks as A, including nine two-session and nine ambiguous tasks.
+Plugin mode is design only; current `harness=true` is the legacy loop and must
+not be used as H3. Sol is gpt-6.1-sol medium, requested priority/Fast, seed 0;
+hooks use pinned gpt-6-luna low, no automatic retry/regeneration/fallback.
 
-Let S=N+D required work sessions, Q eligible ambiguity clarification resumes,
-and R<=S deterministic-failure repair workloads. Each completed session allows
-two gpt-6-luna low calls, with no retries/fallback. A clarification or application
-repair reuses that session's hook artifacts. Ledger continuation work is included
-in the executor token scenario, without adding another Luna call.
+| Component | Count |
+| --- | ---: |
+| Tasks N | 54 |
+| Second sessions D | 9 |
+| Required sessions S=N+D | 63 |
+| Clarification reserve Q | 9 |
+| Application-repair reserve R | 63 |
+| Sol workloads S+Q+R | 135 |
+| Luna calls 2S | 126 |
+| Combined STOP-3 units | 261 |
 
-| Component | Current candidate list | Planned completed population |
-| --- | ---: | ---: |
-| Tasks N | 9 | 54 |
-| Second sessions D | 0 | 9 |
-| Work sessions S | 9 | 63 |
-| Clarification reserve Q | 0 | 9 |
-| Application-repair reserve R | 9 | 63 |
-| Sol workloads S+Q+R | 18 | 135 |
-| Luna calls 2S | 18 | 126 |
-| Combined STOP-3 units | 36 | 261 |
+Without reserves: 63 Sol workloads plus 126 Luna calls, 189 combined units.
+Each completed native session allows two Luna calls total; clarification and
+application repair reuse that budget. Ledger bookkeeping is included in the
+executor token scenario, not another application repair or Luna call. Charge
+actual usage only, not unused reserves. Question-only pauses may consume only
+the requirements call; the table reserves completed sessions.
 
-Without reserves the current list has 9 Sol workloads plus 18 Luna calls, or 27
-combined units. Exec sessions may make several provider requests; these are
-workload planning units. Charge actual native usage once, retain failed/invalid
-costs, and do not bill unused reserves. Unknown usage/pricing stays null.
+Use the existing offline `openai-fast-short-2026-10-23-v1` snapshot, not a
+network refresh. Sol rates per million tokens: $4 uncached input, $0.2 cached
+input, $20 output. An assumed workload of 20k uncached + 10k cached input and
+4k output costs $0.162000. Cached tokens are a subset of total input; reasoning
+output is counted once. These are unmeasured scenarios, not spending limits.
+Provider requests within an exec may exceed these workload planning units.
+Retain native usage, failures and invalid costs; unknown accounting stays null.
 
-Use the existing offline `openai-fast-short-2026-10-23-v1` snapshot. Sol rates per
-million tokens are $4/$0.2/$20 for uncached/cached/output; Luna rates are
-$0.2/$0.02/$1. The unmeasured Sol workload of 20k uncached + 10k cached input
-and 4k output costs $0.162000. Luna's 20k uncached + 2k cached input and 4k
-output costs $0.008040. Reasoning tokens are included once in output.
+Luna rates per million tokens: $0.2/$0.02/$1 uncached/cached/output. The assumed
+20k uncached + 2k cached input and 4k output costs $0.008040 per call.
 
-| Scenario | Current 9 | Planned 54 |
-| --- | ---: | ---: |
-| No clarification/repair reserves | $1.602720 | $11.219040 |
-| All clarification, no repair | $1.602720 | $12.677040 |
-| All reserves | $3.060720 | $22.883040 |
-| 2× tokens, all reserves | $6.121440 | $45.766080 |
-| 5× tokens, all reserves | $15.303600 | $114.415200 |
+| Scenario | 54 tasks / 63 sessions |
+| --- | ---: |
+| No clarification/repair reserves | $11.219040 |
+| All clarification, no repair | $12.677040 |
+| All reserves | $22.883040 |
+| 2× tokens, all reserves | $45.766080 |
+| 5× tokens, all reserves | $114.415200 |
 
-These are spending scenarios, not evidence of the <=15% cost-per-pass goal or
-the latency/control-cost targets. Deadlines remain 900 seconds per executor
-process and 30 seconds per grading run, subject to host validation.
-
-The user supplied approval/freeze of interface v3 on 2026-10-25. Production
-plugin implementation, provenance, question pause/resume, ledger injection and
-exec/resume compatibility still require host evidence. Disjoint pilot approval,
-all 54 authored tasks, independent review and task freeze remain pending. Pin the
-plugin/config/CLI/model/tier/prices and revise token estimates before seeking
-spending approval. Any batch of ten or more paid calls, including this partial
-H3 scope, requires its estimate reported first. Extra recoveries need a new bound.
+This does not establish the <=15% cost-per-pass goal, latency or control-cost
+targets. Host hook/provenance/pause-resume/ledger/accounting evidence, Claude
+review, disjoint calibration and separate freeze remain pending. Pin plugin,
+CLI/model/tier, prices and population; revise estimates from the pilot before
+approval of ten-plus paid calls. No calls were made. Extra recoveries require a
+new bound; measured runtime and a hard spending cap remain unavailable.

@@ -1,8 +1,12 @@
 ## Current state
 
-- Latest job: 2026-10-25 status-format-migration Role 5.
-- Existing work and evidence are preserved under History.
-- Continue authoring by complete shape: `feature_plus_test`, then `constrained_refactoring`, `multiple_requirements`, `two_session`, `ambiguous_requirement`; nine tasks each, 45 remaining. Keep the DESIGN inventory and domain balance. Preserve private coverage/reference/mutation validation and zero-survivor acceptance for each added shape.
+- Latest consolidation: 2026-10-25 v3-doc-config-corpus-consolidation Role 5.
+- All 54 v3 candidates are authored, six shapes; 63 required sessions; metadata remains unfrozen.
+- Canonical counts: eval/tasks-v3/VALIDATION.md; 24 cross-shape author pairs added; Claude host acceptance pending.
+- Full A/H3 configs contain identical sorted inventories and remain draft_not_approved; plugin mode is design only.
+- Pilot draft reserves ten disjoint IDs across all shapes (11 sessions); separate materials/private validation are not authored.
+- Corpus exporter/tests/synthetic seed included; real retained-run export awaits the host.
+- Continue from the latest dated Remaining section; older History construction remainders are superseded below.
 
 ## History
 
@@ -85,3 +89,51 @@
 ### Assumptions
 
 - See History / Assumptions; format conversion only.
+
+## 2026-10-25 v3-doc-config-corpus-consolidation Role 5
+
+### Done
+
+- Consolidated the 54 validation rows from the six shape-session sources into VALIDATION.md, retaining per-shape evidence with links to canonical counts: 225 covered requirements, 325 reference checks, 3,168 mutants, 2,980 killed, 188 equivalent, zero survivors/errors; these are prior author results, not fresh private validation (`.venv/bin/python /tmp/check_v3_consolidation.py`: PASS, 54 validation rows and totals reconcile).
+- Added 24 cross-shape author comparisons with separate architecture/data-flow/failure columns, covering all six shapes; refreshed DESIGN, README and CHANGES (`.venv/bin/python /tmp/check_v3_consolidation.py`: PASS, 24 pairs with differing shapes).
+- Filled both full-run configs with the same lexicographically ordered 54 IDs and updated estimates for 63 required sessions; all metadata remains frozen=false and configs draft_not_approved (`.venv/bin/python /tmp/check_v3_consolidation.py`: PASS, balanced inventory, session counts and draft refusals).
+- Added the draft A calibration config and estimate: ten reserved disjoint IDs, all six shapes, 11 sessions, calibration=true; materials remain unauthored (`.venv/bin/python /tmp/check_v3_consolidation.py`: PASS, ten unique non-evaluation IDs and draft refusal).
+- Included the corpus session's four new files; replaced the private directory literal with runtime environment/supplied-root basenames plus the generic placeholder, using neutral synthetic tests (`.venv/bin/python /tmp/check_v3_consolidation.py`: PASS, changed corpus sources/fixtures contain no retired literal).
+
+- Verified the eval package including corpus regressions (`.venv/bin/python -m pytest tests/eval -q`: 2147 passed in 444.64s, exit 0).
+
+### Remaining
+
+- Claude independently reviews all-population architecture/data flow/failure mechanisms and public-to-hidden derivations; rerun trusted private validation on the host before the separate freeze. This supersedes History's remaining 45-task authoring/config inventory items; all 54 public tasks now exist.
+- Author the ten reserved disjoint calibration tasks, their private references/graders/coverage and independent validation. The new pilot config is a reservation only. Obtain host pilot approval, run A and manually review at least five outputs; do not reuse or select the 54 held-out tasks based on outcomes. The 60–85% target remains unmeasured.
+- Implement/host-probe actual plugin mode, including provenance, question pause/resume, ledger revision binding, captured artifacts and exact Luna accounting; current harness=true is legacy orchestration. Prior ambiguity-session notes record completed matchers/fixtures, and two-session notes record day-2/carryover evidence; validate them independently on the host.
+- Export available retained report/native streams on the host into the corpus with explicit rebaseline review; only the synthetic seed is present here. Do not infer original-run audit certification from sanitized replay.
+- Freeze public/private inputs only after host review and calibration; pin population, CLI/model/tier, plugin and prices, refresh estimates and obtain spending approval before ten-plus paid calls. Run the full repository suite once before merge; this session runs only tests/eval. No paid calls, real-hook evidence or private-grader reruns occurred here.
+
+### Decisions
+
+- Keep per-shape files as evidence notes with canonical count links: preserve session evidence without competing validation tables.
+- Use lexicographic full-run order for both arms: paired inventories must agree exactly.
+- Reserve a separate cal-v3 namespace/root with two tasks per first four shapes and one per two-session/ambiguity shape: satisfy user-requested all-shape coverage while keeping all 54 evaluation tasks held out. Materials remain explicit future work.
+- Keep draft wrappers and unfrozen task bytes: documentation consolidation does not establish host acceptance, calibration, plugin compatibility or spending approval.
+- Derive private basenames at use time and retain neutral synthetic fixtures: prevent host directory names from entering repository sources while preserving export/rebaseline behavior and existing flags.
+
+### Verify commands
+
+- `.venv/bin/python -m pytest tests/eval -q` (2147 passed in 444.64s, exit 0).
+- `.venv/bin/python /tmp/check_v3_consolidation.py` (PASS: inventories, unfrozen metadata, draft refusal, validation totals, cross-shape pairs, privacy/scope/staging checks).
+- `git diff --check` (exit 0).
+- `git diff --name-only -- eval/tasks eval/tasks-v2 eval/prices.yaml schemas controller verifier plugin prompts AGENTS.md` (empty output).
+- `git diff --cached --name-only` (empty output).
+
+### Do not touch
+
+- Only eval/, tests/eval/ and state/STATUS-eval.md are authorized. No task prompt, workspace or meta.json edits; no historical task/report/schema/CLI changes.
+- No private-root discovery/access, network, model calls, plugin installation, staging, commits, deletions or history rewriting in this session. Keep .git read-only.
+- Preserve prior STATUS dated sections and History; this consolidation alone refreshes Current state. No sub-agents.
+
+### Assumptions
+
+- The user's 54-task inventory is authoritative and matches public discovery; original shape-session validation is consolidated as recorded evidence, not re-certified without private storage.
+- No disjoint calibration materials exist in this worktree: the ten-task pilot config reserves future materials rather than silently using held-out tasks. Its single two-session task requires 11 sessions; report ambiguity/carryover separately from difficulty calibration.
+- Existing offline Fast prices remain uncalibrated planning inputs; no cost cap, paid execution approval or successful plugin runtime is inferred.

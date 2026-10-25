@@ -2,18 +2,8 @@
 
 Nine candidates are complete and remain `frozen=false`. This author review does not establish independent acceptance, calibration or host freeze. No model calls were made.
 
-| Task ID | Requirements covered | Reference pass | Starter fail | Generated | Targeted | Executed | Killed | Equivalent | Survivors | Errors |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| v3-cache-negative | 4 | 6 | 4 | 32 | 2 | 34 | 30 | 4 | 0 | 0 |
-| v3-event-watermark | 4 | 5 | 4 | 42 | 2 | 44 | 41 | 3 | 0 | 0 |
-| v3-index-cursor | 4 | 5 | 4 | 92 | 2 | 94 | 86 | 8 | 0 | 0 |
-| v3-link-preview | 4 | 6 | 5 | 8 | 2 | 10 | 9 | 1 | 0 | 0 |
-| v3-plural-catalog | 4 | 5 | 3 | 39 | 2 | 41 | 39 | 2 | 0 | 0 |
-| v3-pool-lease | 4 | 6 | 3 | 59 | 2 | 61 | 54 | 7 | 0 | 0 |
-| v3-scope-explanation | 4 | 6 | 5 | 41 | 2 | 43 | 40 | 3 | 0 | 0 |
-| v3-undo-group | 4 | 6 | 5 | 14 | 2 | 16 | 15 | 1 | 0 | 0 |
-| v3-workflow-checkpoint | 4 | 6 | 4 | 57 | 2 | 59 | 55 | 4 | 0 | 0 |
-| Total | 36 | 51 | 37 | 384 | 18 | 402 | 369 | 33 | 0 | 0 |
+Validation counts are maintained only in [VALIDATION.md](VALIDATION.md).
+This file preserves the original shape-session evidence and author pair review.
 
 All nine untouched starters fail substantive checks. Uncovered requirements, unexecuted mutants, shared public assertion lines, shared corpus assertions and corpus warnings: 0 each. Corpus files examined per task: 994. Hash-bound equivalence reviews and requirement derivations are retained outside public inputs.
 

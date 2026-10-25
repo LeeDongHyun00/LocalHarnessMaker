@@ -1,3 +1,32 @@
+# Version 3 consolidation and corpus privacy — 2026-10-25
+
+Consolidate all 54 shape-session validation rows into VALIDATION.md; per-shape
+files retain evidence and link to canonical counts. Add 24 cross-shape author
+pairs on all three DESIGN axes. Refresh README and draft full A/H3 inventories
+and estimates for 54 tasks/63 sessions. Keep all task metadata unfrozen and
+independent Claude host acceptance pending.
+
+Reserve a draft A-only pilot with ten separate calibration IDs across all six
+shapes (11 sessions), an explicit disjointness rule and estimate. Materials and
+private validation remain pending; this draft cannot execute. No paid calls,
+private-grader access, task edits, staging or commits occurred.
+
+Include the prior corpus session's exporter, regression tests and synthetic
+seed. Derive forbidden private directory names from runtime environment basenames
+and supplied roots; retain the generic placeholder and neutral synthetic tests.
+Export/rebaseline behavior and existing CLI flags remain unchanged. Real retained
+corpus export requires the host; synthetic replay is not original-run certification.
+
+Verification: `.venv/bin/python -m pytest tests/eval -q` — 2147 passed in
+444.64s. Inventory/draft/privacy/scope checks and `git diff --check` pass.
+
+## Assumptions
+
+- Lexicographic ID order is the common full-run order; host review/pilot/freeze
+  and runtime pins precede execution. Offline price scenarios are uncalibrated.
+- Disjoint pilot materials are absent; separate IDs reserve future work rather
+  than reusing the held-out population. All-shape coverage includes one two-session task.
+
 # Version 3 bug-fix construction — 2026-10-25
 
 Author and offline-validate all nine `bug_fix` candidates. Each includes its own

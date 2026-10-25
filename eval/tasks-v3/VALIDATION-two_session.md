@@ -2,18 +2,8 @@
 
 Nine two-session candidates, 18 required executor sessions; 9 remain unfrozen. All day-2 requests depend on at least three day-1 policy decisions. Calibration, the 60–85% A target, independent review and host freeze remain unmeasured/pending. No paid calls or model outcomes were used.
 
-| Task ID | Requirements covered | Reference pass | Starter fail | Generated | Targeted | Executed | Killed | Equivalent | Survivors | Errors |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| v3-component-order | 5 | 5 | 4 | 66 | 2 | 68 | 65 | 3 | 0 | 0 |
-| v3-document-theme | 5 | 5 | 4 | 44 | 2 | 46 | 46 | 0 | 0 | 0 |
-| v3-import-reconcile | 5 | 5 | 5 | 58 | 2 | 60 | 57 | 3 | 0 | 0 |
-| v3-package-lock | 5 | 6 | 5 | 105 | 2 | 107 | 100 | 7 | 0 | 0 |
-| v3-page-recovery | 5 | 8 | 8 | 66 | 2 | 68 | 66 | 2 | 0 | 0 |
-| v3-secret-redaction | 5 | 5 | 5 | 75 | 2 | 77 | 70 | 7 | 0 | 0 |
-| v3-shift-calendar | 5 | 6 | 5 | 94 | 2 | 96 | 93 | 3 | 0 | 0 |
-| v3-stream-negotiation | 5 | 6 | 6 | 71 | 2 | 73 | 70 | 3 | 0 | 0 |
-| v3-trace-sampling | 5 | 6 | 6 | 113 | 2 | 115 | 104 | 11 | 0 | 0 |
-| Total | 45 | 52 | 48 | 692 | 18 | 710 | 671 | 39 | 0 | 0 |
+Validation counts are maintained only in [VALIDATION.md](VALIDATION.md).
+This file preserves the original shape-session evidence and author pair review.
 
 Uncovered requirements, shared public assertion lines, shared corpus assertion lines, corpus warnings, unresolved mutants and unexecuted mutants: 0 each. The corpus scan examined 994 distinct retained files per task (8,946 task/file occurrences). All generated and targeted populations were exhausted; equivalence reviews are private and hash-bound. Timeouts are unresolved, never counted as kills.
 
