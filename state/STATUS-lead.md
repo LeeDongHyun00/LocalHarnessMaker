@@ -158,3 +158,42 @@
 - This session performs the single format-consolidation job; other-role migration records reference their preserved legacy work without changing its meaning.
 - Synthetic pin evidence and a mocked Luna client exercise package contracts only. No installed-Codex/provider/command-isolation acceptance is inferred.
 - Shared verifier check help must retain both documented modes; flags are compared to their documented union and unconditional requirements to their intersection. Actual v3 behavior is exercised by the integration test.
+
+## 2026-10-25 r1-pin-observed-001 Role 1
+
+### Done
+
+- Published accepted decision 0012, the two model verification sources, version-specific operator procedure and unchanged controller identity enforcement; synchronized AGENTS.md section 3 and docs/interfaces-v3.md while retaining frozen version 3 (.venv/bin/python -m pytest tests/lead -q: 171 passed in 13.21s).
+- Added only the closed model_evidence object and its enabled-result requirement to the pin-check schema, preserving existing enabled reason_codes and all other constraints; added listing/probe synthetic examples and the offline example mapping (make validate-schemas: Validated 11 draft 2020-12 schemas and 14 examples).
+- Added source, required-field, unknown-field, nullable-value, timestamp, hash and enabled-reason regression coverage; reused the repository's deterministic RFC 3339 checker because optional jsonschema format dependencies are absent (.venv/bin/python -m pytest tests/lead -q: 171 passed in 13.21s; initial run: 3 timestamp-test failures, corrected in the test helper).
+- Confirmed the requested additive scope and historical preservation without runtime edits (python3 inline HEAD structural/byte comparison: Pin-check change is exactly additive; 23 other tracked schema/example/marker files unchanged; VERSION=3; git diff --check -- AGENTS.md docs/interfaces-v3.md docs/decisions/0012-pin-check-observed-service.md docs/validate_schemas.py schemas tests/lead state/STATUS-lead.md: exit 0, no output).
+
+### Remaining
+
+- Role 2 must implement the approved version-specific luna_observation registry and pin-check evidence integration in owned paths; Role 3 retains per-call identity enforcement. The additive schema still requires checks.model_listed=true and a model_list artifact when enabled. Any required relaxation needs a separate approved interface change; do not fabricate listing evidence. Synthetic examples do not establish a working no-listing runtime path.
+- The prior r1-process-001 late audit-merge regressions now pass in this checkout; host full-suite-before-merge and real installation/compatibility/sandbox validation remain pending. This session does not attribute or certify an owning-role runtime fix.
+- Continue History / Remaining integration, held-out v3 freeze, smokes, evaluation and presentation work in its existing order. No live H3 acceptance is established here.
+
+### Decisions
+
+- Publish 0012 at version 3 as an explicit exception to the normal increment rule: the user approved this exact amendment at 05:55 KST and required the set to stay frozen at version 3.
+- Preserve all pre-existing schema constraints and record the legacy listing limitation: the user authorized only an additive model_evidence change, not relaxation of checks/model_list or runtime implementation.
+- Append this job without refreshing Current state: this is an ordinary amendment job, not a status consolidation job.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/lead -q
+- make validate-schemas
+- git diff --check -- AGENTS.md docs/interfaces-v3.md docs/decisions/0012-pin-check-observed-service.md docs/validate_schemas.py schemas tests/lead state/STATUS-lead.md
+- python3 inline structural comparison against HEAD removing only model_evidence and then.required; byte comparison of all other tracked schemas/examples/VERSION.
+
+### Do not touch
+
+- Runtime packages, plugin/VERIFIED_VERSIONS.json, other roles' tests/STATUS, eval artifacts/task sets/private graders, docs/weekly, docs/handoff, docs/evaluation, root configuration and read-only .git. Do not stage, commit, delete files, rewrite history, change external configuration, use network, invoke live/nested models or spawn sub-agents.
+- Historical schemas/examples and all frozen interfaces except the exact user-approved 0012 addition. Subsequent changes require their own decision, explicit approval and version increment.
+
+### Assumptions
+
+- The 05:55 KST approval, installed-CLI listing failure and six-second priority Luna probe are supplied host evidence, not independently measured here. The external evidence file and its user-referenced Role 2 history digest were not available as a verifiable observation in this checkout; no digest or native thread identity is invented.
+- Both examples are synthetic schema fixtures. Their existing enabled listing fields are retained to satisfy unchanged constraints and do not prove that probe-only enablement is implemented.
+- No PR is requested; this append supplies the change summary and Assumptions. The host owns full-suite validation, staging and committing after reviewing runtime integration.

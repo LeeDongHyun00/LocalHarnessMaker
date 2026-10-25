@@ -2,10 +2,12 @@
 
 Status: frozen, approved by the user on 2026-10-25 at 01:55 KST, exactly as proposed at commit
 `d82b87a` in this document and `schemas/`, under [0011](decisions/0011-pinned-luna-hook-direction.md).
-`schemas/VERSION = 3` now denotes the frozen set. Roles 2–5 start implementation
-now. Any later change to a frozen v3 schema requires a new decision, explicit
-user approval and a version increment. Schema bytes (including original proposal
-metadata) are preserved exactly; this approval record governs their status.
+`schemas/VERSION = 3` includes [amendment 0012](decisions/0012-pin-check-observed-service.md),
+accepted by the user on 2026-10-25 at 05:55 KST. The set remains frozen at
+version 3 with this approved exception to the version-increment rule. Only the
+pin-check schema and its examples are amended; other frozen schema bytes
+(including original proposal metadata) remain preserved. Any subsequent change
+requires a new decision, explicit user approval and a version increment.
 Versions 1/2 interfaces remain in [interfaces.md](interfaces.md), including all
 six historical CLIs. Frozen v3 hook operations and event mapping are published
 in [AGENTS.md sections 3.2–3.3](../AGENTS.md); no new hook wire fields are added.
@@ -177,7 +179,7 @@ Ledger validation is schema plus runtime ID/hash/path checks, not an LLM call.
 
 SessionStart writes `pin-check.json` before Luna work, with exact requested model
 `gpt-6-luna`, observed CLI version, version/model/pricing checks, hash-pinned
-model list and pricing snapshot, pricing_ref, reason codes and user-readable
+model verification evidence and pricing snapshot, pricing_ref, reason codes and user-readable
 advisory. `enabled` requires every check true and observed evidence. Missing,
 renamed or unobservable model, unverified version, absent price coverage, or
 conflicting provider model identity disables all later Luna calls. The user sees
@@ -186,6 +188,36 @@ H3. Deterministic guard/ledger behavior remains available if safely configured.
 Do not substitute a newer model, use local control or derive HTTP credentials
 from CLI login. Pin failure is fail-closed for Luna functionality, not permission
 to change external configuration. Probe newer CLI versions before using them.
+
+Amendment 0012 permits two model verification sources in `model_evidence`:
+`listing` for an exact model-list entry, or `probe_observation` when no listing
+facility answers. The object is optional for disabled results and required for
+`enabled`, whose `reason_codes` stays empty. It has required fields `source`,
+`observed_model` (string), `service_tier` (string or null), `observed_at` (RFC 3339),
+`thread_id` (string or null), and `evidence_sha256` (64 lowercase hex or null).
+The object rejects unknown fields. Listing verification records `source=listing`.
+Existing `checks` and `model_list` schema constraints remain unchanged; the
+synthetic probe example does not establish a real listing or live acceptance.
+
+Host operator procedure when the installed CLI version changes:
+
+1. Verify hook compatibility for that exact version under decision 0006. Try the
+   supported listing facility; a responding list must contain the exact pin.
+2. If no listing facility answers, run a minimal pinned `gpt-6-luna` probe at
+   low effort and retain the native service identity evidence (for example,
+   `thread_settings_applied`), observed tier, timestamp, thread ID and evidence
+   hash. This is an operator action outside the two per-session hook calls;
+   SessionStart does not automatically invoke a model probe.
+3. Record that version's observation in `plugin/VERIFIED_VERSIONS.json` as
+   `luna_observation`, then enable H3 only after pin, pricing and artifact
+   validation pass. A version without recorded observation stays disabled;
+   never reuse another CLI version's observation or fabricate missing fields.
+
+The controller still checks requested model equals observed model on every
+call. A mismatch records `pin_mismatch` and exits 2, rather than accepting the
+output. Observed availability does not replace this enforcement or permit
+fallback from an answering list that omits the pin. Registry/runtime changes
+belong to the owning roles; this interface publication does not implement them.
 
 At most two provider invocations per native session: one requirements and one
 claim audit, each low effort. Failures, transport attempts, regenerations and

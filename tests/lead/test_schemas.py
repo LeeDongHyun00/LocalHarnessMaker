@@ -33,7 +33,7 @@ def contract_with(check: dict[str, Any]) -> dict[str, Any]:
 
 
 def test_all_schemas_and_examples_validate() -> None:
-    assert validator_module.validate_tree() == (11, 13)
+    assert validator_module.validate_tree() == (11, 14)
 
 
 @pytest.mark.parametrize("check", [

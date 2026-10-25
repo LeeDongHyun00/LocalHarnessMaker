@@ -20,5 +20,13 @@
   },
   "pricing_ref": "SYNTHETIC-prices-v3",
   "reason_codes": [],
-  "advisory": "SYNTHETIC: pinned Luna hooks enabled."
+  "advisory": "SYNTHETIC: pinned Luna hooks enabled.",
+  "model_evidence": {
+    "source": "listing",
+    "observed_model": "gpt-6-luna",
+    "service_tier": null,
+    "observed_at": "2026-10-25T00:00:00Z",
+    "thread_id": null,
+    "evidence_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
 }

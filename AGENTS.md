@@ -45,8 +45,12 @@ Rules:
 
 Status: frozen, approved by the user on 2026-10-25 at 01:55 KST, exactly as proposed in
 `docs/interfaces-v3.md` and `schemas/` at commit `d82b87a`.
-`schemas/VERSION` stays 3 and now denotes the frozen set. Roles 2–5 start
-implementation now. Any later change to a frozen v3 schema requires a new
+`schemas/VERSION` stays 3 and includes amendment
+[0012](docs/decisions/0012-pin-check-observed-service.md), accepted by the user
+on 2026-10-25 at 05:55 KST: pin-check adds model evidence from a listing or a
+version-specific operator probe observation. The set remains frozen at version 3
+with this approved exception to the version-increment rule. Roles 2–5 implement
+the amended set. Any subsequent change to a frozen v3 schema requires a new
 decision, explicit user approval and a version increment. Publication does not
 assert runtime implementation or compatibility.
 
@@ -59,7 +63,7 @@ schemas and examples in schemas/examples/:
 | requirements.schema.json | Native session ID, prompt path/hash, state; numbered id/text/kind/source_excerpt/code-derived check rows; open_questions with nullable user answers; Luna accounting reference |
 | completion-report.schema.json | Requirements hash; current final-message hash; per-requirement pass/fail/unverifiable and check evidence (output excerpt, path, hash); claim audit with cited evidence and audited-message hash; single-retry record; escalation advice |
 | ledger.schema.json | Executor-written decisions/rationale and fixed names/signatures/constants with paths; open items; hook-owned validation with identifier presence and workspace hashes |
-| pin-check.schema.json | Installed version, exact model-list/pricing checks with evidence hashes, enabled/disabled status, reason codes and visible advisory |
+| pin-check.schema.json | Installed version, exact model/pricing checks with evidence hashes, listing or probe model_evidence (required when enabled), enabled/disabled status, reason codes and visible advisory |
 | luna-call.schema.json | One accounting JSONL line: session/call/phase, requested and actual model, backend, low effort, tokens, latency, pricing_ref, nullable USD, status/error |
 
 Requirement kinds map deterministically: behavior -> configured project tests
@@ -81,8 +85,15 @@ The ledger supersedes handoff only for this hook path; keep handoff.schema.json
 for retained v1/v2 artifacts. All artifact paths are confined relative paths;
 code checks IDs, source/target correspondence, hashes and call references.
 
-Pin `gpt-6-luna` at low effort, verify installed Codex version/model list and
-pinned pricing at SessionStart. Fail closed: missing/renamed/unobservable model,
+Pin `gpt-6-luna` at low effort, verify installed Codex version/model evidence and
+pinned pricing at SessionStart. Per 0012, use `source=listing` when a listing
+answers; when no listing facility answers, permit `source=probe_observation`
+from a minimal pinned probe recorded by the host operator for that exact CLI
+version in `plugin/VERIFIED_VERSIONS.json` as `luna_observation`. A version
+without recorded observation stays disabled. On version changes, probe and
+record again before enabling H3. The controller still requires requested model
+to equal observed model per call; mismatch records `pin_mismatch` and exits 2.
+Fail closed: missing/renamed/unobservable model,
 unverified version, missing price coverage or provider identity mismatch writes
 a visible advisory and disables Luna hooks; never silently substitute. At most
 two calls per native session, one requirements and one claim audit, counting

@@ -28,6 +28,7 @@ EXAMPLE_SCHEMAS = {
     "completion-report.json": "completion-report.schema.json",
     "ledger.json": "ledger.schema.json",
     "pin-check.json": "pin-check.schema.json",
+    "pin-check-probe.json": "pin-check.schema.json",
     "luna-call.json": "luna-call.schema.json",
 }
 REQUIRED_SCHEMAS = set(EXAMPLE_SCHEMAS.values())

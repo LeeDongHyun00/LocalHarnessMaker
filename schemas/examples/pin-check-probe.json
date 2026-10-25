@@ -1,0 +1,32 @@
+{
+  "schema_version": 3,
+  "session_id": "synthetic-session",
+  "checked_at": "2026-10-25T00:00:00Z",
+  "status": "enabled",
+  "requested_model": "gpt-6-luna",
+  "codex_version": "SYNTHETIC verified version",
+  "checks": {
+    "codex_version_verified": true,
+    "model_listed": true,
+    "pricing_covered": true
+  },
+  "model_list": {
+    "path": "evidence/models.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "pricing_snapshot": {
+    "path": "evidence/prices.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "pricing_ref": "SYNTHETIC-prices-v3",
+  "reason_codes": [],
+  "advisory": "SYNTHETIC: pinned Luna hooks enabled with recorded probe observation.",
+  "model_evidence": {
+    "source": "probe_observation",
+    "observed_model": "gpt-6-luna",
+    "service_tier": "priority",
+    "observed_at": "2026-10-25T00:00:00Z",
+    "thread_id": "SYNTHETIC-probe-thread",
+    "evidence_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

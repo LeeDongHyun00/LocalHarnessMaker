@@ -9,9 +9,11 @@ from pathlib import Path
 import shutil
 from typing import Any
 
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator
 import pytest
 from referencing import Registry, Resource
+
+from docs.validate_schemas import format_checker
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"
@@ -28,7 +30,7 @@ def validator(name: str) -> Draft202012Validator:
         for path in SCHEMAS.glob("*.schema.json")
     )
     return Draft202012Validator(load(f"{name}.schema.json"), registry=registry,
-                               format_checker=FormatChecker())
+                               format_checker=format_checker())
 
 
 @pytest.mark.parametrize("name", NEW)
@@ -186,3 +188,63 @@ def test_direction_and_schema_set_are_approved_and_frozen() -> None:
         assert "01:55 KST" in content, name
     # The old report schema is deliberately not relabeled as interface v3.
     assert "Interface version 2" in load("evaluation-report.schema.json")["description"]
+
+
+@pytest.mark.parametrize("example,source", [
+    ("pin-check.json", "listing"),
+    ("pin-check-probe.json", "probe_observation"),
+])
+def test_pin_evidence_sources_require_complete_closed_records(example: str, source: str) -> None:
+    sample = load(f"examples/{example}")
+    check = validator("pin-check")
+    check.validate(sample)
+    assert sample["model_evidence"]["source"] == source
+    assert sample["reason_codes"] == []
+    for field in sample["model_evidence"]:
+        invalid = copy.deepcopy(sample)
+        invalid["model_evidence"].pop(field)
+        assert not check.is_valid(invalid), field
+    invalid = copy.deepcopy(sample)
+    invalid["model_evidence"]["unexpected"] = True
+    assert not check.is_valid(invalid)
+    sample.pop("model_evidence")
+    assert not check.is_valid(sample)
+    sample.update(status="disabled", reason_codes=["model_list_unavailable"])
+    check.validate(sample)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("source", "inferred"), ("observed_model", None), ("observed_model", 1),
+    ("service_tier", 1), ("thread_id", 1), ("observed_at", None),
+    ("observed_at", "2026-10-25"), ("observed_at", "2026-10-25T05:55:00"),
+    ("observed_at", "2026-13-25T05:55:00Z"),
+    ("evidence_sha256", "A" * 64), ("evidence_sha256", "a" * 63),
+    ("evidence_sha256", "g" * 64), ("evidence_sha256", 1),
+])
+def test_pin_evidence_rejects_invalid_types_formats_and_sources(field: str, value: Any) -> None:
+    sample = load("examples/pin-check-probe.json")
+    sample["model_evidence"][field] = value
+    assert not validator("pin-check").is_valid(sample)
+
+
+@pytest.mark.parametrize("example", ["pin-check.json", "pin-check-probe.json"])
+def test_pin_evidence_nullable_fields_and_enabled_reason_codes(example: str) -> None:
+    sample = load(f"examples/{example}")
+    sample["model_evidence"].update(service_tier=None, thread_id=None, evidence_sha256=None,
+                                    observed_at="2026-10-25T05:55:00+09:00")
+    check = validator("pin-check")
+    check.validate(sample)
+    sample["reason_codes"] = ["model_missing"]
+    assert not check.is_valid(sample)
+
+
+def test_observed_service_amendment_keeps_v3_and_operator_identity_rules() -> None:
+    decision = (ROOT / "docs/decisions/0012-pin-check-observed-service.md").read_text()
+    assert "Status: accepted by the user on 2026-10-25 at 05:55 KST" in decision
+    assert (SCHEMAS / "VERSION").read_text().strip() == "3"
+    for name in ["AGENTS.md", "docs/interfaces-v3.md", "docs/decisions/0012-pin-check-observed-service.md"]:
+        content = (ROOT / name).read_text()
+        for term in ["0012", "listing", "probe_observation", "luna_observation",
+                     "plugin/VERIFIED_VERSIONS.json", "pin_mismatch", "exits 2" if name != "docs/decisions/0012-pin-check-observed-service.md" else "exit 2"]:
+            assert term in content, (name, term)
+        assert "version 3" in content
