@@ -320,7 +320,7 @@ A clean audit states no access was observed; it does not prove read isolation.
 
 ## 4. Working rules
 
-1. Start of session: read state/STATUS-ROLE.md for your role. Continue from the first item under the heading Remaining. If the file is empty, do the First task section of your role prompt.
+1. Start of session: read the current state block and latest dated job section in state/STATUS-ROLE.md for your role. Continue from its first Remaining item, following History references when present. If the file is empty, do the First task section of your role prompt.
 2. Assumptions: never guess. List anything the request does not specify under a heading named Assumptions, both in the PR description and in the STATUS file.
 3. Bias to action: do not stop to ask questions. Produce a reviewable result, then report it together with your assumptions. Stop only for the conditions in section 5.
 4. Definition of done: tests pass, STATUS file updated, change summary written. Every claim of done must carry evidence, meaning the command you ran and its output. Items without evidence are reported as not done.
@@ -330,6 +330,7 @@ A clean audit states no access was observed; it does not prove read isolation.
 8. Scope: no unrequested refactoring or features. Do not change schemas, CLIs or hook interfaces. Only Role 1 may.
 9. Secrets: API keys come from environment variables only. Never write them into the repository.
 10. Reports: short paragraphs and tables. No decorative formatting, no repetition, no closing summaries.
+11. Parallel jobs: different roles may work concurrently in their own worktrees. Within one role, concurrent jobs must use disjoint paths and unique job IDs, followed by a single consolidation job that integrates their changes, refreshes the STATUS current state block and runs the package checks. Append each job's dated STATUS section without rewriting another job's lines. This rule permits separate jobs, not sub-agents within a session.
 
 ## 5. Stop and escalate conditions
 
@@ -341,10 +342,25 @@ Stop and report to the user when any of these holds:
 
 ## 6. STATUS file format
 
-File: state/STATUS-ROLE.md. Use exactly these headings, in this order, as markdown level-2 headings:
+File: state/STATUS-ROLE.md. Keep a short `## Current state` block at the top,
+at most 10 lines including its heading. Only the single consolidation job
+refreshes that block; ordinary jobs append their own sections at EOF.
+
+Each job appends one section with the fixed header line
+`## <date> <job id> <role>`, where date is YYYY-MM-DD in Asia/Seoul, job id is
+unique within the role, and role is `Role 1` through `Role 5`. Completed job
+sections are append-only: corrections and follow-up evidence belong in a new
+dated section. Concurrent same-role jobs reserve disjoint implementation paths;
+their STATUS appends are combined by the consolidation job without editing
+the appended text. Archive pre-conversion prose under `## History`, preserving
+all content and demoting its headings so the archive remains one section.
+Do not infer dates or job IDs for legacy work; the conversion job's date labels
+only the format migration. Historical completion claims retain their original evidence.
+
+Within each dated job section use exactly these markdown level-3 headings, in order:
 
 1. Done. One bullet per item, each ending with the evidence in parentheses: the command and its result.
-2. Remaining. One bullet per item, in the order they should be done.
+2. Remaining. One bullet per item, in the order they should be done; carry forward or reference unresolved prior work explicitly.
 3. Decisions. One bullet per decision in the form: what was decided, then a colon, then why.
 4. Verify commands. One bullet per command that shows the current state is correct.
 5. Do not touch. One bullet per path or rule the next session must not change.

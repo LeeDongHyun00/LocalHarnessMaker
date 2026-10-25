@@ -44,6 +44,12 @@ roles' tests/STATUS and task sets. No staging/commit in a read-only .git session
 2. Run the full suite once before merge, not after each edit. Host-only checks remain pending with their owners in restricted sessions.
 3. Update STATUS with evidence, remaining work, decisions, commands, exclusions and Assumptions; give a short change summary. Do not claim runtime implementation from schema tests.
 
+## Reporting
+
+Final report at most 40 lines. Limit README and CHANGES edits to what changed.
+Do not restate the brief. Append the dated job STATUS section required by
+AGENTS.md section 6; only the consolidation job refreshes the current state block.
+
 ## Stop and escalate conditions
 
 In addition to AGENTS.md STOP-1 through STOP-4:

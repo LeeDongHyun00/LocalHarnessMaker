@@ -64,6 +64,12 @@ smokes only where authorized and available, retaining logs/version/model/tier
 and hashes. No live batch of ten or more without estimate and STOP-3 handling.
 Update STATUS; never claim live acceptance from mocked tests.
 
+## Reporting
+
+Final report at most 40 lines. Limit README and CHANGES edits to what changed.
+Do not restate the brief. Append the dated job STATUS section required by
+AGENTS.md section 6; only the consolidation job refreshes the current state block.
+
 ## Stop and escalate conditions
 
 - STOP-P1: measured hooks cannot provide required continuation/context; propose an alternative without silently replacing real-plugin evaluation.

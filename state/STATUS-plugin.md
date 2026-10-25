@@ -1,4 +1,12 @@
-## Done
+## Current state
+
+- Latest job: 2026-10-25 status-format-migration Role 2.
+- Existing work and evidence are preserved under History.
+- Integrate Roles 3/4 before any H3/live acceptance: this checkout still has historical controller/verifier parsers. plugin/v3_adapter.py alone contains the user-authorized v3 CLI spellings and the provisional verifier.ledger.ledger_request(ledger=Path, requirements=Path, session_id=str) formatter seam. Match that seam to Role 4's actual in-package ledger text; the current missing formatter fails open visibly and never substitutes plugin-authored wording.
+
+## History
+
+### Done
 
 - Implemented the default v3 hook runtime, exact-model/version/pricing pin-check CLI, confined atomic artifacts, immutable evidence and append-only accounting-prefix validation; legacy v1/v2 routing and evidence remain explicit historical paths (.venv/bin/python -m pytest tests/plugin -q: 313 passed, 1 opt-in real Codex test skipped in 27.21s; mocked pin tests cover exact/renamed/missing/unobservable models, unverified versions, missing prices, timeout and app-server model/list responses).
 - Added per-native-session phase locking/reservations, first-prompt requirements and explicit-answer question pauses, deterministic completion delegation, one executed-failure repair, stale audits, one separate ledger continuation, strict prior-session selection and ledger coverage/hash checks (.venv/bin/python -m pytest tests/plugin -q: 313 passed, 1 skipped in 27.21s; v3 stdin/stdout and state-machine fixtures cover success, disabled pin, pending questions, edited pending workspace, one repair, escalation, duplicate Stops, ledger publication/injection and rejection without older-ledger fallback).
@@ -62,7 +70,7 @@
 - Parameterized the real inherited-pipe process tree for twenty consecutive cases in one session, requiring exit code 3, exact captured output, return within three seconds of the leader's exit announcement and no live grandchild. Added transient/persistent EPERM/ESRCH injection for normal exit, timeout, SIGTERM/SIGHUP/SIGINT, plus individual-signal/reap errors and process-list filtering (.venv/bin/python -m pytest tests/plugin -q: 174 passed, 1 opt-in Codex test skipped in 13.56s; all twenty real-tree cases passed).
 - Documented fallback signalling, zombie-aware verification, stderr diagnostics and sandbox limits; no Codex/model calls, real configuration changes, stage or commit were performed (git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
 
-## Remaining
+### Remaining
 
 - Integrate Roles 3/4 before any H3/live acceptance: this checkout still has historical controller/verifier parsers. plugin/v3_adapter.py alone contains the user-authorized v3 CLI spellings and the provisional verifier.ledger.ledger_request(ledger=Path, requirements=Path, session_id=str) formatter seam. Match that seam to Role 4's actual in-package ledger text; the current missing formatter fails open visibly and never substitutes plugin-authored wording.
 - Host-only v3 verification: after integration run .venv/bin/python -m plugin.host_checks v3-prepare --out /tmp/lhm-v3-host-capture, follow its two interactive session scripts/explicit question-answer instructions, then run v3-check. Verify exact installed model/list protocol, pin disablement, fresh-session hook trust, requirements table/pause, real completion/one repair, ledger writing and injection on two non-evaluation smoke projects. No Codex/model/sandbox-exec was run here; timing, two-call cost targets and real model-context acceptance remain unmeasured.
@@ -72,7 +80,7 @@
 - Pending host measurement: revised Stop 660s / check 480s / handoff 120s / validation 5s budgets and Role 4's internal 450s verifier budget, plus contract cutoff at 30s inside 40s despite the controller's 35s deadline. SIGINT/deadline/exception cleanup with real controller/verifier/Codex descendants remains separate from the completed host SIGTERM/SIGHUP/child-exit checks.
 - Before merge: coordinating role runs the full suite once. This job runs only tests/plugin; .git is read-only and all work remains unstaged/uncommitted. Do not disturb the in-progress host evaluation or edit eval/, controller/ or verifier/.
 
-## Decisions
+### Decisions
 
 - Implement the schema freeze and four v3 CLI operation shapes supplied explicitly by the user: that authorization supersedes the still-proposed wording in checked-in shared documents without editing another role's paths.
 - Use a thin v3 adapter and retain explicit HARNESS_INTERFACE_VERSION=2 for historical demos/tests (HARNESS_STUB=1 also remains historical): the production default is v3 and legacy retry/backend defaults do not leak into it.
@@ -114,7 +122,7 @@
 
 - Detect leader exit independently of pipe EOF with 50ms communicate slices and poll, then drain only after group shutdown with a 250ms bound: inherited descriptors cannot defer cleanup to the CLI deadline. Preserve buffered stdin/output across slices and return the leader's actual exit status. Timeout and catchable-signal shutdown keep the existing TERM/grace/KILL protocol.
 
-## Verify commands
+### Verify commands
 
 - .venv/bin/python -m pytest tests/plugin -q
 - bash -n plugin/install.sh plugin/demo.sh
@@ -147,7 +155,7 @@
 - After host capture: .venv/bin/python -m plugin.check_demo_evidence plugin/evidence/DATE-real
 - Optional host stub reproduction: HARNESS_STUB=1 bash plugin/demo.sh --out plugin/evidence/NEW-stub --scripted-approval
 
-## Do not touch
+### Do not touch
 
 - controller/, verifier/, eval/, schemas/, prompts/, shared root files, docs/hooks-contract.md and other roles' STATUS files; user-authorized paths in this worktree are plugin/, tests/plugin/ and state/STATUS-plugin.md only.
 - .git is read-only: do not stage or commit. Preserve all historical evidence and demos, exact HARNESS_NESTED=1 zero-byte guards and copied child environments. Never run the live host scripts in this sandbox.
@@ -160,7 +168,7 @@
 - Recorded evidence directories: use a new directory for another experiment; approval cannot be retried over existing evidence. Do not delete temporary workspaces, login symlinks or repository files under STOP-4.
 - Never infer real task success, control-model latency, actual cost, fork/clear behavior, real handoff success or installed packaging from synthetic fixture verdicts.
 
-## Assumptions
+### Assumptions
 
 - The user's 2026-10-25 schema freeze/CLI instructions are the current authority; no separate approval or shared interface edit is needed in this session.
 - Explicit question-ID/answer JSON is a local recording convention with no new hook wire field. Unstructured answers remain pending rather than being guessed.
@@ -205,3 +213,29 @@
 - The sandbox forbids ps. The regression therefore checks PID liveness directly and, on Linux, treats an orphan zombie as exited pending init reaping. It requires no live descendant; collection of orphan exit records belongs to init/launchd.
 
 - This session assumes host ps enumeration is available for the macOS fallback. The workspace sandbox denies ps; transient/persistent EPERM/ESRCH member enumeration is injected in unit tests, while actual trees verify no live grandchildren via PID probes. Claude's repeated macOS process-tree checks were subsequently completed on the host, as recorded above.
+
+## 2026-10-25 status-format-migration Role 2
+
+### Done
+
+- Format conversion only; see History / Done (python3 inline conversion audit: archived bytes restore exactly).
+
+### Remaining
+
+- See History / Remaining; format conversion only.
+
+### Decisions
+
+- See History / Decisions: format conversion only; existing decisions are unchanged.
+
+### Verify commands
+
+- See History / Verify commands; format conversion only.
+
+### Do not touch
+
+- See History / Do not touch; format conversion only.
+
+### Assumptions
+
+- See History / Assumptions; format conversion only.

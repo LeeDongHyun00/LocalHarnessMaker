@@ -64,6 +64,12 @@ with local schema references and runtime cross-artifact checks. Host-only
 sandbox/Codex tests need real evidence; mocked results are not live acceptance.
 Update STATUS with exact commands/results and pending integration limits.
 
+## Reporting
+
+Final report at most 40 lines. Limit README and CHANGES edits to what changed.
+Do not restate the brief. Append the dated job STATUS section required by
+AGENTS.md section 6; only the consolidation job refreshes the current state block.
+
 ## Stop and escalate conditions
 
 - STOP-V1: shared schema/CLI addition needed; propose it and stop before changing another role's paths.

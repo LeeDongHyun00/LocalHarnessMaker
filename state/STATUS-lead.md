@@ -1,4 +1,13 @@
-## Done
+## Current state
+
+- Latest job: 2026-10-25 r1-process-001 Role 1 (format consolidation).
+- Lead checks: 151 passed, 2 failed; Role 4 audit merge defect remains open.
+- Next: Role 4 fixes late audit merge; rerun lead checks before host merge validation.
+- Earlier integration, v3 freeze, smoke and presentation work remains under History / Remaining.
+
+## History
+
+### Done
 
 - Published the user-approved frozen v3 schema/artifact set from d82b87a (2026-10-25, 01:55 KST), exact hook CLIs, hook-event mapping, pending-question unchanged-workspace exit, production caller boundaries and role implementation start; synchronized decision 0011, interfaces, plan and prompts (`.venv/bin/python -m pytest tests/lead -q`: 141 passed in 10.12s; `make validate-schemas`: Validated 11 draft 2020-12 schemas and 13 examples).
 - Preserved every approved schema/example/marker byte, including original proposal metadata, while schemas/VERSION remains 3 and now denotes the frozen set (`python3` inline git ls-tree/git show byte comparison against d82b87a: 25 tracked schema/marker/example files byte-for-byte unchanged; VERSION=3).
@@ -42,7 +51,7 @@
 
 - Confirmed the final owned changes have no whitespace errors (`git diff --check -- AGENTS.md docs/decisions/0011-pinned-luna-hook-direction.md docs/interfaces-v3.md docs/interfaces.md docs/plan.md prompts/ tests/lead/test_hook_interfaces_v3.py state/STATUS-lead.md`: exit 0, no output).
 
-## Remaining
+### Remaining
 
 - Coordinate owning-role work: Role 2 pin-check/guard/advice/ledger injection; Role 3 independent prompt/calibration design and pinned client/accounting; Role 4 deterministic completion/single repair/Stop ledger request; Role 5 v3 task design and real-plugin artifact collection, A/H3 configs and estimates. No runtime implementation or live acceptance is established by this lead publication.
 - Publish a separate v3 freeze record after Role 5 supplies the held-out inventory/digest and reference/starter/mutation/shared-line validation. Freeze before full A/H3 runs. Keep v1/v2 task sets, graders, reports and prior freezes historical and unchanged; no H3 evaluation on them.
@@ -52,7 +61,7 @@
 - Refresh D-5 README/architecture/demo for implemented v3 hooks by 11/13 and obtain fresh-clone/live host evidence. Existing v1/v2 demo captures are historical, not H3 acceptance. D-6 slides and Q&A by 11/15; presentation 11/16, with the original negative result stated plainly.
 - Host performs the full suite once before merge and real compatibility/installation/Codex/sandbox tests. This restricted session runs lead tests only; no staging or commit. Nested Codex/live calls/macOS sandbox-exec/network remain unavailable here.
 
-## Decisions
+### Decisions
 
 - Adopt user-approved 0011, accepted 2026-10-25: the original claim is answered negatively; build deterministic hooks plus two low-effort pinned Luna calls and evaluate only A/H3 on held-out v3. B is dropped, C optional, 0010 record-only.
 - Freeze schema version 3 from d82b87a, approved by the user 2026-10-25 at 01:55 KST: approval is now explicit, schemas/VERSION stays 3, Roles 2–5 implement now; later schema changes require a new decision, user approval and version increment. Preserve the approved bytes including proposal metadata.
@@ -64,22 +73,88 @@
 - Distinguish A and H3 child guards: A uses HARNESS_NESTED=1, H3 removes it for real hooks, controller-owned nested Codex always sets it; never mutate parent configuration/environment.
 - Preserve the user's no-quality-loss rule and report paired uncertainty: an interval containing zero alone is not proof of equivalence; no numeric margin was supplied.
 
-## Verify commands
+### Verify commands
 
 - .venv/bin/python -m pytest tests/lead -q
 - make validate-schemas
 - git diff --check -- AGENTS.md docs/decisions/0010-reservations-r2-grader.md docs/decisions/0011-pinned-luna-hook-direction.md docs/interfaces.md docs/interfaces-v3.md docs/plan.md docs/validate_schemas.py prompts/01-tech-lead.md prompts/02-plugin-engineer.md prompts/03-controller-engineer.md prompts/04-verifier-engineer.md prompts/05-eval-engineer.md schemas tests/lead state/STATUS-lead.md
 
-## Do not touch
+### Do not touch
 
 - This session: eval/, plugin/, controller/, verifier/, task sets/private graders, docs/weekly/, docs/handoff/, docs/evaluation/, CLAUDE.md, root configuration, other roles' tests/STATUS and read-only .git. Do not stage/commit, delete files, rewrite history, change external configuration, use network, spawn agents or invoke nested/live models/macOS sandbox-exec.
 - Historical v1/v2 schema bodies/examples/report fields, task sets, grader contents/digests and measured captures. The current schema marker denotes frozen hook interfaces, not a report migration.
 - No unapproved revision of frozen v3 interfaces and no tuning H3 on frozen v3 outcomes. Implementation belongs to Roles 2–5 in their owned paths.
 
-## Assumptions
+### Assumptions
 
 - Direction approval and measured findings are explicit user instructions and attributed Claude proposal/host evidence dated 2026-10-24/25; this offline session did not remeasure them. V2 harness has 23 invalid tasks and stopped recovery; its subset is diagnostic. B pricing at the stop was pending; the proposal's about-1.2x figure is attributed, not recomputed.
 - The approval time, commit identity, CLI operations and question-pause policy are supplied explicitly by the user; no independent host observation is claimed. This documentation publication establishes no runtime compatibility or implementation evidence.
 - Expected command exit defaults to configured zero-success convention only when unspecified; unsupported/ambiguous oracles stay unavailable and user questions remain unanswered until visible clarification. A ledger presence/hash check does not establish decision quality.
 - No numeric equivalence/noninferiority margin was supplied. The proposal's two-hour Fast run estimate and timing/control-cost targets remain estimates/targets, not measurements or paid-batch approval.
 - No PR is requested in this read-only .git session. This STATUS/0011 provide the change summary and Assumptions; the final Commit plan lists only owned changes. Historical Done evidence below is retained as history, not current H3 acceptance.
+
+## 2026-10-25 status-format-migration Role 1
+
+### Done
+
+- Format conversion only; see History / Done (python3 inline conversion audit: archived bytes restore exactly).
+
+### Remaining
+
+- See History / Remaining; format conversion only.
+
+### Decisions
+
+- See History / Decisions: format conversion only; existing decisions are unchanged.
+
+### Verify commands
+
+- See History / Verify commands; format conversion only.
+
+### Do not touch
+
+- See History / Do not touch; format conversion only.
+
+### Assumptions
+
+- See History / Assumptions; format conversion only.
+
+## 2026-10-25 r1-process-001 Role 1
+
+### Done
+
+- Added cross-role v3 adapter/CLI fixture regressions with mocked Luna, both verifier rounds, supported citations, accounting, immutable evidence and ledger publication; checks remain red on the owning-role defect rather than relaxing the contract (.venv/bin/python -m pytest tests/lead -q: 151 passed, 2 failed in 40.18s; both cases reached valid ledger publication before failing on ignored audits).
+- Added specification-driven CLI help coverage for all 11 section-3.2 signatures across 10 parsers, including retained historical modes (same pytest command: all 10 CLI-help cases passed; no argument drift observed).
+- Converted all five STATUS files to dated append-only jobs and <=10-line current blocks, preserving legacy content under History; documented worktree/disjoint-path parallel jobs and consolidation (python3 inline archive/format audit: all five archives restore byte-for-byte to HEAD, six ordered job headings valid).
+- Added the 40-line final-report cap, change-only README/CHANGES rule and no-brief-restatement rule to all five prompts; wrote docs/changes/2026-10-25-contract-tests-and-status.md (python3 inline prompt audit: all five prompts contain all three reporting rules).
+- Verified schema preservation and offline validity without editing runtime packages or frozen interfaces (make validate-schemas: Validated 11 draft 2020-12 schemas and 13 examples; git diff --quiet -- controller verifier plugin schemas: exit 0).
+
+### Remaining
+
+- Role 4: fix verifier/v3_report.py's late audit merge; an existing round-1 report currently prevents reading the supplied claim-audit.json. Both unchanged-message and stale-message regressions fail with status=unavailable, claims=[] and luna_call=null. Preserve original audit provenance and the two-call budget.
+- Rerun .venv/bin/python -m pytest tests/lead -q after the owning-role fix; CI is intentionally failing on this defect. The host runs the full suite once before merge and the real installation/compatibility/sandbox checks.
+- Continue all earlier integration, v3 freeze, smoke, evaluation and presentation items in History / Remaining in their existing order; this process job does not establish live H3 acceptance.
+
+### Decisions
+
+- Keep cross-package failures visible in CI: the user explicitly requested defects for owning roles, without runtime edits or a weakened specification.
+- Keep legacy dates/content in History and use dated migration metadata only: existing prose does not establish historical job boundaries.
+- Use r1-process-001 as this consolidation job ID: the request supplied no job ID and authorized a concrete reviewable result.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/lead -q
+- make validate-schemas
+- git diff --quiet -- controller verifier plugin schemas
+- git diff --check -- AGENTS.md prompts state tests/lead docs/changes/2026-10-25-contract-tests-and-status.md
+
+### Do not touch
+
+- Runtime packages, other roles' tests, evaluation artifacts/task sets/graders, frozen schema bytes, docs/weekly, docs/handoff, docs/evaluation, root configuration and read-only .git. Other-role STATUS edits are format conversion only.
+- No staging, commits, deletion, history rewriting, network, live model calls, nested Codex, macOS sandbox-exec or sub-agents in this session.
+
+### Assumptions
+
+- This session performs the single format-consolidation job; other-role migration records reference their preserved legacy work without changing its meaning.
+- Synthetic pin evidence and a mocked Luna client exercise package contracts only. No installed-Codex/provider/command-isolation acceptance is inferred.
+- Shared verifier check help must retain both documented modes; flags are compared to their documented union and unconditional requirements to their intersection. Actual v3 behavior is exercised by the integration test.

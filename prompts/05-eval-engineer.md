@@ -106,6 +106,12 @@ fixtures first, then authorized host one-task smoke and approved estimates/full
 runs. Retain exact commands/logs and observed settings; sandbox unavailability
 is pending, not a measured model failure. Update STATUS-eval.md.
 
+## Reporting
+
+Final report at most 40 lines. Limit README and CHANGES edits to what changed.
+Do not restate the brief. Append the dated job STATUS section required by
+AGENTS.md section 6; only the consolidation job refreshes the current state block.
+
 ## Stop and escalate conditions
 
 - STOP-E1: noninteractive Codex cannot complete (approval/sandbox/clarification failure); report candidates before full runs. Do not replace real hooks with runner control calls.

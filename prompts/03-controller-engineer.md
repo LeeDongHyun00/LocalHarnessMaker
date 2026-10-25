@@ -59,6 +59,12 @@ against the frozen schemas with local references. Live independent
 calibration/smokes only on an authorized host, with cost estimate before any
 batch of ten or more. Update STATUS with exact outputs and pending targets.
 
+## Reporting
+
+Final report at most 40 lines. Limit README and CHANGES edits to what changed.
+Do not restate the brief. Append the dated job STATUS section required by
+AGENTS.md section 6; only the consolidation job refreshes the current state block.
+
 ## Stop and escalate conditions
 
 - STOP-C1: additional shared field/CLI is required; write proposal and stop, without editing the interface.

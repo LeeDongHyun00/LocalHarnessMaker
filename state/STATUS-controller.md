@@ -1,4 +1,12 @@
-## Done
+## Current state
+
+- Latest job: 2026-10-25 status-format-migration Role 3.
+- Existing work and evidence are preserved under History.
+- First priority, pending host verification: integrate the frozen-v3 controller commands with Roles 2/4 using a real SessionStart pin-check and exact session artifact path. Verify native model metadata visibility, pin/pricing snapshot format/reference, disabled-pin advisories, no retries, schema/runtime cross-artifact validation and the hook-owned two-call budget. Missing native identity must fail closed. Confirm Role 4 uses controller.v3_checks.signature_bytes-compatible baseline serialization before enabling configured signature checks.
+
+## History
+
+### Done
 
 - Implemented the user-approved frozen-v3 requirements and claim-audit CLIs with strict v1 prompts, native gpt-6-luna/low pin enforcement, atomic artifacts, one-shot phase allocations, code-owned derivation, verified citations, stale audits and visible-answer recording; preserved historical operations (.venv/bin/python -m pytest tests/controller -q: 405 passed in 6.86s).
 - Added mocked regressions for every emitted public artifact, unsafe absolute/parent/symlink paths, shell syntax and partial excerpts, configured test/signature/input baselines, schema-invalid output, exact accounting, native failures/timeouts, pin mismatch/disablement, duplicate calls, stale audits and atomic replacement (.venv/bin/python -m pytest tests/controller -q: 405 passed in 6.86s).
@@ -60,14 +68,14 @@
 - Expanded hand-authored samples to 30 and ran them through all three mocked adapters; fixtures are implementation evidence rather than model quality measurements (.venv/bin/python -m pytest tests/controller -q -s: Mocked codex_cli/cheap_api/local each schema=30/30 and ambiguous assumptions=8/8; original fixture report 10/10 and 4/4).
 - Updated controller/CHANGES.md with the current behavior, verification limits and Assumptions (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0).
 
-## Remaining
+### Remaining
 
 - First priority, pending host verification: integrate the frozen-v3 controller commands with Roles 2/4 using a real SessionStart pin-check and exact session artifact path. Verify native model metadata visibility, pin/pricing snapshot format/reference, disabled-pin advisories, no retries, schema/runtime cross-artifact validation and the hook-owned two-call budget. Missing native identity must fail closed. Confirm Role 4 uses controller.v3_checks.signature_bytes-compatible baseline serialization before enabling configured signature checks.
 - Pending host calibration: after reporting/approving the batch estimate, run `.venv/bin/python -m controller.measure_v3 --phase requirements --out /tmp/v3-requirements-host.json --live --pin-check SESSION/pin-check.json --i-have-approval` and the corresponding `--phase claim-audit` command with a distinct output file. Each phase is at most 40 calls / planning USD 0.048000; both are 80 calls / USD 0.096000, not caps. Record live row/question/claim/citation precision and recall, misses, accounting and latency in controller/evidence/. Current dated evidence is explicitly pending; synthetic scorer round trips do not establish model quality.
 - Pending host verification: HARNESS_CONTROL_TIMEOUT_SECONDS unset and with a host-selected positive value; native success/failure/timeout accounting, unknown usage, sub-ten-second call target and combined cost versus executor denominator. Network, nested Codex, live model calls and macOS sandbox-exec were unavailable and were not attempted here.
 - Before merge, coordinate one full repository suite and two non-evaluation hook smokes on the host. Source-tree controller tests pass; wheel resource packaging and production plugin/report integration remain unverified. Historical v1/v2 measurements remain retained history and are not v3 deliverables.
 
-## Decisions
+### Decisions
 
 - Implement the exact two new CLI operations supplied by the user: their explicit 2026-10-25 freeze/authorization supersedes stale proposed-status prose while Role 1 updates shared documents concurrently.
 - Isolate v3 from historical routing: one pinned CLI invocation per phase, no regeneration/fallback, durable allocation before invocation and schema-valid accounting for actual calls; the hook still owns the session budget.
@@ -108,7 +116,7 @@
 - Retain byte-bound preflight features without a tokenizer dependency: provider token counts remain authoritative and no root dependency/interface change is needed.
 - Treat JSONL library provenance as an owner-curated precondition: schema validation proves structure, not prior verifier success, and the controller never auto-collects cases.
 
-## Verify commands
+### Verify commands
 
 - Completed offline: `.venv/bin/python -m pytest tests/controller -q` (405 passed in 6.86s).
 - Completed whitespace: `git diff --check -- controller tests/controller state/STATUS-controller.md` (exit 0).
@@ -133,7 +141,7 @@
 - Preview only (refuses calls with exit 1): .venv/bin/python -m controller.measure_contracts --out /tmp/controller-d4.json
 - Pending before merge: full repository test suite, coordinated with the owning roles.
 
-## Do not touch
+### Do not touch
 
 - Read only explicitly permitted public eval/tasks/**/prompt.md and eval/tasks-v2/**/prompt.md when needed for the approved calibration provenance. Do not read task implementations, graders, evaluation runner/reports or held-out v3 material. Historical capacity-only restrictions below describe earlier sessions.
 
@@ -146,7 +154,7 @@
 - No verifier imports, new shared fields/interfaces, secrets in files, paid batches of ten or more without an estimate, or model-output training data without terms review.
 - Keep local.enabled=false and retain version 1 fail-closed behavior; D-3/D-5 are dropped and local must never become a hidden fallback.
 
-## Assumptions
+### Assumptions
 
 - Current session: the user explicitly froze v3 and authorized the two CLI shapes; old proposed-status prose is stale pending Role 1 publication. No shared schema, CLI specification or hook wire field was edited here.
 - Current session: calibration uses allowed public v1/v2 request excerpts and authored variants; only public prompt.md files were read, never graders or task implementation. Older unread-evaluation statements below refer to previous sessions.
@@ -186,3 +194,29 @@
 - Decision 0007 drops local serving and QLoRA work; existing mock-only local protocol evidence makes no claim about compatibility, memory or performance.
 - Authored responses, runner events and local fixture prices verify plumbing only. No model calls or live benchmark comparisons ran this session.
 - No PR exists; controller/CHANGES.md contains the reviewable summary and Assumptions. Only owned directories and this STATUS file belong in the eventual commit.
+
+## 2026-10-25 status-format-migration Role 3
+
+### Done
+
+- Format conversion only; see History / Done (python3 inline conversion audit: archived bytes restore exactly).
+
+### Remaining
+
+- See History / Remaining; format conversion only.
+
+### Decisions
+
+- See History / Decisions: format conversion only; existing decisions are unchanged.
+
+### Verify commands
+
+- See History / Verify commands; format conversion only.
+
+### Do not touch
+
+- See History / Do not touch; format conversion only.
+
+### Assumptions
+
+- See History / Assumptions; format conversion only.

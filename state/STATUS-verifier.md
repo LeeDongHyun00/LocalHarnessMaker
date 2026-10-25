@@ -1,4 +1,12 @@
-## Done
+## Current state
+
+- Latest job: 2026-10-25 status-format-migration Role 4.
+- Existing work and evidence are preserved under History.
+- V3 first priority, pending host/Role 2/3 integration: wire the approved CLI operations and verifier.stop_text functions into native Stop/SessionStart; use python_identity.signature_snapshot_bytes for pre-edit baselines and supply retained claim-audit objects/accounting. Verify one application repair, one separate ledger continuation, refreshed final-message hashes, invalid-ledger advisory/no older-memory injection and two non-evaluation project/two-session smoke evidence. No live hooks, model calls or nested Codex ran here.
+
+## History
+
+### Done
 
 - Implemented the user-approved v3 check and ledger-validate CLIs while retaining historical contract/handoff/sample operations; deterministic checks, confined native-session artifacts, exact immutable raw evidence, offline schema/provenance/accounting checks, canonical Python signature baselines and sandboxed argv execution have synthetic and actual-module-entry-point coverage (.venv/bin/python -m pytest tests/verifier -q: 669 passed, 8 host-only Seatbelt skips in 11.85s).
 - Implemented durable one-repair reservation, round-two exhaustion/advice, duplicate-Stop result reuse, original-message retention, unsupported citation filtering and stale-audit updates; no v3 judge/controller/model calls are made (.venv/bin/python -m pytest tests/verifier -q: 669 passed, 8 skipped; 103 new v3 cases include every supported check kind's pass/fail/unverifiable outcomes and path/hash/continuation regressions).
@@ -59,7 +67,7 @@
 
 - Confirmed the final owned-path diff has no whitespace errors (git diff --check -- verifier tests/verifier state/STATUS-verifier.md: exit 0, no output).
 
-## Remaining
+### Remaining
 
 - V3 first priority, pending host/Role 2/3 integration: wire the approved CLI operations and verifier.stop_text functions into native Stop/SessionStart; use python_identity.signature_snapshot_bytes for pre-edit baselines and supply retained claim-audit objects/accounting. Verify one application repair, one separate ledger continuation, refreshed final-message hashes, invalid-ledger advisory/no older-memory injection and two non-evaluation project/two-session smoke evidence. No live hooks, model calls or nested Codex ran here.
 - V3 host verification: run .venv/bin/python -m pytest tests/verifier/test_sandbox.py -v (all eight cases: six original plus two unittest discovery cases); exercise the new argv adapter's subdirectory cwd with the whole-workspace write boundary, no network/outside writes, raw output and process-tree cleanup. These boundaries are reused and mocked, not host-accepted by this session.
@@ -76,7 +84,7 @@
 - D-4: investigate further measured misjudgments after the host smoke. verifier/RULES.md now documents the reported live-smoke fixes and cause categories; broader comparison evidence remains pending.
 - Before merge: run the full suite once on the host. This session ran only tests/verifier; .git is read-only and no staging, commit or merge was attempted.
 
-## Decisions
+### Decisions
 
 - The user's explicit 2026-10-25 schema freeze and exact CLI authorization supersede the still-proposed labels in checked-in shared documents: implement only the two authorized v3 operations without editing shared interfaces or other roles' paths.
 - V3 reservations are persisted in the completion report and an exclusive evidence/ledger-request.txt marker: duplicate Stops cannot spend another repair, audit or ledger request; Role 2 consumes the summary and exact package texts.
@@ -136,7 +144,7 @@
 - Keep measured response_item/message/assistant/final_answer/output_text parsing and the public workspace judge artifact: published exec/TUI evidence and the approved controller CLI remain the interface boundaries.
 - Keep unavailable/malformed judge results unverifiable without verifier retries: the controller owns generation retry/fallback limits.
 
-## Verify commands
+### Verify commands
 
 - .venv/bin/python -m pytest tests/verifier -q (latest session: 669 passed, 8 skipped in 11.85s; skips require host Seatbelt).
 - git diff --check -- verifier tests/verifier state/STATUS-verifier.md (latest session: exit 0, no output).
@@ -150,7 +158,7 @@
 - Host only with live-call authorization, pending: .venv/bin/python tests/verifier/smoke.py
 - Host only before merge, pending: .venv/bin/python -m pytest
 
-## Do not touch
+### Do not touch
 
 - This v3 session: only verifier/, tests/verifier/ and state/STATUS-verifier.md are writable scope; shared schemas/CLIs/docs, controller/, plugin/, eval/, other roles' files and .git remain untouched. Never read eval/tasks*/ or private grader paths.
 
@@ -160,7 +168,7 @@
 - Existing harness/, experiments/, scripts/, plugin evidence and docs/hooks-contract.md.
 - .git contents, staging, commits, file deletion, git history rewriting, external service configuration, secrets, network access, nested Codex, live model calls and sandbox-exec in the current environment.
 
-## Assumptions
+### Assumptions
 
 - This session follows the user's explicit v3 approval and priority order despite stale proposal wording in shared documents; no further approval or interface proposal is needed for the two supplied CLI shapes.
 - All v3 artifact inputs are already retained in the canonical native-session directory; Role 2/3 own pin verification, trustworthy request/configuration derivation and visible question handling. The verifier validates references and does not invent user answers or executable oracles.
@@ -202,3 +210,29 @@
 - Current transcript support is pinned to published exec/TUI evidence. Resume/compaction variants and installed-wheel schema resources remain unverified.
 - No optional FastAPI/httpx provisioning, real macOS sandbox, live model or real controller integration was attempted here. Historical host results do not verify this job's changes.
 - No PR was requested; verifier/CHANGES.md contains the change summary and Assumptions for a future PR. Other roles' concurrent changes were not edited, staged or committed.
+
+## 2026-10-25 status-format-migration Role 4
+
+### Done
+
+- Format conversion only; see History / Done (python3 inline conversion audit: archived bytes restore exactly).
+
+### Remaining
+
+- See History / Remaining; format conversion only.
+
+### Decisions
+
+- See History / Decisions: format conversion only; existing decisions are unchanged.
+
+### Verify commands
+
+- See History / Verify commands; format conversion only.
+
+### Do not touch
+
+- See History / Do not touch; format conversion only.
+
+### Assumptions
+
+- See History / Assumptions; format conversion only.
