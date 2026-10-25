@@ -18,8 +18,8 @@ from controller.errors import BackendError, InputError
 from controller.generation import read_text, schema_validator, validate_input
 from controller.settings import PACKAGE_DIR, load_object
 from controller.v3_checks import confined, derive_check, digest, source_clause
-from controller.v3_client import MODEL, PinMismatch, PinnedLunaClient
-from controller.v3_wire import CLAIMS, REQUIREMENTS
+from controller.v3_client import MODEL, IdentityUnobserved, PinMismatch, PinnedLunaClient, call_error
+from controller.v3_wire import CLAIMS, REQUIREMENTS, validate_requirements_output
 
 logger = logging.getLogger(__name__)
 ClientFactory = Callable[[Prices, str], Any]
@@ -89,11 +89,12 @@ def _pin(directory: Path, session_id: str) -> tuple[dict[str, Any], Prices, str]
     return pin, Prices.from_dict(book["models"][MODEL]), pin["pricing_ref"]
 
 
-def _disable_pin(directory: Path) -> None:
+def _disable_pin(directory: Path, *, unobserved: bool = False) -> None:
     pin = load_object(directory / "pin-check.json")
     pin["status"] = "disabled"
-    if "model_identity_mismatch" not in pin["reason_codes"]:
-        pin["reason_codes"].append("model_identity_mismatch")
+    reason = "model_list_unavailable" if unobserved else "model_identity_mismatch"
+    if reason not in pin["reason_codes"]:
+        pin["reason_codes"].append(reason)
     pin["advisory"] = "Luna hooks disabled: native provider model identity could not be verified against gpt-6-luna."
     validate_input(pin, "pin-check.schema.json")
     atomic_json(directory / "pin-check.json", pin)
@@ -121,6 +122,7 @@ def _record(directory: Path, record: dict[str, Any]) -> None:
 
 def _requirements(value: dict[str, Any], prompt: str, workspace: Path,
                   config: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    validate_requirements_output(value)
     rows: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
     for number, row in enumerate(value["requirements"], 1):
@@ -307,7 +309,8 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
                 record = json.loads(line)
                 validate_input(record, "luna-call.schema.json")
                 if (record["session_id"] != session_id or record["phase"] == phase
-                        or record["status"] == "pin_mismatch"):
+                        or record["status"] == "pin_mismatch"
+                        or (record["error"] or "").startswith("identity_unobserved")):
                     raise BackendError("phase already invoked, pin mismatched or accounting identity invalid")
         # Reserve before construction/provider invocation; never retry after interruption.
         try:
@@ -329,6 +332,8 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
                 {"role": "user", "content": json.dumps(inputs, ensure_ascii=False)},
             ]
             value = client.generate(wire, messages)
+            if client.model is None:
+                raise IdentityUnobserved("identity_unobserved")
             if client.model != MODEL:
                 raise PinMismatch("native provider identity does not match requested model")
             if not Draft202012Validator(wire).is_valid(value):
@@ -347,8 +352,9 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
             record.update(status="success", error=None)
         except Exception as exc:
             mismatch = isinstance(exc, PinMismatch)
-            record.update(status="pin_mismatch" if mismatch else "timeout" if getattr(client, "timeout", False) else "error",
-                          error="native model pin mismatch" if mismatch else "Luna call failed or returned invalid output")
+            record.update(status="pin_mismatch" if mismatch else "error" if isinstance(exc, IdentityUnobserved)
+                          else "timeout" if getattr(client, "timeout", False) else "error",
+                          error=getattr(client, "error", None) or call_error(exc))
             if phase == "requirements":
                 artifact.update(state="unavailable", requirements=[], open_questions=[])
             else:
@@ -364,8 +370,13 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
             _record(directory, record)
             if record["status"] == "pin_mismatch":
                 _disable_pin(directory)
+            elif record["error"] and record["error"].startswith("identity_unobserved"):
+                _disable_pin(directory, unobserved=True)
             if events:
                 retain(directory, f"evidence/{phase}-native.jsonl", events.encode("utf-8"))
+            native = getattr(client, "native_events", "")
+            if native:
+                retain(directory, f"evidence/{phase}-rollout.jsonl", native.encode("utf-8"))
         artifact["luna_call"] = _call_ref(call_id)
         if record["status"] != "success":
             logger.error("controller_hook_unavailable %s", record["error"])

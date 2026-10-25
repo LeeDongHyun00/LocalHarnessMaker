@@ -81,3 +81,61 @@ def test_score_saved_predictions_has_no_model_quality_claim(tmp_path: Path) -> N
     result = load_object(output)
     assert result["measurement"] == "supplied_predictions"
     assert result["model"] is None and result["total_usd"] is None and result["calls"] == []
+
+
+@pytest.mark.parametrize("phase", ["requirements", "claim_audit"])
+def test_mocked_measurement_both_phases_are_schema_valid(phase: str) -> None:
+    from controller.backends.base import Usage
+
+    cases, predictions = gold(phase)
+    next_case = iter(cases)
+    invoked = 0
+
+    class Client:
+        model = "gpt-6-luna"
+        events = ""
+
+        def generate(self, schema: dict[str, Any], messages: list[dict[str, str]]) -> dict[str, Any]:
+            nonlocal invoked
+            invoked += 1
+            case = next(next_case)
+            value = predictions[case["id"]]
+            Draft202012Validator(schema).validate(value)
+            assert "expected_rows" not in messages[1]["content"]
+            return value
+
+        def usage(self) -> Usage:
+            return Usage(100, 50, .000035, .1, 0)
+
+    result = measure(phase, client_factory=Client)
+    assert result["schema_valid"] == invoked == len(result["calls"]) == 40
+    assert all(call["status"] == "success" and call["model"] == "gpt-6-luna"
+               and call["error"] is None for call in result["calls"])
+    for metric in result["metrics"].values():
+        assert metric["precision"] == metric["recall"] == 1
+    assert result["total_usd"] == pytest.approx(40 * .000035)
+
+
+@pytest.mark.parametrize("model,status", [(None, "identity_unobserved"), ("other", "pin_mismatch")])
+def test_measurement_stops_on_distinct_identity_failures(model: str | None, status: str) -> None:
+    from controller.backends.base import Usage
+
+    _, predictions = gold("requirements")
+
+    class Client:
+        events = ""
+
+        def __init__(self) -> None:
+            self.model = model
+
+        def generate(self, schema: dict[str, Any], messages: list[dict[str, str]]) -> dict[str, Any]:
+            return next(iter(predictions.values()))
+
+        def usage(self) -> Usage:
+            return Usage(100, 50, .000035, .1, 0)
+
+    result = measure("requirements", client_factory=Client)
+    call, = result["calls"]
+    assert call["status"] == status and call["model"] == model
+    assert call["error"] and result["schema_valid"] == 0
+    assert result["total_usd"] == .000035

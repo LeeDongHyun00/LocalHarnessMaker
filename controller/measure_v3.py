@@ -21,8 +21,8 @@ from controller.generation import read_text
 from controller.settings import PACKAGE_DIR, load_object
 from controller.v3 import _pin, atomic_json
 from controller.v3_checks import digest
-from controller.v3_client import MODEL, PinMismatch, PinnedLunaClient
-from controller.v3_wire import CLAIMS, REQUIREMENTS
+from controller.v3_client import MODEL, IdentityUnobserved, PinMismatch, PinnedLunaClient, call_error
+from controller.v3_wire import CLAIMS, REQUIREMENTS, validate_requirements_output
 
 FIXTURES = PACKAGE_DIR.parent / "tests/controller/fixtures/v3-calibration"
 
@@ -69,6 +69,11 @@ def score(cases: list[dict[str, Any]], predictions: dict[str, Any], phase: str) 
         key = case["id"]
         value = predictions.get(key)
         valid = isinstance(value, dict) and Draft202012Validator(wire).is_valid(value)
+        if valid and phase == "requirements":
+            try:
+                validate_requirements_output(value)
+            except ValueError:
+                valid = False
         if not valid:
             errors.append(key)
             value = {"requirements": [], "open_questions": [], "claims": []}
@@ -119,23 +124,29 @@ def measure(phase: str, *, predictions: dict[str, Any] | None = None,
                                        {"role": "user", "content": json.dumps(inputs, ensure_ascii=False)}]
             client = client_factory()
             status = "error"
+            error = None
             try:
                 responses[case["id"]] = client.generate(REQUIREMENTS if phase == "requirements" else CLAIMS, messages)
+                if client.model is None:
+                    raise IdentityUnobserved("identity_unobserved")
                 if client.model != MODEL:
                     raise PinMismatch("native model pin mismatch")
                 status = "success"
             except Exception as exc:
-                status = ("pin_mismatch" if isinstance(exc, PinMismatch) else
+                status = ("identity_unobserved" if isinstance(exc, IdentityUnobserved) else
+                          "pin_mismatch" if isinstance(exc, PinMismatch) else
                           "timeout" if getattr(client, "timeout", False) else "error")
+                error = getattr(client, "error", None) or call_error(exc)
                 responses[case["id"]] = None
             finally:
                 usage = client.usage()
-                calls.append({"case_id": case["id"], "status": status, "model": client.model,
+                calls.append({"case_id": case["id"], "status": status, "error": error, "model": client.model,
                               "input_tokens": usage.input_tokens, "cached_input_tokens": usage.cached_input_tokens,
                               "output_tokens": usage.output_tokens, "usd": usage.usd,
                               "latency_seconds": usage.latency_seconds,
+                              "native_metadata_sha256": digest(getattr(client, "native_events", "").encode()),
                               "native_events_sha256": digest(getattr(client, "events", "").encode())})
-            if status == "pin_mismatch":
+            if status in {"pin_mismatch", "identity_unobserved"}:
                 break  # A failed identity pin disables further provider calls.
     result = score(cases, responses, phase)
     result.update(date=datetime.now(timezone.utc).date().isoformat(), phase=phase,

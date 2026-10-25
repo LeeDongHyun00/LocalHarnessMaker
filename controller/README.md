@@ -32,16 +32,37 @@ are retained. A crash can leave a consumed allocation without a result; it never
 permits an automatic second invocation. Such incomplete accounting needs host
 review and cannot establish successful H3.
 
-The client verifies observed native model metadata, not a generated model name.
-Missing/malformed or conflicting identity fails closed as `pin_mismatch` and
-disables later Luna calls in the pin advisory. A timeout without observed model
-identity remains `timeout`; it cannot establish a successful pin. Usage from
-native completion records is retained for failed/timed-out calls. Unknown tokens
-or cost stay null. Known tokens are priced from the pinned snapshot, including
+The client matches the CLI's `thread.started` ID to a native rollout under the
+child's `CODEX_HOME/sessions` (default `~/.codex/sessions`), verifies its session
+ID, and reads `event_msg.thread_settings_applied.thread_settings.model` or an
+explicit model in `event_msg.token_count`/its `info`. V3 children omit
+`--ephemeral` so native evidence can persist; historical children keep it.
+Generated text and unrelated threads cannot supply identity. A record naming a
+different model records `pin_mismatch`; missing/malformed identity records
+`status=error`, `error=identity_unobserved`, including after a deadline. Both
+disable later Luna calls. Unobserved identity uses the existing pin reason
+`model_list_unavailable`; the advisory and call error describe the missing native
+evidence. Measurement uses its internal `identity_unobserved` status and stops.
+Timeouts with observed matching identity record `timeout`.
+
+Completed-turn usage takes precedence. If absent, the final native cumulative
+token total from this fresh exec thread supplies usage, without summing earlier
+snapshots or adding reasoning tokens again. Matching native metadata is retained
+under immutable session evidence. Failed provider diagnostics are decoded from
+CLI error events or stderr into the `control_call` stderr accounting line and
+the public call's `error`, bounded to 2000 characters. If identity is also absent,
+the error starts with `identity_unobserved` followed by the provider diagnostic.
+Unknown tokens or cost stay null. Known tokens are priced from the pinned snapshot, including
 cached-input discounts; separate reasoning-token fields are not added twice.
 `HARNESS_CONTROL_TIMEOUT_SECONDS` is read at construction (finite positive;
 default 35 seconds). Existing measured `control_call` and deadline diagnostics
 are retained. The under-ten-second latency target is unmeasured here.
+
+The requirements provider schema uses closed objects with every property
+required and basic string/integer/array types plus a string-only kind enum.
+Nonempty text/rows and positive, unique, in-range question references are checked
+locally before mapping to the unchanged frozen requirements artifact. Host
+acceptance of this adapter still requires a live rerun.
 
 Requirements prompt v1 supplies only text, six-kind classification, verbatim
 source excerpts and unanswered questions. Code checks source correspondence,

@@ -24,6 +24,33 @@ logger = logging.getLogger(__name__)
 Runner = Callable[..., subprocess.CompletedProcess[str]]
 
 
+def provider_error(events: str, stderr: str) -> str | None:
+    """Keep provider diagnostics independent of truncated event-log presentation."""
+    messages: list[str] = []
+    for line in events.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict) or event.get("type") not in {"error", "turn.failed"}:
+            continue
+        value = event.get("error", event.get("message"))
+        # CLI versions may wrap a provider error as a JSON-encoded message.
+        for _ in range(4):
+            if isinstance(value, dict):
+                value = value.get("error", value.get("message"))
+            elif isinstance(value, str):
+                try:
+                    value = json.loads(value)
+                except ValueError:
+                    break
+            else:
+                break
+        if isinstance(value, str) and value:
+            messages.append(value)
+    return ("\n".join(dict.fromkeys(messages)) or stderr.strip() or None)
+
+
 def _read_usage(events: str, prices: Prices | None) -> Usage:
     """Sum completed-turn JSONL usage and price it at configured API rates."""
     totals: list[int | None] = [0, 0, 0]
@@ -81,6 +108,7 @@ class CodexCLIBackend:
         self, *, runner: Runner = subprocess.run, config: dict[str, Any] | None = None,
         prices: Prices | None = None, executable: str | None = None,
         clock: Callable[[], float] = time.monotonic,
+        persist_session: bool = False, log_calls: bool = True,
     ) -> None:
         root = load_object(PACKAGE_DIR / "config.yaml")
         self.config = config if config is not None else root["codex_cli"]
@@ -100,6 +128,9 @@ class CodexCLIBackend:
             raise TransportError("Codex CLI executable was not found on PATH")
         self.runner = runner
         self.clock = clock
+        self.persist_session = persist_session
+        self.log_calls = log_calls
+        self.error: str | None = None
         self._usage = Usage(None, None, None, 0.0)
 
     def usage(self) -> Usage:
@@ -112,6 +143,8 @@ class CodexCLIBackend:
         started = self.clock()
         status = "error"
         events = ""
+        stderr = ""
+        self.error = None
         with tempfile.TemporaryDirectory(prefix="localharness-codex-") as temporary:
             workdir = Path(temporary)
             if any(workdir.iterdir()):
@@ -121,7 +154,8 @@ class CodexCLIBackend:
             schema_path.write_text(json.dumps(structured_schema(schema)), encoding="utf-8")
             argv = [
                 self.executable, "exec", "--model", self.model,
-                "--sandbox", self.sandbox, "--ephemeral", "--skip-git-repo-check",
+                "--sandbox", self.sandbox,
+                *([] if self.persist_session else ["--ephemeral"]), "--skip-git-repo-check",
                 "--config", f'model_reasoning_effort="{self.reasoning_effort}"',
                 "--output-schema", str(schema_path), "-o", str(output_path), "--json", "-",
             ]
@@ -134,9 +168,12 @@ class CodexCLIBackend:
                         capture_output=True, timeout=self.timeout, check=False, shell=False,
                     )
                     events = result.stdout or ""
+                    stderr = result.stderr or ""
                 except subprocess.TimeoutExpired as exc:
                     raw = exc.stdout or ""
                     events = raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else raw
+                    raw_error = exc.stderr or ""
+                    stderr = raw_error.decode("utf-8", errors="replace") if isinstance(raw_error, bytes) else raw_error
                     self._usage = _read_usage(events, self.prices)
                     log_control_timeout(logger, "codex_cli", self.model, self.timeout)
                     raise TransportError("Codex CLI timed out; consult its JSONL usage log") from exc
@@ -167,15 +204,19 @@ class CodexCLIBackend:
             except OSError as exc:
                 raise TransportError("Codex CLI output could not be read") from exc
             finally:
+                if status != "success":
+                    diagnostic = provider_error(events, stderr)
+                    self.error = diagnostic[:2000] if diagnostic else None
                 logger.info("control_cli_events %s", json.dumps({"model": self.model, "events": events}))
                 self._usage = Usage(
                     self._usage.input_tokens, self._usage.output_tokens, self._usage.usd,
                     max(0.0, self.clock() - started), self._usage.cached_input_tokens,
                 )
-                logger.info("control_call %s", json.dumps({
-                    "backend": "codex_cli", "model": self.model,
-                    "timeout_seconds": self.timeout,
-                    "reasoning_effort": self.reasoning_effort, "status": status,
-                    "pricing_ref": self.pricing_ref,
-                    **asdict(self._usage),
-                }, sort_keys=True))
+                if self.log_calls:
+                    logger.info("control_call %s", json.dumps({
+                        "backend": "codex_cli", "model": self.model,
+                        "timeout_seconds": self.timeout,
+                        "reasoning_effort": self.reasoning_effort, "status": status,
+                        "error": self.error, "pricing_ref": self.pricing_ref,
+                        **asdict(self._usage),
+                    }, sort_keys=True))

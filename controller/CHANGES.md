@@ -1,3 +1,24 @@
+# Native Luna evidence and requirements adapter — 2026-10-25
+
+V3 calls retain native rollouts, match their session ID to `thread.started` in
+the child Codex home, and read applied settings/token-count metadata. Explicit
+other-model evidence remains `pin_mismatch`; missing identity is public
+`status=error`, `error=identity_unobserved` and a distinct measurement status.
+Both fail closed without retries. Completed-turn counters take precedence over
+the last cumulative native token total; reasoning is never added twice.
+
+The private requirements wire schema uses the requested provider subset;
+removed constraints are enforced locally and the frozen artifact schema is
+unchanged. Provider error text from CLI events/stderr is retained in the control
+accounting log and public call error, bounded to 2000 characters. An absent
+identity prefixes that diagnostic with `identity_unobserved`.
+
+Verification uses authored native metadata fixtures, mocked measurements and
+controller package tests. No live acceptance, calibration quality, timing or
+cost targets are claimed; the host must rerun. Assumptions: native rollout files
+are available after child exit, and this fresh exec thread has no prior resume
+usage. Unknown evidence remains unavailable if those assumptions do not hold.
+
 # Frozen v3 hook operations — 2026-10-25
 
 Added the user-approved `controller requirements` and `controller claim-audit`
@@ -8,8 +29,9 @@ regeneration or fallback. A session lock and durable phase allocation prevent
 duplicate events from spending another call. Every nested child retains the
 copied-environment HARNESS_NESTED=1 guard.
 
-Pin evidence is checked before calls. Native identity missing/mismatch records
-pin_mismatch, disables later Luna work and exits 2 with an unavailable artifact.
+Pin evidence is checked before calls. Native identity failure disables later
+Luna work and exits 2 with an unavailable artifact; current classifications are
+specified above.
 Failures and timeouts retain known usage priced from the pinned snapshot;
 unknowns stay null. Measured backend latency and existing control_call/deadline
 logs are reused with HARNESS_CONTROL_TIMEOUT_SECONDS. Failed calls are not
