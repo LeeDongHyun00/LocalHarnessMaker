@@ -319,3 +319,41 @@
 - --link-auth accepts a login file or its containing Codex home; missing/broken auth.json makes --check fail. Existing conflicting login files are preserved and rejected before installation writes.
 - Live hooks/list availability is not established by local schema generation or mocked responses; discovery falls back visibly when unavailable. Schema generation invoked no executor/model session or network request.
 - No PR, staging or commit was performed. Carry these assumptions into any later PR description; host smokes and full-suite merge checks remain pending.
+
+## 2026-10-25 r2-v3-005 Role 2
+
+### Done
+
+- Embedded the resolved absolute HARNESS_CODEX path beside each rendered hook timeout; install --check prints the resolved and registered paths and rejects missing, nonexecutable or absent embedded binaries (.venv/bin/python -m pytest tests/plugin -q: 353 passed, 1 opt-in real Codex test skipped in 23.42s; quoted-path rendering, check output and moved-executable rejection passed).
+- Forwarded HARNESS_CODEX and prepended its directory to PATH in copied controller/verifier child environments, preserving HARNESS_NESTED=1 and the parent environment (.venv/bin/python -m pytest tests/plugin -q: 353 passed, 1 skipped; both packages tested with unset, empty and populated PATH).
+- Made SessionStart pass the supplied executable directly into pin-check without importing the installer from the installed snapshot; recorded the binary used in schema-permitted pin-check advisory text (.venv/bin/python -m pytest tests/plugin -q: 353 passed, 1 skipped; installed v3 SessionStart with empty PATH and a fake executable path containing spaces retained the correct version/path; enabled/disabled pin outcomes retained the path).
+- Checked patch whitespace and authorized path scope (git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0; git diff --name-only: only plugin/, tests/plugin/ and state/STATUS-plugin.md).
+
+### Remaining
+
+- Integrate Role 3's HARNESS_CODEX controller resolution change, reinstall in an isolated host home, and rerun the fresh non-evaluation hook smoke to verify real Luna requirements/audit calls and accounting. This session establishes offline path propagation only.
+- Carry forward r2-v3-004 / Remaining: confirm shared decision 0012/schema availability and Roles 3/4 integration, complete both v3 host smokes and retained trust/bundle/silence captures, verify ledger injection and measure latency/cost.
+- Coordinate the full repository suite once before merge; this session ran only tests/plugin. No live H3 acceptance is claimed.
+
+### Decisions
+
+- Reuse the install-time executable for all installed hooks and pass it directly to the existing pin-check function: preserve frozen CLI/hook interfaces and support the app-bundle-only host without PATH discovery at hook time.
+- Store the observed binary path in pin-check.json advisory: the existing schema permits this provenance without adding fields.
+- Validate embedded executables independently of current discovery: finding another working binary must not hide a stale hook registration.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/plugin -q (353 passed, 1 skipped in 23.42s).
+- git diff --check -- plugin tests/plugin state/STATUS-plugin.md (exit 0).
+- git diff --name-only (only authorized plugin, plugin-test and plugin-status paths).
+
+### Do not touch
+
+- controller/, verifier/, eval/, schemas/, docs/, root configuration and other roles' STATUS files; only plugin/, tests/plugin/ and state/STATUS-plugin.md are authorized.
+- .git is read-only: do not stage or commit. Preserve historical evidence and exact nested zero-byte guards; no live Codex/model/network or real-home installation is authorized here.
+
+### Assumptions
+
+- The user's supplied fresh-smoke diagnosis is host evidence; this session uses fake executables and mocked subprocesses to verify propagation and artifact provenance, without claiming actual Luna execution.
+- No new product assumptions or shared interface changes are needed. Role 3 owns controller executable selection; the plugin forwards its explicit path and a compatible child PATH.
+- No PR, staging or commit was performed; copy these assumptions into any future PR description. The current state block remains unchanged because this is an append-only ordinary job, not consolidation.

@@ -48,6 +48,8 @@ def test_pin_outcomes(tmp_path: Path, outcome: str, monkeypatch: pytest.MonkeyPa
                             pricing=tmp_path / 'missing-prices' if outcome == 'pricing' else pin_check.PRICES)
     validate(value, 'pin-check.schema.json')
     assert value == read(directory / 'pin-check.json')
+    assert 'Codex executable: /mock/codex' in value['advisory']
+    assert all(command[0] == '/mock/codex' for command in calls)
     assert (value['status'] == 'enabled') == (outcome in {'enabled', 'rpc'})
     if value['status'] == 'enabled':
         assert value['model_evidence']['source'] == 'listing'

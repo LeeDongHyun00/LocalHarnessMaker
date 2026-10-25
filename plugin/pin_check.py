@@ -145,6 +145,7 @@ def check(session_id: str, directory: Path, codex: str, *,
     advisory = ('Pinned gpt-6-luna low-effort hooks enabled; live compatibility remains separately measured.'
                 if enabled else 'Luna hooks disabled: ' + ', '.join(reasons) +
                 '. Continue ordinary work; this session cannot be represented as H3. No model substitution.')
+    advisory += f' Codex executable: {codex}'
     value = {'schema_version': 3, 'session_id': session_id,
              'checked_at': datetime.now(timezone.utc).isoformat(),
              'status': 'enabled' if enabled else 'disabled', 'requested_model': MODEL,

@@ -92,8 +92,11 @@ class Runtime:
         self.save()
         pin = self.pin()
         if pin is None:
-            from plugin.install import resolve_codex
-            pin = pin_check.check(self.session_id, self.directory, resolve_codex() or 'codex',
+            executable = os.environ.get('HARNESS_CODEX')
+            if not executable:
+                from plugin.install import resolve_codex
+                executable = resolve_codex() or 'codex'
+            pin = pin_check.check(self.session_id, self.directory, executable,
                                   runner=self.adapter.runner)
         texts = [pin['advisory']]
         try:

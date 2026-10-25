@@ -489,3 +489,26 @@ def test_adapter_root_follows_installed_copy(tmp_path: Path) -> None:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     assert module.RUNTIME_ROOT == installed
+
+
+@pytest.mark.parametrize('module,operation', [('controller', 'requirements'), ('verifier', 'check')])
+@pytest.mark.parametrize('prior_path', [None, '', '/usr/bin:/bin'])
+def test_adapter_forwards_codex_and_prepends_child_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        module: str, operation: str, prior_path: str | None) -> None:
+    import os
+    executable = '/Applications/ChatGPT App/MacOS/codex'
+    monkeypatch.setenv('HARNESS_CODEX', executable)
+    monkeypatch.setenv('HARNESS_NESTED', '0')
+    if prior_path is None:
+        monkeypatch.delenv('PATH', raising=False)
+    else:
+        monkeypatch.setenv('PATH', prior_path)
+    original = dict(os.environ)
+    def runner(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        env = kwargs['env']
+        assert env['HARNESS_CODEX'] == executable
+        assert env['HARNESS_NESTED'] == '1'
+        assert env['PATH'] == str(Path(executable).parent) + (os.pathsep + prior_path if prior_path else '')
+        return subprocess.CompletedProcess(command, 0, '', '')
+    Adapter(runner=runner).call(module, operation, session_id='native', directory=tmp_path)
+    assert dict(os.environ) == original
