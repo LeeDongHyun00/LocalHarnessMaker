@@ -1,0 +1,4 @@
+{"timestamp":"2026-10-25T01:00:00Z","type":"session_meta","payload":{"id":"01a171ff-aed8-71f3-adcd-067bc5de1a9f","model_provider":"openai"}}
+{"timestamp":"2026-10-25T01:00:00Z","type":"event_msg","payload":{"type":"thread_settings_applied","thread_id":"01a171ff-aed8-71f3-adcd-067bc5de1a9f","thread_settings":{"model":"gpt-6-luna","model_provider_id":"openai","service_tier":"priority","reasoning_effort":"low"}}}
+{"timestamp":"2026-10-25T01:00:01Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":1000,"cached_input_tokens":100,"output_tokens":40,"reasoning_output_tokens":10}}}}
+{"timestamp":"2026-10-25T01:00:02Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":1200,"cached_input_tokens":300,"output_tokens":65,"reasoning_output_tokens":20}}}}

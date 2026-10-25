@@ -220,3 +220,79 @@
 ### Assumptions
 
 - See History / Assumptions; format conversion only.
+
+## 2026-10-25 native-identity-schema-blocker Role 3
+
+### Done
+
+- Read the role prompt, current state, latest job and supplied host evidence; confirmed the requirements schema rejection and missing-model pin_mismatch reports (cat prompts/03-controller-engineer.md state/STATUS-controller.md /Users/donghyunlee/Desktop/LocalHarnessMaker/codex-bridge/report-copies/luna-calibration-2026-10-25.txt: exit 0).
+- Identified STOP-1 before implementation: the requested distinct identity_unobserved accounting status is absent from the frozen Luna-call status enum (cat schemas/luna-call.schema.json: exit 0; status permits exactly success, error, timeout and pin_mismatch).
+
+### Remaining
+
+- Resolve the interface conflict through Role 1 and explicit user approval before implementing a distinct identity_unobserved public status; no shared schema was changed. Alternatively, obtain explicit direction to retain public status=error with error=identity_unobserved and use a distinct internal/measurement status.
+- After resolution, implement thread-ID-matched native rollout identity/token reading, including CODEX_HOME and thread_settings_applied fixtures; repair the private requirements response-format adapter without changing the frozen requirements artifact.
+- Run mocked measurements for both phases and .venv/bin/python -m pytest tests/controller -q, then have the host rerun live measurements; carry forward History / Remaining integration, calibration, timing/cost, hook smokes and pre-merge full-suite items.
+
+### Decisions
+
+- Stop under STOP-1: the frozen public status enum cannot represent the requested new status, and this session prohibits schema/interface changes.
+- Record the blocker here instead of creating a docs/decisions proposal: the user's narrower write scope permits only controller/, tests/controller/ and this status file.
+
+### Verify commands
+
+- cat schemas/luna-call.schema.json (exit 0; identity_unobserved is not an allowed status).
+- git diff --check -- controller tests/controller state/STATUS-controller.md (exit 0); git status --short (only state/STATUS-controller.md modified).
+
+### Do not touch
+
+- Frozen schemas, CLIs and hook interfaces; all paths outside controller/, tests/controller/ and this status file.
+- Read-only host evidence, .git, private graders and evaluation tasks; no staging, commits, live calls or network access.
+
+### Assumptions
+
+- The requested distinct status applies to public Luna-call accounting as well as measurement; mapping it to error without explicit direction would not satisfy that request literally.
+- This is an ordinary job, not consolidation; the Current state block and all completed job sections remain unchanged. No implementation or test changes were made, and tests were not run.
+
+## 2026-10-25 r3-v3-003 Role 3
+
+### Done
+
+- Resolved the preceding native-identity-schema-blocker / r3-v3-002 STOP-1 using the user's explicit interface-preserving direction; implemented public status=error/error=identity_unobserved, distinct internal measurement status, explicit-other-model pin_mismatch and fail-closed phase disablement without changing frozen schemas (.venv/bin/python -m pytest tests/controller -q: 444 passed in 8.26s).
+- Added thread.started-ID-matched native rollout reading from the child CODEX_HOME or ~/.codex, validated native session IDs, excluded unrelated/child records, read applied settings and token-count model metadata, and retained matched metadata under immutable evidence; v3 children omit --ephemeral while historical children retain it (.venv/bin/python -m pytest tests/controller -q: 444 passed in 8.26s, including authored thread_settings_applied/token_count fixtures and both frozen-artifact phases).
+- Preserved completed-turn accounting precedence; recovered final cumulative native totals only when completed-turn records are absent, without summing snapshots or adding reasoning twice; invalid/missing counts remain null (.venv/bin/python -m pytest tests/controller -q: 444 passed in 8.26s).
+- Repaired the private requirements provider schema to closed/all-required objects and basic types/string enums; locally enforced nonempty rows/text and positive, unique, in-range question references before mapping into the unchanged frozen requirements artifact (.venv/bin/python -m pytest tests/controller -q: 444 passed in 8.26s, including validation of the actual --output-schema payload).
+- Decoded provider errors from error/turn.failed events or child stderr into one control_call stderr accounting line and luna-calls.jsonl error, bounded to 2000 characters, including when identity is unobserved; retained complete synthetic diagnostics below the bound and tested truncation above it (.venv/bin/python -m pytest tests/controller -q: 444 passed in 8.26s).
+- Ran both 40-case measurements with mocked clients and authored expected responses; all 40 per phase were schema-valid with exact synthetic precision/recall=1, without making a live quality claim; updated controller README/CHANGES (.venv/bin/python -m pytest tests/controller -q: 444 passed in 8.26s, including test_mocked_measurement_both_phases_are_schema_valid for both phases).
+
+### Remaining
+
+- Host rerun: verify native rollout availability/identity and requirements response_format acceptance on the installed CLI; capture the next complete provider error via control_call/error if rejected. Network-disabled session made no live calls; original provider rejection text remains unavailable in the supplied truncated evidence.
+- Carry forward History / Remaining: real SessionStart/Role 2/4 integration, signature-baseline agreement, independent live calibration and latency/cost denominators, two non-evaluation hook smokes, and full-suite checks once before merge. None is established by these mocked controller tests.
+
+### Decisions
+
+- Preserve public interfaces and existing accounting statuses: identity_unobserved is an internal exception/measurement label and public error text, never a new schema status.
+- Use the existing pin reason model_list_unavailable when native identity is unobserved: frozen pin reason codes have no unobserved-specific member; the advisory and call error identify missing native identity rather than asserting substitution.
+- Give missing identity precedence over timeout in public accounting: the user's explicit direction requires error/identity_unobserved whenever no native record names the model; existing deadline diagnostics remain, and timeouts with observed matching identity remain timeout.
+- Preserve both diagnoses when identity and provider output fail: prefix the provider diagnostic with identity_unobserved in the existing error field, bounded to 2000 total characters; otherwise retain the provider text directly.
+- Persist only v3 child native sessions: --ephemeral would prevent the rollout evidence required for served-model verification; copied HARNESS_NESTED=1, read-only child sandbox, one-shot calls and historical transport policy remain enforced.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/controller -q (444 passed in 8.26s; offline mocks only).
+- git diff --check -- controller tests/controller state/STATUS-controller.md (exit 0).
+- git status --short (only controller/, tests/controller/ and state/STATUS-controller.md changed; no staging or commits).
+
+### Do not touch
+
+- Frozen schemas, CLIs and hook interfaces; paths outside controller/, tests/controller/ and state/STATUS-controller.md.
+- Read-only host evidence, .git, private graders and evaluation tasks; no staging, commits, network access or live calls in this session.
+- Existing Current state block and completed job sections, including the prior STOP-1 section; this is an ordinary append-only job, not consolidation.
+
+### Assumptions
+
+- Native rollout metadata becomes readable after the control child exits; missing, malformed or unmatched evidence fails closed rather than substituting a model or retrying.
+- Each v3 transport uses a fresh codex exec thread with no resume history, so its last cumulative native token count is the invocation total; completed-turn records always take precedence.
+- The requirements adapter implements the user-specified provider subset; actual provider acceptance, served-model visibility and live quality/timing/cost require a host rerun.
+- Synthetic native records and gold-response measurement clients prove adapter/accounting behavior only; they do not reproduce the unavailable full provider rejection or measure Luna quality.

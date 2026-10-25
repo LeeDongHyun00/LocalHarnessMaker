@@ -18,7 +18,7 @@ from controller.settings import PACKAGE_DIR, load_object
 from controller.v3 import (_audit_validator, artifact_root, atomic_json, retain,
                            run_operation, validate_requirements)
 from controller.v3_checks import derive_check, digest, safe_argv, signature_bytes
-from controller.v3_client import PinMismatch, PinnedLunaClient, native_models
+from controller.v3_client import IdentityUnobserved, PinMismatch, PinnedLunaClient, native_models
 from controller.v3_wire import CLAIMS, REQUIREMENTS
 
 SESSION = "native/session/한글"
@@ -108,7 +108,7 @@ def test_unanswered_questions_are_preserved(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("mode,status", [("error", "error"), ("timeout", "timeout"),
-                                          ("mismatch", "pin_mismatch"), ("missing", "pin_mismatch"),
+                                          ("mismatch", "pin_mismatch"), ("missing", "error"),
                                           ("schema", "error"), ("excerpt", "error"), ("empty", "error")])
 def test_failures_are_unavailable_recorded_once(tmp_path: Path, mode: str, status: str) -> None:
     directory, prompt = setup_session(tmp_path)
@@ -127,9 +127,11 @@ def test_failures_are_unavailable_recorded_once(tmp_path: Path, mode: str, statu
     schema_validator("requirements.schema.json").validate(result)
     record = accounting(directory)[0]
     assert record["status"] == status and record["usd"] is not None
+    if mode == "missing":
+        assert record["error"] == "identity_unobserved" and record["model"] is None
     assert invoke(directory, prompt, client)[1] == 2
     assert len(accounting(directory)) == client.calls == 1
-    if status == "pin_mismatch":
+    if status == "pin_mismatch" or mode == "missing":
         pin = load_object(directory / "pin-check.json")
         schema_validator("pin-check.schema.json").validate(pin)
         assert pin["status"] == "disabled"
@@ -269,7 +271,7 @@ def test_native_pin_and_one_invocation_guard(tmp_path: Path, models: list[str], 
         if models == ["gpt-6-luna"]:
             assert client.generate(REQUIREMENTS, [{"role": "user", "content": "input"}]) == rows()
         else:
-            with pytest.raises(PinMismatch):
+            with pytest.raises(PinMismatch if models else IdentityUnobserved):
                 client.generate(REQUIREMENTS, [{"role": "user", "content": "input"}])
     with pytest.raises(BackendError, match="second"):
         client.generate(REQUIREMENTS, [{"role": "user", "content": "input"}])
@@ -350,9 +352,10 @@ def test_unknown_usage_stays_null_and_claim_failure_is_accounted(tmp_path: Path)
     assert accounting(directory)[1]["usd"] is None and accounting(directory)[1]["status"] == "error"
 
 
-def test_mismatch_disables_later_phase_without_call(tmp_path: Path) -> None:
+@pytest.mark.parametrize("model", ["renamed", None])
+def test_identity_failure_disables_later_phase_without_call(tmp_path: Path, model: str | None) -> None:
     directory, prompt = setup_session(tmp_path)
-    path, _ = invoke(directory, prompt, FakeClient(rows(), model="renamed"))
+    path, _ = invoke(directory, prompt, FakeClient(rows(), model=model))
     final = tmp_path / "final.txt"
     final.write_text("Done.")
     client = FakeClient({"claims": []})
@@ -435,7 +438,7 @@ def test_explicit_exit_code_and_unquoted_commands_derive_from_request(tmp_path: 
         assert check["origin"] == "request"
 
 
-def test_timeout_without_native_usage_remains_unknown_and_once(tmp_path: Path) -> None:
+def test_timeout_without_native_identity_remains_unobserved_and_once(tmp_path: Path) -> None:
     directory, prompt = setup_session(tmp_path)
     count = 0
 
@@ -448,7 +451,8 @@ def test_timeout_without_native_usage_remains_unknown_and_once(tmp_path: Path) -
                                client_factory=lambda prices, ref: PinnedLunaClient(prices, ref, runner=runner, config=config))
     record = accounting(directory)[0]
     assert code == 2 and load_object(path)["state"] == "unavailable"
-    assert record["status"] == "timeout" and record["model"] is None
+    assert record["status"] == "error" and record["model"] is None
+    assert record["error"] == "identity_unobserved"
     assert record["usd"] is record["input_tokens"] is record["output_tokens"] is None
     assert count == 1
 
