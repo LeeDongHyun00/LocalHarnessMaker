@@ -10,7 +10,7 @@ from typing import Any, Protocol
 
 from controller.analyze import Prices
 from controller.errors import InputError
-from controller.settings import PACKAGE_DIR, load_object
+from controller.settings import pricing_snapshot
 
 Message = dict[str, str]
 
@@ -64,12 +64,11 @@ def configured_prices(config: dict[str, Any], override: Prices | None = None) ->
     """Pin a price snapshot; custom or unavailable prices have no false reference."""
     if override is not None:
         return override, None
-    snapshot = PACKAGE_DIR / "prices.yaml"
-    book = load_object(snapshot)
+    _, data, book = pricing_snapshot()
     key = config.get("price_key")
     if key not in book["models"]:
         return None, None
-    digest = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+    digest = hashlib.sha256(data).hexdigest()
     return Prices.from_dict(book["models"][key]), (
         f"controller/prices.yaml@{book['checked_on']}#{key}:sha256:{digest}"
     )

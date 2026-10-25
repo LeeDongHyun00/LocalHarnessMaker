@@ -78,6 +78,100 @@ def accounting(directory: Path) -> list[dict[str, Any]]:
     return records
 
 
+def test_hook_clis_from_external_working_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    directory, prompt = setup_session(tmp_path)
+    external = tmp_path / "external"
+    external.mkdir()
+    monkeypatch.chdir(external)
+    requirements_client = FakeClient(rows())
+    audit_client = FakeClient({"claims": []})
+    clients = iter((requirements_client, audit_client))
+    monkeypatch.setattr("controller.v3.PinnedLunaClient", lambda *_: next(clients))
+    assert main(["requirements", "--prompt", str(prompt), "--session-id", SESSION,
+                 "--artifacts", str(directory)]) == 0
+    requirements = load_object(directory / "requirements.json")
+    assert requirements["state"] == "ready"
+    final = tmp_path / "final.txt"
+    final.write_text("Created answer.py.")
+    assert main(["claim-audit", "--requirements", str(directory / "requirements.json"),
+                 "--final-message", str(final), "--session-id", SESSION,
+                 "--artifacts", str(directory)]) == 0
+    audit = load_object(directory / "claim-audit.json")
+    _audit_validator().validate(audit)
+    assert audit["status"] == "complete"
+    assert requirements_client.calls == audit_client.calls == 1
+    assert [record["status"] for record in accounting(directory)] == ["success", "success"]
+
+
+@pytest.mark.parametrize("mode,diagnostic", [
+    ("missing_snapshot", "pricing snapshot not found at path"),
+    ("disabled", "pin disabled: reason_codes=['model_missing']"),
+    ("session", "pin session mismatch"),
+    ("hash", "pin pricing_snapshot evidence hash mismatch at path"),
+    ("missing_evidence", "pin pricing_snapshot evidence not found at path"),
+    ("price", "pin pricing snapshot mismatch against package path"),
+])
+def test_pin_diagnostics_without_fictitious_accounting(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture,
+    mode: str, diagnostic: str,
+) -> None:
+    directory, prompt = setup_session(tmp_path)
+    pin = load_object(directory / "pin-check.json")
+    if mode == "missing_snapshot":
+        monkeypatch.setattr("controller.settings.PACKAGE_DIR", tmp_path / "missing-package")
+    elif mode == "disabled":
+        pin.update(status="disabled", reason_codes=["model_missing"])
+    elif mode == "session":
+        pin["session_id"] = "other"
+    elif mode == "hash":
+        pin["pricing_snapshot"]["sha256"] = "0" * 64
+    elif mode == "missing_evidence":
+        pin["pricing_snapshot"]["path"] = "evidence/missing.json"
+    else:
+        data = b'{"models":{}}'
+        (directory / pin["pricing_snapshot"]["path"]).write_bytes(data)
+        pin["pricing_snapshot"]["sha256"] = digest(data)
+    atomic_json(directory / "pin-check.json", pin)
+    client = FakeClient(rows())
+    path, code = invoke(directory, prompt, client)
+    assert code == 2 and load_object(path)["state"] == "unavailable"
+    assert diagnostic in caplog.text
+    if mode in {"missing_snapshot", "hash", "missing_evidence"}:
+        assert str(tmp_path) in caplog.text
+    elif mode == "price":
+        assert str(PACKAGE_DIR / "prices.yaml") in caplog.text
+    assert client.calls == 0 and not (directory / "luna-calls.jsonl").exists()
+
+
+@pytest.mark.parametrize("phase", ["requirements", "claim_audit"])
+def test_call_diagnostic_in_accounting_and_log(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture, phase: str,
+) -> None:
+    class FailedClient(FakeClient):
+        def generate(self, schema: dict[str, Any], messages: list[dict[str, str]]) -> dict[str, Any]:
+            self.calls += 1
+            raise BackendError("pricing comparison failed: snapshot hash mismatch at path /mock/prices.yaml")
+
+    directory, prompt = setup_session(tmp_path)
+    if phase == "requirements":
+        _, code = invoke(directory, prompt, FailedClient(rows()))
+    else:
+        requirements, code = invoke(directory, prompt, FakeClient(rows()))
+        assert code == 0
+        final = tmp_path / "final.txt"
+        final.write_text("Created answer.py.")
+        path, code = run_operation("claim_audit", session_id=SESSION, artifacts=directory,
+                                   requirements_path=requirements, final_path=final,
+                                   client_factory=lambda *_: FailedClient({"claims": []}))
+        assert load_object(path)["reason"] == "Luna pin/call unavailable; inspect pin-check.json and accounting"
+    record = accounting(directory)[-1]
+    assert code == 2
+    assert record["error"] == "pricing comparison failed: snapshot hash mismatch at path /mock/prices.yaml"
+    assert record["error"] in caplog.text
+
+
 @pytest.mark.parametrize("version", [None, "v1", "v2"])
 def test_prompt_selection_both_phases_and_accounting_reference(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, version: str | None,

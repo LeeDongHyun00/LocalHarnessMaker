@@ -16,7 +16,7 @@ from controller.analyze import Prices, calculate_cost
 from controller.backends.base import Message, Usage
 from controller.errors import BackendError, InputError
 from controller.generation import read_text, schema_validator, validate_input
-from controller.settings import PACKAGE_DIR, load_object
+from controller.settings import load_object, pricing_snapshot
 from controller.v3_checks import confined, derive_check, digest, source_clause
 from controller.v3_client import MODEL, IdentityUnobserved, PinMismatch, PinnedLunaClient, call_error
 from controller.v3_prompts import select_prompt
@@ -73,20 +73,32 @@ def artifact_root(directory: Path, session_id: str) -> tuple[Path, Path]:
 def _pin(directory: Path, session_id: str) -> tuple[dict[str, Any], Prices, str]:
     pin = load_object(confined(directory, "pin-check.json"))
     validate_input(pin, "pin-check.schema.json")
-    if pin["session_id"] != session_id or pin["status"] != "enabled":
-        raise BackendError("Luna pin is disabled or belongs to another session")
+    if pin["session_id"] != session_id:
+        raise BackendError(f"pin session mismatch: expected {session_id!r}, got {pin['session_id']!r}")
+    if pin["status"] != "enabled":
+        raise BackendError(f"pin disabled: reason_codes={pin['reason_codes']}")
     retained: dict[str, bytes] = {}
     for field in ("model_list", "pricing_snapshot"):
         reference = pin[field]
-        data = confined(directory, reference["path"]).read_bytes()
+        path = confined(directory, reference["path"])
+        try:
+            data = path.read_bytes()
+        except FileNotFoundError as exc:
+            raise BackendError(f"pin {field} evidence not found at path {path}") from exc
         if digest(data) != reference["sha256"]:
-            raise BackendError("pin evidence hash mismatch")
+            raise BackendError(f"pin {field} evidence hash mismatch at path {path}: "
+                               f"expected {reference['sha256']}, got {digest(data)}")
         retained[field] = data
     if not re.search(rb'(?<![a-zA-Z0-9_.-])gpt-6-luna(?![a-zA-Z0-9_.-])', retained["model_list"]):
         raise BackendError("exact pinned model absent from model-list evidence")
     book = json.loads(retained["pricing_snapshot"])
-    if book != load_object(PACKAGE_DIR / "prices.yaml"):
-        raise BackendError("pin pricing snapshot differs from controller's pinned snapshot")
+    snapshot_path, snapshot_data, snapshot_book = pricing_snapshot()
+    if book != snapshot_book:
+        raise BackendError(f"pin pricing snapshot mismatch against package path {snapshot_path}: "
+                           f"pin sha256={digest(retained['pricing_snapshot'])}, "
+                           f"package sha256={digest(snapshot_data)}")
+    if MODEL not in book.get("models", {}):
+        raise BackendError(f"pricing snapshot at path {snapshot_path} has no coverage for {MODEL}")
     return pin, Prices.from_dict(book["models"][MODEL]), pin["pricing_ref"]
 
 
@@ -359,7 +371,8 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
             if phase == "requirements":
                 artifact.update(state="unavailable", requirements=[], open_questions=[])
             else:
-                artifact.update(status="unavailable", claims=[], reason=record["error"])
+                artifact.update(status="unavailable", claims=[],
+                                reason="Luna pin/call unavailable; inspect pin-check.json and accounting")
         finally:
             usage: Usage = client.usage()
             record.update(model=client.model, input_tokens=usage.input_tokens,
@@ -382,7 +395,7 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
         if record["status"] != "success":
             logger.error("controller_hook_unavailable %s", record["error"])
     except (BackendError, InputError, OSError, ValueError, KeyError) as exc:
-        logger.error("controller_hook_unavailable Luna pin/call unavailable; inspect pin-check.json and accounting (%s)", type(exc).__name__)
+        logger.error("controller_hook_unavailable %s: %s", type(exc).__name__, call_error(exc))
         if phase == "requirements":
             artifact.update(state="unavailable", requirements=[], open_questions=[])
         else:
