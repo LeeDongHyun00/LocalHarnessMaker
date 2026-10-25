@@ -400,3 +400,92 @@ def test_v3_demo_two_session_evidence_checker(harness: dict[str, Any], tmp_path:
     (h['root'] / 'followup.txt').write_text('wrong\n')
     with pytest.raises(ValueError, match='release label'):
         v3_demo.check(out)
+
+
+@pytest.mark.parametrize('module,operation,limit', [('controller', 'requirements', 30),
+    ('controller', 'claim-audit', 30), ('verifier', 'check', 480)])
+def test_adapter_uses_installed_package_root_and_deadline(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        module: str, operation: str, limit: int) -> None:
+    from plugin.v3_adapter import RUNTIME_ROOT
+    monkeypatch.chdir(tmp_path)
+    def runner(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        assert kwargs['cwd'] == RUNTIME_ROOT
+        assert all((kwargs['cwd'] / name).is_dir() for name in ('plugin', 'controller', 'verifier'))
+        assert kwargs['timeout'] == limit
+        return subprocess.CompletedProcess(command, 0, '', '')
+    Adapter(runner=runner).call(module, operation, session_id='native', directory=tmp_path)
+
+
+def test_v3_outer_deadlines_and_cumulative_budget(harness: dict[str, Any]) -> None:
+    from plugin.hooks._config import OUTER
+    hooks = read(ROOT / 'plugin/hooks/hooks.json')
+    assert hooks['hooks']['UserPromptSubmit'][0]['hooks'][0]['timeout'] == OUTER['UserPromptSubmit'] == 60
+    assert hooks['hooks']['Stop'][0]['hooks'][0]['timeout'] == OUTER['Stop'] == 660
+    runtime = Runtime({'cwd': str(harness['root']), 'session_id': 'budget', 'hook_event_name': 'Stop'})
+    import time
+    assert 649 < runtime.adapter.deadline - time.monotonic() <= 650
+
+
+@pytest.mark.parametrize('module,operation,event', [('controller', 'requirements', 'UserPromptSubmit'),
+    ('verifier', 'check', 'Stop'), ('controller', 'claim-audit', 'Stop')])
+def test_call_failure_retained_and_visible(harness: dict[str, Any], monkeypatch: pytest.MonkeyPatch,
+        module: str, operation: str, event: str) -> None:
+    h = harness
+    h['drive']('SessionStart')
+    if event == 'Stop':
+        h['drive']('UserPromptSubmit', prompt='Create result.txt.')
+        h['final']('Created result.txt.')
+    monkeypatch.setenv('HOME', '/private/operator-home')
+    original = h['adapter'].runner
+    def failed(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        if command[2:4] == [module, operation]:
+            return subprocess.CompletedProcess(command, 2, '', 'x' * 1100 + '\n/private/operator-home/resource missing\nsecond line')
+        return original(command, **kwargs)
+    h['adapter'].runner = failed
+    response = h['drive'](event, prompt='Create result.txt.')
+    failures = read(h['directory'] / 'hook-state.json')['call_failures']
+    assert failures[-1]['exit_code'] == 2
+    assert len(failures[-1]['stderr_tail']) <= 1000
+    assert '<HOME>/resource missing' in failures[-1]['stderr_tail']
+    assert '/private/operator-home' not in json.dumps(response) + json.dumps(failures)
+    assert f'{module} {operation} exited 2:' in response['hookSpecificOutput']['additionalContext']
+
+
+def test_adapter_timeout_records_unknown_exit(harness: dict[str, Any]) -> None:
+    h = harness
+    h['drive']('SessionStart')
+    def timeout(command: list[str], **kwargs: Any) -> Any:
+        raise subprocess.TimeoutExpired(command, 30, stderr='startup timed out')
+    h['adapter'].runner = timeout
+    response = h['drive']('UserPromptSubmit', prompt='Create result.txt.')
+    failure = read(h['directory'] / 'hook-state.json')['call_failures'][-1]
+    assert failure['exit_code'] is None and failure['stderr_tail'] == 'startup timed out'
+    assert 'startup timed out' in response['hookSpecificOutput']['additionalContext']
+
+
+
+def test_invalid_ledger_exit_is_retained_without_extra_continuation(harness: dict[str, Any]) -> None:
+    h = harness
+    start(h)
+    h['final']('Created result.txt.')
+    assert h['drive']('Stop')['decision'] == 'block'
+    h['final']('Ledger saved.')
+    response = h['drive']('Stop')
+    failure = read(h['directory'] / 'hook-state.json')['call_failures'][-1]
+    assert failure['module'] == 'verifier' and failure['operation'] == 'ledger-validate'
+    assert failure['exit_code'] == 1
+    assert 'decision' not in response
+    assert 'verifier ledger-validate exited 1:' in response['hookSpecificOutput']['additionalContext']
+
+
+def test_adapter_root_follows_installed_copy(tmp_path: Path) -> None:
+    import importlib.util
+    installed = tmp_path / 'installed'
+    (installed / 'plugin').mkdir(parents=True)
+    source = installed / 'plugin/v3_adapter.py'
+    source.write_bytes((ROOT / 'plugin/v3_adapter.py').read_bytes())
+    spec = importlib.util.spec_from_file_location('installed_adapter', source)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert module.RUNTIME_ROOT == installed

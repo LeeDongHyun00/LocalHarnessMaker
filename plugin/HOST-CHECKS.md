@@ -60,6 +60,50 @@ These procedures require a host with the logged-in Codex CLI and macOS `/usr/bin
 
 Use a fresh evidence directory for each capture. Preparation creates a separate temporary HOME, CODEX_HOME and project; it links the existing login without reading or copying its contents. It never edits the real Codex configuration. Keep the temporary files until review; these commands do not delete them. A failed stage must be investigated in its retained logs; use a new directory to repeat the procedure.
 
+## 2026-10-25 v3 scratch smoke prerequisites
+
+The first v3 scratch-project smoke on 2026-10-25 (codex-cli
+0.163.0-alpha.11.1, host findings supplied by the operator) found that
+noninteractive `codex exec` silently skipped untrusted `hooks.json`. Interactive
+Codex asks the user to trust hooks. For an isolated noninteractive home without
+recorded trust, review its hook commands and launch with
+`CODEX_HOME=/ISOLATED/CODEX_HOME codex --dangerously-bypass-hook-trust exec ...`.
+The compatibility probe uses this flag too; it grants permission for that
+invocation and does not establish persisted trust. `install.py --check` attempts
+bounded, non-generating app-server `hooks/list` discovery for the selected home,
+reports the matching `hooks.json` trust status when available, and otherwise
+prints the required flag. Project trust alone does not authorize hooks.
+
+An isolated Codex home also needs a login. The same smoke returned HTTP 401
+until `auth.json` was linked. Install with
+`.venv/bin/python -m plugin.install --codex-home /ISOLATED/CODEX_HOME --project /PROJECT --link-auth /LOGGED_IN/CODEX_HOME`
+(or pass the existing `auth.json` path). This creates a symlink, reads no
+credential contents, refuses to replace a different existing login, and is
+idempotent. `--check` reports a missing or broken `auth.json` as an installation
+failure. Do not include login files or their contents in evidence exports.
+
+The plain `.local-harness-maker` opt-in file must survive project cleanups.
+Installation adds its filename to the repository's local `.git/info/exclude`
+(including a linked worktree's common Git directory); it never edits a tracked
+`.gitignore`. Ordinary `git clean -fd` then preserves the ignored marker;
+`git clean -fdx` includes ignored files, so preserve or recreate the marker
+explicitly when using that option. Non-Git projects keep the marker without an
+exclude file.
+
+V3 controller and verifier subprocesses run from the installed package root,
+which contains `controller/`, `verifier/` and `plugin/`. Controller calls have a
+30-second deadline for a measured 5–10-second Luna call plus Codex startup
+margin. UserPromptSubmit has a 60-second outer timeout (55-second internal
+budget); Stop retains its 660-second outer and 650-second cumulative internal
+budget. These deadlines do not change the 10-second model-call target.
+
+Failed subprocesses append `module`, `operation`, `exit_code` and `stderr_tail`
+to `hook-state.json` under `call_failures`. Stderr is home-path redacted and
+limited to its last 1000 characters; the first retained line is surfaced in
+additional context. A startup/timeout failure has `exit_code=null`. This is
+plugin-owned diagnostic state, not a successful completion artifact or an
+extra retry. A verifier's invalid-ledger exit 1 is retained too.
+
 ## Persisted hook trust
 
 ```sh

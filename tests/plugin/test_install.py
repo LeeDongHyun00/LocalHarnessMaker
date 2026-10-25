@@ -27,6 +27,7 @@ def test_fresh_snapshot_and_distinct_check_messages(tmp_path: Path) -> None:
     result = subprocess.run(command, env=env, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert (tmp_path / 'project/AGENTS.md').exists()
+    (codex_home / 'auth.json').write_text('{}')
     result = subprocess.run([*command, '--check'], env=env, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     hooks = json.loads((codex_home / 'hooks.json').read_text())
@@ -78,7 +79,10 @@ def installer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]
     monkeypatch.setattr(_process, 'run_group', version)
     def run(check: bool = False) -> int:
         monkeypatch.setattr(sys, 'argv', ['install', '--codex-home', str(home), '--project', str(project), *(['--check'] if check else [])])
-        return install.main()
+        result = install.main()
+        if not check and result == 0:
+            (home / 'auth.json').write_text('{}')
+        return result
     return {'home': home, 'project': project, 'run': run}
 
 
@@ -194,3 +198,109 @@ def test_new_host_verified_version_passes_check(installer: dict[str, Any], monke
     monkeypatch.setattr(_process, 'run_group', version)
     assert installer['run']() == 0
     assert installer['run'](True) == 0
+
+
+def test_check_reports_missing_auth_and_unknown_trust(installer: dict[str, Any], capsys: pytest.CaptureFixture[str]) -> None:
+    assert installer['run']() == 0
+    (installer['home'] / 'auth.json').rename(installer['home'] / 'saved-login')
+    assert installer['run'](True) == 1
+    errors = capsys.readouterr().err
+    assert 'auth.json missing' in errors
+    assert 'Hook trust for CODEX_HOME: unknown' in errors
+    assert '--dangerously-bypass-hook-trust' in errors
+
+
+@pytest.mark.parametrize('status', ['managed', 'trusted', 'untrusted', 'modified', None])
+def test_hook_trust_discovery_scoped_to_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+                                           capsys: pytest.CaptureFixture[str], status: str | None) -> None:
+    home, project = tmp_path / 'codex-home', tmp_path
+    def discovery(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        assert command == ['/fake/codex', 'app-server']
+        assert kwargs['env']['CODEX_HOME'] == str(home)
+        assert kwargs['env']['HARNESS_NESTED'] == '1'
+        assert kwargs['timeout'] == 5 and kwargs['shell'] is False
+        messages = [json.loads(line) for line in kwargs['input'].splitlines()]
+        assert [m['method'] for m in messages] == ['initialize', 'initialized', 'hooks/list']
+        assert messages[-1]['params'] == {'cwds': [str(project)]}
+        hooks = [{'sourcePath': str(home / 'hooks.json'), 'trustStatus': status},
+                 {'sourcePath': '/other/home/hooks.json', 'trustStatus': 'trusted'}]
+        return subprocess.CompletedProcess(command, 0, json.dumps({'id': 2, 'result': {'data': [
+            {'cwd': str(project), 'errors': [], 'warnings': [], 'hooks': hooks}]}}), '')
+    monkeypatch.setattr(_process, 'run_group', discovery)
+    install.hook_trust(home, project, '/fake/codex')
+    errors = capsys.readouterr().err
+    assert f'Hook trust for CODEX_HOME: {status or "unknown"}' in errors
+    assert ('--dangerously-bypass-hook-trust' in errors) == (status not in ('trusted', 'managed'))
+
+
+@pytest.mark.parametrize('directory_source', [False, True])
+def test_link_auth_is_symlink_and_idempotent(tmp_path: Path, installer: dict[str, Any],
+        monkeypatch: pytest.MonkeyPatch, directory_source: bool) -> None:
+    source = tmp_path / 'login'
+    source.mkdir()
+    login = source / 'auth.json'
+    login.write_text('credential contents stay outside snapshot')
+    home, project = installer['home'], installer['project']
+    monkeypatch.setattr(sys, 'argv', ['install', '--codex-home', str(home), '--project', str(project),
+                                    '--link-auth', str(source if directory_source else login)])
+    assert install.main() == 0
+    assert install.main() == 0
+    assert (home / 'auth.json').is_symlink()
+    assert (home / 'auth.json').resolve() == login
+    assert not (home / 'local-harness-maker/auth.json').exists()
+
+
+def test_link_auth_refuses_existing_login_and_missing_source(tmp_path: Path) -> None:
+    home = tmp_path / 'home'
+    home.mkdir()
+    existing = home / 'auth.json'
+    existing.write_text('existing')
+    source = tmp_path / 'auth.json'
+    source.write_text('other')
+    with pytest.raises(ValueError, match='refusing to replace'):
+        install.auth_source(source, home)
+    with pytest.raises(FileNotFoundError):
+        install.auth_source(tmp_path / 'absent', home)
+    assert existing.read_text() == 'existing'
+
+
+@pytest.mark.parametrize('worktree', [False, True])
+def test_marker_excluded_locally_without_gitignore(tmp_path: Path, installer: dict[str, Any], worktree: bool) -> None:
+    project = installer['project']
+    project.mkdir()
+    gitdir = project / '.git'
+    if worktree:
+        common = tmp_path / 'common-git'
+        gitdir = common / 'worktrees/project'
+        gitdir.mkdir(parents=True)
+        (gitdir / 'commondir').write_text('../..')
+        (project / '.git').write_text('gitdir: ' + str(gitdir))
+        gitdir = common
+    (gitdir / 'info').mkdir(parents=True)
+    exclude = gitdir / 'info/exclude'
+    exclude.write_text('# keep\nother')
+    (project / '.gitignore').write_text('tracked rule\n')
+    assert installer['run']() == 0
+    assert installer['run']() == 0
+    assert exclude.read_text() == '# keep\nother\n.local-harness-maker\n'
+    assert (project / '.gitignore').read_text() == 'tracked rule\n'
+
+
+@pytest.mark.parametrize('mode', ['timeout', 'error', 'malformed', 'other-home'])
+def test_trust_probe_failures_print_operator_flag(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str], mode: str) -> None:
+    def discovery(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        if mode == 'timeout':
+            raise subprocess.TimeoutExpired(command, 5)
+        if mode == 'error':
+            return subprocess.CompletedProcess(command, 1, '', 'unsupported')
+        if mode == 'malformed':
+            return subprocess.CompletedProcess(command, 0, '{', '')
+        return subprocess.CompletedProcess(command, 0, json.dumps({'id': 2, 'result': {
+            'data': [{'cwd': str(tmp_path), 'errors': [], 'warnings': [],
+                      'hooks': [{'sourcePath': '/other/hooks.json', 'trustStatus': 'trusted'}]}]}}), '')
+    monkeypatch.setattr(_process, 'run_group', discovery)
+    install.hook_trust(tmp_path / 'home', tmp_path, '/fake/codex')
+    errors = capsys.readouterr().err
+    assert 'Hook trust for CODEX_HOME: unknown' in errors
+    assert '--dangerously-bypass-hook-trust' in errors

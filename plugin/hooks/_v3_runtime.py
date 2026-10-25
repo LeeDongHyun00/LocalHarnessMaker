@@ -11,7 +11,7 @@ from typing import Any
 from plugin import pin_check
 from plugin.artifacts import (atomic_bytes, confined, digest, locked, read, session_directory,
                               snapshot, validate, verify_reference, workspace_hash, write)
-from plugin.v3_adapter import Adapter
+from plugin.v3_adapter import Adapter, CallFailure
 
 
 class Runtime:
@@ -23,8 +23,13 @@ class Runtime:
         self.root = self.directory.parents[1]
         self.state_path = confined(self.directory, 'hook-state.json')
         event = payload['hook_event_name']
-        self.adapter = adapter or Adapter(budget={'SessionStart': 5, 'UserPromptSubmit': 35, 'Stop': 650}[event])
+        self.adapter = adapter or Adapter(budget={'SessionStart': 5, 'UserPromptSubmit': 55, 'Stop': 650}[event])
         self.state: dict[str, Any] = {}
+        self.adapter.on_failure = self.record_failure
+
+    def record_failure(self, record: dict[str, Any]) -> None:
+        self.state.setdefault('call_failures', []).append(record)
+        self.save()
 
     @property
     def cli_seconds(self) -> float:
@@ -45,7 +50,22 @@ class Runtime:
             self.state = read(self.state_path) if self.state_path.exists() else {'session_id': self.session_id}
             if self.state.get('session_id') != self.session_id:
                 raise ValueError('hook state native session identity mismatch')
-            return {'SessionStart': self.start, 'UserPromptSubmit': self.prompt, 'Stop': self.stop}[event]()
+            before = len(self.state.get('call_failures', []))
+            try:
+                response = {'SessionStart': self.start, 'UserPromptSubmit': self.prompt, 'Stop': self.stop}[event]()
+            except CallFailure as exc:
+                response = self.context(f'LocalHarnessMaker call failed: {exc}. Not H3; no automatic retry.')
+            failures = self.state.get('call_failures', [])[before:]
+            if failures:
+                lines = []
+                for failure in failures:
+                    first = failure['stderr_tail'].splitlines()
+                    lines.append(f"{failure['module']} {failure['operation']} exited {failure['exit_code']}: "
+                                 + (first[0] if first else '(no stderr)'))
+                response = response or {}
+                context = response.setdefault('hookSpecificOutput', {'hookEventName': event})
+                context['additionalContext'] = context.get('additionalContext', '') + '\n' + '\n'.join(lines)
+            return response
 
     def pin(self) -> dict[str, Any] | None:
         path = confined(self.directory, 'pin-check.json')
