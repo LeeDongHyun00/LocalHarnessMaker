@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import re
+import sys
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
@@ -395,13 +396,14 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
         if record["status"] != "success":
             logger.error("controller_hook_unavailable %s", record["error"])
     except (BackendError, InputError, OSError, ValueError, KeyError) as exc:
+        print(f"controller: {call_error(exc)}", file=sys.stderr)
         logger.error("controller_hook_unavailable %s: %s", type(exc).__name__, call_error(exc))
         if phase == "requirements":
             artifact.update(state="unavailable", requirements=[], open_questions=[])
         else:
             reason = artifact["reason"]
             artifact.update(status="unavailable", claims=[], reason=(reason if reason != "claim audit not available"
-                else "Luna pin/call unavailable; inspect pin-check.json and accounting"))
+                else call_error(exc)))
     if phase == "requirements":
         validate_input(artifact, "requirements.schema.json")
     elif not _audit_validator().is_valid(artifact):

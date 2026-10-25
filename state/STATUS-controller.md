@@ -372,3 +372,42 @@
 
 - The installed plugin distribution must include controller resources and sibling schemas; cwd independence does not establish that the host copy is complete or identical to this checkout.
 - External-cwd mocked success establishes resource resolution and artifact behavior only; the host finding requires a live host rerun with these diagnostics to establish its cause.
+
+## 2026-10-25 r3-v3-006 Role 3
+
+### Done
+
+- Added absolute HARNESS_CODEX override, PATH lookup and the known ChatGPT Mac application bundle fallback; successful historical and pinned-v3 control_call stderr accounting includes the resolved executable (.venv/bin/python -m pytest tests/controller -q: 478 passed in 8.03s).
+- Made caught pre-call failures print a controller: diagnostic directly to stderr; requirements remains schema-valid unavailable without fictitious accounting, while claim-audit carries the cause in its existing reason field (.venv/bin/python -m pytest tests/controller -q: 478 passed in 8.03s).
+- Added fake executable/PATH/override precedence, invalid override, successful accounting-path and both hook CLI missing-executable regressions; public Luna-call records retain their frozen shape (.venv/bin/python -m pytest tests/controller -q: 478 passed in 8.03s).
+- Verified owned-path whitespace and change scope; no staging or commits (git diff --check -- controller tests/controller state/STATUS-controller.md: exit 0; git status --short: only controller/backends/codex_cli.py, controller/v3.py, controller/v3_client.py, tests/controller/test_codex_cli.py and tests/controller/test_v3.py modified before this STATUS append).
+
+### Remaining
+
+- Host rerun the installed-hook smoke with the updated controller: verify bundle fallback, executable in stderr accounting and successful requirements under the hook's restricted PATH. This offline session did not run Codex children or paid calls.
+- Carry forward r3-v3-005 / r3-v3-004 Remaining: live v2 calibration targets, installed-hook integration with Roles 2/4, signature-baseline agreement, two non-evaluation smokes, timing/cost denominators and full-suite checks once before merge.
+
+### Decisions
+
+- Keep successful executable evidence in stderr control_call only: the frozen luna-calls.jsonl schema has no executable field; resolution failures occur before an actual call and must not fabricate a record.
+- Fail closed on an invalid nonempty HARNESS_CODEX: an explicit host selection must be absolute and executable rather than silently selecting another binary.
+- Preserve explicit configured/injected executable paths: historical configuration and mocked runners retain their existing behavior; the override takes precedence and ordinary command names use PATH then bundle fallback.
+- Print pre-call diagnostics directly as well as retaining existing unavailable logging: an already configured logging handler must not hide the required stderr channel.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/controller -q (478 passed in 8.03s; offline mocks only).
+- git diff --check -- controller tests/controller state/STATUS-controller.md (exit 0 before STATUS append; rerun after append).
+- git status --short (owned implementation/test paths only before STATUS append; no staging or commits).
+
+### Do not touch
+
+- Frozen schemas, CLIs, hook interfaces and paths outside controller/, tests/controller/ and state/STATUS-controller.md.
+- Read-only .git, host evidence, private graders and evaluation tasks; no network access, live calls, staging or commits.
+- Existing Current state block and completed job sections; this is an ordinary append-only job, not consolidation.
+
+### Assumptions
+
+- An unset or empty HARNESS_CODEX uses ordinary lookup; a nonempty invalid override is a configuration failure.
+- Known application bundle availability and production hook success require the host rerun; fake executable fixtures establish lookup and accounting behavior only.
+- No PR was created; the eventual PR must retain these assumptions. Suggested commit: fix(controller): resolve Codex in restricted hook environments.

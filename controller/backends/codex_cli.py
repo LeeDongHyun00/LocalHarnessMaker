@@ -22,6 +22,26 @@ from controller.settings import PACKAGE_DIR, load_object
 
 logger = logging.getLogger(__name__)
 Runner = Callable[..., subprocess.CompletedProcess[str]]
+APP_BUNDLE_CODEX = "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex"
+
+
+def resolve_executable(cli: str) -> str:
+    """Prefer the host override, then configured CLI/PATH, then the Mac bundle."""
+    override = os.environ.get("HARNESS_CODEX")
+    if override:
+        if not Path(override).is_absolute():
+            raise TransportError("HARNESS_CODEX must be an absolute executable path")
+        resolved = shutil.which(override)
+        if not resolved:
+            raise TransportError(f"codex executable not found or not executable: {override}")
+        return resolved
+    # Preserve explicit configured/injected paths used by historical callers.
+    if os.path.sep in cli:
+        return str(Path(cli).absolute())
+    resolved = shutil.which(cli) or shutil.which(APP_BUNDLE_CODEX)
+    if not resolved:
+        raise TransportError("codex executable not found (HARNESS_CODEX, PATH, application bundle)")
+    return str(Path(resolved).absolute())
 
 
 def provider_error(events: str, stderr: str) -> str | None:
@@ -123,9 +143,7 @@ class CodexCLIBackend:
                 raise ValueError("Unexpected Codex model execution policy")
         except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
             raise InputError("Invalid Codex CLI configuration or prices") from exc
-        self.executable = shutil.which(cli) if os.path.sep not in cli else cli
-        if not self.executable:
-            raise TransportError("Codex CLI executable was not found on PATH")
+        self.executable = resolve_executable(cli)
         self.runner = runner
         self.clock = clock
         self.persist_session = persist_session
@@ -215,6 +233,7 @@ class CodexCLIBackend:
                 if self.log_calls:
                     logger.info("control_call %s", json.dumps({
                         "backend": "codex_cli", "model": self.model,
+                        "executable": self.executable,
                         "timeout_seconds": self.timeout,
                         "reasoning_effort": self.reasoning_effort, "status": status,
                         "error": self.error, "pricing_ref": self.pricing_ref,

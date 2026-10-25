@@ -78,6 +78,47 @@ def accounting(directory: Path) -> list[dict[str, Any]]:
     return records
 
 
+def test_missing_executable_cli_reports_reason_without_call(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    directory, prompt = setup_session(tmp_path)
+    monkeypatch.setenv("PATH", "")
+    monkeypatch.delenv("HARNESS_CODEX", raising=False)
+    monkeypatch.setattr("controller.backends.codex_cli.APP_BUNDLE_CODEX", str(tmp_path / "missing"))
+    assert main(["requirements", "--prompt", str(prompt), "--session-id", SESSION,
+                 "--artifacts", str(directory)]) == 2
+    captured = capsys.readouterr()
+    assert "controller: codex executable not found" in captured.err
+    assert captured.out == ""
+    assert not (directory / "luna-calls.jsonl").exists()
+    assert "control_call " not in caplog.text
+    artifact = load_object(directory / "requirements.json")
+    schema_validator("requirements.schema.json").validate(artifact)
+    assert artifact["state"] == "unavailable" and artifact["luna_call"] is None
+
+
+def test_missing_executable_audit_retains_reason_in_allowed_field(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    directory, prompt = setup_session(tmp_path)
+    requirements, code = invoke(directory, prompt, FakeClient(rows()))
+    assert code == 0
+    before = (directory / "luna-calls.jsonl").read_bytes()
+    final = tmp_path / "final.txt"
+    final.write_text("Created answer.py.")
+    monkeypatch.setenv("PATH", "")
+    monkeypatch.delenv("HARNESS_CODEX", raising=False)
+    monkeypatch.setattr("controller.backends.codex_cli.APP_BUNDLE_CODEX", str(tmp_path / "missing"))
+    assert main(["claim-audit", "--requirements", str(requirements), "--final-message", str(final),
+                 "--session-id", SESSION, "--artifacts", str(directory)]) == 2
+    assert "controller: codex executable not found" in capsys.readouterr().err
+    audit = load_object(directory / "claim-audit.json")
+    _audit_validator().validate(audit)
+    assert audit["status"] == "unavailable" and "codex executable not found" in audit["reason"]
+    assert (directory / "luna-calls.jsonl").read_bytes() == before
+
+
 def test_hook_clis_from_external_working_directory(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -450,6 +491,9 @@ def test_native_pin_and_one_invocation_guard(tmp_path: Path, models: list[str], 
     with pytest.raises(BackendError, match="second"):
         client.generate(REQUIREMENTS, [{"role": "user", "content": "input"}])
     assert len(calls) == 1 and 'control_call ' in caplog.text
+    log = next(json.loads(r.message.removeprefix("control_call ")) for r in caplog.records
+               if r.message.startswith("control_call "))
+    assert log["executable"] == "/mock/codex"
     assert os.environ.get("HARNESS_NESTED") == parent
 
 

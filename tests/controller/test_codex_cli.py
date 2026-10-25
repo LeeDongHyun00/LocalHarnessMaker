@@ -167,8 +167,43 @@ def test_invalid_messages_are_input_errors() -> None:
 
 def test_missing_cli_is_transport_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("controller.backends.codex_cli.shutil.which", lambda _: None)
-    with pytest.raises(TransportError, match="not found on PATH"):
+    monkeypatch.delenv("HARNESS_CODEX", raising=False)
+    with pytest.raises(TransportError, match="codex executable not found"):
         CodexCLIBackend(executable="missing-codex")
+
+
+@pytest.mark.parametrize("source", ["override", "path", "bundle"])
+def test_executable_resolution_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    override, path_cli, bundle = tmp_path / "override", bindir / "codex", tmp_path / "bundle"
+    for candidate in (override, path_cli, bundle):
+        candidate.write_text("#!/bin/sh\nexit 0\n")
+        candidate.chmod(0o755)
+    monkeypatch.setenv("PATH", str(bindir) if source != "bundle" else "")
+    monkeypatch.setattr("controller.backends.codex_cli.APP_BUNDLE_CODEX", str(bundle))
+    monkeypatch.delenv("HARNESS_CODEX", raising=False)
+    if source == "override":
+        monkeypatch.setenv("HARNESS_CODEX", str(override))
+    expected = {"override": override, "path": path_cli, "bundle": bundle}[source]
+    runner = MockRunner()
+    backend = CodexCLIBackend(runner=runner)
+    with caplog.at_level(logging.INFO):
+        assert backend.generate(contract_schema(), build_messages("test")) == model_contract()
+    assert runner.calls[0]["argv"][0] == str(expected)
+    record = next(json.loads(r.message.removeprefix("control_call ")) for r in caplog.records
+                  if r.message.startswith("control_call "))
+    assert record["executable"] == str(expected)
+
+
+@pytest.mark.parametrize("override", ["relative/codex", "/missing/codex"])
+def test_invalid_override_fails_closed(monkeypatch: pytest.MonkeyPatch, override: str) -> None:
+    monkeypatch.setenv("HARNESS_CODEX", override)
+    with pytest.raises(TransportError, match="absolute executable path|codex executable not found"):
+        CodexCLIBackend(executable="/mock/codex")
 
 
 def test_api_fallback_model_and_rates_match_cli_estimate() -> None:

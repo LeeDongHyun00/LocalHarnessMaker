@@ -107,6 +107,7 @@ class PinnedLunaClient:
         self.error = call_error(failure, self.backend.error) if failure else None
         logger.info("control_call %s", json.dumps({
             "backend": "codex_cli", "requested_model": MODEL, "model": self.model,
+            "executable": self.backend.executable,
             "timeout_seconds": self.backend.timeout, "reasoning_effort": "low", "status": status,
             "error": self.error, "pricing_ref": self.backend.pricing_ref, **asdict(self._usage),
         }, sort_keys=True))
