@@ -1,0 +1,10 @@
+{
+  "id": "v3-token-scanner",
+  "type": "constrained_refactoring",
+  "domain": "text_protocol",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

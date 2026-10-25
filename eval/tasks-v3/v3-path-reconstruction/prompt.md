@@ -1,0 +1,8 @@
+Refactor routes.route(graph, source, target) to store predecessor links and reconstruct a path only when the target is reached. The starter copies complete prefixes into its breadth-first frontier.
+PR1. Return a list for a shortest directed route, including both endpoints. Among equal-length routes, use breadth-first discovery with each adjacency iterable in its given order; mark vertices seen when enqueuing, not when dispatching. Missing adjacency means no outgoing edges. Vertices are arbitrary hashable objects, including None. source == target returns [source] even if absent from graph; an unreachable target returns None.
+PR2. Each reached non-target vertex's adjacency iterable is consumed once at most. Handle cycles, self edges, duplicate edges and one-shot adjacency generators. Do not mutate the graph or adjacency lists. Never compare or sort vertex values; preserve their object identity in the returned list.
+PR3. Use predecessor links with a vertex-only frontier, not copied path sequences per queued vertex. Auxiliary storage is linear in reached vertices, excluding the final path. As an executable bound, a graph of a 100-edge trunk ending in a fanout of 2400 terminal vertices must use no more than 1,000,000 peak newly traced Python allocation bytes during route (graph constructed before tracing). No per-path prefix copying or disabling allocation tracing is allowed. Do not recurse.
+PR4. Preserve the route parameter names and callable behavior across repeated calls; do not retain visited state between calls. Add regression tests for tie order and unreachable endpoints.
+
+Use Python 3.11+ and the standard library. Add regression tests as needed.
+Run `python -m unittest discover -s . -p "test_*.py" -v` from workspace/.

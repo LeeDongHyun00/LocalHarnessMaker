@@ -1,0 +1,10 @@
+{
+  "id": "v3-build-manifest",
+  "type": "constrained_refactoring",
+  "domain": "build_tooling",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

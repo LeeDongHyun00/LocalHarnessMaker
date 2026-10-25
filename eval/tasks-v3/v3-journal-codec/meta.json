@@ -1,0 +1,10 @@
+{
+  "id": "v3-journal-codec",
+  "type": "constrained_refactoring",
+  "domain": "storage",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
