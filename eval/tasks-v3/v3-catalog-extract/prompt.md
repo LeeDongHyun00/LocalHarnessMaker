@@ -1,0 +1,12 @@
+Finish catalog.py's Python-source message extractor and CLI. Keep extract(sources)
+->list, where sources maps file-name strings to source text; never execute source.
+Add ExtractError(filename,line,column,reason) and `python catalog.py FILE...`.
+
+CE1. Extract only direct calls to the name _ with exactly one positional string literal and no keywords. Python adjacent string literals count as one; multiline/escaped/empty literals are supported. Ignore strings/comments without calls and attribute calls such as obj._. A direct _ call with other arguments is ExtractError at the call start, reason 'literal'.
+CE2. One catalog entry per distinct decoded message, sorted by message using Python string order. Each entry has exactly id, comments, locations. locations are unique sorted [filename,start_line,start_column,end_line,end_column] for the entire call; lines are 1-based, columns 0-based Unicode characters and end is exclusive. Repeated extraction and source-map insertion order must not change the result or mutate sources.
+CE3. A call owns the contiguous block of immediately preceding lines beginning, after indentation, with '# TRANSLATORS:'. Strip that prefix and surrounding whitespace, discard empty comments and merge distinct comments sorted by text across duplicate messages. A blank line or any other line breaks ownership; trailing inline comments do not become translator notes.
+CE4. Process file names sorted; report invalid Python as ExtractError with reason 'syntax' at SyntaxError.lineno and offset-1 (use line 1 and offset 1 when the corresponding attribute is missing or zero). For literal errors traverse ast.walk order. Error attributes are filename,line,column,reason and str(error) is 'FILE:LINE:COLUMN: REASON'. No partial catalog is returned.
+CE5. CLI reads UTF-8 sources named by argv, deduplicates repeated paths and outputs JSON using sort_keys=True, indent=2, ensure_ascii=False and final newline, exit 0, empty stderr; no args yields []. Read/decode errors use FILE:0:0: read. Any ExtractError: exit 2, empty stdout, one error line on stderr. Add EXTRACT.md with `python catalog.py FILE...`, a fenced python example containing a translator note and two distinct direct literal calls, and explain Unicode column units and comment ownership.
+
+Use Python 3.11+ and only the standard library. Preserve the stated APIs.
+Run `python -m unittest discover -s . -p "test_*.py" -v` from workspace/.

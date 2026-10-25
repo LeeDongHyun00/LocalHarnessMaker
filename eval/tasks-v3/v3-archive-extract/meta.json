@@ -1,0 +1,10 @@
+{
+  "id": "v3-archive-extract",
+  "type": "multiple_requirements",
+  "domain": "filesystem",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

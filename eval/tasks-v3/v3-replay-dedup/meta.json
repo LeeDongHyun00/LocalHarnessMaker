@@ -1,0 +1,10 @@
+{
+  "id": "v3-replay-dedup",
+  "type": "multiple_requirements",
+  "domain": "event_processing",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

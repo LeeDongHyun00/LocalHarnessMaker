@@ -1,0 +1,10 @@
+{
+  "id": "v3-query-explain",
+  "type": "multiple_requirements",
+  "domain": "search",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
