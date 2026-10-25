@@ -76,6 +76,9 @@ def merge_audit(
     elif audited and audited["sha256"] != current["sha256"]:
         audit["status"] = "stale"
         audit["reason"] = "current final message changed after the original audit; no new call"
+    elif audited and audit["status"] == "stale":
+        audit["status"] = "complete"
+        audit["reason"] = None
     return audit
 
 
@@ -169,8 +172,17 @@ def check_requirements(
                       "claim_audit": unavailable_audit("no claim audit supplied"),
                       "retry": retry, "escalation_advice": advice}
         audit = prior["claim_audit"] if prior else unavailable_audit("no claim audit supplied")
-        if claim_audit is not None and not prior:
-            audit_file = supplied_file(root, claim_audit)
+        # The first deterministic report may precede controller claim-audit.
+        # Load that sidecar on a later Stop, but never replace a retained audit.
+        audit_file = None
+        if audit["audited_final_message"] is None and audit["luna_call"] is None:
+            if claim_audit is not None:
+                audit_file = supplied_file(root, claim_audit)
+            else:
+                candidate = confined(root, "claim-audit.json")
+                if candidate.exists():
+                    audit_file = candidate
+        if audit_file is not None:
             try:
                 audit_bytes = audit_file.read_bytes()
             except FileNotFoundError:

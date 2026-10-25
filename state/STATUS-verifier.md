@@ -236,3 +236,35 @@
 ### Assumptions
 
 - See History / Assumptions; format conversion only.
+## 2026-10-25 round-two-audit-retention Role 4
+
+### Done
+
+- Fixed audit selection after the initial deterministic report: retain the verified original audit, otherwise merge the supplied sidecar or canonical claim-audit.json; preserve audited source hashes, citation verification results and accounting, and refresh stale status on later Stop events (.venv/bin/python -m pytest tests/verifier -q: 682 passed, 8 host-only Seatbelt skips in 31.79s).
+- Added 13 regression cases covering report/supplied/discovered audits, unchanged/changed final messages, rejected citation hashes, replacement-audit rejection, duplicate round-two freshness updates and no-audit unavailability; assert unchanged sidecar/accounting bytes (.venv/bin/python -m pytest tests/verifier -q: 682 passed, 8 skipped).
+
+### Remaining
+
+- Host/Role 1: rerun the read-only reference cross-role pipeline test with installed controller/plugin/verifier packages; it was read here, not executed or modified.
+- Retain prior integration, host Seatbelt and performance work listed in the historical Remaining section; run the full suite once on the host before merge.
+
+### Decisions
+
+- Prefer a report's retained original over any replacement sidecar: later Stop events must preserve the single original audit and its mechanically verified citations.
+- Load a sidecar when the prior report has no audited source or accounting reference: the frozen pipeline runs deterministic checks before controller claim-audit.
+- Refresh stale to complete when current bytes again match the audited hash: freshness follows the current final message without a new provider call.
+- Append this dated section with the six handoff headings: main already contains the append-only status-format migration; preserve this worktree's existing history verbatim.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/verifier -q (682 passed, 8 host-only Seatbelt skips in 31.79s).
+- git diff --check -- verifier tests/verifier state/STATUS-verifier.md (exit 0, no output).
+
+### Do not touch
+
+- Only verifier/, tests/verifier/ and this STATUS file are writable scope; shared interfaces, other roles' files, the external cross-role reference and .git remain read-only. Do not stage or commit.
+
+### Assumptions
+
+- No new interface or provider invocation is needed; later rounds mean round 2 and repeated Stop updates under the frozen round 1/2 CLI.
+- The user's specific audit-retention fix takes priority over earlier host integration work. Cross-role/live-hook acceptance and the eight Seatbelt cases remain host verification, not results claimed by these local tests.
