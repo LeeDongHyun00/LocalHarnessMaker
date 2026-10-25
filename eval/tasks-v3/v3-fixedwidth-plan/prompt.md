@@ -1,0 +1,8 @@
+Compile fixed-width descriptors once per render_rows call, instead of once per row. Keep compile_fields(fields) and render_rows(fields, rows) public, including parameter names.
+FW1. Descriptors are an iterable of triples (name, width, align). compile_fields consumes it once and returns a tuple of triples in source order. Validate each descriptor in this order: name must be a nonempty str; duplicate names are invalid; width must be type int (not bool) and positive; align must be 'L' or 'R'. The first error raises ValueError('field I: REASON'), with zero-based I and REASON name, duplicate, width, or align. Finish validation of one descriptor before inspecting the next. The triples themselves are well-formed triples.
+FW2. render_rows must invoke the current compile_fields function exactly once per call, before consuming any row, even with zero rows or zero fields. Invalid descriptors prevent all row consumption. Accept one-shot descriptor and row iterables. Do not cache plans across calls; repeated calls reflect edits to field descriptors.
+FW3. For each mapping row, use str(row.get(name, '')), truncate to width Unicode code points, then right-pad with ASCII spaces for L or left-pad for R. Concatenate cells without a separator or newline and return a list of strings in row order. Missing fields are empty. Ignore extra mapping keys. With zero fields return one empty string per row.
+FW4. Do not mutate descriptor lists or row mappings. Preserve signatures, empty-result behavior and exact diagnostic order. Add regression tests for compile count and validation before row side effects.
+
+Use Python 3.11+ and the standard library. Add regression tests as needed.
+Run `python -m unittest discover -s . -p "test_*.py" -v` from workspace/.

@@ -1,0 +1,8 @@
+Separate the journal wire codec from stream I/O. Keep journal.append(stream, payload) and journal.replay(stream).
+JC1. Add pure codec.encode(payload: bytes) -> bytes and codec.decode(data: bytes) -> tuple[list[bytes], bytes]. A record is a two-byte unsigned little-endian payload length, the payload, then one checksum byte equal to sum(payload) modulo 256. Empty payloads are valid. Reject length >65535 with ValueError('oversize') before I/O. Do not change these wire bytes.
+JC2. decode returns all complete payloads and the exact unconsumed truncated suffix, including an incomplete length header. A checksum mismatch in a complete record raises ValueError('checksum at N') with the record's byte offset. Do not silently skip corruption. Empty input returns ([], b''). Codec operations perform no file or stream I/O.
+JC3. append must call codec.encode once and write its result to the supplied stream at its current position, looping on short writes until complete. None, nonpositive, or greater-than-offered write counts raise OSError('short write'); propagate other I/O exceptions unchanged. Never seek, flush, close, or retry an exception. Oversize payloads cause no stream operation.
+JC4. replay must call stream.read() once and codec.decode once, returning only the decoded list and ignoring an incomplete tail. Propagate read and checksum errors; never write, seek, close or flush. Both adapters must use the codec module's current functions, so replacing a codec function observes the call. Preserve signatures and add tests for the separation.
+
+Use Python 3.11+ and the standard library. Add regression tests as needed.
+Run `python -m unittest discover -s . -p "test_*.py" -v` from workspace/.
