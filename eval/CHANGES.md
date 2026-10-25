@@ -1,3 +1,33 @@
+# Version 3 freeze preparation — 2026-10-25
+
+Set only `frozen=true` in all 54 task metadata files, following the user-supplied
+Claude host acceptance and evaluator waiver of a disjoint calibration pilot.
+Add the host-only `eval.freeze_v3` command and a shared v3 digest over tracked
+public files and the complete private snapshot (excluding caches), covering
+coverage, references and ambiguity notes/matchers without assuming their layout.
+The command prints only counts and the digest; it was not run in this sandbox.
+
+Unwrap full-v3-a into the current standalone runner shape, retain its estimate,
+and add host-filled `task_set_sha256` placeholders to A and draft H3. The runner
+rejects unfilled or mismatching pins before execution. Historical v1/v2 digest
+algorithms, CLI flags, reports and task inputs are unchanged. H3 remains
+`draft_not_approved` pending plugin mode. README records the host procedure and
+private-snapshot immutability requirement. Synthetic tests cover each input
+class, private filename binding, cache exclusion, symlink rejection, A loading
+with a filled digest, H3 refusal and pre-execution mismatch rejection.
+
+Verification: `.venv/bin/python -m pytest tests/eval -q` — 2157 passed in
+470.47s; targeted regression tests — 10 passed in 0.45s. Scope audit and
+`git diff --check` pass. No paid calls, staging or commits.
+
+## Assumptions
+
+- The user's host acceptance and weekly evaluator decision supersede earlier
+  pending review/pilot requirements. Difficulty remains unmeasured.
+- The supplied private root is the complete v3 frozen snapshot, including
+  responder notes/matchers; future generated outputs must live elsewhere.
+- A retains the existing pinned baseline CLI version; the host must match it.
+
 # Version 3 consolidation and corpus privacy — 2026-10-25
 
 Consolidate all 54 shape-session validation rows into VALIDATION.md; per-shape

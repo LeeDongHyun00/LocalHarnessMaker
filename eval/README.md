@@ -8,25 +8,47 @@ shared schema. Historical reports in `reports/baseline-a-first-task/` remain
 unaltered provisional evidence; they have not been reclassified as approved
 reports or rerun.
 
-## Version 3 construction checkpoint — 2026-10-25
+## Version 3 freeze — 2026-10-25
 
-All 54 candidates are authored: nine per shape, 45 single-session and nine
-two-session tasks (63 required sessions). Metadata remains `frozen=false`.
-[Canonical validation](tasks-v3/VALIDATION.md) consolidates the shape-session
-results: 225 covered requirements, 325 reference checks, 3,168 executed mutants,
-2,980 killed, 188 reviewed equivalents, zero survivors/errors. Private evidence
-was not rerun here. [Structure review](tasks-v3/STRUCTURE-REVIEW.md) adds 24
-cross-shape pairs on architecture, data flow and failure mechanism. Claude's
-independent host review, calibration and separate freeze remain pending.
+All 54 tasks now have `frozen=true`: nine per shape, 45 single-session and nine
+two-session tasks (63 required sessions). Only the frozen field changed in
+public task inputs. Per the user's host-review handoff and
+[weekly evaluator decision](../docs/weekly/2026-10-21-host-verification.md),
+Claude accepted the population after 60 mutants per task with zero errors or
+survivors and no private references in public inputs. The evaluator waived the
+disjoint calibration pilot; full A measures difficulty without task selection.
+The 60–85% target remains unmeasured. Earlier per-shape notes describe historical
+construction checkpoints, not the current freeze state.
 
-Both full-v3 draft configs contain the same lexicographically ordered 54 IDs.
+Claude must run this read-only command on the host; it was not run here:
+
+```sh
+.venv/bin/python -m eval.freeze_v3 --private-root "$LHM_PRIVATE_V3"
+```
+
+It prints `task_set_sha256`, task count, shape counts and two-session count.
+Hash inputs are tracked public task files and relative names/bytes of **all**
+regular files in the supplied v3 private root, including graders, coverage,
+`.references/<task>/` and ambiguity author notes/matchers wherever stored there.
+Interpreter/test caches are excluded; symlinks fail closed. Keep that complete
+private snapshot immutable and write future validation/run outputs elsewhere.
+No private names, paths or contents are printed. This broader snapshot avoids
+assuming an undocumented responder-data directory layout.
+
+Replace `FILL_FROM_HOST_FREEZE_V3_OUTPUT` in A's top-level `task_set_sha256` and
+H3's `run_config.task_set_sha256` with the printed digest. The runner rejects an
+unfilled pin or changed inputs before execution. A is unwrapped, `harness=false`,
+and uses the existing baseline CLI pin (`codex-cli 0.163.0-alpha.11.1`); its
+[estimate](reports/full-v3-a-estimate.md) remains available to the current loader.
+H3 stays wrapped `draft_not_approved` until actual plugin mode and compatibility
+evidence exist; `harness=true` in that draft must never launch the legacy loop.
+
 A estimates 63 Sol workloads ($10.206000 scenario); H3 reserves 135 Sol workloads
-plus 126 Luna calls ($22.883040). These are unmeasured token scenarios, not
-spending approval. `pilot-v3-a.yaml` reserves ten separate calibration IDs across
-all six shapes (11 sessions); materials/private validation remain unauthored.
-The [pilot estimate](reports/pilot-v3-a-estimate.md) records the selection rule.
-All templates remain wrapped `draft_not_approved`, rejected by the run loader.
-The 60–85% difficulty target is unmeasured. No model calls were made here.
+plus 126 Luna calls ($22.883040). These are unmeasured scenarios, not spending
+approval. The optional `pilot-v3-a.yaml` remains a draft cost check with unauthored
+disjoint materials. Current estimates retain their historical pre-freeze text;
+the host decision above supersedes their pending-review/pilot language. No model
+calls, private-root discovery or private validation occurred in this session.
 
 The v3 validator requires executed coverage, no public assertion overlap and
 exhaustive generated/targeted mutations with zero survivors/errors/unexecuted

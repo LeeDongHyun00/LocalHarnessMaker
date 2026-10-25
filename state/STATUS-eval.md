@@ -137,3 +137,82 @@
 - The user's 54-task inventory is authoritative and matches public discovery; original shape-session validation is consolidated as recorded evidence, not re-certified without private storage.
 - No disjoint calibration materials exist in this worktree: the ten-task pilot config reserves future materials rather than silently using held-out tasks. Its single two-session task requires 11 sessions; report ambiguity/carryover separately from difficulty calibration.
 - Existing offline Fast prices remain uncalibrated planning inputs; no cost cap, paid execution approval or successful plugin runtime is inferred.
+
+## 2026-10-25 v3-freeze-host-handoff Role 5
+
+### Done
+
+- Set frozen=true in all 54 version 3 metadata files, changing only that field; confirmed six shapes with nine tasks each and nine two-session tasks (`.venv/bin/python /tmp/audit_v3_freeze.py`: PASS, 54 metadata-only freezes and matching inventories).
+- Added eval/freeze_v3.py for Claude's host invocation, printing the digest, task count, shape counts and two-session count; shared runner hashing includes tracked public files and the full private snapshot, including coverage/references/responder data (synthetic digest/config regression tests: `.venv/bin/python -m pytest tests/eval/test_frozen_v3.py -q`: 10 passed in 0.45s; real freeze command intentionally not run).
+- Unwrapped full-v3-a into the standalone runner configuration, retained its estimate, and added host-filled task_set_sha256 placeholders to A and draft H3; runner rejects unfilled/mismatching pins before execution (`.venv/bin/python -m pytest tests/eval/test_frozen_v3.py -q`: 10 passed, including filled A estimate matching, H3 refusal and pre-execution mismatch rejection).
+- Updated README and CHANGES with host procedure, evaluator pilot waiver and private-snapshot constraints; verified only authorized paths changed, no prompt/workspace/v1/v2/staged changes (`.venv/bin/python /tmp/audit_v3_freeze.py`: PASS; `git diff --check`: exit 0).
+- Verified the eval package (`.venv/bin/python -m pytest tests/eval -q`: 2157 passed in 470.47s, exit 0).
+
+### Remaining
+
+- Claude runs `.venv/bin/python -m eval.freeze_v3 --private-root "$LHM_PRIVATE_V3"` on the host and fills both task_set_sha256 placeholders from its output. Send inventory/digest and host evidence to Role 1 for publication. No host digest or private validation is claimed here.
+- Implement and host-probe actual plugin mode, including provenance, question pause/resume, ledger revision binding, artifact capture and pinned accounting; H3 remains draft_not_approved. Carry forward this item from v3-doc-config-corpus-consolidation.
+- Carry forward the retained-run corpus export/rebaseline item from v3-doc-config-corpus-consolidation; synthetic replay does not certify original access audits.
+- Confirm host CLI/model/tier/pricing pins and spending approval before full paid batches; run the full repository suite once on the host before merge. Full A measures difficulty without selecting or tuning tasks; disclose any result outside the target band.
+- Earlier pending host-review, mandatory disjoint-pilot and unfrozen-population items are superseded by the user-supplied host acceptance and weekly evaluator decision. The optional disjoint pilot reservation remains unbuilt, not a freeze gate.
+
+### Decisions
+
+- Freeze now without a disjoint calibration pilot: user reports Claude accepted all 54 tasks after host review (60 mutants per task, zero errors/survivors and no private references in public inputs), with the evaluator waiver recorded in docs/weekly/2026-10-21-host-verification.md.
+- Hash the complete supplied version 3 private snapshot using relative filenames and bytes, excluding interpreter/test caches: include notes/matchers without guessing their undocumented storage namespace; additional retained private records are pinned too. Future validation/run outputs must remain outside this immutable snapshot.
+- Add an optional internal configuration digest pin and enforce it before executor work: the existing runner had population IDs but no explicit expected-digest field; no CLI flag, report schema or historical digest algorithm changes are needed.
+- Retain the existing baseline CLI pin for A and keep H3 wrapped: A uses the current standalone runner, whereas actual plugin mode and hook compatibility remain future work.
+- Append this handoff without refreshing Current state: this is a freeze job, not the single consolidation job authorized to rewrite that block.
+
+### Verify commands
+
+- `.venv/bin/python -m pytest tests/eval -q` (2157 passed in 470.47s, exit 0).
+- `.venv/bin/python -m pytest tests/eval/test_frozen_v3.py -q` (10 passed in 0.45s).
+- `.venv/bin/python /tmp/audit_v3_freeze.py` (PASS: metadata-only freeze, inventory, estimate, draft, ownership and staging checks; temporary session audit, not a committed tool).
+- `git diff --check` (exit 0).
+
+### Do not touch
+
+- Only eval/, tests/eval/ and state/STATUS-eval.md are authorized; preserve v1/v2 files, report schemas, CLI flags and every v3 prompt/workspace byte.
+- Do not locate/access the real private root or run the real freeze command here; no network, model calls, plugin installation, staging, commits, deletion or history rewriting. Keep .git read-only; no sub-agents.
+- Preserve completed dated STATUS sections and History; leave H3 draft until the plugin-mode runner exists.
+
+### Assumptions
+
+- The user's host-review handoff and the matching weekly evaluator decision are authoritative; sandbox tests do not re-certify private validation or measure A/H3 quality.
+- The host-supplied root is a separate, complete version 3 snapshot containing graders, coverage, references and all ambiguity author notes/matchers. The broader private-root hash requires that snapshot to remain immutable.
+- A retains codex-cli 0.163.0-alpha.11.1 from the existing baseline configurations; the installed host version must match. Existing estimate files remain uncalibrated scenarios, not spending approval.
+
+## 2026-10-25 v3-filled-digest-test-fix Role 5
+
+### Done
+
+- Replaced the placeholder assertion with matching 64-character lowercase hex digest checks for A/H3; load the filled A config directly and retain its estimate match and H3 draft rejection (`.venv/bin/python -m pytest tests/eval/test_frozen_v3.py -q`: 10 passed, 1 skipped in 0.52s).
+- Added optional host comparison against eval.freeze_v3.freeze_summary when LHM_PRIVATE_V3 is set; otherwise skip only that host test; mocked runner checks reject a mismatching digest and accept the filled digest through real frozen metadata/public-input checks before checkpoint writing or executor work (`.venv/bin/python -m pytest tests/eval -q`: 2157 passed, 1 skipped in 469.27s, exit 0).
+
+### Remaining
+
+- Run the optional host digest regression with LHM_PRIVATE_V3 supplied; the user reports Claude already ran freeze_v3 and filled both config pins, superseding the prior placeholder-fill remainder. This sandbox does not independently certify the private snapshot.
+- Carry forward plugin-mode implementation/host probing, retained-run corpus export/rebaseline, host runtime/pricing/spending gates and the full repository suite before merge from v3-freeze-host-handoff; this narrowly scoped fix changes none of them.
+
+### Decisions
+
+- Test the filled configuration directly: host freeze output has replaced the placeholders, so readiness must validate the persisted digest rather than require placeholder text or substitute a synthetic config.
+- Mock private loading and computed digest for runner acceptance, stopping before checkpoint writing: exercise enforcement against actual frozen public inputs without private access or executor calls.
+- Append this section only: the user requested one dated section and this is not a consolidation job.
+
+### Verify commands
+
+- `.venv/bin/python -m pytest tests/eval -q` (2157 passed, 1 skipped in 469.27s, exit 0).
+- `.venv/bin/python -m pytest tests/eval/test_frozen_v3.py -q` (10 passed, 1 skipped in 0.52s).
+- `git diff --check` (exit 0 after STATUS append).
+
+### Do not touch
+
+- Preserve all existing freeze changes, every task file, v1/v2 inputs and shared interfaces; this session edits only tests/eval/test_frozen_v3.py and appends state/STATUS-eval.md.
+- Keep .git read-only; no staging, commits, network, model calls, private-root discovery, deletion or history rewriting.
+
+### Assumptions
+
+- The user-supplied host digest 7645e003ed4ef52c43d58555f494c7554ee468c5e628b5d95e22c37a30b5b01d and Claude's host freeze run are authoritative handoff evidence; LHM_PRIVATE_V3 is unset here, so local tests cannot re-certify that private hash.
+- The complete planned freeze commit includes eval/CHANGES.md, eval/README.md, both full-v3 configs, eval/runner/core.py, eval/freeze_v3.py, eval/runner/frozen_v3.py, tests/eval/test_frozen_v3.py, state/STATUS-eval.md and all 54 eval/tasks-v3/*/meta.json files; no staging or commit was requested.
