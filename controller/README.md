@@ -6,6 +6,14 @@ without regeneration, fallback or inherited historical routing. The hook owns
 the session's two-call budget. Controller phase allocations and a one-shot client
 also refuse duplicate invocations, including after failure or interruption.
 
+Both phases default to prompt `v2`. Set `HARNESS_LUNA_PROMPT_VERSION=v1` to
+select the preserved historical prompts; only `v1` and `v2` are accepted. No hook
+CLI flag is added. The existing accounting `call_id` and artifact `luna_call`
+reference encode the selected version, for example `requirements-v2-1` or
+`claim_audit-v2-1`. Phase reservations remain independent of version; changing
+versions cannot spend another call in the same session. Older call references
+remain valid.
+
 ```sh
 SESSION_KEY=$(printf %s "$SESSION_ID" | shasum -a 256 | cut -d ' ' -f 1)
 ARTIFACTS=".localharness/v3/sessions/$SESSION_KEY"
@@ -118,8 +126,14 @@ new call. Claims never trigger repair. No verifier imports occur in controller.
 Calibration sets and scoring instructions are in
 [fixtures/v3-calibration](../tests/controller/fixtures/v3-calibration/README.md).
 Each phase has 40 requests derived from permitted public v1/v2 prompt excerpts
-and authored variants. Host measurement has not been run; dated evidence records
-null live precision/recall. Scorer round-trip numbers are synthetic validation.
+and authored variants. The user-supplied host v1 measurement and prediction
+analysis are described in
+[the v1 analysis](evidence/2026-10-25-v3-prompt-v1-analysis.md). V2 live quality
+is pending host measurement. Scorer round-trip numbers are synthetic validation.
+`controller.measure_v3 --prompt-version v1|v2` overrides the environment/default
+for calibration and records the selected prompt version/hash. With saved
+`--predictions`, version metadata is caller-declared only when the flag is given;
+otherwise it stays unknown rather than assigning v2 to old predictions.
 
 ## Historical version 1/2 operations
 

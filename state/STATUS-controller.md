@@ -225,7 +225,7 @@
 
 ### Done
 
-- Read the role prompt, current state, latest job and supplied host evidence; confirmed the requirements schema rejection and missing-model pin_mismatch reports (cat prompts/03-controller-engineer.md state/STATUS-controller.md /Users/donghyunlee/Desktop/LocalHarnessMaker/codex-bridge/report-copies/luna-calibration-2026-10-25.txt: exit 0).
+- Read the role prompt, current state, latest job and supplied host evidence; confirmed the requirements schema rejection and missing-model pin_mismatch reports (cat prompts/03-controller-engineer.md state/STATUS-controller.md codex-bridge/report-copies/luna-calibration-2026-10-25.txt: exit 0).
 - Identified STOP-1 before implementation: the requested distinct identity_unobserved accounting status is absent from the frozen Luna-call status enum (cat schemas/luna-call.schema.json: exit 0; status permits exactly success, error, timeout and pin_mismatch).
 
 ### Remaining
@@ -296,3 +296,42 @@
 - Each v3 transport uses a fresh codex exec thread with no resume history, so its last cumulative native token count is the invocation total; completed-turn records always take precedence.
 - The requirements adapter implements the user-specified provider subset; actual provider acceptance, served-model visibility and live quality/timing/cost require a host rerun.
 - Synthetic native records and gold-response measurement clients prove adapter/accounting behavior only; they do not reproduce the unavailable full provider rejection or measure Luna quality.
+
+## 2026-10-25 r3-v3-004 Role 3
+
+### Done
+
+- Analyzed supplied v1 predictions: requirements 40/40 schema-valid, rows TP/FP/FN 227/115/75, questions TP/FP/FN 4/7/16; 10 unasked, 5 reference mismatches, 1 lexical mismatch, 1 unauthored question; claim audit 40/40 schema-valid, claimed rows TP/FP/FN 16/20/4, 16 over-attributions, 4 excerpt-boundary pairs, citations TP/FP/FN 15/1/1 (.venv/bin/python inline host-report/fixture comparison using controller.measure_v3.score: exit 0, counts reproduced).
+- Added requirements/claim-audit v2 prompts, preserved v1, documented prediction-level analysis and version selection; default v2 with environment selection and measurement flag, version-bearing existing call IDs/references, unchanged phase reservations and frozen artifacts (.venv/bin/python -m pytest tests/controller -q: 458 passed in 7.46s).
+- Kept mocked measurements passing for both phases with default v2 and explicit v1/v2; covered schema-valid references, low effort, replay/version switches, interrupted allocations, invalid selectors and failed calls (.venv/bin/python -m pytest tests/controller -q: 458 passed in 7.46s).
+
+### Remaining
+
+- Claude host rerun with prompt v2 on the same public calibration cases: question precision/recall each at least 0.6, claimed-row precision at least 0.7 and recall at least 0.8, row precision at least 0.75 with recall at least 227/302. No live v2 quality, latency or cost result is established here.
+- Carry forward r3-v3-003 / History Remaining: installed-hook SessionStart integration with Roles 2/4, signature-baseline agreement, two non-evaluation hook smokes, timing/cost denominators and full-suite checks once before merge. Supplied host results establish both v1 phases' schema acceptance and identity visibility for that measured run.
+
+### Decisions
+
+- Define ambiguity through observable decisions and candidate readings: require one question per unresolved choice while excluding explicit choices and conventional defaults.
+- Attribute completion before assessing support: negations, instructions and unmentioned requirements do not become claims through an unsupported/unverifiable label.
+- Encode version in the existing free-form call_id and artifact luna_call reference: frozen schemas permit this without a new field or hook CLI flag; phase allocations remain version-independent.
+- Keep saved-prediction version/hash unknown unless explicitly declared: the v2 default cannot establish provenance of previously generated output.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/controller -q (458 passed in 7.46s; offline mocks only).
+- git diff --check -- controller tests/controller state/STATUS-controller.md (exit 0).
+- git diff --exit-code -- controller/prompts/requirements-v1.md controller/prompts/claim-audit-v1.md (exit 0; unchanged).
+- git status --short (only controller/, tests/controller/ and state/STATUS-controller.md changed; no staging or commits).
+
+### Do not touch
+
+- Frozen schemas, hook CLIs, shared interfaces and paths outside controller/, tests/controller/ and state/STATUS-controller.md.
+- Read-only host evidence, .git, private graders and evaluation tasks; no network access or live calls in this session.
+- Existing Current state block and completed job sections; this is an ordinary append-only job, not consolidation.
+
+### Assumptions
+
+- Existing free-form call IDs can carry prompt versions; historical IDs remain valid without migration.
+- Failure-mode explanations are inferences from predictions, not observations of model reasoning. Strict lexical metrics and semantic over-attribution counts describe different errors.
+- Prompt v2 target attainment requires Claude's live host measurement; gold-response mocks establish plumbing and accounting only.

@@ -78,6 +78,86 @@ def accounting(directory: Path) -> list[dict[str, Any]]:
     return records
 
 
+@pytest.mark.parametrize("version", [None, "v1", "v2"])
+def test_prompt_selection_both_phases_and_accounting_reference(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, version: str | None,
+) -> None:
+    from controller.v3_prompts import PROMPT_VERSION_ENV, select_prompt
+
+    if version is None:
+        monkeypatch.delenv(PROMPT_VERSION_ENV, raising=False)
+    else:
+        monkeypatch.setenv(PROMPT_VERSION_ENV, version)
+    selected = version or "v2"
+    directory, prompt = setup_session(tmp_path)
+    requirements_client = FakeClient(rows())
+    requirements_path, code = invoke(directory, prompt, requirements_client)
+    assert code == 0
+    final = tmp_path / "final.txt"
+    final.write_text("Created answer.py.")
+    audit_client = FakeClient({"claims": [{"requirement_id": "R-1", "claim_excerpt": "Created answer.py.",
+                                         "citations": [], "assessment": "unverifiable"}]})
+    audit_path, code = run_operation("claim_audit", session_id=SESSION, artifacts=directory,
+                                    requirements_path=requirements_path, final_path=final,
+                                    client_factory=lambda *_: audit_client)
+    assert code == 0
+    records = accounting(directory)
+    for phase, path, client, record in zip(
+        ("requirements", "claim_audit"), (requirements_path, audit_path),
+        (requirements_client, audit_client), records, strict=True,
+    ):
+        assert client.messages[0]["content"] == select_prompt(phase, selected)[1]
+        assert load_object(path)["luna_call"] == {"path": "luna-calls.jsonl", "call_id": record["call_id"]}
+        assert record["call_id"] == f"{phase}-{selected}-1"
+        assert record["reasoning_effort"] == "low"
+    # Replayed events preserve the original reference even after version changes.
+    monkeypatch.setenv(PROMPT_VERSION_ENV, "v1" if selected == "v2" else "v2")
+    assert invoke(directory, prompt, requirements_client) == (requirements_path, 0)
+    assert requirements_client.calls == 1 and len(accounting(directory)) == 2
+
+
+@pytest.mark.parametrize("version", ["", "v3", "2", "../../other"])
+def test_invalid_prompt_version_rejected_before_call(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, version: str,
+) -> None:
+    from controller.v3_prompts import PROMPT_VERSION_ENV
+
+    monkeypatch.setenv(PROMPT_VERSION_ENV, version)
+    directory, prompt = setup_session(tmp_path)
+    client = FakeClient(rows())
+    with pytest.raises(InputError, match="must be v1 or v2"):
+        invoke(directory, prompt, client)
+    assert client.calls == 0
+    assert not (directory / "luna-calls.jsonl").exists()
+    assert not (directory / "evidence/requirements-allocation.json").exists()
+
+
+def test_prompt_version_switch_cannot_bypass_interrupted_phase(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from controller.v3_prompts import PROMPT_VERSION_ENV
+
+    directory, prompt = setup_session(tmp_path)
+    retain(directory, "evidence/requirements-allocation.json",
+           json.dumps({"call_id": "requirements-v1-1", "session_id": SESSION}).encode())
+    monkeypatch.setenv(PROMPT_VERSION_ENV, "v2")
+    client = FakeClient(rows())
+    path, code = invoke(directory, prompt, client)
+    assert code == 2 and load_object(path)["state"] == "unavailable"
+    assert client.calls == 0 and not (directory / "luna-calls.jsonl").exists()
+
+
+def test_failed_call_keeps_prompt_version_in_reference(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from controller.v3_prompts import PROMPT_VERSION_ENV
+
+    monkeypatch.setenv(PROMPT_VERSION_ENV, "v2")
+    directory, prompt = setup_session(tmp_path)
+    path, code = invoke(directory, prompt, FakeClient(rows(), fail=True))
+    record, = accounting(directory)
+    assert code == 2 and record["status"] == "error"
+    assert record["call_id"] == load_object(path)["luna_call"]["call_id"] == "requirements-v2-1"
+
+
 def test_requirements_schema_checks_accounting_and_duplicate_event(tmp_path: Path) -> None:
     directory, prompt = setup_session(tmp_path)
     client = FakeClient(rows())

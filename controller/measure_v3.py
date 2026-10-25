@@ -17,11 +17,11 @@ from jsonschema import Draft202012Validator
 
 from controller.backends.base import Message
 from controller.errors import BackendError, InputError
-from controller.generation import read_text
 from controller.settings import PACKAGE_DIR, load_object
 from controller.v3 import _pin, atomic_json
 from controller.v3_checks import digest
 from controller.v3_client import MODEL, IdentityUnobserved, PinMismatch, PinnedLunaClient, call_error
+from controller.v3_prompts import PROMPT_VERSIONS, select_prompt
 from controller.v3_wire import CLAIMS, REQUIREMENTS, validate_requirements_output
 
 FIXTURES = PACKAGE_DIR.parent / "tests/controller/fixtures/v3-calibration"
@@ -110,7 +110,9 @@ def score(cases: list[dict[str, Any]], predictions: dict[str, Any], phase: str) 
 
 
 def measure(phase: str, *, predictions: dict[str, Any] | None = None,
-            client_factory: Callable[[], Any] | None = None) -> dict[str, Any]:
+            client_factory: Callable[[], Any] | None = None,
+            prompt_version: str | None = None) -> dict[str, Any]:
+    selected_version, system_prompt = select_prompt(phase, prompt_version)
     fixtures = FIXTURES / ("requirements.json" if phase == "requirements" else "claim-audit.json")
     cases = load_object(fixtures)["cases"]
     responses = dict(predictions or {})
@@ -119,8 +121,7 @@ def measure(phase: str, *, predictions: dict[str, Any] | None = None,
         for case in cases:
             inputs = ({"request": case["request"]} if phase == "requirements" else
                       {"requirements": case["requirements"], "final_message": case["final_message"]})
-            prompt = PACKAGE_DIR / "prompts" / ("requirements-v1.md" if phase == "requirements" else "claim-audit-v1.md")
-            messages: list[Message] = [{"role": "system", "content": read_text(prompt)},
+            messages: list[Message] = [{"role": "system", "content": system_prompt},
                                        {"role": "user", "content": json.dumps(inputs, ensure_ascii=False)}]
             client = client_factory()
             status = "error"
@@ -150,6 +151,9 @@ def measure(phase: str, *, predictions: dict[str, Any] | None = None,
                 break  # A failed identity pin disables further provider calls.
     result = score(cases, responses, phase)
     result.update(date=datetime.now(timezone.utc).date().isoformat(), phase=phase,
+                  prompt_version=selected_version if client_factory or prompt_version is not None else None,
+                  prompt_sha256=(digest(system_prompt.encode("utf-8"))
+                                 if client_factory or prompt_version is not None else None),
                   fixture_sha256=digest(fixtures.read_bytes()),
                   measurement="live_host" if client_factory else "supplied_predictions",
                   model=MODEL if client_factory else None, reasoning_effort="low" if client_factory else None,
@@ -164,6 +168,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--phase", choices=("requirements", "claim-audit"), required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--predictions", type=Path)
+    parser.add_argument("--prompt-version", choices=PROMPT_VERSIONS,
+                        help="hook prompt version (environment or v2 by default); caller-declared for saved predictions")
     parser.add_argument("--live", action="store_true")
     parser.add_argument("--pin-check", type=Path)
     parser.add_argument("--i-have-approval", action="store_true")
@@ -173,7 +179,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.predictions is not None:
             if args.live:
                 raise InputError("choose supplied predictions or live calls")
-            result = measure(args.phase.replace("-", "_"), predictions=load_object(args.predictions))
+            result = measure(args.phase.replace("-", "_"), predictions=load_object(args.predictions),
+                             prompt_version=args.prompt_version)
         else:
             # Planning only: 6000 input and 1200 output tokens per case, no cache.
             print("40 maximum provider calls; planning estimate USD 0.048000 (not a cap).", file=sys.stderr)
@@ -183,7 +190,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             pin = load_object(args.pin_check)
             _, prices, reference = _pin(args.pin_check.parent, pin["session_id"])
             result = measure(args.phase.replace("-", "_"),
-                             client_factory=lambda: PinnedLunaClient(prices, reference))
+                             client_factory=lambda: PinnedLunaClient(prices, reference),
+                             prompt_version=args.prompt_version)
         atomic_json(args.out, result)
     except (BackendError, InputError, OSError, ValueError) as exc:
         print(f"measure_v3: {type(exc).__name__}", file=sys.stderr)

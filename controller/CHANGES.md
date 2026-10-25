@@ -1,3 +1,27 @@
+# Hook prompt version 2 — 2026-10-25
+
+Requirements v2 defines an observable, unresolved decision, asks one question
+with candidate readings, excludes explicit/default choices and keeps coherent
+source spans and behavior kinds. Claim audit v2 first attributes affirmative
+completion, then assesses support; denials and instructions contribute no claims.
+The prediction-level v1 analysis is in
+`controller/evidence/2026-10-25-v3-prompt-v1-analysis.md`; v1 prompts are unchanged.
+
+Both phases default to v2, selectable with `HARNESS_LUNA_PROMPT_VERSION=v1|v2`.
+Measurement also accepts `--prompt-version` and records version/hash. The existing
+free-form `call_id` records the version in accounting and artifact references;
+no public field or hook CLI is added. Phase allocations still enforce one call
+regardless of version. Mocked measurements exercise both versions and phases;
+live target attainment awaits Claude's host rerun. Model and effort stay pinned.
+
+## Assumptions
+
+- The existing free-form call ID is the interface-preserving version reference;
+  historical IDs remain valid and do not require migration.
+- Supplied predictions without a declared version have unknown prompt metadata.
+- Observed output patterns support failure-mode hypotheses, not claims about the
+  model's internal reasoning. No live quality improvement is asserted.
+
 # Native Luna evidence and requirements adapter — 2026-10-25
 
 V3 calls retain native rollouts, match their session ID to `thread.started` in
