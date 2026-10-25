@@ -1,0 +1,10 @@
+{
+  "id": "v3-cache-negative",
+  "type": "feature_plus_test",
+  "domain": "caching",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
