@@ -1,0 +1,10 @@
+{
+  "id": "v3-trace-sampling",
+  "type": "two_session",
+  "domain": "observability",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "v3-secret-redaction",
+  "type": "two_session",
+  "domain": "configuration",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

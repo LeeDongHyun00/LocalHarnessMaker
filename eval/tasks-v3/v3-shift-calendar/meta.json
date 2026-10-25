@@ -1,0 +1,10 @@
+{
+  "id": "v3-shift-calendar",
+  "type": "two_session",
+  "domain": "scheduling",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
