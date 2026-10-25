@@ -1,0 +1,10 @@
+{
+  "id": "v3-link-preview",
+  "type": "feature_plus_test",
+  "domain": "filesystem",
+  "difficulty": "hard",
+  "two_session": false,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
