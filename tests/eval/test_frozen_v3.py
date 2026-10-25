@@ -78,13 +78,14 @@ def test_frozen_inventory_and_config_readiness(tmp_path: Path, monkeypatch: pyte
     h3 = json.loads(h3_path.read_text())
     metadata = [json.loads(path.read_text()) for path in (core.REPOSITORY / 'eval/tasks-v3').glob('*/meta.json')]
     assert len(metadata) == 54 and all(meta['frozen'] is True for meta in metadata)
-    assert sorted(meta['id'] for meta in metadata) == a['tasks'] == h3['run_config']['tasks']
+    assert sorted(meta['id'] for meta in metadata) == a['tasks'] == h3['tasks']
     assert sorted(Counter(meta['type'] for meta in metadata).values()) == [9] * 6
     assert sum(meta['two_session'] for meta in metadata) == 9
-    assert a['task_set_sha256'] == h3['run_config']['task_set_sha256']
+    assert a['task_set_sha256'] == h3['task_set_sha256']
     assert re.fullmatch(r'[0-9a-f]{64}', a['task_set_sha256'])
-    with pytest.raises(ValueError, match='baseline fields'):
-        core.load_config(h3_path)
+    assert core.load_config(h3_path) == h3
+    assert h3['mode'] == 'plugin' and h3['template_status'] == 'draft_not_approved'
+    assert core.require_call_estimate(h3)['paid_call_bound'] == 261
     loaded = core.load_config(a_path)
     assert loaded == a and loaded['harness'] is False
     assert core.require_call_estimate(loaded)['matched_estimate'] == 'eval/reports/full-v3-a-estimate.md'

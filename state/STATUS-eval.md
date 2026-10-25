@@ -216,3 +216,50 @@
 
 - The user-supplied host digest 7645e003ed4ef52c43d58555f494c7554ee468c5e628b5d95e22c37a30b5b01d and Claude's host freeze run are authoritative handoff evidence; LHM_PRIVATE_V3 is unset here, so local tests cannot re-certify that private hash.
 - The complete planned freeze commit includes eval/CHANGES.md, eval/README.md, both full-v3 configs, eval/runner/core.py, eval/freeze_v3.py, eval/runner/frozen_v3.py, tests/eval/test_frozen_v3.py, state/STATUS-eval.md and all 54 eval/tasks-v3/*/meta.json files; no staging or commit was requested.
+
+## 2026-10-25 v3-plugin-mode-runner Role 5
+
+### Done
+
+- Implemented an installed-hook path separate from legacy orchestration: isolated installer/auth linkage, project marker preservation, hook trust flag on exec/resume, copied unset nested guard and runner Python, per-exit captures and fresh day-2 sessions; runner controller/verifier calls are forbidden by mocks (`.venv/bin/python -m pytest tests/eval/test_plugin_mode.py tests/eval/test_frozen_v3.py -q --tb=short`: 41 passed, 1 host-only skipped in 19.25s).
+- Added schema/reference/session/prompt/native-generation checks, immutable resume evidence and accounting prefixes, installation checks, artifact/control-stream access auditing, eligible single clarification delivery, ledger injection observations and human-review artifact indexing; the final focused run includes the provider-stream truncation regression added during the expanded package run (`.venv/bin/python -m pytest tests/eval/test_plugin_mode.py tests/eval/test_frozen_v3.py -q --tb=short`: 41 passed, 1 skipped).
+- Reconciled Luna phases, identities, allocations, token totals, controller-price records and per-request bounds; repriced observed tiers from the pinned catalog, retained failed/extra calls and unknown costs, and excluded Luna native threads from Sol usage (`.venv/bin/python -m pytest tests/eval/test_plugin_mode.py tests/eval/test_frozen_v3.py -q --tb=short`: 41 passed, 1 skipped, including long-context, cumulative multi-request, failed-call and clarification deduplication cases).
+- Unwrapped full-v3-h3 with mode=plugin, CLI/source/contract/catalog pins and retained draft_not_approved status; refreshed README, CHANGES and its estimate (inline load_config/paid_call_bound/require_call_estimate audit: PASS, identical 54-task A/H3 inventories and frozen digest, matching runtime pins, 261 units and eval/reports/full-v3-h3-estimate.md).
+- Verified the expanded eval package and the earlier focused legacy checks (`.venv/bin/python -m pytest tests/eval -q`: 2187 passed, 1 host-only skipped in 473.47s; `.venv/bin/python -m pytest tests/eval/test_runner.py tests/eval/test_report.py tests/eval/test_control_failures.py -q`: 151 passed in 97.87s).
+- Preserved frozen tasks, pricing, schemas, other packages and unstaged-only work (`git diff --exit-code -- eval/tasks eval/tasks-v2 eval/tasks-v3 eval/prices.yaml schemas controller verifier plugin prompts AGENTS.md`: exit 0; `git diff --cached --name-only`: empty; `git diff --check`: exit 0).
+
+### Remaining
+
+- Claude performs non-evaluation host smoke for installed exec/resume, native table/child provenance, observed tiers, question-only pause/answer and day-2 ledger context. Keep template_status=draft_not_approved until it passes; no real H3 compatibility or quality measurement is claimed by the fake executor tests.
+- Configure plugin.responders for the nine ambiguity tasks using their existing frozen matcher/reply files. Their storage/layout was not inspected here. The supported matcher has version and phrase_pairs; host must verify that format and that the verbatim fixed notes satisfy the current plugin's explicit JSON answers protocol. Missing mappings produce no reply; unresolved pauses are invalid. Do not invent/wrap notes or change frozen private data to fit the runner.
+- Confirm host pins, rerun the optional supplied-root digest test and obtain spending approval before full paid batches; the matched bound is 63 sessions plus 63 repair workloads, nine clarification resumes and 126 Luna calls, 261 combined units, $22.883040 under the unmeasured Fast token scenario.
+- Carry forward retained-run corpus export/rebaseline and the full repository suite before merge from v3-freeze-host-handoff. Pre-repair workspace revisions remain unavailable unless the hooks retain them; do not substitute the final revision for earlier report-accuracy review.
+
+### Decisions
+
+- Use explicit mode or harness/codex_cli/plugin configuration to select installed hooks: historical harness configurations retain their original behavior, while H3 never enters the runner-owned control/repair loop.
+- Keep exact v3 phases in hashed sidecars and map requirements/claim_audit to the existing report purpose labels contract/judge for accounting only: the frozen report enum cannot add phase names, and no historical contract or llm_judge operation runs on this path.
+- Require native generation plus freshly captured child-thread evidence and immutable snapshots for a hook table: an arbitrary executor lookalike or final-message question cannot authorize a note; this observation chain does not establish OS write isolation.
+- Make responder files explicit configuration relative to the already pinned private snapshot: its undocumented layout cannot be inferred without accessing unavailable private data. Keep host format checks visible rather than silently adapting the author reply.
+- Count application sessions and recorded hook repairs separately from clarification segments: clarification and ledger continuations reuse the two-call native-session budget, and their Sol tokens remain charged once.
+- Preserve provider event-stream truncation checks while normalizing only the controller's known metadata fragment: a valid last JSON object without the required provider-stream newline is still inconclusive audit evidence.
+
+### Verify commands
+
+- `.venv/bin/python -m pytest tests/eval -q` (2187 passed, 1 skipped in 473.47s).
+- `.venv/bin/python -m pytest tests/eval/test_plugin_mode.py tests/eval/test_frozen_v3.py -q --tb=short` (41 passed, 1 skipped in 19.25s; includes final truncation regression).
+- Inline configuration audit using load_config, source_inventory/inventory_hash, digest, paid_call_bound and require_call_estimate (PASS: 54 paired tasks, frozen digest, all pins, 261-unit matched estimate and draft status).
+- `git diff --check` and the protected-path/staging checks listed in Done.
+
+### Do not touch
+
+- Edit only eval/, tests/eval/ and state/STATUS-eval.md; preserve every frozen task/private byte, report schema, existing CLI flag and historical report. Preserve all prior STATUS text and the Current state block; this is an append-only implementation job.
+- No private-root discovery, network, live model calls, real plugin installation, staging, commits, file deletion or history rewriting in this sandbox. No sub-agents; .git remains read-only.
+- Do not declare H3 valid when its pin, native provenance, required artifacts, accounting, access audit or two-session injection observation is missing/inconsistent. Do not silently substitute baseline execution or fabricate zero costs.
+
+### Assumptions
+
+- The user's codex-cli 0.163.0-alpha.11.1 trust/auth/marker/interpreter/session-ID facts are authoritative host handoff evidence; this session independently tests only fake Codex and synthetic hook artifacts.
+- The complete private snapshot remains pinned by the existing A/H3 digest. No actual responder paths, note contents or format were available here; host mapping/format verification is explicitly pending, not inferred from synthetic fixtures.
+- The existing Fast prices are planning inputs, not measured Luna service-tier evidence or a spending limit. Actual observed tiers select their own pinned rates; unknown usage/pricing stays null.
+- Hook ledger revalidation may change its validation block; native day-2 context must preserve the source ledger's decisions, requirements and other executor-written content. Missing pre-tool injection evidence invalidates the handoff observation.

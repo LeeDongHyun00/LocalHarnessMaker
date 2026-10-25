@@ -1,3 +1,20 @@
+# Version 3 installed-hook runner — 2026-10-25
+
+Implement explicit plugin mode, isolated installation/auth linkage, trusted exec
+and resume flags, per-exit artifact snapshots and access auditing, schema/hash/
+native-origin validation, pinned Luna repricing and separate Sol accounting.
+Eligible unchanged ambiguity pauses receive one verbatim frozen reply; A never
+receives one. Day 2 uses a fresh session and observed plugin ledger injection.
+Requirements/reports, clarification, missing revision evidence and phase mappings
+use hashed sidecars under the unchanged report schema. Historical runner mode,
+CLI flags and task bytes are preserved.
+
+Unwrap full-v3-h3, pin source/contract/catalog identities and CLI 0.163.0-alpha.11.1,
+retain draft template status, and match its refreshed 261-unit STOP-3 estimate.
+Host smoke must finish responder mappings/format checks and native delivery
+verification; sandbox tests use fake Codex/artifacts only. Full-suite evidence
+is recorded in the dated STATUS entry. No staging, commits or paid calls.
+
 # Version 3 freeze preparation — 2026-10-25
 
 Set only `frozen=true` in all 54 task metadata files, following the user-supplied
