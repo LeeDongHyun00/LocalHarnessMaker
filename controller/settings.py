@@ -19,3 +19,21 @@ def load_object(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise InputError(f"Expected a JSON object: {path}")
     return value
+
+
+def pricing_snapshot() -> tuple[Path, bytes, dict[str, Any]]:
+    """Read the package snapshot once, independent of the caller's directory."""
+    path = PACKAGE_DIR / "prices.yaml"
+    try:
+        data = path.read_bytes()
+    except FileNotFoundError as exc:
+        raise InputError(f"pricing snapshot not found at path {path}") from exc
+    except OSError as exc:
+        raise InputError(f"pricing snapshot unreadable at path {path}: {exc}") from exc
+    try:
+        book = json.loads(data)
+        if not isinstance(book, dict):
+            raise ValueError("expected a JSON object")
+    except ValueError as exc:
+        raise InputError(f"invalid pricing snapshot at path {path}: {exc}") from exc
+    return path, data, book

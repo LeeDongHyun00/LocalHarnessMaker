@@ -335,3 +335,40 @@
 - Existing free-form call IDs can carry prompt versions; historical IDs remain valid without migration.
 - Failure-mode explanations are inferences from predictions, not observations of model reasoning. Strict lexical metrics and semantic over-attribution counts describe different errors.
 - Prompt v2 target attainment requires Claude's live host measurement; gold-response mocks establish plumbing and accounting only.
+
+## 2026-10-25 r3-v3-005 Role 3
+
+### Done
+
+- Audited v3.py, v3_client.py, v3_wire.py, backends/codex_cli.py and historical operations: prompts/config, sibling schemas and measurement fixtures were already anchored to PACKAGE_DIR derived from __file__; no cwd-relative internal resource lookup was found in this checkout (rg -n 'Path\(|open\(|read_text|read_bytes' controller -g '*.py': exit 0; source inspection).
+- Centralized package-relative pricing reads for v3 pin comparison and historical backend accounting; parse and hash the same retained bytes, with explicit missing/unreadable/invalid snapshot path diagnostics (.venv/bin/python -m pytest tests/controller -q: 471 passed in 23.72s).
+- Replaced generic pin exception logging with the actual failed check, including disabled pin reason codes, session mismatch, evidence paths/hash mismatches and package pricing mismatch; preserved detailed actual-call accounting errors and generic user-facing claim-audit failure reasons, with no fictitious pre-call accounting (.venv/bin/python -m pytest tests/controller -q: 471 passed in 23.72s).
+- Added mocked external-cwd coverage for both v3 CLI operations and historical contract/judge/handoff operations, package pricing resolution despite a cwd-local decoy, explicit pin diagnostics and actual-call errors in logs/accounting (.venv/bin/python -m pytest tests/controller -q: 471 passed in 23.72s).
+
+### Remaining
+
+- Host rerun from the installed plugin directory with the updated controller copy: identify the exact previously hidden pin failure if it persists. External-cwd mocks pass, but this session did not reproduce or resolve a measured live host failure.
+- Carry forward r3-v3-004 Remaining: v2 live calibration targets, installed-hook integration with Roles 2/4, signature-baseline agreement, two non-evaluation smokes, timing/cost denominators and full-suite checks once before merge.
+
+### Decisions
+
+- Use one pricing snapshot loader in controller.settings: pin comparison and historical accounting must resolve the same package file and consume a consistent byte snapshot.
+- Preserve existing schema/CLI/accounting semantics: pre-call pin failures log their diagnosis but create no luna-calls.jsonl record; only actual invocations receive accounting errors.
+- Keep existing package-relative prompt/schema/fixture paths: the audit found them already independent of cwd, so no speculative path rewrites are warranted.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/controller -q (471 passed in 23.72s; offline mocks only).
+- git diff --check -- controller tests/controller state/STATUS-controller.md (exit 0).
+- git status --short (only controller/backends/base.py, controller/settings.py, controller/v3.py, tests/controller/test_v3.py, tests/controller/test_resources.py and state/STATUS-controller.md changed; no staging or commits).
+
+### Do not touch
+
+- Frozen schemas, CLIs, hook interfaces and paths outside controller/, tests/controller/ and state/STATUS-controller.md.
+- Read-only .git, host evidence, private graders and evaluation tasks; no staging, commits, network access or live calls in this session.
+- Existing Current state block and completed job sections; this is an ordinary append-only job, not consolidation.
+
+### Assumptions
+
+- The installed plugin distribution must include controller resources and sibling schemas; cwd independence does not establish that the host copy is complete or identical to this checkout.
+- External-cwd mocked success establishes resource resolution and artifact behavior only; the host finding requires a live host rerun with these diagnostics to establish its cause.
