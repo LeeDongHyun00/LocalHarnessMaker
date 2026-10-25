@@ -52,9 +52,14 @@ class Adapter:
         if timeout <= 0:
             detail = self.failure(module, operation, None, 'hook cumulative deadline exhausted')
             raise CallFailure(detail)
+        child_env = {**os.environ, 'HARNESS_NESTED': '1'}
+        if executable := child_env.get('HARNESS_CODEX'):
+            directory_path = str(Path(executable).parent)
+            prior_path = child_env.get('PATH', '')
+            child_env['PATH'] = directory_path + (os.pathsep + prior_path if prior_path else '')
         started = time.monotonic()
         try:
-            result = self.runner(command, cwd=RUNTIME_ROOT, env={**os.environ, 'HARNESS_NESTED': '1'},
+            result = self.runner(command, cwd=RUNTIME_ROOT, env=child_env,
                                  shell=False, text=True, capture_output=True, check=False, timeout=timeout)
         except Exception as exc:
             stderr = getattr(exc, 'stderr', '') or ''

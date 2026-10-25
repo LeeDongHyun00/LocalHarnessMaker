@@ -61,6 +61,7 @@ def test_demo_does_not_overwrite_an_attempted_approval(tmp_path: Path) -> None:
 
 def test_demo_records_unlisted_version(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv('CODEX_HOME', str(tmp_path / 'no-auth'))
+    monkeypatch.setattr('plugin.install.resolve_codex', lambda: '/mock/codex')
     def run(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
         return subprocess.CompletedProcess(command, 0, "codex-cli 0.163.0-alpha.11.1\n", "")
     output = tmp_path / "evidence"

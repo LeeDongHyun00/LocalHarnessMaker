@@ -31,20 +31,24 @@ def resolve_codex() -> str | None:
     """Prefer the explicit executable, then PATH, then the macOS app bundle."""
     for candidate in (os.environ.get('HARNESS_CODEX'), 'codex', APP_CODEX):
         if candidate and (resolved := shutil.which(candidate)):
-            return resolved
+            return str(Path(resolved).absolute())
     return None
 
 
-def configuration(snapshot: Path) -> dict[str, Any]:
+def configuration(snapshot: Path, executable: str | None = None) -> dict[str, Any]:
     """Render integer deadlines from validated settings before writing targets."""
     from plugin.hooks._config import validate_settings
     values = validate_settings()
+    executable = executable or resolve_codex()
+    if executable is None:
+        raise ValueError('Codex CLI not found')
     hooks = json.loads((ROOT / 'plugin/hooks/hooks.json').read_text())
     for event, script in EVENTS.items():
         handler = hooks['hooks'][event][0]['hooks'][0]
         timeout = values[f'HARNESS_{event.upper()}_TIMEOUT']
         handler['timeout'] = timeout
         handler['command'] = shlex.join(['env', f'HARNESS_{event.upper()}_TIMEOUT={timeout}',
+                                          f'HARNESS_CODEX={executable}',
                                           sys.executable, str(snapshot / 'plugin/hooks' / script)])
     return hooks
 
@@ -106,6 +110,12 @@ def check_install(home: Path, project: Path) -> bool:
             if actual != expected:
                 raise ValueError(f'{event}: timeout type or value mismatch')
             tokens = shlex.split(handler['command'])
+            binaries = [part.removeprefix('HARNESS_CODEX=') for part in tokens
+                        if part.startswith('HARNESS_CODEX=')]
+            if (len(binaries) != 1 or not Path(binaries[0]).is_absolute()
+                    or shutil.which(binaries[0]) is None):
+                raise ValueError(f'{event}: embedded Codex executable missing or invalid')
+            print(f'{event} Codex executable: {binaries[0]}', file=sys.stderr)
             setting = f'HARNESS_{event.upper()}_TIMEOUT='
             embedded = [part[len(setting):] for part in tokens if part.startswith(setting)]
             if len(embedded) != 1 or integer_timeout(embedded[0], event, 5) != actual:
@@ -115,7 +125,7 @@ def check_install(home: Path, project: Path) -> bool:
         if not (project / '.local-harness-maker').is_file():
             raise ValueError('project marker missing')
     except (OSError, ValueError, KeyError, TypeError) as exc:
-        if 'timeout type or value mismatch' in str(exc):
+        if 'timeout type or value mismatch' in str(exc) or 'Codex executable' in str(exc):
             print(str(exc), file=sys.stderr)
         print('Hooks not registered', file=sys.stderr)
         valid = False
@@ -242,10 +252,10 @@ def enabled_config(path: Path) -> bytes:
     return text.encode()
 
 
-def plan_install(home: Path, project: Path) -> dict[Path, bytes]:
+def plan_install(home: Path, project: Path, executable: str | None = None) -> dict[Path, bytes]:
     """Load, validate and serialize every target before creating directories/files."""
     snapshot = home / 'local-harness-maker'
-    wanted = configuration(snapshot)
+    wanted = configuration(snapshot, executable)
     if not all((ROOT / name).is_file() for name in REQUIRED):
         raise ValueError('source runtime is incomplete')
     existing = load_hooks(home / 'hooks.json')
@@ -308,13 +318,14 @@ def main() -> int:
         parser.error('--link-auth cannot be used with --check')
     login = None if args.check else auth_source(args.link_auth, home)
     # Preflight does not run under --check: installed settings are authoritative.
-    plan = None if args.check else plan_install(home, project)
     executable = resolve_codex()
+    plan = None if args.check else plan_install(home, project, executable)
     version_ok = False
     version_verified = False
     if executable is None:
         print('Codex CLI not found', file=sys.stderr)
     else:
+        print(f'Codex executable: {executable}', file=sys.stderr)
         from plugin.hooks._process import run_group
         try:
             result = run_group([executable, '--version'], capture_output=True, text=True, timeout=5,

@@ -2,6 +2,8 @@
 from __future__ import annotations
 import json
 import os
+import shlex
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -72,7 +74,11 @@ def isolated_install_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 @pytest.fixture
 def installer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
     home, project = tmp_path / 'codex-home', tmp_path / 'project'
-    monkeypatch.setattr(install, 'resolve_codex', lambda: '/fake/codex')
+    executable = tmp_path / 'ChatGPT App/codex'
+    executable.parent.mkdir()
+    executable.write_text('#!/bin/sh\nexit 0\n')
+    executable.chmod(0o755)
+    monkeypatch.setattr(install, 'resolve_codex', lambda: str(executable))
     def version(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
         assert kwargs['timeout'] == 5 and kwargs['env']['HARNESS_NESTED'] == '1'
         return subprocess.CompletedProcess(command, 0, (ROOT / 'plugin/CODEX_VERSION').read_text(), '')
@@ -83,7 +89,7 @@ def installer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]
         if not check and result == 0:
             (home / 'auth.json').write_text('{}')
         return result
-    return {'home': home, 'project': project, 'run': run}
+    return {'home': home, 'project': project, 'run': run, 'executable': executable}
 
 
 @pytest.mark.parametrize('bad', ['10.0', '1.5', '0', '-1', '86401', 'nan', 'inf', 'true'])
@@ -164,7 +170,7 @@ def test_binary_resolution_order(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(install.shutil, 'which', lambda name: name if name in available else None)
     assert install.resolve_codex() == '/explicit/codex'
     available.remove('/explicit/codex')
-    assert install.resolve_codex() == 'codex'
+    assert install.resolve_codex() == str(Path('codex').absolute())
     available.remove('codex')
     assert install.resolve_codex() == install.APP_CODEX
     available.clear()
@@ -304,3 +310,46 @@ def test_trust_probe_failures_print_operator_flag(tmp_path: Path, monkeypatch: p
     errors = capsys.readouterr().err
     assert 'Hook trust for CODEX_HOME: unknown' in errors
     assert '--dangerously-bypass-hook-trust' in errors
+
+
+def test_rendered_codex_path_and_check_output(installer: dict[str, Any], capsys: pytest.CaptureFixture[str]) -> None:
+    assert installer['run']() == 0
+    hooks = json.loads((installer['home'] / 'hooks.json').read_text())
+    executable = str(installer['executable'])
+    for event in install.EVENTS:
+        handler = hooks['hooks'][event][0]['hooks'][0]
+        tokens = shlex.split(handler['command'])
+        assert tokens[0] == 'env'
+        assert tokens[2] == f'HARNESS_CODEX={executable}'
+    assert installer['run'](True) == 0
+    errors = capsys.readouterr().err
+    assert f'Codex executable: {executable}' in errors
+    for event in install.EVENTS:
+        assert f'{event} Codex executable: {executable}' in errors
+    installer['executable'].rename(installer['executable'].with_name('moved-codex'))
+    assert installer['run'](True) == 1
+    assert 'embedded Codex executable missing or invalid' in capsys.readouterr().err
+
+
+def test_installed_v3_pin_uses_embedded_codex_with_empty_path(installer: dict[str, Any], tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    assert installer['run']() == 0
+    home, project = installer['home'], installer['project']
+    executable = installer['executable']
+    version = (ROOT / 'plugin/CODEX_VERSION').read_text().strip()
+    executable.write_text('#!/bin/sh\nprintf "%s\\n" ' + shlex.quote(version) + '\n')
+    hooks = json.loads((home / 'hooks.json').read_text())
+    tokens = shlex.split(hooks['hooks']['SessionStart'][0]['hooks'][0]['command'])
+    command = [shutil.which('env'), *tokens[1:]]
+    monkeypatch.delenv('HARNESS_CODEX', raising=False)
+    payload = {'cwd': str(project), 'session_id': 'installed-v3', 'hook_event_name': 'SessionStart'}
+    result = subprocess.run(command, input=json.dumps(payload), cwd=tmp_path,
+        env={**os.environ, 'PATH': '', 'HARNESS_INTERFACE_VERSION': '3', 'HARNESS_NESTED': '0'},
+        capture_output=True, text=True, timeout=10)
+    assert result.returncode == 0, result.stderr
+    pins = list((project / '.localharness/v3/sessions').glob('*/pin-check.json'))
+    assert len(pins) == 1, result.stdout + result.stderr
+    pin = json.loads(pins[0].read_text())
+    assert pin['codex_version'] == version
+    assert f'Codex executable: {executable}' in pin['advisory']
+    assert str(executable) in result.stdout
