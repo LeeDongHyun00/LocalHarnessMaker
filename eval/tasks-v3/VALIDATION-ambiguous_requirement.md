@@ -2,20 +2,10 @@
 
 Authored: 9/9. Frozen: 0/9. Model calls: 0. Measured A pass rate: unavailable;
 60–85% remains an unmeasured target. Independent reviewer acceptance: 0.
-Both validator commands exited 0. Counts below are final offline results.
+Both validator commands exited 0. Canonical counts linked below are the original offline results.
 
-| Task ID | Requirements covered | Reference pass | Starter fail | Generated | Targeted | Executed | Killed | Equivalent | Survivors | Errors |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| v3-approval-quorum | 3 | 5 | 3 | 41 | 2 | 43 | 42 | 1 | 0 | 0 |
-| v3-cache-refresh | 4 | 6 | 5 | 41 | 2 | 43 | 40 | 3 | 0 | 0 |
-| v3-copy-collision | 4 | 6 | 8 | 16 | 4 | 20 | 19 | 1 | 0 | 0 |
-| v3-editor-anchor | 4 | 5 | 14 | 80 | 2 | 82 | 77 | 5 | 0 | 0 |
-| v3-event-tie | 4 | 5 | 5 | 55 | 2 | 57 | 55 | 2 | 0 | 0 |
-| v3-locale-fallback | 3 | 5 | 5 | 13 | 2 | 15 | 15 | 0 | 0 | 0 |
-| v3-pool-resize | 3 | 5 | 5 | 38 | 2 | 40 | 40 | 0 | 0 | 0 |
-| v3-search-empty | 4 | 6 | 6 | 61 | 2 | 63 | 62 | 1 | 0 | 0 |
-| v3-token-expiry | 3 | 5 | 4 | 59 | 2 | 61 | 60 | 1 | 0 | 0 |
-| Total | 32 | 48 | 55 | 404 | 20 | 424 | 410 | 14 | 0 | 0 |
+Validation counts are maintained only in [VALIDATION.md](VALIDATION.md).
+This file preserves the original shape-session evidence and author pair review.
 
 Starter failure counts include failed subtests. Public starter smoke checks: 9/9.
 Uncovered requirements, unexecuted mutants, shared public assertion lines,

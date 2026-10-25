@@ -4,18 +4,8 @@ Nine `multiple_requirements` candidates are authored and offline-validated. All
 remain `frozen=false`. Live calibration, measured A pass rate, independent host
 reviewer acceptance and population freeze remain pending. Paid calls: 0.
 
-| Task ID | Requirements covered | Reference pass | Starter fail | Generated | Targeted | Executed | Killed | Equivalent | Survivors | Errors |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| v3-archive-extract | 5 | 10 | 9 | 99 | 2 | 101 | 97 | 4 | 0 | 0 |
-| v3-cache-invalidation | 5 | 8 | 8 | 99 | 2 | 101 | 95 | 6 | 0 | 0 |
-| v3-catalog-extract | 5 | 6 | 6 | 62 | 2 | 64 | 61 | 3 | 0 | 0 |
-| v3-connection-drain | 6 | 8 | 8 | 97 | 2 | 99 | 80 | 19 | 0 | 0 |
-| v3-job-compensation | 5 | 10 | 10 | 58 | 2 | 60 | 57 | 3 | 0 | 0 |
-| v3-policy-migration | 5 | 6 | 6 | 52 | 2 | 54 | 52 | 2 | 0 | 0 |
-| v3-query-explain | 5 | 6 | 6 | 202 | 2 | 204 | 188 | 16 | 0 | 0 |
-| v3-replay-dedup | 5 | 8 | 8 | 103 | 2 | 105 | 101 | 4 | 0 | 0 |
-| v3-selection-patch | 5 | 8 | 8 | 99 | 2 | 101 | 94 | 7 | 0 | 0 |
-| Total | 46 | 70 | 69 | 871 | 18 | 889 | 825 | 64 | 0 | 0 |
+Validation counts are maintained only in [VALIDATION.md](VALIDATION.md).
+This file preserves the original shape-session evidence and author pair review.
 
 All 9 starters fail substantive checks. Uncovered requirements: 0. Unexecuted
 mutants, unresolved errors, survivors and shared assertion lines across public

@@ -1,0 +1,54 @@
+{
+  "template_status": "draft_not_approved",
+  "warning": "Draft calibration reservation only: ten separate task materials and private validation are not authored. Do not execute or substitute held-out tasks. Host approval required.",
+  "design_reference": "eval/tasks-v3/DESIGN.md",
+  "estimate_reference": "eval/reports/pilot-v3-a-estimate.md",
+  "run_config": {
+    "name": "pilot-v3-a",
+    "task_root": "eval/calibration-v3",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "medium",
+    "service_tier": "priority",
+    "harness": false,
+    "control_backend": "none",
+    "reinstruction_limit": 0,
+    "retry_limit": 0,
+    "seed": 0,
+    "codex_version": "PIN_AFTER_V3_HOOK_COMPATIBILITY_PROBE",
+    "tasks": [
+      "cal-v3-bug-fix-1",
+      "cal-v3-bug-fix-2",
+      "cal-v3-feature-plus-test-1",
+      "cal-v3-feature-plus-test-2",
+      "cal-v3-constrained-refactoring-1",
+      "cal-v3-constrained-refactoring-2",
+      "cal-v3-multiple-requirements-1",
+      "cal-v3-multiple-requirements-2",
+      "cal-v3-two-session-1",
+      "cal-v3-ambiguous-requirement-1"
+    ],
+    "timeout_seconds": 900,
+    "grading_timeout_seconds": 30,
+    "calibration": true
+  },
+  "execution_design": {
+    "mode": "standalone",
+    "plugin_enabled": false,
+    "executor_nested_guard": "1",
+    "clarification_responder": "hook_questions_only_so_A_never_receives_a_note",
+    "task_count": 10,
+    "two_session_tasks": 1,
+    "required_sessions": 11,
+    "pricing_snapshot": "openai-fast-short-2026-10-23-v1",
+    "pricing_snapshot_sha256": "PIN_EXISTING_SNAPSHOT_BYTES_BEFORE_RUN",
+    "population_sha256": "PIN_AFTER_DISJOINT_CALIBRATION_AUTHORING_AND_VALIDATION",
+    "day2_delivery": "new_session_new_prompt_retained_workspace_no_runner_memory"
+  },
+  "construction_status": {
+    "candidate_task_count": 0,
+    "reserved_task_count": 10,
+    "materials": "not_authored",
+    "frozen": false,
+    "selection_rule": "Two separate tasks each for bug_fix, feature_plus_test, constrained_refactoring, multiple_requirements; one each for two_session and ambiguous_requirement. Disjoint IDs, implementations and fixtures from all 54 evaluation tasks; no outcome-based selection."
+  }
+}

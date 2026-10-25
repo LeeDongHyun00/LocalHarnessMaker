@@ -10,31 +10,29 @@ reports or rerun.
 
 ## Version 3 construction checkpoint — 2026-10-25
 
-The user authorized task construction and supplied interface-v3 approval. The
-complete `bug_fix` shape now has nine independent candidates, with public prompts,
-starters, smoke tests, metadata and grading-command descriptors. All metadata
-keeps `frozen=false`. References, coverage/derivation maps, targeted mutants and
-hash-bound equivalence reviews stay in trusted storage. No v1/v2 input or grader
-was changed. No model execution or calibration was performed.
+All 54 candidates are authored: nine per shape, 45 single-session and nine
+two-session tasks (63 required sessions). Metadata remains `frozen=false`.
+[Canonical validation](tasks-v3/VALIDATION.md) consolidates the shape-session
+results: 225 covered requirements, 325 reference checks, 3,168 executed mutants,
+2,980 killed, 188 reviewed equivalents, zero survivors/errors. Private evidence
+was not rerun here. [Structure review](tasks-v3/STRUCTURE-REVIEW.md) adds 24
+cross-shape pairs on architecture, data flow and failure mechanism. Claude's
+independent host review, calibration and separate freeze remain pending.
 
-[Validation counts by task](tasks-v3/VALIDATION.md) and the
-[36-pair author structure comparison](tasks-v3/STRUCTURE-REVIEW.md) record the
-checkpoint. Independent host review remains required; the author comparison is
-not a substitute. Ten disjoint calibration tasks and the approved A-only pilot
-remain pending, so the 60–85% target is unmeasured. The other five shapes (45 tasks)
-are unbuilt, including all ambiguity author notes/matchers and day-2 prompts.
+Both full-v3 draft configs contain the same lexicographically ordered 54 IDs.
+A estimates 63 Sol workloads ($10.206000 scenario); H3 reserves 135 Sol workloads
+plus 126 Luna calls ($22.883040). These are unmeasured token scenarios, not
+spending approval. `pilot-v3-a.yaml` reserves ten separate calibration IDs across
+all six shapes (11 sessions); materials/private validation remain unauthored.
+The [pilot estimate](reports/pilot-v3-a-estimate.md) records the selection rule.
+All templates remain wrapped `draft_not_approved`, rejected by the run loader.
+The 60–85% difficulty target is unmeasured. No model calls were made here.
 
-The offline validator recognizes v3 IDs and per-task requirement namespaces. It
-requires executed coverage and rejects private assertion overlap against all
-public versions. V3 mutation acceptance exhausts the generated and declared
-targeted population, requires zero survivors/errors/unexecuted mutants, and keeps
-timeouts unresolved. Equivalences require a named reviewer and a rationale bound
-to reference, grader and complete public input bytes. Historical v1/v2 acceptance
-and existing CLI flags are preserved. Executor-corpus matches remain warnings;
-the checkpoint includes counts of examined and distinct files.
-
-With the trusted parent supplying `LHM_PRIVATE_V3` and the nine IDs from either
-wrapped config, run the existing tools (the variable's value must stay external):
+The v3 validator requires executed coverage, no public assertion overlap and
+exhaustive generated/targeted mutations with zero survivors/errors/unexecuted
+mutants. Timeouts remain unresolved; equivalences need hash-bound reviews.
+Supply the trusted root externally on the host, and expand TASK_IDS from the
+canonical table:
 
 ```sh
 .venv/bin/python -m eval.runner.validate_graders --private-root "$LHM_PRIVATE_V3" --tasks TASK_IDS
@@ -42,14 +40,15 @@ wrapped config, run the existing tools (the variable's value must stay external)
 .venv/bin/python -m pytest tests/eval -q
 ```
 
-`--mutants` remains a limit, not a sampling claim: a v3 population larger than that
-limit is rejected as incomplete. Both wrapped full-v3 config files now list only
-the nine authored candidates, with an explicit 54-task planned population and
-45-task construction remainder. They remain `draft_not_approved` and rejected
-by the strict run-config loader. Their estimates cover the actual partial list:
-A has nine Sol workloads ($1.458000 scenario); H3 reserves 18 Sol workloads plus
-18 Luna calls ($3.060720 scenario), or 36 combined STOP-3 units. No spending is
-authorized; the full-population estimates remain separately labeled planning.
+`eval.runner.corpus_export` exports sanitized command streams from retained
+checkpoints and native rollouts. The checked-in corpus is synthetic pipeline
+coverage only; real retained-run export awaits the host. Private-bearing lines
+are omitted before extraction. Forbidden directory names derive at runtime from
+`LHM_PRIVATE_GRADERS`, optional `LHM_PRIVATE_V3`, and supplied roots/markers;
+the generic placeholder is always forbidden. Hashed guards support later CI
+checks without publishing names. Existing changed records require explicit
+`--rebaseline RECORD_ID` review. See the [corpus instructions](../tests/eval/fixtures/corpus/README.md).
+Sanitized replay expectations do not certify the original run's access audit.
 
 ## Version 3 plugin mode — design only, 2026-10-25
 
@@ -58,7 +57,7 @@ after stopping v2 harness recovery. This section specifies future work; the
 current runner still implements the v1/v2 external contract/verifier loop.
 It does not implement plugin mode, hook-question replies or v3 accounting.
 Nothing here changes the current CLI, schemas, frozen populations or reports.
-[Task design](tasks-v3/DESIGN.md) plans 54 independent tasks, 63 work sessions,
+[Task design](tasks-v3/DESIGN.md) covers 54 independent candidates, 63 work sessions,
 and a 20-task human-review sample. A and H3 are the full comparisons; B is
 dropped and C optional. Historical v2 recovery entries are not authorization
 to resume that abandoned experiment.
@@ -226,15 +225,15 @@ final executor message, using identical extraction rules, not from H3's report.
 ### Draft templates and STOP-3
 
 [A template](configs/full-v3-a.yaml) and [H3 template](configs/full-v3-h3.yaml)
-are deliberately wrapped design documents with the partial nine-task candidate
-list, unresolved version/build pins and `draft_not_approved` status. The existing
+are deliberately wrapped design documents with the complete ordered 54-task
+candidate list, unresolved version/build pins and `draft_not_approved` status. The existing
 strict loader rejects both; do not unwrap H3 and launch the legacy harness.
 They do not approve calls. Estimates are separate drafts:
 [A](reports/full-v3-a-estimate.md), [H3](reports/full-v3-h3-estimate.md).
 No current run/estimate gate is modified or tested as implemented plugin mode.
 
-For the completed planned population, let N=54, D=9, S=N+D=63 logical work sessions, Q<=9 eligible clarification
-resumes, and R<=S one-check-failure retries. A budgets S=63 executor workloads
+For the authored unfrozen population, let N=54, D=9, S=N+D=63 logical work
+sessions, Q<=9 eligible clarification resumes, and R<=S one-check-failure retries. A budgets S=63 executor workloads
 and no controls. H3 budgets S+Q+R<=135 executor workloads and 2S=126 Luna
 calls, or 261 combined budget units. Before clarification/retry reserves its
 count is 3S=189. An internal Stop continuation may stay in one exec process;

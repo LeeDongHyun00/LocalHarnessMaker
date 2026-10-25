@@ -1,8 +1,8 @@
 # Version 3 task design — 2026-10-25
 
-Construction checkpoint: nine `bug_fix` candidates are authored and remain
-unfrozen; the other 45 tasks are pending. See [validation](VALIDATION.md) and
-[structure comparison](STRUCTURE-REVIEW.md). The 54-task design below is retained.
+Construction checkpoint: all 54 candidates across six shapes are authored and
+unfrozen. See [validation](VALIDATION.md) and
+[structure comparison](STRUCTURE-REVIEW.md). Calibration and host review remain pending.
 The user approved interface v3 on 2026-10-25 and separately authorized candidate
 authoring; task freeze still requires host validation. The user-approved
 [v3 direction](../../docs/handoff/2026-10-25-v3-direction.md), especially sections
@@ -206,11 +206,18 @@ deliverables, rather than longer copies of one requirements list. Constraints
 must be explicit and executable; use operation counts/injected clocks rather
 than noisy wall-time limits. Public tests are useful but incomplete.
 
-Before building the held-out population, author ten separate single-session
-calibration tasks (two per single-session shape), excluded permanently from
-the 54 and with different implementations/fixtures. Run A only after a pilot
-estimate is approved; inspect five pilot-A outputs manually. A result of 6–8
-passes out of ten is compatible with the target but has wide uncertainty.
+The draft [pilot config](../configs/pilot-v3-a.yaml) reserves ten separate
+calibration tasks, permanently excluded from the 54: two each in bug fix,
+feature plus test, constrained refactoring and multiple requirements, one each
+in two-session and ambiguity. This user-requested all-shape coverage replaces
+the earlier two-per-single-session-shape plan. IDs use a separate `cal-v3-`
+namespace and `eval/calibration-v3` root; implementations and fixtures must also
+be disjoint. Materials and private validation are not yet authored, so this is
+a reservation, not a runnable pilot. One two-session task means 11 sessions;
+report its carryover and the ambiguity result separately from single-session
+difficulty. Run A only after a pilot estimate is approved; inspect five pilot-A
+outputs manually. The small per-shape samples have wide uncertainty; do not
+equate the overall pilot rate with the 45-single-session difficulty target.
 Review per-shape difficulty and independently review the complete candidate,
 since v2's pilot did not predict its full-population ceiling. Do not claim the
 held-out rate has been calibrated. If calibration misses the target, revise
@@ -326,9 +333,9 @@ quality loss. No claim is measured in this session.
 ## Assumptions
 
 - 54 tasks, balanced shapes and the 20-task sampling allocation are design
-  choices within the approved range; only the nine bug-fix candidates have been
-  constructed in this checkpoint. The complete population remains pending.
-- The plugin contract in AGENTS.md will define exact artifact paths and schemas.
+  choices within the approved range; all 54 candidates are constructed and
+  unfrozen. Independent host acceptance and calibration remain pending.
+- The frozen plugin contract in AGENTS.md defines exact artifact paths and schemas.
   Question-only pause/resume, hook provenance and report revision binding must
   be confirmed before implementation; no shared interface is changed here.
 - Two Luna calls means one table and one claim audit per logical work session;
