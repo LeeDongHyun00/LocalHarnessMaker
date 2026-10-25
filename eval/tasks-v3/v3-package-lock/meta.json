@@ -1,0 +1,10 @@
+{
+  "id": "v3-package-lock",
+  "type": "two_session",
+  "domain": "build_tooling",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}

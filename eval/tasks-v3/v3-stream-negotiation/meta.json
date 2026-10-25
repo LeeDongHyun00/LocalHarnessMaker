@@ -1,0 +1,10 @@
+{
+  "id": "v3-stream-negotiation",
+  "type": "two_session",
+  "domain": "text_protocol",
+  "difficulty": "hard",
+  "two_session": true,
+  "source": "hand_written",
+  "version": 3,
+  "frozen": false
+}
