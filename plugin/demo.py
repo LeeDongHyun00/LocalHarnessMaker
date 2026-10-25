@@ -75,15 +75,18 @@ def workspace_files(workspace: Path) -> dict[str, dict[str, str]]:
                 entries[relative] = {"type": "file", "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
     return entries
 
-def prepare(out: Path, run: Runner = run_group, mode: str = "stub") -> dict[str, Any]:
+def prepare(out: Path, run: Runner = run_group, mode: str = "stub",
+            executable: str | None = None) -> dict[str, Any]:
     """Register only reviewed harness hooks in a temporary home/workspace."""
     if out.exists():
         raise ValueError("use a new output directory; evidence is never overwritten")
     if mode not in {"real", "stub"}:
         raise ValueError("unsupported demo mode")
     validate_settings()
-    hooks = configuration(ROOT)
-    executable = resolve_codex() or "codex"
+    executable = executable or resolve_codex()
+    if executable is None:
+        raise ValueError("Codex CLI not found")
+    hooks = configuration(ROOT, executable)
     result = run([executable, "--version"], capture_output=True, text=True, check=False, timeout=5, shell=False,
                   env={**os.environ, "HARNESS_NESTED": "1"})
     if result.returncode != 0:

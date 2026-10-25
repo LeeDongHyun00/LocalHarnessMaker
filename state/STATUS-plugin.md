@@ -357,3 +357,41 @@
 - The user's supplied fresh-smoke diagnosis is host evidence; this session uses fake executables and mocked subprocesses to verify propagation and artifact provenance, without claiming actual Luna execution.
 - No new product assumptions or shared interface changes are needed. Role 3 owns controller executable selection; the plugin forwards its explicit path and a compatible child PATH.
 - No PR, staging or commit was performed; copy these assumptions into any future PR description. The current state block remains unchanged because this is an append-only ordinary job, not consolidation.
+
+## 2026-10-25 r2-v3-006 Role 2
+
+### Done
+
+- Added installer --codex PATH with executable validation and precedence over automatic discovery; invalid explicit paths fail without fallback or target writes, while omitted paths retain existing discovery and missing-CLI diagnostics (.venv/bin/python -m pytest tests/plugin/test_install.py tests/plugin/test_demo.py -q: 57 passed in 20.23s).
+- Made demo preparation pass its selected executable into hook rendering; offline demo tests supply temporary fake executables with no PATH/env/bundle discovery available, including the two reported Linux regressions (masked plugin suite below: 359 passed, 1 opt-in real Codex test skipped in 25.06s).
+- Verified the entire plugin suite with HARNESS_CODEX unset, PATH=/usr/bin:/bin containing no Codex, and plugin.install.APP_CODEX set to /nonexistent/lhm-ci-app/codex before pytest starts (env -u HARNESS_CODEX PATH=/usr/bin:/bin .venv/bin/python -c 'import shutil; import pytest; import plugin.install as install; install.APP_CODEX = "/nonexistent/lhm-ci-app/codex"; assert shutil.which("codex") is None; assert install.resolve_codex() is None; raise SystemExit(pytest.main(["tests/plugin", "-q"]))': 359 passed, 1 skipped in 25.06s).
+- Checked patch whitespace and authorized file scope (git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0; git status --short: only authorized plugin, plugin-test and plugin-status paths).
+
+### Remaining
+
+- Carry forward r2-v3-005 / Remaining: Role 3 executable-resolution integration, shared decision 0012/schema and Roles 3/4 integration, isolated host reinstall and both non-evaluation v3 smokes, trust/bundle/silence captures, ledger injection and latency/accounting evidence.
+- Coordinate the full repository suite once before merge; this job runs only tests/plugin. GitHub CI and live H3 acceptance were not run in this network-disabled session.
+
+### Decisions
+
+- Accept an explicit installer executable before automatic discovery: tests and evaluation callers can select their own binary without depending on a macOS application bundle.
+- Reject invalid explicit paths without substituting a discovered binary: preserve production installation errors and make --check report failure visibly.
+- Resolve the demo binary once and reuse it for hooks, version probe and executor metadata: mocked launches must not trigger a second host-dependent installer lookup.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/plugin/test_install.py tests/plugin/test_demo.py -q (57 passed in 20.23s; the later full run includes the final demo fallback regression change).
+- env -u HARNESS_CODEX PATH=/usr/bin:/bin .venv/bin/python -c 'import shutil; import pytest; import plugin.install as install; install.APP_CODEX = "/nonexistent/lhm-ci-app/codex"; assert shutil.which("codex") is None; assert install.resolve_codex() is None; raise SystemExit(pytest.main(["tests/plugin", "-q"]))' (359 passed, 1 opt-in real Codex test skipped in 25.06s).
+- git diff --check -- plugin tests/plugin state/STATUS-plugin.md (exit 0).
+- git status --short (only authorized paths modified).
+
+### Do not touch
+
+- controller/, verifier/, eval/, schemas/, docs/, root configuration, other roles' STATUS files and .git; do not stage or commit.
+- Preserve historical evidence, exact nested zero-byte guards and frozen hook interfaces; no network, live model calls or real-home installation in this job.
+
+### Assumptions
+
+- The user's explicit --codex PATH request authorizes this installer option; no frozen hook/controller/verifier interface changes are needed.
+- Local masking reproduces missing executable discovery for these tests; it does not claim an Ubuntu CI run or live Codex acceptance.
+- This is an ordinary append-only job; the Current state block remains unchanged. No PR, staging or commit was performed; carry these assumptions into any later PR description.

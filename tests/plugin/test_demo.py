@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 from typing import Any
@@ -13,6 +14,19 @@ import pytest
 
 from plugin.check_demo_evidence import audit
 from plugin.demo import finish, launch, prepare
+
+
+@pytest.fixture
+def demo_codex(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> str:
+    from plugin import install
+    monkeypatch.delenv('HARNESS_CODEX', raising=False)
+    monkeypatch.setenv('PATH', str(tmp_path))
+    monkeypatch.setattr(install, 'APP_CODEX', str(tmp_path / 'missing-app/codex'))
+    assert install.resolve_codex() is None
+    executable = tmp_path / 'fake codex'
+    executable.write_text('#!/bin/sh\nexit 0\n')
+    executable.chmod(0o755)
+    return str(executable)
 
 
 def test_demo_uses_copied_environment_and_explicit_resume(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -59,9 +73,9 @@ def test_demo_does_not_overwrite_an_attempted_approval(tmp_path: Path) -> None:
         finish({"out": str(tmp_path)}, scripted=True, run=forbidden)
 
 
-def test_demo_records_unlisted_version(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_demo_records_unlisted_version(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, demo_codex: str) -> None:
     monkeypatch.setenv('CODEX_HOME', str(tmp_path / 'no-auth'))
-    monkeypatch.setattr('plugin.install.resolve_codex', lambda: '/mock/codex')
+    monkeypatch.setattr('plugin.demo.resolve_codex', lambda: demo_codex)
     def run(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
         return subprocess.CompletedProcess(command, 0, "codex-cli 0.163.0-alpha.11.1\n", "")
     output = tmp_path / "evidence"
@@ -86,7 +100,7 @@ def test_recorded_demo_and_missing_continuation(tmp_path: Path) -> None:
         audit(copy)
 
 
-def test_real_mode_isolated_home_backend_and_prompt(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_real_mode_isolated_home_backend_and_prompt(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, demo_codex: str) -> None:
     monkeypatch.setenv('HARNESS_STUB', '1')
     monkeypatch.setenv('HOME', str(tmp_path / 'original-home'))
     monkeypatch.setenv('CODEX_HOME', str(tmp_path / 'original-codex-home'))
@@ -98,7 +112,7 @@ def test_real_mode_isolated_home_backend_and_prompt(tmp_path: Path, monkeypatch:
             return subprocess.CompletedProcess(command, 0, (Path(__file__).resolve().parents[2] / 'plugin/CODEX_VERSION').read_text(), '')
         return subprocess.CompletedProcess(command, 0, '{"type":"thread.started","thread_id":"real-session"}\n', '')
 
-    metadata = prepare(tmp_path / 'evidence', run=run, mode='real')
+    metadata = prepare(tmp_path / 'evidence', run=run, mode='real', executable=demo_codex)
     launch(metadata, 'request', run=run)
     env = calls[-1]['env']
     assert env['HARNESS_BACKEND'] == 'codex_cli'
@@ -108,6 +122,10 @@ def test_real_mode_isolated_home_backend_and_prompt(tmp_path: Path, monkeypatch:
     assert calls[-1]['timeout'] > 3 * 600
     assert 'result.txt' in calls[-1]['input']
     assert 'workspace-write' in (Path(metadata['codex_home']) / 'config.toml').read_text()
+    assert all(call['command'][0] == demo_codex for call in calls)
+    hooks = json.loads((Path(metadata['codex_home']) / 'hooks.json').read_text())
+    for groups in hooks['hooks'].values():
+        assert f'HARNESS_CODEX={demo_codex}' in shlex.split(groups[0]['hooks'][0]['command'])
 
 
 @pytest.mark.parametrize('name,value', [('HARNESS_STOP_TIMEOUT', '660.0'), ('HARNESS_VERIFY_TIMEOUT', '86401'),
@@ -121,14 +139,14 @@ def test_demo_preflights_all_overrides_before_writing(tmp_path: Path, monkeypatc
     assert list(tmp_path.iterdir()) == []
 
 
-def test_demo_writes_integer_hook_timeouts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_demo_writes_integer_hook_timeouts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, demo_codex: str) -> None:
     monkeypatch.setenv('HOME', str(tmp_path / 'home'))
     monkeypatch.setenv('CODEX_HOME', str(tmp_path / 'source-codex-home'))
     monkeypatch.setenv('HARNESS_STOP_TIMEOUT', '700')
     def version(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
         pin = Path(__file__).resolve().parents[2] / 'plugin/CODEX_VERSION'
         return subprocess.CompletedProcess(command, 0, pin.read_text(), '')
-    metadata = prepare(tmp_path / 'evidence', run=version, mode='real')
+    metadata = prepare(tmp_path / 'evidence', run=version, mode='real', executable=demo_codex)
     hooks = json.loads((Path(metadata['codex_home']) / 'hooks.json').read_text())
     for groups in hooks['hooks'].values():
         assert type(groups[0]['hooks'][0]['timeout']) is int

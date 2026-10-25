@@ -64,6 +64,8 @@ from typing import Any
 from plugin import install
 from plugin.hooks import _process
 
+REAL_RESOLVE_CODEX = install.resolve_codex
+
 
 @pytest.fixture(autouse=True)
 def isolated_install_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -83,8 +85,10 @@ def installer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]
         assert kwargs['timeout'] == 5 and kwargs['env']['HARNESS_NESTED'] == '1'
         return subprocess.CompletedProcess(command, 0, (ROOT / 'plugin/CODEX_VERSION').read_text(), '')
     monkeypatch.setattr(_process, 'run_group', version)
-    def run(check: bool = False) -> int:
-        monkeypatch.setattr(sys, 'argv', ['install', '--codex-home', str(home), '--project', str(project), *(['--check'] if check else [])])
+    def run(check: bool = False, codex: Path | None = None) -> int:
+        monkeypatch.setattr(sys, 'argv', ['install', '--codex-home', str(home), '--project', str(project),
+                                        *(['--check'] if check else []),
+                                        *(['--codex', str(codex)] if codex is not None else [])])
         result = install.main()
         if not check and result == 0:
             (home / 'auth.json').write_text('{}')
@@ -175,6 +179,46 @@ def test_binary_resolution_order(monkeypatch: pytest.MonkeyPatch) -> None:
     assert install.resolve_codex() == install.APP_CODEX
     available.clear()
     assert install.resolve_codex() is None
+
+
+def test_explicit_codex_overrides_discovery(installer: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
+    def forbidden() -> str | None:
+        raise AssertionError('explicit executable must bypass discovery')
+    monkeypatch.setattr(install, 'resolve_codex', forbidden)
+    assert installer['run'](codex=installer['executable']) == 0
+    assert installer['run'](True, codex=installer['executable']) == 0
+    hooks = json.loads((installer['home'] / 'hooks.json').read_text())
+    for event in install.EVENTS:
+        tokens = shlex.split(hooks['hooks'][event][0]['hooks'][0]['command'])
+        assert f"HARNESS_CODEX={installer['executable']}" in tokens
+
+
+@pytest.mark.parametrize('check', [False, True])
+@pytest.mark.parametrize('exists', [False, True])
+def test_invalid_explicit_codex_never_falls_back(installer: dict[str, Any], tmp_path: Path,
+        capsys: pytest.CaptureFixture[str], check: bool, exists: bool) -> None:
+    executable = tmp_path / 'invalid-codex'
+    if exists:
+        executable.write_text('not executable')
+        executable.chmod(0o644)
+    assert installer['run'](check, codex=executable) == 1
+    assert 'Codex CLI not found or not executable' in capsys.readouterr().err
+    assert not installer['home'].exists() and not installer['project'].exists()
+
+
+def test_no_codex_discovery_rejects_install_and_check(installer: dict[str, Any], tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch.delenv('HARNESS_CODEX', raising=False)
+    monkeypatch.setenv('PATH', str(tmp_path))
+    monkeypatch.setattr(install, 'APP_CODEX', str(tmp_path / 'missing-app/codex'))
+    # Restore actual discovery instead of the installer fixture's fake resolver.
+    monkeypatch.setattr(install, 'resolve_codex', REAL_RESOLVE_CODEX)
+    assert install.resolve_codex() is None
+    with pytest.raises(ValueError, match='Codex CLI not found'):
+        installer['run']()
+    assert installer['run'](True) == 1
+    assert 'Codex CLI not found' in capsys.readouterr().err
+    assert not installer['home'].exists() and not installer['project'].exists()
 
 
 def test_version_probe_failure_writes_nothing(installer: dict[str, Any], monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:

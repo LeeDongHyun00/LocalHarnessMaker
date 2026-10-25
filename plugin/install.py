@@ -309,6 +309,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--codex-home', required=True, type=Path)
     parser.add_argument('--project', required=True, type=Path)
+    parser.add_argument('--codex', type=Path, metavar='PATH',
+                        help='use this Codex executable instead of automatic discovery')
     parser.add_argument('--check', action='store_true')
     parser.add_argument('--link-auth', type=Path, metavar='FROM',
                         help='symlink an existing auth.json (or Codex home) into the target home')
@@ -318,7 +320,10 @@ def main() -> int:
         parser.error('--link-auth cannot be used with --check')
     login = None if args.check else auth_source(args.link_auth, home)
     # Preflight does not run under --check: installed settings are authoritative.
-    executable = resolve_codex()
+    executable = str(args.codex.expanduser().absolute()) if args.codex is not None else resolve_codex()
+    if args.codex is not None and shutil.which(executable) is None:
+        print(f'Codex CLI not found or not executable: {executable}', file=sys.stderr)
+        return 1
     plan = None if args.check else plan_install(home, project, executable)
     version_ok = False
     version_verified = False
