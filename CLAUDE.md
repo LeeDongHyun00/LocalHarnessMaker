@@ -68,6 +68,11 @@ Every job prompt has this shape. Keep it in English, ASCII only.
 
 Reasoning effort: high for Role 1 schema work and Role 4; medium otherwise; raise to high after a second failure on the same task.
 
+Brief quality rules (added 2026-10-25 after the version 2 recovery day):
+- Evidence, not paraphrase: when a job fixes something observed on the host, attach the verbatim records (native rollout lines, exec events, CLI output) in a read-only file under ../codex-bridge/report-copies/ and name it in the brief. Paraphrased symptoms produced wrong fixes twice.
+- Length caps: the final report at most 40 lines; README and CHANGES edits limited to the behavior that changed; no restating of the brief. Claude reads every report, so verbosity is a direct cost.
+- Parallel jobs: different roles run concurrently in their own worktrees (lhm-plugin, lhm-controller, lhm-verifier, lhm-r5-*, main for Role 1). Within one role, parallel jobs are allowed only on disjoint paths, with the shared files (STATUS, CHANGES, README, configs) left to a single consolidation job afterwards.
+
 ## 4. What Claude does after every job
 
 1. Read the final message and the STATUS file of that role.
@@ -78,7 +83,7 @@ Reasoning effort: high for Role 1 schema work and Role 4; medium otherwise; rais
 6. Push `origin main` only. Never force-push, never rewrite history.
 7. Record the host verification result in docs/weekly/ at the next integration review.
 
-Claude may edit files directly only for: CLAUDE.md, docs/handoff/, and docs/weekly/. Everything else goes through a Codex job for the owning role, including AGENTS.md, schemas/ and prompts/ (Role 1).
+Claude may edit files directly only for: CLAUDE.md, docs/handoff/, and docs/weekly/. Host-operator tooling that Claude uses to dispatch, verify, scan, commit and watch (../codex-bridge/ops/) lives outside the repository and is written by Codex through an ops job; Claude runs it. Everything else goes through a Codex job for the owning role, including AGENTS.md, schemas/ and prompts/ (Role 1).
 
 ## 5. Evaluation duties (Role 5 produces data, Claude judges)
 
