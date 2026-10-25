@@ -16,7 +16,7 @@ from time import sleep
 from typing import Any, Callable
 import uuid
 
-from eval.runner import harness
+from eval.runner import harness, plugin_mode
 from eval.runner.publication import checkout_text, control_target, review_bytes, safe_source
 from eval.runner.report import build, build_task, current_commit, native_version_reasons
 from eval.runner.audit import FingerprintCache, PrivateGraders, audit_logs, audit_retained_logs, interrupted_logs, digest, executor_environment
@@ -124,7 +124,7 @@ def load_config(path: Path) -> dict[str, Any]:
     config = json.loads(path.read_text())
     required = {"name", "model", "reasoning_effort", "harness", "control_backend", "reinstruction_limit",
                 "retry_limit", "seed", "codex_version", "tasks", "timeout_seconds", "grading_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population", "task_root", "service_tier", "calibration", "task_set_sha256"} != required:
+    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population", "task_root", "service_tier", "calibration", "task_set_sha256", "mode", "plugin", "template_status"} != required:
         raise ValueError("Config must contain exactly the documented baseline fields")
     if "task_set_sha256" in config and (not isinstance(config["task_set_sha256"], str) or
             not re.fullmatch(r"[0-9a-f]{64}", config["task_set_sha256"])):
@@ -163,6 +163,7 @@ def load_config(path: Path) -> dict[str, Any]:
         if (config["harness"] or config["control_backend"] != "none" or
                 not isinstance(config["static_template_dir"], str) or not config["static_template_dir"]):
             raise ValueError("Static templates require a standalone baseline and a directory")
+    plugin_mode.validate_config(config)
     task_directory(config)
     if "service_tier" in config and (not isinstance(config["service_tier"], str) or
             not re.fullmatch(r"[a-z][a-z0-9_-]*", config["service_tier"])):
@@ -197,6 +198,10 @@ def paid_call_bound(config: dict[str, Any], judges: dict[str, int] | None = None
     """Count both days, transport retries, three-call control budgets and handoffs."""
     two = sum((task_directory(config) / task / "day2.md").is_file() for task in config["tasks"])
     sessions = len(config["tasks"]) + two
+    if plugin_mode.enabled(config):
+        questions = sum(json.loads((task_directory(config) / task / 'meta.json').read_text())['type'] ==
+                        'ambiguous_requirement' for task in config['tasks'])
+        return sessions * 4 + questions  # Sol + one repair + two Luna calls; resumes reuse the native session.
     turns = config["reinstruction_limit"] + 1
     executor = sessions * (config["retry_limit"] + 1) * turns
     return executor + (3 * (sessions + two + sum((judges or {}).values()) * turns)
@@ -207,7 +212,7 @@ def require_call_estimate(config: dict[str, Any], judges: dict[str, int] | None 
                           recovery: bool = False) -> dict[str, Any]:
     """Require exact estimates, allowing task subsets only for explicit recovery."""
     maximum = paid_call_bound(config, judges)
-    if config["harness"]:
+    if config["harness"] and not plugin_mode.enabled(config):
         print(f"Paid-call estimate: at most {maximum} calls with currently known judge criteria; "
               "includes both days, contracts, handoff, retries and fallbacks. "
               "New judge criteria require a revised bound; planning USD is in the matched estimate, measured USD requires complete accounting.", file=sys.stderr)
@@ -360,8 +365,11 @@ def run(
     version: str | Callable[[], str] | None = None,
     _recorded_config_sha256: str | None = None,
 ) -> Path:
-    """Run or recover baseline tasks without relying on plugin hooks."""
+    """Run baseline, historical harness, or installed v3 plugin tasks."""
     config = load_config(config_path)
+    plugin = plugin_mode.enabled(config)
+    legacy_harness = config['harness'] and not plugin
+
     from eval.runner.static_templates import load_templates
     templates = load_templates(config, REPOSITORY)
     template_hashes = {task: digest(content) for task, content in templates.items()}
@@ -476,6 +484,12 @@ def run(
             write_json(checkpoint, state)
         runtime = Path(entry["runtime"])
         workspace, codex_home = runtime / "workspace", runtime / "codex-home"
+        if plugin and not entry.get('plugin_installation'):
+            if entry['segments']:
+                raise ValueError('Cannot install plugin into an already executed runtime')
+            entry['plugin_installation'] = plugin_mode.install(
+                REPOSITORY, config, runtime, workspace, codex_home, private, execute)
+            write_json(checkpoint, state)
         def audit(paths: list[Path], private: PrivateGraders, **kwargs: Any) -> dict[str, Any]:
             return audit_retained_logs(paths, private, retained_context=entry.get("retained_audit_context"),
                                        interrupted_paths=interrupted_logs(runtime, entry["segments"]),
@@ -537,7 +551,7 @@ def run(
                 last = day_segments[-1]
                 final_process = ProcessResult(last["exit_code"], last.get("timed_out", False))
             control_error = entry.get("control_error")
-            if config["harness"] and not blocked and not execution_finished:
+            if legacy_harness and not blocked and not execution_finished:
                 try:
                     if not entry["segments"]:
                         guard.recover_prelaunch(control_runtime, REPOSITORY)
@@ -546,7 +560,7 @@ def run(
                     entry["control_invalid_reason"] = exc.invalid_reason
                     control_error = entry["control_error"] = str(exc)
             contract_name = str((control_runtime / "contract.json").relative_to(runtime))
-            if config["harness"] and not blocked and not control_error and not execution_finished and contract_name not in guard.hashes:
+            if legacy_harness and not blocked and not control_error and not execution_finished and contract_name not in guard.hashes:
                 try:
                     harness.contract(public, control_runtime, config, repository=REPOSITORY, execute=execute,
                                      prompt_name="day2.md" if day == 2 else "prompt.md",
@@ -559,7 +573,7 @@ def run(
                     entry["control_invalid_reason"] = exc.invalid_reason
                     control_error = str(exc)
                     entry["control_error"] = control_error
-            if config["harness"] and not control_error and (control_runtime / "contract.json").exists():
+            if legacy_harness and not control_error and (control_runtime / "contract.json").exists():
                 generated = json.loads((control_runtime / "contract.json").read_text())
                 judges = sum(c["check"]["type"] == "llm_judge" for c in generated["success_criteria"])
                 entry.setdefault("judge_counts", {})[f"{task_id}:{day}"] = judges
@@ -610,11 +624,16 @@ def run(
                         entry["control_invalid_reason"] = exc.invalid_reason
                         control_error = entry["control_error"] = str(exc)
             remaining = (config["retry_limit"] + 1) * (config["reinstruction_limit"] + 1) - sum(not s.get("capacity_error") for s in day_segments)
-            if not config["harness"]:
+            if not legacy_harness:
                 remaining = config["retry_limit"] + 1 - sum(not s.get("capacity_error") for s in day_segments)
             if entry["phase"] in {"interrupted", "usage_limited", "capacity_limited"}:
                 remaining = max(1, remaining)
             transport_retries = entry.get("transport_retries", 0)
+            if plugin:
+                remaining = 1 if not day_segments else 0
+                # Resume authorization is checkpointed before delivery; never send a note twice.
+                if entry.get('clarification_pending'):
+                    remaining = 1
             if blocked or day_finished or control_error:
                 remaining = 0
             recovery = 0
@@ -627,7 +646,7 @@ def run(
                         "recorded_version": actual_version, "observed_version": observed_version,
                         "calibration": config.get("calibration", False), "task_root": config.get("task_root", "eval/tasks"), "service_tier": config.get("service_tier")})
                     raise IncompleteRun("Codex version changed before executor session; run halted and remains resumable")
-                if config["harness"]:
+                if legacy_harness:
                     try:
                         guard.verify()
                     except harness.HarnessError as exc:
@@ -639,28 +658,40 @@ def run(
                 argv = ["codex", "--no-daemon", "-a", "never", "exec"]
                 if resumed_id:
                     argv.append("resume")
-                argv += ["--ignore-user-config", "--skip-git-repo-check", "--json", "-m", config["model"],
+                if plugin:
+                    argv.append(plugin_mode.TRUST_FLAG)
+                argv += ([] if plugin else ["--ignore-user-config"]) + [ "--skip-git-repo-check", "--json", "-m", config["model"],
                          "-c", f'model_reasoning_effort="{config["reasoning_effort"]}"',
-                         "-c", "features.hooks=false", "-c", "features.plugins=false",
+                         "-c", "features.hooks=" + ("true" if plugin else "false"), "-c", "features.plugins=false",
                          "-c", "features.remote_plugin=false", "-c", "mcp_servers={}",
                          "-o", str(runtime / f"final-{index}.md")]
                 if "service_tier" in config:
                     argv += ["-c", "service_tier=" + json.dumps(config["service_tier"])]
                 if resumed_id:
                     argv += ["-c", 'sandbox_mode="workspace-write"', resumed_id, "-"]
-                    prompt = entry.get("reinstruction") or "Continue the original task from the current workspace."
+                    prompt = entry.get('clarification_pending', {}).get('reply') or entry.get("reinstruction") or "Continue the original task from the current workspace."
                 else:
                     argv += ["--sandbox", "workspace-write", "-C", str(workspace), "-"]
                     prompt = (public / ("day2.md" if day == 2 else "prompt.md")).read_bytes().decode("utf-8")
-                    if config["harness"] and day == 2:
+                    if legacy_harness and day == 2:
                         argv += ["-c", "developer_instructions=" + json.dumps(
                             "Approved evaluation contract (benchmark runner authorization):\n" +
                             (control_runtime / "contract.json").read_text())]
                     elif day == 1 and task_id in templates:
                         prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + templates[task_id].decode("utf-8")
-                    elif config["harness"]:
+                    elif legacy_harness:
                         prompt += "\n\nApproved evaluation contract (benchmark runner authorization):\n" + (control_runtime / "contract.json").read_text()
                 segment = {"attempt": index, "started_at": now(), "events": event_path.name, "stderr": stderr_path.name, "day": day, "cli_version": observed_version}
+                if plugin:
+                    segment['application_start_sha256'] = plugin_mode.application_digest(workspace)
+                    segment['hook_trust_flag'] = plugin_mode.TRUST_FLAG
+                    segment['environment_policy'] = {'HARNESS_NESTED': 'unset', 'HARNESS_PYTHON': sys.executable}
+                    if entry.get('clarification_pending'):
+                        segment['clarification_resume'] = True
+                        entry['clarification']['delivered_at'] = now()
+                        entry['clarification']['delivery_attempt'] = index
+                        entry.pop('clarification_pending')
+                        write_json(checkpoint, state)
                 if recovery or (resumed_id and entry["segments"] and
                                 entry["segments"][-1].get("capacity_error") and
                                 entry["segments"][-1].get("day", 1) == day):
@@ -686,7 +717,8 @@ def run(
                 start = time.monotonic()
                 try:
                     final_process = execute(
-                        argv, cwd=workspace, env=executor_environment(private, codex_home), stdin=prompt,
+                        argv, cwd=workspace, env=(plugin_mode.environment(private, codex_home) if plugin else
+                                                        executor_environment(private, codex_home)), stdin=prompt,
                         stdout=event_path, stderr=stderr_path, timeout=config.get("task_timeout_seconds", {}).get(task_id, config["timeout_seconds"]), on_start=started,
                     )
                 except KeyboardInterrupt:
@@ -704,6 +736,9 @@ def run(
                 entry.pop("pid", None)
                 native_changed = [p for p in (codex_home / "sessions").rglob("*.jsonl")
                                   if native_before.get(p) != digest(p.read_bytes())]
+                if plugin:
+                    segment['hook_native_sources'] = {str(p): digest(p.read_bytes()) for p in native_changed}
+                    native_changed = plugin_mode.executor_native(native_changed, {session_id([event_path])})
                 segment["pricing_evidence"] = capture_tier(native_changed, tiers_before,
                                                             model=config['model'], service_tier=config.get('service_tier'))
                 native_usage = native_token_delta(tokens_before, native_token_totals(native_changed))
@@ -722,15 +757,34 @@ def run(
                 segment["settings_verified"] = settings["verified"]
                 if "service_tier" in config:
                     segment["service_tier_verified"] = settings["service_tier_verified"]
+                if plugin:
+                    prompt_bytes = (public / ('day2.md' if day == 2 else 'prompt.md')).read_bytes()
+                    hook_observation = plugin_mode.observe(workspace, runtime, task_out, entry, segment,
+                        prompt_bytes, REPOSITORY, json.loads((REPOSITORY / 'eval/prices.yaml').read_text()))
+                    try:
+                        plugin_mode.verify_installation(codex_home, entry['plugin_installation'])
+                    except (OSError, ValueError):
+                        hook_observation['invalid_reasons'].append('plugin_installation_changed')
+                    if day == 2 and not resumed_id:
+                        prior_day = next((o for o in reversed(entry.get('plugin_observations', [])[:-1])
+                                          if o['day'] == 1 and o.get('ledger_sha256')), None)
+                        receipt = plugin_mode.injection_receipt(native_changed, prior_day) if prior_day else None
+                        entry['day2_observation']['plugin_ledger_injection'] = receipt
                 try:
                     write_json(checkpoint, state)
                     current_audit = audit([runtime / saved['events'] for saved in entry['segments']] +
                                           sorted((codex_home / 'sessions').rglob('*.jsonl')),
                                           private, workspace=workspace, repository=REPOSITORY,
                                           grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+                    if plugin:
+                        hook_paths = [Path(p) for o in entry.get('plugin_observations', []) for p in o['audit_paths']]
+                        current_audit = audit([runtime / saved['events'] for saved in entry['segments']] +
+                            sorted((codex_home / 'sessions').rglob('*.jsonl')) + hook_paths,
+                            private, workspace=workspace, repository=REPOSITORY,
+                            grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                     infrastructure_stop = usage_limit_message([event_path])
                     capacity = capacity_message([event_path])
-                    if capacity and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
+                    if capacity and not plugin and not infrastructure_stop and not interrupted and current_audit["status"] == "clean":
                         segment.update(capacity_error=True, infrastructure_recovery=True,
                                        usage_evidence="Capacity refusal before any item: zero tokens" if
                                        capacity_refusal_without_items(records(event_path)) else
@@ -759,7 +813,26 @@ def run(
                     if final_process.returncode == 0 and not final_process.timed_out:
                         transport_retries = 0
                         entry["transport_retries"] = 0
-                        if not config["harness"]:
+                        if plugin:
+                            if (hook_observation.get('paused') and hook_observation.get('valid_documents') and
+                                    not hook_observation['invalid_reasons'] and
+                                    metadata[task_id]['type'] == 'ambiguous_requirement' and
+                                    not entry.get('clarification') and day == 1):
+                                directory = Path(hook_observation['snapshot']) / 'sessions' / digest(resumed_id.encode())
+                                docs = {'requirements.json': json.loads((directory / 'requirements.json').read_text())}
+                                try:
+                                    observation, reply = plugin_mode.clarification(docs, directory, task_id,
+                                        resumed_id, private, config)
+                                except (OSError, ValueError, KeyError, TypeError):
+                                    observation, reply = {'reason': 'invalid_frozen_responder', 'delivered_at': None}, None
+                                entry['clarification'] = observation
+                                if reply is not None:
+                                    entry['clarification_pending'] = {'reply': reply}
+                                    remaining = 1
+                                    write_json(checkpoint, state)
+                                    continue
+                            break
+                        if not legacy_harness:
                             break
                         try:
                             native = sorted((codex_home / "sessions").rglob("*.jsonl"))
@@ -790,6 +863,9 @@ def run(
                     if not interrupted:
                         record_workspace_exit(workspace, entry, segment)
                         write_json(checkpoint, state)
+            if plugin and (not entry.get('plugin_observations') or
+                    entry['plugin_observations'][-1]['invalid_reasons'] or entry['plugin_observations'][-1]['paused']):
+                break
             if (infrastructure_stop or interrupted or blocked or control_error or not final_process or
                     current_audit is None or current_audit["status"] != "clean" or
                     transport.unresolved(transport.inspect(entry, private.redact))):
@@ -803,7 +879,7 @@ def run(
                                         grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
                 if day1_audit["status"] != "clean":
                     break
-                if config["harness"]:
+                if legacy_harness:
                     try:
                         if not entry.get(f"verdicts_day{day}"):
                             try:
@@ -839,8 +915,11 @@ def run(
             write_json(checkpoint, state)
         event_paths = [runtime / segment["events"] for segment in entry["segments"]]
         native_paths = sorted((codex_home / "sessions").rglob("*.jsonl"))
-        access_audit = audit(event_paths + native_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
+        hook_paths = [Path(p) for o in entry.get('plugin_observations', []) for p in o['audit_paths']] if plugin else []
+        access_audit = audit(event_paths + native_paths + hook_paths, private, workspace=workspace, repository=REPOSITORY, grading_roots=audit_roots(runtime), fingerprint_cache=fingerprint_cache)
         write_json(task_out / "access-audit.json", json.loads(private.redact(json.dumps(access_audit))))
+        if plugin:
+            native_paths = plugin_mode.executor_native(native_paths, {session_id([p]) for p in event_paths})
         telemetry = collect(event_paths, native_paths, config["model"], config["reasoning_effort"], config.get("service_tier"))
         telemetry["executor_runs"] = collect_runs(event_paths, native_paths, entry["segments"])
         # Extract only settings and token/rate-limit evidence from native transcripts.
@@ -864,10 +943,24 @@ def run(
                     target is not None):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 publish(evidence, target, private, source_root=runtime)
+        if plugin:
+            for source in sorted((runtime / 'plugin').rglob('*')):
+                if source.is_file() and not source.is_symlink():
+                    target = task_out / source.relative_to(runtime)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    publish(source, target, private, source_root=runtime)
+            write_json(task_out / 'plugin-installation.json', entry['plugin_installation'])
+            write_json(task_out / 'plugin-index.json', {'task_id': task_id,
+                'observations': entry.get('plugin_observations', []),
+                'clarification': entry.get('clarification'),
+                'day2_observation': entry.get('day2_observation'),
+                'workspace_exit_sha256': entry.get('workspace_exit_sha256'),
+                'review': {'requirements': 'retained', 'completion_reports': 'retained',
+                           'pre_repair_workspace_revision': 'unavailable unless supplied by hook evidence'}})
         if infrastructure_stop:
             stop_reason = private.redact("STOP-E1: " + ("capacity error" if "at capacity" in infrastructure_stop.lower() else "usage limit") + "; run remains resumable. " + infrastructure_stop)
             break
-        if config["harness"]:
+        if legacy_harness:
             try:
                 guard.verify()
             except harness.HarnessError as exc:
@@ -880,6 +973,16 @@ def run(
             invalid.append("control_timeout" if specific == "control_timeout" else "control_cli_error")
             if specific and specific not in invalid:
                 invalid.append(specific)
+        if plugin:
+            observations = plugin_mode.latest_observations(entry)
+            invalid.extend(r for o in observations for r in o['invalid_reasons'])
+            if len(observations) != (2 if two_session else 1):
+                invalid.append('plugin_session_artifacts_missing')
+            if any(o['paused'] for o in observations):
+                invalid.append('plugin_unresolved_questions')
+            if two_session and not entry.get('day2_observation', {}).get('plugin_ledger_injection'):
+                invalid.append('plugin_ledger_injection_unobserved')
+            invalid = list(dict.fromkeys(invalid))
         observation = entry.get("day2_observation")
         if two_session and not valid_day2_observation(entry, public):
             invalid.append("missing_two_session_handoff_observation")
@@ -909,7 +1012,9 @@ def run(
             outcome = grading["result"]
         meta = json.loads((public / "meta.json").read_text())
         result = {"task_id": task_id, "task_type": meta["type"], "outcome": outcome,
-                  "invalid_reasons": invalid, "attempts": max(1, sum(not s.get("capacity_error") for s in entry["segments"])),
+                  "invalid_reasons": invalid, "attempts": (max(1, sum(1 + o.get('repair_used', 0)
+                      for o in plugin_mode.latest_observations(entry))) if plugin else
+                      max(1, sum(not s.get("capacity_error") for s in entry["segments"]))),
                   "session_id": session_id(event_paths), "segments": entry["segments"],
                   "two_session": two_session, "day2_observation": observation,
                   "grader_access_audit": access_audit, "grading": grading, "verdicts": entry.get("verdicts", []),

@@ -1,9 +1,9 @@
 # Full v3 H3 STOP-3 estimate — DRAFT, NOT APPROVED
 
 2026-10-25: the [config](../configs/full-v3-h3.yaml) contains the same ordered
-54 unfrozen tasks as A, including nine two-session and nine ambiguous tasks.
-Plugin mode is design only; current `harness=true` is the legacy loop and must
-not be used as H3. Sol is gpt-6.1-sol medium, requested priority/Fast, seed 0;
+54 frozen tasks as A, including nine two-session and nine ambiguous tasks.
+The config now selects implemented `mode=plugin`; its
+`template_status=draft_not_approved` remains until Claude's host smoke passes. Sol is gpt-6.1-sol medium, requested priority/Fast, seed 0;
 hooks use pinned gpt-6-luna low, no automatic retry/regeneration/fallback.
 
 | Component | Count |
@@ -44,8 +44,16 @@ Luna rates per million tokens: $0.2/$0.02/$1 uncached/cached/output. The assumed
 | 5× tokens, all reserves | $114.415200 |
 
 This does not establish the <=15% cost-per-pass goal, latency or control-cost
-targets. Host hook/provenance/pause-resume/ledger/accounting evidence, Claude
-review, disjoint calibration and separate freeze remain pending. Pin plugin,
-CLI/model/tier, prices and population; revise estimates from the pilot before
-approval of ten-plus paid calls. No calls were made. Extra recoveries require a
+targets. The population digest, CLI, plugin source, contract and catalog hashes are now
+pinned in the standalone config; the evaluator waived a disjoint pilot.
+Host hook/provenance/pause-resume/ledger/accounting smoke and frozen responder
+file mappings remain pending. Reconcile observed Luna tiers (which may differ
+from this Fast scenario) and refresh estimates from approved host evidence
+before approval of ten-plus paid calls. No paid calls were made. Extra recoveries require a
 new bound; measured runtime and a hard spending cap remain unavailable.
+
+Runner calculation: `paid_call_bound(load_config(full-v3-h3)) = 4S + Q =
+4×63 + 9 = 261`; `require_call_estimate` matches this file. Clarification
+resumes do not allocate a new native session or another pair of Luna calls.
+The repair reserve belongs to the Stop hook; the runner has no independent
+repair/retry loop. Installation and read-only version probes are unpaid.

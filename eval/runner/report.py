@@ -116,7 +116,11 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
     else:
         grading = None
     executor_usd = total([c["usage"]["usd"] for c in calls])
-    controls, control_usd = control_calls(entry, result["task_id"], pricing, provenance=provenance) if config["harness"] else ([], 0)
+    from eval.runner import plugin_mode
+    if plugin_mode.enabled(config):
+        controls, control_usd = plugin_mode.task_accounting(entry, provenance)
+    else:
+        controls, control_usd = control_calls(entry, result["task_id"], pricing, provenance=provenance) if config["harness"] else ([], 0)
     calls.extend(controls)
     history = entry.get("rerun_history")
     if history:
@@ -158,6 +162,8 @@ def build_task(result: dict[str, Any], entry: dict[str, Any], out: Path,
             "costs": {"executor_usd": executor_usd, "control_usd": control_usd,
                       "total_usd": total([executor_usd, control_usd])},
             "artifacts": [artifact(p) for p in [*sorted(out.iterdir()), *sorted((out / "control-interruptions").rglob("*")),
+                          *sorted((out / "plugin").rglob("*")),
+                          *sorted((runtime / "plugin").rglob("*")),
                           *sorted((runtime / "codex-home/sessions").rglob("*.jsonl"))] if p.is_file()], "handoff": handoff}
 
 
@@ -222,7 +228,21 @@ def validate(report: dict[str, Any], repository: Path) -> None:
     for task in tasks:
         validate_session_versions(task, report["metadata"]["codex_version"])
         retained_provenance(task, report["metadata"]["pricing"])
-        if task["attempts"] != max(1, sum(not capacity_message([evidence_path(s["events"]["path"])]) for s in task["executor_segments"])) and task["outcome"] != "invalid":
+        expected_attempts = max(1, sum(not capacity_message([evidence_path(s["events"]["path"])]) for s in task["executor_segments"]))
+        plugin_indexes = [a for a in task['artifacts'] if Path(a['path']).name == 'plugin-index.json']
+        if plugin_indexes:
+            if len(plugin_indexes) != 1:
+                raise ValueError('Duplicate plugin index')
+            ref = plugin_indexes[0]
+            path = evidence_path(ref['path'])
+            if digest(path.read_bytes()) != ref['sha256']:
+                raise ValueError('Plugin index hash mismatch')
+            index = json.loads(path.read_text())
+            if index['task_id'] != task['task_id']:
+                raise ValueError('Plugin index task mismatch')
+            latest = {o['session_id']: o for o in index['observations']}
+            expected_attempts = max(1, sum(1 + o.get('repair_used', 0) for o in latest.values()))
+        if task["attempts"] != expected_attempts and task["outcome"] != "invalid":
             raise ValueError("Attempt/segment count mismatch")
         previous = None
         for index, seg in enumerate(task["executor_segments"], 1):

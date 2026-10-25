@@ -35,19 +35,19 @@ private snapshot immutable and write future validation/run outputs elsewhere.
 No private names, paths or contents are printed. This broader snapshot avoids
 assuming an undocumented responder-data directory layout.
 
-Replace `FILL_FROM_HOST_FREEZE_V3_OUTPUT` in A's top-level `task_set_sha256` and
-H3's `run_config.task_set_sha256` with the printed digest. The runner rejects an
-unfilled pin or changed inputs before execution. A is unwrapped, `harness=false`,
-and uses the existing baseline CLI pin (`codex-cli 0.163.0-alpha.11.1`); its
-[estimate](reports/full-v3-a-estimate.md) remains available to the current loader.
-H3 stays wrapped `draft_not_approved` until actual plugin mode and compatibility
-evidence exist; `harness=true` in that draft must never launch the legacy loop.
+The host-filled `task_set_sha256` pins now agree in both top-level configs.
+The runner rejects changed inputs before execution. A uses `harness=false`;
+H3 uses explicit `mode=plugin`, `harness=true`, `control_backend=codex_cli`,
+and pinned plugin/contract/pricing hashes. Both pin codex-cli
+0.163.0-alpha.11.1. H3 is loader-compatible but retains
+`template_status=draft_not_approved` until Claude's host smoke passes; this
+status records readiness, not spending approval.
 
 A estimates 63 Sol workloads ($10.206000 scenario); H3 reserves 135 Sol workloads
 plus 126 Luna calls ($22.883040). These are unmeasured scenarios, not spending
 approval. The optional `pilot-v3-a.yaml` remains a draft cost check with unauthored
-disjoint materials. Current estimates retain their historical pre-freeze text;
-the host decision above supersedes their pending-review/pilot language. No model
+disjoint materials. The refreshed H3 estimate reflects the frozen inventory; the host decision
+above supersedes older pending-review/pilot language. No model
 calls, private-root discovery or private validation occurred in this session.
 
 The v3 validator requires executed coverage, no public assertion overlap and
@@ -72,219 +72,90 @@ checks without publishing names. Existing changed records require explicit
 `--rebaseline RECORD_ID` review. See the [corpus instructions](../tests/eval/fixtures/corpus/README.md).
 Sanitized replay expectations do not certify the original run's access audit.
 
-## Version 3 plugin mode — design only, 2026-10-25
+## Version 3 plugin mode — offline implementation, 2026-10-25
 
-The user approved the [v3 direction](../docs/handoff/2026-10-25-v3-direction.md)
-after stopping v2 harness recovery. This section specifies future work; the
-current runner still implements the v1/v2 external contract/verifier loop.
-It does not implement plugin mode, hook-question replies or v3 accounting.
-Nothing here changes the current CLI, schemas, frozen populations or reports.
-[Task design](tasks-v3/DESIGN.md) covers 54 independent candidates, 63 work sessions,
-and a 20-task human-review sample. A and H3 are the full comparisons; B is
-dropped and C optional. Historical v2 recovery entries are not authorization
-to resume that abandoned experiment.
+`mode=plugin` (or `harness=true`, `control_backend=codex_cli` with `plugin`
+configuration) selects installed hooks. Historical configurations keep the
+legacy runner loop. The plugin path never invokes controller/verifier itself
+and adds no application repair loop or infrastructure retry. The frozen
+[task design](tasks-v3/DESIGN.md) still defines clarification and review policy.
 
-### Runtime installation and execution
+Each task retains A's isolated workspace, Codex home and linked `auth.json`.
+The runner invokes `plugin/install.py --codex-home HOME --project WORKSPACE`
+with its Python interpreter, pins source/config/installation inventories, and
+preserves the `.local-harness-maker` marker through session start. H3 exec and
+resume use `--dangerously-bypass-hook-trust`, enable hooks, load the isolated
+home configuration, and set `HARNESS_PYTHON` to the runner interpreter while
+removing `HARNESS_NESTED` from copied environments. A keeps its zero-byte guard.
+The flag, environment policy and observed CLI version are retained per segment.
+No personal configuration or authentication bytes are copied into reports.
 
-For each task, create an isolated public workspace and task-runtime Codex home.
-In H3 install the pinned plugin build into that home using the plugin's supported
-installer, with gpt-6-luna low and the frozen pricing snapshot configured.
-Retain plugin source/build/config hashes and an installation inventory. Use
-the supported login mechanism on the host; never copy auth.json or derive an
-HTTP key from CLI login. No installation or model probe is performed in this
-offline design session. A gets the same runtime, model, effort, tier, deadlines,
-initial task prompts and supported credentials, with LocalHarnessMaker disabled
-and no unrelated plugins in either arm.
+After each executor process group exits, `plugin/segment-N/` captures the entire
+`.localharness/v3/` root. The native `thread.started.thread_id` selects
+`sessions/<sha256(session_id)>/`. Raw captures and redacted review copies are
+hash-pinned in existing report artifacts. `plugin-index.json` binds sessions,
+stages, requirements/completion/ledger hashes, clarification observations,
+workspace exit hash and missing pre-repair revision evidence. The runner checks
+frozen schemas, relative paths/hashes, prompt/session/row/call correspondence,
+enabled pins, native Luna generation and child-thread evidence, unchanged
+installation, immutable evidence and accounting prefixes across resumes.
+Missing, disabled, malformed or inconsistent treatment is invalid before grading.
 
-Launch `codex exec` exactly as for A: Sol medium, workspace-write sandbox,
-`--json` capture and retained last-message output. H3's hooks do the work inside
-that execution. The runner must not additionally call controller contract,
-verifier judge/check or handoff, inject a requirements table, or run the legacy
-harness orchestration. Existing `harness=true` selects that old path today;
-it must never be treated as sufficient to run H3. Future mode selection needs
-implementation against the approved contract, without changing existing CLI
-flags in this design job.
+All captured bytes are audited as observed output, alongside native tool
+streams and normalized control accounting fragments. Raw hashes remain
+available when redaction changes review bytes. Only audit-clean exited work
+enters fresh trusted grading copies. Table provenance is an observation chain
+from installed source, native generation/thread and immutable captures; it does
+not establish OS write isolation from a hostile executor.
 
-Use copied child environments. A keeps HARNESS_NESTED=1 and plugins disabled.
-H3's top-level executor has HARNESS_NESTED unset so hooks run; plugin-owned
-Luna/nested Codex children still have the exact guard HARNESS_NESTED=1. Retain
-effective environment policy evidence without secrets. Preserve parent/home
-configuration outside the task runtime. This intentional top-level exception
-to the legacy runner guard requires the approved v3 AGENTS.md contract; it is
-not a change to the guard's exact-string behavior. A compatibility probe must
-prove the installed CLI fires the production hooks under exec and resume,
-honors trust/configuration, and does not recursively invoke them. An old
-startup-only probe is insufficient.
+`luna-calls.jsonl` supplies every actual call, including failed or extra calls.
+The runner reconciles native models, tokens, allocations and phase references,
+checks per-request context bounds, validates recorded controller-price totals,
+and reprices the observed tier from the pinned eval catalog. Unknown accounting
+stays null. Luna native threads are excluded from Sol usage/settings, avoiding
+double billing. `pricing-provenance.json` retains exact phases and both price
+references. The unchanged report enum uses `purpose=contract` for requirements
+and `purpose=judge` for claim audit as accounting labels only; no historical
+contract generation or `llm_judge` operation runs. One requirements plus one
+claim-audit call is allowed per completed native session, shared by clarification,
+repair and bookkeeping continuations.
 
-SessionStart checks the model pin and snapshot. Missing/mismatched model,
-plugin, CLI or pricing identity cannot silently become A, a different model,
-or a hidden cloud fallback. Retain the advisory and costs; mark an H3 treatment
-not actually applied as infrastructure-invalid, not a passing H3 trial. Hook
-timeouts, malformed/missing required artifacts or missing control evidence
-likewise fail the treatment/audit checks. A normal deterministic check failure
-or an audit-clean executor failure remains a valid quality sample.
+For ambiguity tasks, only a valid pending table with native provenance and an
+unchanged application workspace can trigger a reply. Configure
+`plugin.responders[TASK_ID]` with `matcher` and `reply` paths relative to the
+already frozen private snapshot. This explicit mapping avoids assuming its
+undocumented directory layout; full-v3-h3 leaves it empty for host completion.
+Matcher JSON contains `version` and 1–128 `phrase_pairs`, each a pair of subject
+and choice-axis strings. Normalize NFKC/case/whitespace; require an unanswered
+interrogative question matching both phrases. Read the fixed UTF-8 reply file
+verbatim and send it once through `codex exec resume SESSION_ID -`, retaining
+the table hash, question locator/text/result, matcher version/hash, reply hash
+and delivery time. Generic questions, assertions, stale/lookalike tables and A
+receive no note. No eligible reply leaves an unresolved, invalid H3 pause.
+Before full execution Claude must map the existing frozen responder files and
+verify their format without changing the private snapshot. The current plugin
+accepts explicit JSON `answers` messages; host smoke must confirm the frozen
+verbatim notes fit that protocol. The runner never wraps or invents an answer.
+Ambiguity results disclose this information advantage separately, as in DESIGN.
 
-### Question response in noninteractive runs
+Day 2 starts a fresh session in the same workspace/home with only `day2.md`.
+The runner supplies no memory or ledger text. Retain both days' artifact hashes
+and observe the real `HARNESS_LEDGER` user/developer context before tools in
+native day-2 evidence, bound to day 1's ledger. Revalidation may change the
+hook-owned validation block; decisions/requirements must agree. Missing native
+injection evidence makes handoff incomplete/invalid. Application attempts count
+sessions plus the hook's recorded repairs, excluding clarification segments and
+ledger-only continuations; the hashed index supports this runtime invariant.
 
-Use the question-only pause protocol in
-[DESIGN.md](tasks-v3/DESIGN.md#clarification-protocol-and-disclosed-asymmetry).
-After the first process exits, inspect only the current, provenance-bound hook
-table's open questions. Apply the frozen deterministic subject/choice matcher.
-An eligible question earns exactly the prewritten author note, delivered
-verbatim through `codex exec resume` as a user message in the same session.
-No eligible hook question means no note. Retain question/table/reply hashes,
-timing, session/segment IDs and responder decision evidence. Author-note data
-contains no grader source, oracle cases or private paths. The plugin must skip
-its completion Luna call at a question-only pause and reuse the first table on
-resume; it spends its second Luna call only at work completion.
-
-A has no hook, so no hook question can be detected and no note is delivered,
-including when A's executor prose asks a question. H3 prose alone is also
-ineligible. There is at most one note/resume per ambiguous task, without new
-model matching calls. A wrong assumption fails that policy's hidden checks;
-a correct guess can pass. Disclose this information asymmetry and split the
-nine ambiguous tasks from ordinary single-session results. Before coding this
-mode, Role 1/2 must confirm pause/resume and artifact provenance in the plugin
-contract; no ad hoc artifact filenames, hook fields or response flags are
-introduced here.
-
-### Artifact collection, access audit and pricing
-
-The authoritative locations and schemas of the requirements table, completion
-report, decision ledger and Luna-call accounting JSONL are the v3 plugin
-artifact contract in [AGENTS.md](../AGENTS.md) and its referenced schemas.
-Resolve every location from that contract; do not duplicate exact paths in
-runner design or infer them from arbitrary workspace files. Record the contract
-revision/hash. Artifact observation must distinguish hook-owned writes from
-executor-created lookalikes and reject aliases, path escapes, stale sessions,
-partial writes and hash changes after collection.
-
-Retain both exec JSON streams and complete native session/tool records for all
-resumes and hook/control children. After each process and all spawned work
-exit, collect the plugin artifact directory, raw accounting JSONL, advisories
-and deterministic check evidence into an immutable evidence copy with hashes.
-Pin report/check/workspace revision relationships, including any pre-retry
-snapshots; do not call a cached first report a new final audit. A public-only
-snapshot may be pinned while the executor is paused at Stop, but no graders
-are added or run until the executor and all children exit. If the plugin
-cannot supply that revision, report accuracy for the earlier audit is missing,
-not inferred from the final workspace. Audit artifacts,
-tool arguments/results and hook/control logs for grader access under STOP-E4,
-using the same canonical paths, aliases, denied-attempt and inconclusive rules
-as other executor evidence. Prose path mentions alone are not access. Audit
-before trusted grading and publication; raw private-path findings are retained
-securely and any public redaction must preserve provenance hashes.
-
-Only audit-clean exited work is copied to a fresh trusted grading copy, then
-graders are added. Never execute/resume Codex in a grading copy. Missing or
-unsupported captures, unresolved accesses or observed grader access invalidate
-the task and aggregate; a clean audit establishes observed cleanliness only.
-Artifact contents, Luna inputs and question replies never receive graders.
-
-Price every Luna call from the contract's accounting JSONL, using its actual
-model, transport, tier and token counts and the hash-pinned existing snapshot
-`openai-fast-short-2026-10-23-v1` in `eval/prices.yaml` for the draft priority
-scenario. Verify model and tier against captured native evidence, session and
-call IDs, request bounds, complete terminal accounting and totals. Cached
-input is a subset of total input; price uncached input separately. Include
-failed calls and any observed unexpected retry/fallback in cost and protocol
-deviation evidence; do not omit them to fit the two-call design. Missing usage,
-unknown model/tier/rates or an out-of-snapshot request context stays null with
-a reason. Do not price CLI login at zero or count reasoning output twice.
-
-Reconcile JSONL with retained hook/control invocations. Each actual Luna call
-appears once in task calls/costs; do not also charge the same nested native
-rollout as an executor call. Sum executor segments plus Luna usage once,
-including invalid trials and extra continuations. Two calls per completed work
-session is the protocol (table, claim audit); early failures may have fewer,
-with missing expected stages diagnosed. There is no model retry, regeneration,
-LLM judge or automatic transport fallback in H3. At most one executable-failure
-retry per session is permitted, by the plugin Stop hook. No retry on opinion,
-unverifiable evidence or hidden grading; never let the runner add another.
-The second Stop reuses the Luna audit and updates deterministic evidence without
-a third Luna call, exposing report age and final check outcomes.
-
-### Day-2 ledger delivery and reporting
-
-After day 1, pin the executor-authored, plugin-validated ledger and the ordinary
-workspace. Use a new Codex session on day 2 with the same task runtime's home
-and retained public workspace. H3's SessionStart injects the validated ledger;
-the runner supplies only the new day-2 prompt. It does not summarize day 1,
-append a ledger, call a handoff generator or resume the day-1 conversation.
-A gets retained code/files and a fresh session with the same day-2 prompt,
-without plugin injection or a runner memory. No hidden day-1 grading feedback
-reaches either arm.
-
-Retain the day-1 ledger SHA-256, the plugin's day-2 load/validation/injection
-receipt with the same hash, and the day-2 SessionStart capture before tools
-run. Also pin day-2 output ledger separately. Hash equality proves which bytes
-were delivered; it does not prove semantic use. Record behavioral preservation
-through hidden day-1/day-2 requirements and retain the no-restatement prompt
-hashes. Missing delivery evidence makes handoff observation incomplete rather
-than silently dropping the task. Ledger and routine continuation Sol tokens
-remain in executor usage, even though they are not Luna calls.
-
-Record requirements-table and completion-report files, ledgers, accounting,
-injection receipts, clarification evidence and an eval-owned artifact index via
-the current task `artifacts` path/SHA-256 references. Existing segment, calls,
-cost, audit and handoff fields keep their published meanings. Do not populate
-legacy contract/verdict fields with incompatible v3 objects. The artifact index
-binds task, session, stage, workspace revision, plugin/contract revision and
-raw hashes. Human-review annotations/metrics are a separately pinned sidecar
-using these references, not additions to the report's fixed metrics keys.
-If a future implementation cannot represent required evidence under the
-published report contract, escalate to Role 1 before writing that change.
-
-Human review follows the preregistered 20-task plan in DESIGN.md: table
-precision plus coverage, completion accuracy against hidden per-requirement
-grading, artifact missingness, false passes/fails and reviewer agreement.
-Review both sessions of sampled two-session tasks. Score cached pre-retry
-reports against the workspace version actually reviewed and disclose staleness.
-A's absent user-facing artifacts are not applicable, not zero precision or
-accuracy. Task-level false-done still comes from each configuration's retained
-final executor message, using identical extraction rules, not from H3's report.
-
-### Draft templates and STOP-3
-
-[A template](configs/full-v3-a.yaml) and [H3 template](configs/full-v3-h3.yaml)
-are deliberately wrapped design documents with the complete ordered 54-task
-candidate list, unresolved version/build pins and `draft_not_approved` status. The existing
-strict loader rejects both; do not unwrap H3 and launch the legacy harness.
-They do not approve calls. Estimates are separate drafts:
-[A](reports/full-v3-a-estimate.md), [H3](reports/full-v3-h3-estimate.md).
-No current run/estimate gate is modified or tested as implemented plugin mode.
-
-For the authored unfrozen population, let N=54, D=9, S=N+D=63 logical work
-sessions, Q<=9 eligible clarification resumes, and R<=S one-check-failure retries. A budgets S=63 executor workloads
-and no controls. H3 budgets S+Q+R<=135 executor workloads and 2S=126 Luna
-calls, or 261 combined budget units. Before clarification/retry reserves its
-count is 3S=189. An internal Stop continuation may stay in one exec process;
-the retry reserve bounds its extra Sol workload without charging native token
-usage twice. Clarification resumes are extra segments of existing sessions,
-not extra sessions entitled to more Luna calls. Routine ledger writing is
-included in each executor workload assumption; revise if observed usage does
-not fit. Multi-request exec workloads are planning units, not a claim to count
-provider requests as individual processes.
-
-At the existing offline Fast snapshot, an assumed executor workload of 20k
-uncached + 10k cached input and 4k output costs $0.162; a Luna workload of 20k
-uncached + 2k cached and 4k output costs $0.008040. A's scenario is $10.206;
-H3's all-reserves scenario is $22.883040. These are not hard token/spend caps
-or measurements. Revise estimates from an approved disjoint pilot, pin actual
-task selection and all versions, and report/obtain STOP-3 approval before any
-batch of ten or more calls. Infrastructure restarts, extra question turns,
-additional model calls or budget changes need a new bound and approval; there
-is no automatic recovery/retry beyond the single deterministic retry.
-
-### Assumptions
-
-- Role 1's concurrent v3 artifact contract, Role 2's production hook probe and
-  supported installation are implementation prerequisites, not measured here.
-- Single-retry continuation, question pause and ledger continuation reuse the
-  logical session; only the two scheduled hook stages call Luna.
-- Counts, deadlines, token workloads and Fast tier are draft design choices.
-  The current user request authorizes offline candidate authoring and trusted
-  validation. Live execution, task freeze and spending remain unauthorized.
+The [H3 estimate](reports/full-v3-h3-estimate.md) is matched by the existing
+loader/STOP-3 gate: 63 sessions, up to nine clarification resumes, 63 repairs and
+126 Luna calls, or 261 workload units ($22.883040 Fast token scenario). Workload
+units do not bound provider request counts or dollars. The configuration is
+reviewable and runnable by the host; its template status and full-run spending
+approval remain pending. No live plugin installation, model call, private-root
+access or host compatibility claim was made in this sandbox. Run
+`.venv/bin/python -m pytest tests/eval -q`; Claude still runs the real smoke and
+the repository suite before merge.
 
 ## Executor transport outages
 
