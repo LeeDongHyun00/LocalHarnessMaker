@@ -312,6 +312,81 @@ def test_claim_hashes_and_stale_audit(v3: tuple[Path, Path], bad_hash: bool) -> 
     assert second["claim_audit"]["audited_final_message"] == first["claim_audit"]["audited_final_message"]
 
 
+@pytest.mark.parametrize("source", ["report", "supplied", "sidecar"])
+@pytest.mark.parametrize("changed_final", [False, True])
+@pytest.mark.parametrize("bad_hash", [False, True])
+def test_round_two_retains_audit(
+    v3: tuple[Path, Path], source: str, changed_final: bool, bad_hash: bool,
+) -> None:
+    workspace, root = v3
+    row = make_row("file_exists")
+    row["check"]["path"] = "output.py"
+    write_table(root, [row])
+    audit_path = write_audit(root, bad_hash=bad_hash)
+    final = root / "evidence/final.txt"
+    calls = (root / "luna-calls.jsonl").read_bytes()
+    assert run(v3, claim_audit=audit_path if source == "report" else None,
+               final_message=final)["retry_warranted"]
+    first = report(root)
+    if source == "report":
+        # A later supplied replacement must not overwrite the verified original.
+        audit_path.write_text("malformed replacement")
+    elif source == "sidecar":
+        (root / "claim-audit.json").write_bytes(audit_path.read_bytes())
+    audit_bytes = audit_path.read_bytes()
+    sidecar = root / "claim-audit.json"
+    sidecar_bytes = sidecar.read_bytes() if sidecar.exists() else None
+    (workspace / "output.py").write_text("# repaired\n")
+    if changed_final:
+        final = root / "evidence/revised.txt"
+        final.write_text("Created output.py. R-1: completed health.")
+    supplied = audit_path if source in {"report", "supplied"} else None
+    assert run(v3, 2, claim_audit=supplied, final_message=final) == {
+        "overall": "pass", "failed_rows": [], "unverifiable_rows": [], "retry_warranted": False,
+    }
+    saved = report(root)
+    audit = saved["claim_audit"]
+    assert audit["status"] == ("stale" if changed_final else "complete")
+    assert audit["audited_final_message"]["sha256"] == digest(b"R-1: completed health.")
+    assert reference(root, audit["audited_final_message"]) == b"R-1: completed health."
+    assert audit["luna_call"] == {"path": "luna-calls.jsonl", "call_id": "audit-1"}
+    claim = audit["claims"][0]
+    assert claim["assessment"] == ("unsupported" if bad_hash else "supported")
+    assert len(claim["cited_evidence"]) == (0 if bad_hash else 1)
+    if source == "report":
+        assert audit["claims"] == first["claim_audit"]["claims"]
+    assert saved["retry"] == first["retry"]
+    # Later bookkeeping Stop events preserve citation results and recompute freshness.
+    run(v3, 2, final_message=root / "evidence/final.txt")
+    refreshed = report(root)["claim_audit"]
+    assert refreshed["status"] == "complete"
+    assert refreshed["claims"] == audit["claims"]
+    assert refreshed["audited_final_message"] == audit["audited_final_message"]
+    assert (root / "luna-calls.jsonl").read_bytes() == calls
+    assert audit_path.read_bytes() == audit_bytes
+    if sidecar_bytes is not None:
+        assert sidecar.read_bytes() == sidecar_bytes
+
+
+def test_round_two_without_audit_stays_unavailable(v3: tuple[Path, Path]) -> None:
+    workspace, root = v3
+    row = make_row("file_exists")
+    row["check"]["path"] = "output.py"
+    write_table(root, [row])
+    final = root / "evidence/final.txt"
+    final.write_text("Created output.py.")
+    calls = (root / "luna-calls.jsonl").read_bytes()
+    assert run(v3, final_message=final)["retry_warranted"]
+    original = report(root)["claim_audit"]
+    (workspace / "output.py").write_text("# repaired\n")
+    assert run(v3, 2, final_message=final)["overall"] == "pass"
+    assert report(root)["claim_audit"] == original == {
+        "status": "unavailable", "audited_final_message": None, "claims": [],
+        "reason": "no claim audit supplied", "luna_call": None,
+    }
+    assert (root / "luna-calls.jsonl").read_bytes() == calls
+
+
 @pytest.mark.parametrize("mutation", ["escape", "unknown", "accounting", "excerpt", "missing"])
 def test_invented_claim_provenance(v3: tuple[Path, Path], mutation: str) -> None:
     _, root = v3
