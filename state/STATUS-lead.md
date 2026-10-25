@@ -197,3 +197,42 @@
 - The 05:55 KST approval, installed-CLI listing failure and six-second priority Luna probe are supplied host evidence, not independently measured here. The external evidence file and its user-referenced Role 2 history digest were not available as a verifiable observation in this checkout; no digest or native thread identity is invented.
 - Both examples are synthetic schema fixtures. Their existing enabled listing fields are retained to satisfy unchanged constraints and do not prove that probe-only enablement is implemented.
 - No PR is requested; this append supplies the change summary and Assumptions. The host owns full-suite validation, staging and committing after reviewing runtime integration.
+
+## 2026-10-25 r1-v3-005 Role 1
+
+### Done
+
+- Published docs/eval-freeze-v3.md in the v2 record format with the supplied Claude host freeze, exact complete-snapshot digest, 54 tasks/six shapes/nine two-session/18 domains, attributed validation, skipped pilot, clarification asymmetry and post-freeze restrictions (python3 inline documentation audit: PASS, matching digest in freeze/plan, six shapes total 54 tasks and nine two-session, all local links resolve).
+- Updated docs/plan.md for the 10/25 freeze, full A/calibration on 10/25–10/27, live smoke and runner plugin-mode gates by 11/03, H3 on 11/04–11/08, paired comparison/final evaluation by 11/13 and presentation 11/16; H3 stays not approved pending plugin mode and passing host smoke (.venv/bin/python -m pytest tests/lead -q: 171 passed in 22.60s).
+- Verified the existing schema/example set without changing interfaces (make validate-schemas: Validated 11 draft 2020-12 schemas and 14 examples).
+
+### Remaining
+
+- Role 5/host runs full A on the frozen population with native settings, STOP-E4 audits and complete accounting; it doubles as calibration, with any difficulty-target miss disclosed rather than corrected by task selection. Report a call/cost estimate before ten or more paid calls.
+- Roles 2–5 complete independent non-evaluation hook smoke and actual plugin mode, including question interaction, pin/accounting, repair and ledger sequencing; keep H3 not approved until plugin mode exists and host smoke passes. Host/evaluator must reconcile their frozen config/artifact checkout with the older draft evaluator files present here.
+- Run H3, paired comparison and human sample, separately report ambiguity and ambiguity-excluded results, and deliver the final evaluation by 11/13. Carry forward r1-pin-observed-001 and History / Remaining installation, compatibility, full-suite-before-merge, demo, documentation and presentation work; this publication does not certify live acceptance.
+
+### Decisions
+
+- Publish the supplied later host freeze despite stale evaluator draft files in this checkout: the user explicitly supplies the authoritative 10/25 host digest and freeze; evaluator-owned files stay untouched.
+- Apply decision 0008 to the new design: no hook, controller or verifier change may use frozen v3 results; outcome-informed revisions require a new held-out population.
+- Record the evaluator's skipped pilot and hook-mediated ambiguity advantage: full A is calibration evidence and the nine ambiguous tasks require separate and excluded-stratum reporting.
+- Append this ordinary publication job without refreshing Current state: only a consolidation job may rewrite that block.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/lead -q (171 passed in 22.60s).
+- make validate-schemas (11 draft 2020-12 schemas and 14 examples validated).
+- python3 inline digest/inventory/local-link documentation audit (PASS).
+- git diff --check -- docs/eval-freeze-v3.md docs/plan.md state/STATUS-lead.md (exit 0, no output).
+
+### Do not touch
+
+- All runtime packages, eval/, private graders/snapshots, other-role tests/STATUS, schemas, root configuration, docs/weekly, docs/handoff and docs/evaluation. No staging, commits, deletion, history rewriting, external configuration changes, network, paid/nested model calls or sub-agents.
+- Earlier STATUS sections and frozen v1/v2 records/results; no interface changes or outcome-informed v3 tuning.
+
+### Assumptions
+
+- Claude's host review/freeze, digest computation and configuration selection are supplied evidence, not private-snapshot recomputation or evaluator-file synchronization by this session. No freeze commit is inferred.
+- The 10/25–10/27 full A window is a planning target; later H3/analysis deadlines preserve the existing schedule. No run, spending approval or measured runtime follows from these dates.
+- No PR is requested. This status and the final report supply the change summary and Assumptions; the host owns full-suite-before-merge validation and a future documentation-only commit.
