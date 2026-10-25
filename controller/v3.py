@@ -19,6 +19,7 @@ from controller.generation import read_text, schema_validator, validate_input
 from controller.settings import PACKAGE_DIR, load_object
 from controller.v3_checks import confined, derive_check, digest, source_clause
 from controller.v3_client import MODEL, IdentityUnobserved, PinMismatch, PinnedLunaClient, call_error
+from controller.v3_prompts import select_prompt
 from controller.v3_wire import CLAIMS, REQUIREMENTS, validate_requirements_output
 
 logger = logging.getLogger(__name__)
@@ -297,7 +298,8 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
         if not _audit_validator().is_valid(previous):
             raise InputError("existing claim audit is invalid")
         return output, 2 if previous["status"] == "unavailable" else 0
-    call_id = f"{phase}-1"
+    prompt_version, system_prompt = select_prompt(phase)
+    call_id = f"{phase}-{prompt_version}-1"
     try:
         _, prices, pricing_ref = _pin(directory, session_id)
         if phase == "claim_audit" and (not text.strip() or requirements["state"] == "unavailable"):
@@ -327,8 +329,7 @@ def _run_locked(phase: str, session_id: str, directory: Path, workspace: Path, o
                   "usd": None, "pricing_ref": pricing_ref, "cost_basis": "api_equivalent_usd"}
         try:
             messages: list[Message] = [
-                {"role": "system", "content": read_text(PACKAGE_DIR / "prompts" / (
-                    "requirements-v1.md" if phase == "requirements" else "claim-audit-v1.md"))},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": json.dumps(inputs, ensure_ascii=False)},
             ]
             value = client.generate(wire, messages)

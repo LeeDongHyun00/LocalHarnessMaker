@@ -27,5 +27,13 @@ Host preview (no calls):
 Host live measurement requires a current verified `pin-check.json`, `--live`
 and `--i-have-approval`. The preview reports 40 calls and estimated USD 0.048
 per phase (both phases: 80 calls / USD 0.096, not caps). Live targets and model
-accuracy remain unmeasured. `--predictions FILE` scores previously collected
-private-adapter outputs keyed by fixture ID without provider access.
+accuracy for prompt v2 remain unmeasured. `--predictions FILE` scores previously
+collected private-adapter outputs keyed by fixture ID without provider access.
+
+Prompt v2 is now the default. Use `--prompt-version v1` for the unchanged prior
+prompts or `--prompt-version v2` for the revised prompts; this overrides
+`HARNESS_LUNA_PROMPT_VERSION`. Live/mocked reports include prompt version and
+SHA-256. Saved predictions have unknown prompt metadata unless the caller
+explicitly declares it with `--prompt-version`. Do not label v1 predictions v2.
+The 2026-10-25 supplied host v1 run and its prediction-level mismatch analysis
+are recorded in `controller/evidence/2026-10-25-v3-prompt-v1-analysis.md`.

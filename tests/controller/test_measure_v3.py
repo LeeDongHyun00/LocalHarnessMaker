@@ -81,11 +81,20 @@ def test_score_saved_predictions_has_no_model_quality_claim(tmp_path: Path) -> N
     result = load_object(output)
     assert result["measurement"] == "supplied_predictions"
     assert result["model"] is None and result["total_usd"] is None and result["calls"] == []
+    assert result["prompt_version"] is None and result["prompt_sha256"] is None
 
 
 @pytest.mark.parametrize("phase", ["requirements", "claim_audit"])
-def test_mocked_measurement_both_phases_are_schema_valid(phase: str) -> None:
+@pytest.mark.parametrize("version", [None, "v1", "v2"])
+def test_mocked_measurement_both_phases_are_schema_valid(
+    phase: str, version: str | None, monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from controller.backends.base import Usage
+    from controller.v3_checks import digest
+    from controller.v3_prompts import PROMPT_VERSION_ENV, select_prompt
+
+    monkeypatch.delenv(PROMPT_VERSION_ENV, raising=False)
+    selected, system_prompt = select_prompt(phase, version)
 
     cases, predictions = gold(phase)
     next_case = iter(cases)
@@ -102,18 +111,36 @@ def test_mocked_measurement_both_phases_are_schema_valid(phase: str) -> None:
             value = predictions[case["id"]]
             Draft202012Validator(schema).validate(value)
             assert "expected_rows" not in messages[1]["content"]
+            assert messages[0]["content"] == system_prompt
             return value
 
         def usage(self) -> Usage:
             return Usage(100, 50, .000035, .1, 0)
 
-    result = measure(phase, client_factory=Client)
+    result = measure(phase, client_factory=Client, prompt_version=version)
+    assert result["prompt_version"] == selected == (version or "v2")
+    assert result["prompt_sha256"] == digest(system_prompt.encode())
     assert result["schema_valid"] == invoked == len(result["calls"]) == 40
     assert all(call["status"] == "success" and call["model"] == "gpt-6-luna"
                and call["error"] is None for call in result["calls"])
     for metric in result["metrics"].values():
         assert metric["precision"] == metric["recall"] == 1
     assert result["total_usd"] == pytest.approx(40 * .000035)
+
+
+def test_saved_predictions_version_is_explicit_metadata(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from controller.v3_prompts import PROMPT_VERSION_ENV
+
+    monkeypatch.setenv(PROMPT_VERSION_ENV, "v2")
+    _, predictions = gold("requirements")
+    source = tmp_path / "predictions.json"
+    source.write_text(json.dumps(predictions))
+    output = tmp_path / "score.json"
+    assert main(["--phase", "requirements", "--prompt-version", "v1", "--predictions", str(source),
+                 "--out", str(output)]) == 0
+    result = load_object(output)
+    assert result["prompt_version"] == "v1" and len(result["prompt_sha256"]) == 64
+    assert result["calls"] == [] and result["model"] is None
 
 
 @pytest.mark.parametrize("model,status", [(None, "identity_unobserved"), ("other", "pin_mismatch")])
