@@ -155,3 +155,18 @@ Verification: `.venv/bin/python -m pytest tests/controller -q`.
 - This implementation exposes the requested primary CLI transport; historical
   HTTP fallback is not inherited. Live timing, price/pin evidence compatibility,
   hook integration and quality targets require host verification.
+
+Controller process diagnostics can be enabled by setting
+`HARNESS_CONTROLLER_TRACE` to an existing writable file location (the file itself
+may be new). Each flushed JSONL record includes a UTC timestamp and a step:
+argument parsing, artifact validation, pin loading, pricing comparison,
+executable resolution, child start/exit, exceptions and final exit. Child records
+include argv, environment keys set by the controller, elapsed seconds, exit code
+and captured stdout/stderr byte counts. Prompt text and provider streams are
+excluded; home paths are redacted except for the executable. Exception messages
+from pin/executable checks are retained with path redaction; messages that could
+contain request or provider data use a redacted stage message with the exception
+type. An unwritable trace destination does not change command behavior. Every
+nonzero CLI return emits a direct `controller:` stderr line and flushes logging
+handlers and stderr. A host rerun is required to diagnose the reported hook-only
+failure; tracing cannot intercept process termination by an uncatchable signal.
