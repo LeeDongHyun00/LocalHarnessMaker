@@ -6,5 +6,5 @@
   "two_session": true,
   "source": "hand_written",
   "version": 3,
-  "frozen": false
+  "frozen": true
 }

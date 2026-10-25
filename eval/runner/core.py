@@ -124,8 +124,11 @@ def load_config(path: Path) -> dict[str, Any]:
     config = json.loads(path.read_text())
     required = {"name", "model", "reasoning_effort", "harness", "control_backend", "reinstruction_limit",
                 "retry_limit", "seed", "codex_version", "tasks", "timeout_seconds", "grading_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population", "task_root", "service_tier", "calibration"} != required:
+    if not isinstance(config, dict) or set(config) - {"task_timeout_seconds", "static_template_dir", "task_population", "task_root", "service_tier", "calibration", "task_set_sha256"} != required:
         raise ValueError("Config must contain exactly the documented baseline fields")
+    if "task_set_sha256" in config and (not isinstance(config["task_set_sha256"], str) or
+            not re.fullmatch(r"[0-9a-f]{64}", config["task_set_sha256"])):
+        raise ValueError("task_set_sha256 must be a host-filled SHA-256 digest")
     if type(config.get("calibration", False)) is not bool:
         raise ValueError("calibration must be boolean")
     if type(config["harness"]) is not bool:
@@ -184,6 +187,9 @@ def task_directory(config: dict[str, Any]) -> Path:
 def configured_digest(private_by_task: dict[str, PrivateGraders], config: dict[str, Any]) -> str:
     """Keep the historical v1 digest byte-for-byte compatible."""
     root = config.get("task_root", "eval/tasks")
+    if root == "eval/tasks-v3":
+        from eval.runner.frozen_v3 import taskset_digest_v3
+        return taskset_digest_v3(private_by_task)
     return taskset_digest(private_by_task) if root == "eval/tasks" else taskset_digest(private_by_task, root)
 
 
@@ -386,6 +392,8 @@ def run(
                 raise ValueError("Population includes unfrozen task")
             population[task] = PrivateGraders.load(private_root, task, REPOSITORY, task_root=config.get("task_root"))
     task_set_hash = configured_digest(population, config) if "task_population" in config else selected_hash
+    if "task_set_sha256" in config and config["task_set_sha256"] != task_set_hash:
+        raise ValueError("Task inputs differ from the pinned frozen digest")
     # A private root must never appear in config or public task inputs.
     for task, private in private_by_task.items():
         public = task_directory(config) / task
