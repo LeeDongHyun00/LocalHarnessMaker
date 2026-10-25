@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import re
 
-OUTER = {'SessionStart': 10, 'UserPromptSubmit': 40, 'Stop': 660}
+OUTER = {'SessionStart': 10, 'UserPromptSubmit': 60, 'Stop': 660}
 CALLS = {('controller', 'contract'): ('CONTRACT', 30),
          ('verifier', 'check'): ('VERIFY', 480),
          ('controller', 'handoff'): ('HANDOFF', 120),

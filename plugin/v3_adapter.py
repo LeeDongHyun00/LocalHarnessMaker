@@ -4,12 +4,28 @@ from __future__ import annotations
 import importlib
 import os
 from pathlib import Path
+import pwd
 import sys
 import time
 from typing import Any, Callable
 
-from plugin.artifacts import ROOT
 from plugin.hooks._process import run_group
+
+
+# Resolve from this installed module, independently of cwd and schema lookup roots.
+RUNTIME_ROOT = Path(__file__).resolve().parents[1]
+
+
+def redact_home(text: str) -> str:
+    for home in sorted({str(Path.home()), pwd.getpwuid(os.getuid()).pw_dir, os.environ.get('HOME', ''),
+                        os.environ.get('CODEX_HOME', '')}, key=len, reverse=True):
+        if home and home != '/':
+            text = text.replace(home, '<HOME>')
+    return text
+
+
+class CallFailure(RuntimeError):
+    """A retained subprocess failure that the hook can surface without blocking."""
 
 
 class Adapter:
@@ -17,6 +33,7 @@ class Adapter:
         self.runner = runner
         self.deadline = time.monotonic() + budget
         self.seconds = 0.0
+        self.on_failure: Callable[[dict[str, Any]], None] | None = None
 
     def call(self, module: str, operation: str, *, session_id: str, directory: Path,
              workspace: Path | None = None, prompt: Path | None = None,
@@ -30,19 +47,38 @@ class Adapter:
             if value is not None:
                 args += [flag, str(value)]
         command = [os.environ.get('HARNESS_PYTHON', sys.executable), '-m', module, operation, *args]
-        timeout = min(12 if module == 'controller' else 480 if operation == 'check' else 2,
+        timeout = min(30 if module == 'controller' else 480 if operation == 'check' else 2,
                       self.deadline - time.monotonic())
         if timeout <= 0:
-            raise TimeoutError('hook cumulative deadline exhausted')
+            detail = self.failure(module, operation, None, 'hook cumulative deadline exhausted')
+            raise CallFailure(detail)
         started = time.monotonic()
         try:
-            result = self.runner(command, cwd=ROOT, env={**os.environ, 'HARNESS_NESTED': '1'},
+            result = self.runner(command, cwd=RUNTIME_ROOT, env={**os.environ, 'HARNESS_NESTED': '1'},
                                  shell=False, text=True, capture_output=True, check=False, timeout=timeout)
+        except Exception as exc:
+            stderr = getattr(exc, 'stderr', '') or ''
+            if isinstance(stderr, bytes):
+                stderr = stderr.decode(errors='replace')
+            self.failure(module, operation, None, stderr or str(exc))
+            raise CallFailure(redact_home(f'{module} {operation}: {type(exc).__name__}: {exc}').splitlines()[0]) from exc
         finally:
             self.seconds += time.monotonic() - started
-        if result.returncode and not (operation == 'ledger-validate' and result.returncode == 1):
-            raise RuntimeError(f'{module} {operation} exited {result.returncode}: {result.stderr[-1000:]}')
+        if result.returncode:
+            detail = self.failure(module, operation, result.returncode, result.stderr or '')
+            if not (operation == 'ledger-validate' and result.returncode == 1):
+                raise CallFailure(detail)
+
         return result
+
+    def failure(self, module: str, operation: str, exit_code: int | None, stderr: str) -> str:
+        tail = redact_home(stderr)[-1000:]
+        record = {'module': module, 'operation': operation, 'exit_code': exit_code,
+                  'stderr_tail': tail}
+        if self.on_failure is not None:
+            self.on_failure(record)
+        first = tail.splitlines()[0] if tail else '(no stderr)'
+        return f'{module} {operation} exited {exit_code}: {first}'
 
     def repair_text(self, requirements: dict[str, Any], report: dict[str, Any],
                     failed_rows: list[str]) -> str:

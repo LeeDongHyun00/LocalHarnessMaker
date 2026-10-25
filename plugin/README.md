@@ -38,6 +38,50 @@ Controller/verifier children receive that value in a copied environment.
 Direct host demos remove it. No v3 hook calls contract, handoff, judge,
 `llm_judge`, fallback, regeneration, or an automatic effort change.
 
+## Host prerequisites and failure diagnostics
+
+The first v3 scratch-project smoke on 2026-10-25 (codex-cli
+0.163.0-alpha.11.1, host findings supplied by the operator) found that
+noninteractive `codex exec` silently skipped untrusted `hooks.json`. Interactive
+Codex asks the user to trust hooks. For an isolated noninteractive home without
+recorded trust, review its hook commands and launch with
+`CODEX_HOME=/ISOLATED/CODEX_HOME codex --dangerously-bypass-hook-trust exec ...`.
+The compatibility probe uses this flag too; it grants permission for that
+invocation and does not establish persisted trust. `install.py --check` attempts
+bounded, non-generating app-server `hooks/list` discovery for the selected home,
+reports the matching `hooks.json` trust status when available, and otherwise
+prints the required flag. Project trust alone does not authorize hooks.
+
+An isolated Codex home also needs a login. The same smoke returned HTTP 401
+until `auth.json` was linked. Install with
+`.venv/bin/python -m plugin.install --codex-home /ISOLATED/CODEX_HOME --project /PROJECT --link-auth /LOGGED_IN/CODEX_HOME`
+(or pass the existing `auth.json` path). This creates a symlink, reads no
+credential contents, refuses to replace a different existing login, and is
+idempotent. `--check` reports a missing or broken `auth.json` as an installation
+failure. Do not include login files or their contents in evidence exports.
+
+The plain `.local-harness-maker` opt-in file must survive project cleanups.
+Installation adds its filename to the repository's local `.git/info/exclude`
+(including a linked worktree's common Git directory); it never edits a tracked
+`.gitignore`. Ordinary `git clean -fd` then preserves the ignored marker;
+`git clean -fdx` includes ignored files, so preserve or recreate the marker
+explicitly when using that option. Non-Git projects keep the marker without an
+exclude file.
+
+V3 controller and verifier subprocesses run from the installed package root,
+which contains `controller/`, `verifier/` and `plugin/`. Controller calls have a
+30-second deadline for a measured 5–10-second Luna call plus Codex startup
+margin. UserPromptSubmit has a 60-second outer timeout (55-second internal
+budget); Stop retains its 660-second outer and 650-second cumulative internal
+budget. These deadlines do not change the 10-second model-call target.
+
+Failed subprocesses append `module`, `operation`, `exit_code` and `stderr_tail`
+to `hook-state.json` under `call_failures`. Stderr is home-path redacted and
+limited to its last 1000 characters; the first retained line is surfaced in
+additional context. A startup/timeout failure has `exit_code=null`. This is
+plugin-owned diagnostic state, not a successful completion artifact or an
+extra retry. A verifier's invalid-ledger exit 1 is retained too.
+
 ## Pin preflight and installation
 
 ```sh
@@ -207,7 +251,7 @@ HOME="$trial_root/home" CODEX_HOME="$trial_root/codex-home" \
 Both targets are explicit. Installation copies controller, verifier, schemas,
 hooks, skill and project instructions into the targets, so runtime imports and
 data do not require the checkout. Keep the selected Python environment at its
-installed path. No credential is copied. Inputs, configuration, bounded integer
+installed path. No credential is copied; `--link-auth` optionally links an existing login. Inputs, configuration, bounded integer
 timeouts, source files and destination paths are validated before any target
 write. File updates use temporary files and atomic replacement. An interrupted
 installation can be repaired by rerunning the same command. Reruns replace our
@@ -279,7 +323,7 @@ closure and nested process cleanup remain host verification checks.
 | Handoff generation | HARNESS_HANDOFF_TIMEOUT | 120 |
 | Handoff validation | HARNESS_VALIDATE_TIMEOUT | 5 |
 | SessionStart hook | HARNESS_SESSIONSTART_TIMEOUT | 10 |
-| UserPromptSubmit hook | HARNESS_USERPROMPTSUBMIT_TIMEOUT | 40 |
+| UserPromptSubmit hook | HARNESS_USERPROMPTSUBMIT_TIMEOUT | 60 |
 | Stop hook | HARNESS_STOP_TIMEOUT | 660 |
 
 Outer timeouts are resolved into hooks.json as JSON integers at installation or
@@ -296,7 +340,7 @@ its 450-second internal budget (`HARNESS_VERIFY_BUDGET_SECONDS`); its plugin
 caller allows 480 seconds. The contract path is a user-approved exception to
 "callers outlast callees": the controller's per-call Codex deadline is now
 35 seconds (commit `0d57e36`), but the plugin cuts the contract call off at
-30 seconds inside the 40-second hook. The controller cannot reach its 35-second
+30 seconds inside the 60-second hook. The controller cannot reach its 35-second
 deadline and perform deadline-triggered fallback on that path. Other callers
 outlast their callee budgets. Contract calls log latency; hooks log elapsed and
 CLI time. Real latency and nested shutdown require host verification.

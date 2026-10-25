@@ -245,7 +245,7 @@
 ### Done
 
 - Added listing-first pin evidence, bounded models/app-server fallback with initialized notification, and exact-version Luna observation fallback; enabled artifacts carry model_evidence and empty reason_codes; explicit missing-model listings still disable the pin (.venv/bin/python -m pytest tests/plugin -q: 320 passed, 1 opt-in real Codex test skipped in 30.56s).
-- Recorded the supplied 0.163.0-alpha.11.1 observation: gpt-6-luna, priority, thread 01a16ee8-a276-7c23-bd00-0fbe69a816a3, native timestamp 2026-10-24T17:15:04.670Z; read the external verbatim report without writing there (shasum -a 256 /Users/donghyunlee/Desktop/LocalHarnessMaker/codex-bridge/report-copies/luna-pin-probe-2026-10-25.txt: da10b7331103114c67ff3d26e21e95f54e51aca7faaed888b12cc4e434bf11c2).
+- Recorded the supplied 0.163.0-alpha.11.1 observation: gpt-6-luna, priority, thread 01a16ee8-a276-7c23-bd00-0fbe69a816a3, native timestamp 2026-10-24T17:15:04.670Z; read the external verbatim report without writing there (shasum -a 256 codex-bridge/report-copies/luna-pin-probe-2026-10-25.txt: da10b7331103114c67ff3d26e21e95f54e51aca7faaed888b12cc4e434bf11c2).
 - Added local amended-schema validation for pin and lifecycle tests, covering listing evidence, observation fallback, wrong version, model mismatch, malformed observation, listing precedence and retained snapshot hashes; documented operator probe/registration and controller per-call identity enforcement (.venv/bin/python -m pytest tests/plugin -q: 320 passed, 1 skipped in 30.56s; git diff --check -- plugin tests/plugin state/STATUS-plugin.md: exit 0).
 
 ### Remaining
@@ -264,7 +264,7 @@
 
 - .venv/bin/python -m pytest tests/plugin -q
 - git diff --check -- plugin tests/plugin state/STATUS-plugin.md
-- shasum -a 256 /Users/donghyunlee/Desktop/LocalHarnessMaker/codex-bridge/report-copies/luna-pin-probe-2026-10-25.txt
+- shasum -a 256 codex-bridge/report-copies/luna-pin-probe-2026-10-25.txt
 
 ### Do not touch
 
@@ -276,3 +276,46 @@
 - Use the native thread_settings_applied timestamp for observed_at: 2026-10-24T17:15:04.670Z is 2026-10-25 in Asia/Seoul and avoids inventing an observation time from the report's date heading.
 - The supplied host probe is accepted as read-only host evidence; this job verifies its file hash and offline behavior only. The controller's actual per-call identity enforcement remains Role 3-owned.
 - Production validation uses the installed shared schema without a compatibility bypass; Role 1's amendment must accompany deployment. No PR, staging or commit was requested; carry these assumptions into any later PR description.
+
+## 2026-10-25 r2-v3-004 Role 2
+
+### Done
+
+- Documented the supplied scratch-smoke hook-trust/login prerequisites in plugin/README.md and plugin/HOST-CHECKS.md; installer --check now reports home-scoped hooks/list trust statuses or the explicit noninteractive bypass flag, and missing/broken auth.json (.venv/bin/python -m pytest tests/plugin -q: 345 passed, 1 opt-in live Codex test skipped in 24.25s).
+- Added idempotent --link-auth FROM for an existing auth file or Codex home without reading/copying credentials or replacing a different login; installation appends the opt-in marker only to Git-local info/exclude, including common metadata for linked worktrees, and preserves tracked .gitignore (.venv/bin/python -m pytest tests/plugin -q: 345 passed, 1 skipped; installer fixtures cover missing login, source rejection, symlink/idempotence, normal Git and linked-worktree exclusion).
+- Anchored adapter cwd to its installed module's package root, raised controller calls to 30 seconds and UserPromptSubmit to 60 seconds with 55 seconds internally; retained Stop's 660-second outer/650-second cumulative budget (.venv/bin/python -m pytest tests/plugin -q: 345 passed, 1 skipped; source/copy cwd and deadline regressions passed).
+- Retained failed controller/verifier exit codes and redacted stderr tails of at most 1000 characters in hook-state.json call_failures; surfaced first retained lines in additional context across requirements, check, audit and ledger handling without another repair/audit slot (.venv/bin/python -m pytest tests/plugin -q: 345 passed, 1 skipped; nonzero exits, timeout/null exit, invalid-ledger and redaction regressions passed).
+- Confirmed installed CLI protocol fields offline: hooks/list uses cwds and returns data entries with sourcePath/trustStatus, including managed/trusted/untrusted/modified (HARNESS_NESTED=1 /Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex app-server generate-json-schema --out /private/tmp/lhm-r2-v3-004-protocol: exit 0; generated v2/HooksListParams.json and v2/HooksListResponse.json inspected; PATH-alias permission warning only).
+
+### Remaining
+
+- Carry forward r2-v3-003 / Remaining: coordinate shared decision 0012/schema availability and Roles 3/4 integration before deployment; no shared paths were changed here.
+- Reinstall into an isolated host home with --link-auth, review hook trust or use the explicit noninteractive flag, then rerun two non-evaluation v3 smokes; verify actual hooks/list discovery, failure artifacts, ledger injection, latency and accounting. No new live H3 acceptance is claimed.
+- Carry forward retained trust/bundle/silence host captures and coordinate the full repository suite once before merge; only tests/plugin ran in this session.
+
+### Decisions
+
+- Use the installed adapter module's parent as cwd: it is stable in both checkout and installed snapshot and independent of schema-resource roots.
+- Probe hooks/list with the selected CODEX_HOME and project, bounded to five seconds without a thread/model call: unsupported, malformed, failed or inconclusive discovery must print the operator flag instead of guessing trust.
+- Record subprocess diagnostics in plugin-owned state and surface them through existing additionalContext: completion schemas and frozen controller/verifier CLIs remain unchanged.
+- Preserve invalid-ledger exit 1 as a diagnostic while retaining its nonexceptional validation semantics: bookkeeping remains single-use and fail-open.
+- Exclude the opt-in filename in repository-local Git metadata: ordinary clean preserves it; clean with -x still requires explicit operator preservation or recreation.
+
+### Verify commands
+
+- .venv/bin/python -m pytest tests/plugin -q (345 passed, 1 opt-in real Codex test skipped in 24.25s).
+- git diff --check -- plugin tests/plugin state/STATUS-plugin.md (exit 0).
+- HARNESS_NESTED=1 /Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex app-server generate-json-schema --out /private/tmp/lhm-r2-v3-004-protocol (exit 0; local schema generation only).
+
+### Do not touch
+
+- controller/, verifier/, eval/, schemas/, docs/, root configuration and other roles' STATUS files; this job edits only plugin/, tests/plugin/ and state/STATUS-plugin.md.
+- .git is read-only: do not stage or commit. Installer exclusion behavior was exercised only against temporary fixture Git directories; this worktree's Git metadata was not edited.
+- Preserve historical evidence, exact nested zero-byte guards, copied child environments and frozen hook/CLI schemas; do not infer host acceptance from mocked subprocess tests.
+
+### Assumptions
+
+- The user's five supplied 2026-10-25 smoke findings authorize these installer options, deadlines and diagnostic changes; no new shared interface approval is needed.
+- --link-auth accepts a login file or its containing Codex home; missing/broken auth.json makes --check fail. Existing conflicting login files are preserved and rejected before installation writes.
+- Live hooks/list availability is not established by local schema generation or mocked responses; discovery falls back visibly when unavailable. Schema generation invoked no executor/model session or network request.
+- No PR, staging or commit was performed. Carry these assumptions into any later PR description; host smokes and full-suite merge checks remain pending.

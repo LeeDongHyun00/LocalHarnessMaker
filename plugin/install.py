@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import shlex
 import shutil
+import subprocess
 import sys
 import tomllib
 from typing import Any
@@ -121,7 +122,97 @@ def check_install(home: Path, project: Path) -> bool:
     if not (home / 'skills/harness/SKILL.md').is_file():
         print('Skill missing', file=sys.stderr)
         valid = False
+    if not (home / 'auth.json').is_file():
+        print('auth.json missing: log in or install with --link-auth FROM', file=sys.stderr)
+        valid = False
     return valid
+
+
+def hook_trust(home: Path, project: Path, executable: str | None) -> None:
+    """Read app-server hook discovery when supported; never grant trust."""
+    statuses: list[str] = []
+    if executable:
+        from plugin.hooks._process import run_group
+        messages = [
+            {'id': 1, 'method': 'initialize', 'params': {
+                'clientInfo': {'name': 'localharness-install-check', 'version': '3'}}},
+            {'method': 'initialized', 'params': {}},
+            {'id': 2, 'method': 'hooks/list', 'params': {'cwds': [str(project)]}},
+        ]
+        try:
+            result = run_group([executable, 'app-server'],
+                input=''.join(json.dumps(m) + '\n' for m in messages),
+                cwd=project if project.is_dir() else home.parent,
+                env={**os.environ, 'CODEX_HOME': str(home), 'HARNESS_NESTED': '1'},
+                capture_output=True, text=True, timeout=5, check=False, shell=False)
+            if result.returncode != 0:
+                raise ValueError('hook discovery failed')
+            replies = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+            listings = [r['result'] for r in replies if r.get('id') == 2 and 'result' in r]
+            if len(listings) != 1:
+                raise ValueError('hook discovery unavailable')
+
+            entries = listings[0]['data']
+            if not isinstance(entries, list):
+                raise ValueError('unsupported hook discovery')
+            for entry in entries:
+                if Path(entry['cwd']).resolve() != project or entry['errors']:
+                    raise ValueError('hook discovery incomplete or wrong project')
+                for hook in entry['hooks']:
+                    if Path(hook['sourcePath']).resolve() == (home / 'hooks.json').resolve():
+                        status = hook['trustStatus']
+                        if status not in ('managed', 'trusted', 'untrusted', 'modified'):
+                            raise ValueError('unknown hook trust status')
+                        statuses.append(status)
+        except (OSError, ValueError, KeyError, TypeError, AttributeError, TimeoutError, subprocess.TimeoutExpired):
+            statuses = []
+    if statuses:
+        print('Hook trust for CODEX_HOME: ' + ', '.join(sorted(set(statuses))), file=sys.stderr)
+    else:
+        print('Hook trust for CODEX_HOME: unknown (CLI discovery unavailable or unsupported).', file=sys.stderr)
+    if not statuses or any(status not in ('trusted', 'managed') for status in statuses):
+        print('Noninteractive runs: pass --dangerously-bypass-hook-trust after reviewing hooks.json; '
+              'interactive Codex asks you to trust hooks.', file=sys.stderr)
+
+
+def marker_exclude(project: Path) -> Path | None:
+    """Find Git's local exclude file, including linked worktrees and subprojects."""
+    for root in (project, *project.parents):
+        dotgit = root / '.git'
+        if dotgit.is_dir():
+            gitdir = dotgit.resolve()
+        elif dotgit.is_file():
+            text = dotgit.read_text().strip()
+            if not text.startswith('gitdir: '):
+                raise ValueError('invalid project .git file')
+            gitdir = (root / text[8:]).resolve()
+        else:
+            continue
+        common = gitdir / 'commondir'
+        if common.is_file():
+            gitdir = (gitdir / common.read_text().strip()).resolve()
+        target = gitdir / 'info/exclude'
+        if target.is_symlink() or target.parent.is_symlink():
+            raise ValueError('Git exclude symlink is unsupported')
+        return target
+    return None
+
+
+def auth_source(source: Path | None, home: Path) -> Path | None:
+    """Accept an auth file or its Codex home without reading credential contents."""
+    if source is None:
+        return None
+    source = source.expanduser()
+    if source.is_dir():
+        source = source / 'auth.json'
+    source = source.resolve(strict=True)
+    if not source.is_file() or source == home / 'auth.json':
+        raise ValueError('--link-auth requires an external auth.json file or Codex home')
+    target = home / 'auth.json'
+    if target.exists() or target.is_symlink():
+        if not target.is_symlink() or target.resolve() != source:
+            raise ValueError('auth.json already exists; refusing to replace login')
+    return source
 
 
 def enabled_config(path: Path) -> bytes:
@@ -186,8 +277,14 @@ def plan_install(home: Path, project: Path) -> dict[Path, bytes]:
     plan[home / 'hooks.json'] = (json.dumps(existing, indent=2) + '\n').encode()
     manifest = {'timeouts': {event: wanted['hooks'][event][0]['hooks'][0]['timeout'] for event in EVENTS}}
     plan[snapshot / 'install.json'] = (json.dumps(manifest, indent=2) + '\n').encode()
+    exclude = marker_exclude(project)
+    if exclude is not None:
+        previous = exclude.read_bytes() if exclude.exists() else b''
+        if b'.local-harness-maker' not in previous.splitlines():
+            plan[exclude] = previous + (b'\n' if previous and not previous.endswith(b'\n') else b'') + b'.local-harness-maker\n'
     for target in plan:
-        boundary = home if target.is_relative_to(home) else project
+        # Git-local metadata may be outside a linked worktree; validate its own directory.
+        boundary = exclude.parent if target == exclude else home if target.is_relative_to(home) else project
         if not target.resolve().is_relative_to(boundary):
             raise ValueError(f'target symlink escapes installation: {target}')
         for parent in (target, *target.parents):
@@ -203,8 +300,13 @@ def main() -> int:
     parser.add_argument('--codex-home', required=True, type=Path)
     parser.add_argument('--project', required=True, type=Path)
     parser.add_argument('--check', action='store_true')
+    parser.add_argument('--link-auth', type=Path, metavar='FROM',
+                        help='symlink an existing auth.json (or Codex home) into the target home')
     args = parser.parse_args()
     home, project = args.codex_home.resolve(), args.project.resolve()
+    if args.check and args.link_auth is not None:
+        parser.error('--link-auth cannot be used with --check')
+    login = None if args.check else auth_source(args.link_auth, home)
     # Preflight does not run under --check: installed settings are authoritative.
     plan = None if args.check else plan_install(home, project)
     executable = resolve_codex()
@@ -235,6 +337,7 @@ def main() -> int:
             print(f'Codex version probe failed: {exc}', file=sys.stderr)
     if args.check:
         installed_ok = check_install(home, project)
+        hook_trust(home, project, executable)
         pin_ok = True
         if os.environ.get('HARNESS_INTERFACE_VERSION') != '2':
             import tempfile
@@ -259,6 +362,8 @@ def main() -> int:
         temporary = target.with_name(f'.{target.name}.{uuid4().hex}.tmp')
         temporary.write_bytes(data)
         temporary.replace(target)
+    if login is not None and not (home / 'auth.json').is_symlink():
+        (home / 'auth.json').symlink_to(login)
     print(f'Installed LocalHarnessMaker: {home / "local-harness-maker"}')
     return 0
 
