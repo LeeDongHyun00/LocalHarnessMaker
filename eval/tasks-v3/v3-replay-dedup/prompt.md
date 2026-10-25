@@ -1,0 +1,12 @@
+Build the append/replay/compaction log in replay.py. Keep Log(path).append(record)
+->bool, replay()->dict, compact()->None and Corrupt(ValueError) with line and
+reason attributes. Files are UTF-8 JSONL. No concurrent writers are required.
+
+RD1. Ordinary records have exactly id, key, op and (only for op='put') value. id/key are nonempty strings, op is put/delete, value is JSON. append validates before touching the file; invalid records raise ValueError('record'). New ids append one newline-terminated JSON record and return True. Repeating the same id with identical canonical JSON as defined in RD3 (independent of dictionary order) returns False without writing; same id with different content raises ValueError('id conflict').
+RD2. replay processes file order, last put wins per key; delete removes it, including a missing key. An identical repeated id is ignored even if intervening records changed the key. Distinct ids may replace or recreate a deleted key. Missing files replay as {} without being created. Return a detached snapshot.
+RD3. compact validates the whole old log before publication, then atomically replaces it with one checkpoint line containing exactly checkpoint:1, seen, live. live is the replay map; seen maps every historical id to SHA-256 of its original record's UTF-8 canonical JSON (sort_keys=True, separators=(',',':'), ensure_ascii=False). This preserves old-id dedup and conflicts after tombstones/compaction. A checkpoint is accepted only on line 1 and must have dict seen/live; appending after it follows the ordinary format. Repeated compact preserves replay and seen data.
+RD4. Invalid JSON (including blank lines) raises Corrupt(line,'json'); wrong record/checkpoint shape raises Corrupt(line,'shape'); a conflicting repeated id on disk raises Corrupt(line,'id conflict'). line is 1-based; str(error) is exactly 'line N: REASON'. A failed replay/append/compact leaves old bytes unchanged; never skip corrupt records.
+RD5. A failed compaction replacement must preserve the original and remove its temporary sibling. Add FORMAT.md explaining put, delete, id conflict, checkpoint, and the canonical hashing options, with one fenced json example for each ordinary op. Both examples must append/replay successfully with different ids on the same key.
+
+Use Python 3.11+ and only the standard library. Preserve the stated APIs.
+Run `python -m unittest discover -s . -p "test_*.py" -v` from workspace/.
