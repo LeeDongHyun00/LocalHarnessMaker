@@ -54,6 +54,8 @@ A second batch added four stress probes after the first results came back clean:
 
 ## 3. Results (54 runs, 2026-10-26)
 
+Raw results: docs/handoff/probe-runs/mac-b1, mac-b2 and mac-r3smoke (see the README there).
+
 18 probes x 3 repeats, all valid: no service error, no audit hit, no compaction, no language drift; every run on medium, Standard, codex-cli 0.164.0-alpha.11.1. The two batches overlapped and finished 8 minutes after the first started (42 runs in 7.5 minutes, 12 in 3), using 8.0M input tokens (mostly cached) and 0.10M output tokens.
 
 | Weakness | Probes | Seen |

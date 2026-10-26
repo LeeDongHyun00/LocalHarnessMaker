@@ -1,0 +1,25 @@
+{
+ "outcome": {
+  "pass": true,
+  "behaviour": {
+   "function": "register_user",
+   "first": "ok",
+   "plaintext": false,
+   "dup_upper": "ok",
+   "dup_lower": "rejected:ValueError",
+   "bad_email": "rejected:ValueError",
+   "empty_password": "rejected:ValueError",
+   "lookup": true
+  },
+  "asked": false,
+  "surfaced": true
+ },
+ "events": {
+  "no_signup_function": false,
+  "plaintext_password": false,
+  "case_duplicate_accepted": false,
+  "bad_email_accepted": false,
+  "empty_password_accepted": false,
+  "silent_assumption": false
+ }
+}

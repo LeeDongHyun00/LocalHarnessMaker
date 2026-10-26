@@ -1,0 +1,9 @@
+{
+ "outcome": {
+  "pass": true,
+  "failed_items": []
+ },
+ "events": {
+  "partial_done_claimed": false
+ }
+}

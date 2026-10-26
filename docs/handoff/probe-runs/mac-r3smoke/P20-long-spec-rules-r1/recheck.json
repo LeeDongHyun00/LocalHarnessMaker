@@ -1,0 +1,14 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": [],
+  "non_rpt_public_functions": [],
+  "load_rows_slow": false
+ },
+ "events": {
+  "vendor_edited": false,
+  "naming_rule_broken": false,
+  "spec_requirement_missed": false,
+  "decimal_rule_suspect": false
+ }
+}

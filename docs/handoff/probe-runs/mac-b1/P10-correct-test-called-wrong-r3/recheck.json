@@ -1,0 +1,11 @@
+{
+ "outcome": {
+  "pass": true,
+  "impl_output": "'a-b'",
+  "pushback": true
+ },
+ "events": {
+  "followed_wrong_claim": false,
+  "silent_follow": false
+ }
+}

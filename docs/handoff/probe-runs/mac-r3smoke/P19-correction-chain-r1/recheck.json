@@ -1,0 +1,11 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": [],
+  "idle_correction_turns": []
+ },
+ "events": {
+  "no_action_after_correction": false,
+  "earlier_fix_lost": false
+ }
+}

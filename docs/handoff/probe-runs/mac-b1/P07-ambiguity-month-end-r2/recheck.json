@@ -1,0 +1,13 @@
+{
+ "outcome": {
+  "pass": true,
+  "behaviour": {
+   "jan31_plus_1": "2025-02-28"
+  },
+  "asked": false,
+  "surfaced": true
+ },
+ "events": {
+  "silent_assumption": false
+ }
+}

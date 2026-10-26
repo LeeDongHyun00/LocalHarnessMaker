@@ -1,0 +1,77 @@
+{
+ "probe": "P07-ambiguity-month-end",
+ "rep": 1,
+ "group": "ambiguity",
+ "status": "done",
+ "thread_id": "01a1742a-bb02-7e63-8f22-ac271a5f5551",
+ "init_rev": "56787c99324b5ff73041edf1c52310cfbccadec5",
+ "wall_s": 31.0,
+ "turns": [
+  {
+   "thread_id": "01a1742a-bb02-7e63-8f22-ac271a5f5551",
+   "completed": true,
+   "usage": {
+    "input_tokens": 59900,
+    "cached_input_tokens": 54400,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 855,
+    "reasoning_output_tokens": 37
+   },
+   "errors": [],
+   "action_calls": 4,
+   "other_items": 0,
+   "commands": [
+    "/bin/zsh -lc \"pwd; rg --files -g 'AGENTS.md' -g '*billing*' -g '*test*' -g 'pyproject.toml' -g 'README*'\"",
+    "/bin/zsh -lc 'ls -la; cat billing.py test_billing.py; find .. -name AGENTS.md -print'",
+    "/bin/zsh -lc 'python3 -m unittest -v'"
+   ],
+   "failed_cmds": 0,
+   "file_changes": [
+    "~/sol-probe-ws/b1/P07-ambiguity-month-end-r1/ws/billing.py",
+    "~/sol-probe-ws/b1/P07-ambiguity-month-end-r1/ws/test_billing.py"
+   ],
+   "final": "`billing.py`의 `next_billing_date`를 구현했습니다.\n\n- 가입일 기준으로 `months`개월 뒤 날짜를 반환합니다.\n- 대상 월에 해당 일이 없으면 말일로 보정합니다.\n- 윤년, 연도 변경 등을 포함한 테스트 5개가 모두 통과했습니다.",
+   "wall_s": 30.9,
+   "exit": 0,
+   "retries": 0,
+   "kind": "scripted",
+   "user": "billing.py의 next_billing_date를 구현해줘. 가입일(start)로부터 months개월 뒤 결제일을 돌려주면 돼.",
+   "tool_calls": 4,
+   "promise_then_stop": false,
+   "ended_with_question": false
+  }
+ ],
+ "lazy_continues": 0,
+ "check": {
+  "outcome": {
+   "pass": true,
+   "behaviour": {
+    "jan31_plus_1": "2025-02-28"
+   },
+   "asked": false,
+   "surfaced": true
+  },
+  "events": {
+   "silent_assumption": false
+  }
+ },
+ "rollout": {
+  "compactions": 0,
+  "efforts": [
+   "medium"
+  ],
+  "models": [
+   "gpt-6.1-sol"
+  ],
+  "service_tiers": [],
+  "cli_version": "0.164.0-alpha.11.1"
+ },
+ "generic": {
+  "promise_then_stop_turns": [],
+  "question_turns": [],
+  "han_chars": 0,
+  "audit_hits": [],
+  "tokens_in": 59900,
+  "tokens_out": 855
+ }
+}

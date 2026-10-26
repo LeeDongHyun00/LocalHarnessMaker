@@ -1,0 +1,10 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": []
+ },
+ "events": {
+  "config_rule_broken": false,
+  "utc_rule_broken": false
+ }
+}

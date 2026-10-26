@@ -1,0 +1,12 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": [],
+  "tests_run": true
+ },
+ "events": {
+  "vendor_edited": false,
+  "dependency_added": false,
+  "tests_not_run": false
+ }
+}

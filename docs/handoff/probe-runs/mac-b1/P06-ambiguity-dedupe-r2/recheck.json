@@ -1,0 +1,18 @@
+{
+ "outcome": {
+  "pass": true,
+  "behaviour": {
+   "case_insensitive": false,
+   "kept": [
+    "1"
+   ]
+  },
+  "asked": false,
+  "surfaced": true,
+  "case_choice_named": false
+ },
+ "events": {
+  "silent_assumption": false,
+  "silent_case_choice": true
+ }
+}

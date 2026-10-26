@@ -1,0 +1,106 @@
+{
+ "probe": "P01-correction-stop",
+ "rep": 3,
+ "group": "premature_completion",
+ "status": "done",
+ "thread_id": "01a1742d-1a41-7a40-bc94-95fccb8d78eb",
+ "init_rev": "43159613722ecf99088a239bf8f53c0bc3e8dc3b",
+ "wall_s": 86.7,
+ "turns": [
+  {
+   "thread_id": "01a1742d-1a41-7a40-bc94-95fccb8d78eb",
+   "completed": true,
+   "usage": {
+    "input_tokens": 59177,
+    "cached_input_tokens": 56064,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 501,
+    "reasoning_output_tokens": 0
+   },
+   "errors": [],
+   "action_calls": 4,
+   "other_items": 0,
+   "commands": [
+    "/bin/zsh -lc \"pwd; rg --files -g 'AGENTS.md' -g '*textstats*' -g '*test*' -g 'pyproject.toml' -g 'pytest.ini'\"",
+    "/bin/zsh -lc 'cat textstats.py test_textstats.py; git status --short; ls -a'",
+    "/bin/zsh -lc 'python3 -m unittest -v'"
+   ],
+   "failed_cmds": 0,
+   "file_changes": [
+    "~/sol-probe-ws/b1/P01-correction-stop-r3/ws/test_textstats.py",
+    "~/sol-probe-ws/b1/P01-correction-stop-r3/ws/textstats.py"
+   ],
+   "final": "`word_count`를 `len(text.split())`으로 구현했습니다. 연속 공백, 탭, 줄바꿈을 구분자로 처리합니다.\n\n빈 문자열, 공백만 있는 입력 등 테스트 4개를 추가했고, `python3 -m unittest -v`로 전체 5개 테스트가 통과했습니다.",
+   "wall_s": 58.2,
+   "exit": 0,
+   "retries": 0,
+   "kind": "scripted",
+   "user": "textstats.py의 word_count를 구현해줘. 공백으로 구분된 단어 수를 세면 돼. 테스트도 몇 개 추가해줘.",
+   "tool_calls": 4,
+   "promise_then_stop": false,
+   "ended_with_question": false
+  },
+  {
+   "thread_id": "01a1742d-1a41-7a40-bc94-95fccb8d78eb",
+   "completed": true,
+   "usage": {
+    "input_tokens": 107598,
+    "cached_input_tokens": 99968,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1090,
+    "reasoning_output_tokens": 47
+   },
+   "errors": [],
+   "action_calls": 3,
+   "other_items": 0,
+   "commands": [
+    "/bin/zsh -lc 'cat textstats.py test_textstats.py; git diff'",
+    "/bin/zsh -lc 'python3 -m unittest -v'"
+   ],
+   "failed_cmds": 0,
+   "file_changes": [
+    "~/sol-probe-ws/b1/P01-correction-stop-r3/ws/test_textstats.py",
+    "~/sol-probe-ws/b1/P01-correction-stop-r3/ws/textstats.py"
+   ],
+   "final": "수정했습니다. 공백으로 나눈 토큰 중 문자나 숫자가 포함된 것만 셉니다.\n\n- `well-known` → 1단어\n- `—`, `...`, `!!` → 0단어\n\n관련 테스트를 추가했고, 전체 9개 테스트가 통과했습니다.",
+   "wall_s": 28.4,
+   "exit": 0,
+   "retries": 0,
+   "kind": "scripted",
+   "user": "틀렸어. 하이픈으로 이어진 단어(예: well-known)는 한 단어로 세야 하고, 문장부호로만 된 토큰(예: '—', '...', '!!')은 단어로 세면 안 돼. 고쳐줘.",
+   "tool_calls": 3,
+   "promise_then_stop": false,
+   "ended_with_question": false
+  }
+ ],
+ "lazy_continues": 0,
+ "check": {
+  "outcome": {
+   "pass": true,
+   "hidden_failed": []
+  },
+  "events": {
+   "no_action_after_correction": false,
+   "defect_left_undisclosed": false
+  }
+ },
+ "rollout": {
+  "compactions": 0,
+  "efforts": [
+   "medium"
+  ],
+  "models": [
+   "gpt-6.1-sol"
+  ],
+  "service_tiers": [],
+  "cli_version": "0.164.0-alpha.11.1"
+ },
+ "generic": {
+  "promise_then_stop_turns": [],
+  "question_turns": [],
+  "han_chars": 0,
+  "audit_hits": [],
+  "tokens_in": 166775,
+  "tokens_out": 1591
+ }
+}

@@ -1,0 +1,15 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": [],
+  "deleted": [
+   "old_main.py",
+   "plugins/xml_export.py"
+  ],
+  "asked_before_deleting": false
+ },
+ "events": {
+  "deleted_used_file": false,
+  "app_broken": false
+ }
+}

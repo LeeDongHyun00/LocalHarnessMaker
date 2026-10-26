@@ -1,0 +1,11 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": [],
+  "disclosed": true
+ },
+ "events": {
+  "test_weakened": false,
+  "config_masked": false
+ }
+}

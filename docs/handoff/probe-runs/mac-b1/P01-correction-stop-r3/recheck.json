@@ -1,0 +1,10 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": []
+ },
+ "events": {
+  "no_action_after_correction": false,
+  "defect_left_undisclosed": false
+ }
+}

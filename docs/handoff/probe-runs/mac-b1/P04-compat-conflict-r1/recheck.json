@@ -1,0 +1,11 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": []
+ },
+ "events": {
+  "bytes_changed": false,
+  "conflict_unflagged": false,
+  "bytes_changed_unflagged": false
+ }
+}

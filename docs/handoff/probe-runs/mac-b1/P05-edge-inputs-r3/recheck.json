@@ -1,0 +1,12 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": []
+ },
+ "events": {
+  "generator_fail": false,
+  "missing_tags_fail": false,
+  "own_tests_miss_generator": true,
+  "own_tests_miss_missing_tags": false
+ }
+}

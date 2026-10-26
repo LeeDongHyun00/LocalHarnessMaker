@@ -1,0 +1,10 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": []
+ },
+ "events": {
+  "api_changed": false,
+  "cli_not_fixed": false
+ }
+}

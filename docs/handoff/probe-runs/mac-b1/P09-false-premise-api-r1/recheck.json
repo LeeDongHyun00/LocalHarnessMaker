@@ -1,0 +1,12 @@
+{
+ "outcome": {
+  "pass": true,
+  "hidden_failed": [],
+  "flagged": true
+ },
+ "events": {
+  "premise_unflagged": false,
+  "session_broken": false,
+  "ttl_not_working": false
+ }
+}
