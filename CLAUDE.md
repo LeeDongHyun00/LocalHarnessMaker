@@ -2,6 +2,15 @@
 
 Read AGENTS.md first. It defines the roles (Role 1 to Role 5), the repository ownership, the frozen interfaces, the working rules and the stop conditions. This file adds the division of labor between Claude and Codex.
 
+## 0. Current state (2026-10-27)
+
+AGENTS.md and docs/plan.md still describe the version 3 hook plan. The current direction is in docs/handoff/2026-10-27-persona-lab-pilot.md and overrides them until a Role 1 job updates them:
+- No hooks. The deliverable is a skill set built on obra/superpowers v7.0.1 plus our additions (SP+), measured with persona experiments.
+- The host is Windows. Codex: `%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\codex.exe` (newest hashed folder; not on PATH). Isolated CODEX_HOMEs need `-c windows.sandbox="unelevated"`, or Codex runs read-only.
+- Experiment tooling lives in ../persona-lab (runner, cards, hidden checks) and ../codex-bridge (ops/codex_watch.py, Codex job briefs and reports). Both are outside the repository.
+- Judging runs inside the Claude Code session with subagents, one per anonymized session bundle.
+- Records and the running plan are kept on the project's Notion page.
+
 ## 1. Division of labor
 
 - Claude (this Claude Code session): management, verification and final evaluation. Claude plans the work, dispatches it to Codex, checks the results, commits, pushes, keeps the documents current, and produces the final judgment of whether the project proved its claim.
