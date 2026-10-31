@@ -15,13 +15,13 @@ LocalHarnessMaker is the research project behind **SP+**, a Codex plugin built o
 The plugin itself lives in **[LeeDongHyun00/superpowers-sp-plus](https://github.com/LeeDongHyun00/superpowers-sp-plus)**. This repository is the project's front page and keeps its design records.
 
 ```
-   ASK              AGREE             BUILD              CHECK              HAND OVER
-┌──────────┐    ┌───────────┐    ┌────────────┐    ┌──────────────┐    ┌──────────────┐
-│ a short  │───▶│ plan of 8 │───▶│ builds and │───▶│ against what │───▶│ stops before │
-│ request  │    │ lines max,│    │ notes the  │    │ you said the │    │ deploy, send,│
-│ in plain │    │ any "yes" │    │ plan in    │    │ result is for│    │ delete; lists│
-│ words    │    │ starts it │    │ AGENTS.md  │    │              │    │ its files    │
-└──────────┘    └───────────┘    └────────────┘    └──────────────┘    └──────────────┘
+    ASK           AGREE            BUILD          CHECK          HAND OVER
+┌─────────┐   ┌────────────┐   ┌───────────┐   ┌──────────┐   ┌─────────────┐
+│ a short │──▶│ plan of 8  │──▶│ builds,   │──▶│ against  │──▶│ stops at    │
+│ request │   │ lines; any │   │ keeps the │   │ the goal │   │ deploy or   │
+│         │   │ yes starts │   │ plan in   │   │ you gave │   │ delete;     │
+│         │   │ it         │   │ AGENTS.md │   │          │   │ lists files │
+└─────────┘   └────────────┘   └───────────┘   └──────────┘   └─────────────┘
 ```
 
 ## Contents
